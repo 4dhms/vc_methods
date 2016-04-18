@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+DELETE RECORD([Quota])
+ALL RECORDS([Quota])
+ARRAY REAL(arDutyRates;0)
+ARRAY TEXT(<>asCategory;0)
+ARRAY TEXT(asNames;0)
+SELECTION TO ARRAY([Quota]Category;<>asCategory;[Quota]Description;asNames;[Quota]DutyRate;arDutyRates)
+ORDER BY([Quota];[Quota]Category;>)
+OBJECT SET TITLE(bGo;"Add/Edit")
+FORM GOTO PAGE(1)

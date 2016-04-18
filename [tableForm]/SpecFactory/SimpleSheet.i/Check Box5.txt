@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (FORM Get current page=4)
+	cbRemove:=0
+Else 
+	
+	WinPrompt ("Double-click POM line below to delete.")
+	cbRemove:=1
+End if 

@@ -1,0 +1,145 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue;vfRemove)
+C_LONGINT($ordernumber;$i;$n)
+C_TEXT(vsPart12)
+
+ARRAY TEXT(asCPNumbers;0)
+ARRAY TEXT(asCPColorName;0)
+ARRAY TEXT(asSource;0)
+ARRAY TEXT(atDType;0)
+ARRAY LONGINT(alColorKey;0)
+
+If (asOrderNumbers{asOrderNumbers}="SG@")
+	$ordernumber:=-1*(Abs(Num(asOrderNumbers{asOrderNumbers})))
+Else 
+	$ordernumber:=Num(asOrderNumbers{asOrderNumbers})
+End if 
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$ordernumber)
+
+If (vfEdit)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+End if 
+  //DISTINCT VALUES([CP_OrderXRef]CPNumber;asCPNumbers)
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+vsPart3:=[CP_OrderXRef]CPType
+For ($i;1;Records in selection([CP_OrderXRef]))
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+	APPEND TO ARRAY(asCPNumbers;[CP_OrderXRef]CPNumber)
+	APPEND TO ARRAY(asCPColorName;[ColorPrintNumber]CPName)
+	APPEND TO ARRAY(atDType;[CP_OrderXRef]CPType)
+	APPEND TO ARRAY(alColorKey;[CP_OrderXRef]CPOrdID)
+	Case of 
+		: ([CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+			APPEND TO ARRAY(asSource;"THIS PO")
+		: ([CP_OrderXRef]FabOrderKey#0)
+			APPEND TO ARRAY(asSource;String([CP_OrderXRef]FabOrderKey))
+		Else 
+			APPEND TO ARRAY(asSource;"")
+	End case 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+
+Center Window (500;250;1;"")
+DIALOG("EditFabOrder")
+CLOSE WINDOW
+
+If (ok=1)
+	If (vsPart1="SG@")
+		vlOrderNumber:=-1*(Abs(Num(vsPart1)))
+	Else 
+		vlOrderNumber:=Abs(Num(vsPart1))
+	End if 
+	
+	  //Case of 
+	  //: (vsPart3="Combo@")
+	  //vsType:="Combo 1"
+	  //Else 
+	  //vsType:="Self"
+	  //End case 
+	
+	vsType:=asList17{asList17}
+	
+	Case of 
+		: (vfRemove)
+			vtChange:=""
+			vfEdit:=False
+			WinChoice ("Are you sure you want to remove these color/prints?")
+			If (ok=1)
+				$i:=1
+				For ($i;1;Size of array(asCPNumbers))
+					QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$ordernumber)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=asCPNumbers{$i})
+					
+					[CP_OrderXRef]FabOrderKey:=0
+					SAVE RECORD([CP_OrderXRef])
+					UNLOAD RECORD([CP_OrderXRef])
+				End for 
+				
+				QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$ordernumber)
+				[OrdersFabricXRef]FabricOrderKey:=0
+				SAVE RECORD([OrdersFabricXRef])
+				
+				FabPO_OrderArray 
+			End if 
+			  //: (vsPart2="")
+			  //  //by fabric
+			  //QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+			  //QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+			  //If (Records in selection([CP_OrderXRef])>0) & (vsType="Self")
+			  //WinChoice ("There are HMS Orders linked to this Fabric Order by color/print number. Do you want to reset those?")
+			  //If (ok=1)
+			  //APPLY TO SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey:=0)
+			  //End if 
+			  //End if 
+			  //
+			  //QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=vlOrderNumber)
+			  //QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType=vsType)
+			  //
+			  //If ([OrdersFabricXRef]FabricOrderKey#[FabricOrders]FabOrderKey) & ([OrdersFabricXRef]FabricOrderKey>0)
+			  //WinChoice ("This order is related to another Fabric Order. Do you want to move it?";"Yes";"No")
+			  //If (ok=1)
+			  //$continue:=True
+			  //End if 
+			  //Else 
+			  //$continue:=True
+			  //End if 
+			  //
+			  //If ($continue)
+			  //APPLY TO SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey:=[FabricOrders]FabOrderKey)
+			  //SAVE RECORD([OrdersFabricXRef])
+			  //FabPO_Populate (vlOrderNumber;"")
+			  //FabPO_Update 
+			
+			  //End if 
+			
+		Else 
+			  //by color/print
+			$n:=1
+			For ($n;1;Size of array(asCPNumbers))
+				If (vsPart12#"")
+					QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=vlOrderNumber)
+					[OrdersFabricXRef]Consumed:=Num(vsPart12)
+					SAVE RECORD([OrdersFabricXRef])
+				End if 
+				QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=vsType)
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=asCPNumbers{$n})
+				
+				[CP_OrderXRef]FabOrderKey:=[FabricOrders]FabOrderKey
+				SAVE RECORD([CP_OrderXRef])
+			End for 
+			
+			FabPO_Populate (vlOrderNumber)
+			  //FabPO_Update 
+	End case 
+End if 
+
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([Orders])
+

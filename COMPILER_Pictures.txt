@@ -1,0 +1,4 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_PICTURE(<>vxSketch;vxSketch;vxSketch1;vxSketch2;vxSketch3;vxSketch4;vxSketch5;vxSketch6;vxSketch7;vxSketch8)
+C_PICTURE(vxSketch9;vxSketch10;vxSketch11;vxSketch12;vxSketch13;vxSketch14;vxSketch15;vxSketch16;vxSketch17;vxSketch18;vxSketch20)
+C_PICTURE(vxTrash)

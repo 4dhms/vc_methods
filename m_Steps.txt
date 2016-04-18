@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSteps)
+
+Case of 
+	: (<>vlSteps=0)
+		<>vlSteps:=New process("Grade_StepWindow";0;"Steps")
+	Else 
+		SHOW PROCESS(<>vlSteps)
+		BRING TO FRONT(<>vlSteps)
+End case 

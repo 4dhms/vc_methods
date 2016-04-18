@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$order)
+
+$i:=1
+CREATE EMPTY SET([SpecLineCols];"Test")
+FIRST RECORD([SpecLineCols])
+For ($i;1;Records in selection([SpecLineCols]))
+	If ($i%200000=0)
+		ALERT(String($i))
+	End if 
+	QUERY([SpecSheetLines];[SpecSheetLines]SpecLineKey=[SpecLineCols]SpecLineKey)
+	If (Records in selection([SpecSheetLines])=0)
+		ADD TO SET([SpecLineCols];"Test")
+	End if 
+	NEXT RECORD([SpecLineCols])
+	If (Shift down)
+		TRACE
+	End if 
+End for 
+
+USE SET("Test")
+CLEAR SET("Test")
+
+ALERT("Done")

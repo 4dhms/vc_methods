@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($selfTest;$final;Header26)
+
+If (LISTBOX Get number of columns(afLogOn)=15)
+	LISTBOX DELETE COLUMN(afLogOn;8)
+Else 
+	ARRAY TEXT(atLOcolor;0)
+	
+	$i:=1
+	For ($i;1;Size of array(asColors))
+		$c:=Position(" ";asColors{$i})
+		$selfTest:=Substring(asColors{$i};1;$c-1)
+		Case of 
+			: (asColors{$i}="")
+				$final:=""
+			: (atChange{$i}="NS@") | (atChange{$i}="NC@") | (atChange{$i}="CC@")
+				Case of 
+					: (Position("-";$selfTest)>0)
+						$final:=$selfTest
+					Else 
+						vtStyleNo:=asStyleNumbers{$i}
+						$final:=LogOn_ColorGen (asColors{$i})  //;asColorCodes{$i})
+				End case 
+			Else 
+				$final:=""
+		End case 
+		APPEND TO ARRAY(atLOcolor;$final)
+	End for 
+	
+	
+	LISTBOX INSERT COLUMN(afLogOn;8;"LogOnColor";atLOcolor;"Color";Header26)
+	
+	  //DISABLE BUTTON(b20)
+End if 

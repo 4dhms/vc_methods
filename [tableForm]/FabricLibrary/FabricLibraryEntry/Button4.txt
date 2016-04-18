@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+DUPLICATE RECORD([FabricLibrary])
+[FabricLibrary]FabricLibKey:=Sequence number([FabricLibrary])
+[FabricLibrary]CreatedBy:=Current user
+[FabricLibrary]CreationDate:=Current date(*)
+[FabricLibrary]ArticleNumber:=[FabricLibrary]ArticleNumber+" DUPE"
+SAVE RECORD([FabricLibrary])
+
+cbKnit:=0
+cbWoven:=0
+cbCutSew:=0
+FORM GOTO PAGE(2)

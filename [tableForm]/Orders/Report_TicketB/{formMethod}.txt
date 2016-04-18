@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		If (<>vfFactory)
+			vsHeader:=[Orders]Customer
+		Else 
+			vsHeader:=[Orders]Factory
+		End if 
+		
+	: (Form event=On Header)
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String(Printing page)
+		
+End case 

@@ -1,0 +1,110 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c)
+C_BOOLEAN($delete)
+C_BOOLEAN($update)
+$update:=False
+
+
+$i:=1
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=-6)
+FIRST RECORD([DesignLineIncluded])
+For ($i;1;Records in selection([DesignLineIncluded]))
+	[DesignLineIncluded]PageNumber:=-6
+	SAVE RECORD([DesignLineIncluded])
+	NEXT RECORD([DesignLineIncluded])
+End for 
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+CREATE SET([DLPages];"reorder")
+
+$i:=1
+For ($i;1;Size of array(alHistKey))
+	USE SET("reorder")
+	QUERY SELECTION([DLPages];[DLPages]PageNumber=alHistKey{$i})
+	If ([DLPages]Stock#afSpecial{$i})
+		[DLPages]Stock:=afSpecial{$i}
+		SAVE RECORD([DLPages])
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array(afDelete))
+	If (afDelete{$i}=True)
+		$delete:=True
+	End if 
+	If (alHistKey{$i}#$i)
+		$update:=True
+	End if 
+End for 
+
+If ($delete) | ($update)
+	WinChoice ("Are you sure you want to update these pages?")
+	If (ok=1)
+		If ($delete)
+			$i:=1
+			$c:=Size of array(afDelete)
+			For ($i;1;$c)
+				If (afDelete{$c}=True)
+					  //deletes page
+					USE SET("reorder")
+					QUERY SELECTION([DLPages];[DLPages]PageNumber=alHistKey{$c})
+					DELETE RECORD([DLPages])
+					DELETE FROM ARRAY(alHistKey;$c;1)
+					DELETE FROM ARRAY(asPages;$c;1)
+					DELETE FROM ARRAY(afDelete;$c;1)
+					DELETE FROM ARRAY(afPrint;$c;1)
+					DELETE FROM ARRAY(afSpecial;$c;1)
+				End if 
+				$c:=$c-1
+			End for 
+			$i:=1
+		End if 
+		
+		$i:=1
+		For ($i;1;Size of array(alHistKey))
+			USE SET("reorder")
+			QUERY SELECTION([DLPages];[DLPages]PageNumber=alHistKey{$i})
+			[DLPages]NewPageNumber:=$i
+			SAVE RECORD([DLPages])
+		End for 
+		
+		USE SET("reorder")
+		
+		$i:=1
+		ORDER BY([DLPages];[DLPages]NewPageNumber;<)
+		FIRST RECORD([DLPages])
+		
+		For ($i;1;Records in selection([DLPages]))
+			QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey)
+			QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=[DLPages]PageNumber;*)
+			QUERY SELECTION([DesignLineIncluded]; | ;[DesignLineIncluded]PageNumber=-6)
+			$n:=1
+			
+			FIRST RECORD([DesignLineIncluded])
+			For ($n;1;Records in selection([DesignLineIncluded]))
+				[DesignLineIncluded]NewPageNumber:=[DLPages]NewPageNumber
+				SAVE RECORD([DesignLineIncluded])
+				NEXT RECORD([DesignLineIncluded])
+			End for 
+			[DLPages]PageNumber:=[DLPages]NewPageNumber
+			SAVE RECORD([DLPages])
+			NEXT RECORD([DLPages])
+		End for 
+		
+		QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+		
+		$i:=1
+		FIRST RECORD([DesignLineIncluded])
+		
+		For ($i;1;Records in selection([DesignLineIncluded]))
+			If ([DesignLineIncluded]NewPageNumber#[DesignLineIncluded]PageNumber)
+				[DesignLineIncluded]PageNumber:=[DesignLineIncluded]NewPageNumber
+				SAVE RECORD([DesignLineIncluded])
+			End if 
+			NEXT RECORD([DesignLineIncluded])
+		End for 
+		
+		CLEAR SET("reorder")
+	End if 
+End if 

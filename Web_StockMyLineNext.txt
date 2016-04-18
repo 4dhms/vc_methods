@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($catalog)
+
+vfPrinting:=False
+vtCheckedText:=""
+Web_StockVar 
+
+If (Position("_";vtCheckedText)>0)
+	QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+	
+	If (Records in selection([StockOrders])<1)
+		CREATE RECORD([StockOrders])
+		[StockOrders]BuyerKey:=Num(vtBuyer)
+		[StockOrders]SODate:=Current date(*)
+		[StockOrders]MyLine:=True
+		[StockOrders]TempID:=vsWebSession
+		SAVE RECORD([StockOrders])
+	End if 
+	
+	CREATE RECORD([StockOrdersLines])
+	[StockOrdersLines]TempID:=[StockOrders]TempID
+	[StockOrdersLines]MyLine:=True
+	[StockOrdersLines]Color:=vtCheckedText
+	SAVE RECORD([StockOrdersLines])
+End if 
+
+If (vfPrinting)
+	[StockOrders]Print:=True
+	SAVE RECORD([StockOrders])
+	UNLOAD RECORD([StockOrders])
+	WebStock 
+Else 
+	If (vlPage<vlCount)
+		$catalog:="M="+String(vlKey)+"_"+String(vlPage+1)+"_"+String(vlCount)
+		Web_StockCatalog ($catalog)
+	Else 
+		WebStock 
+	End if 
+End if 

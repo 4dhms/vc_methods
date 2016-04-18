@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($type)
+C_LONGINT($i;$n;$c)
+
+$type:=asTypeFinder{asTypeFinder}
+
+Quota_List 
+$i:=1
+$c:=Size of array(asDutyType)
+
+For ($i;1;$c)
+	$n:=$c-($i-1)
+	If (asDutyType{$n}#$type)  //& ($i#1)
+		DELETE FROM ARRAY(asDutyType;$n;1)
+		DELETE FROM ARRAY(alDutyStyle;$n;1)
+		DELETE FROM ARRAY(alDutyColor;$n;1)
+		DELETE FROM ARRAY(<>asCategory;$n;1)
+		DELETE FROM ARRAY(asNames;$n;1)
+		DELETE FROM ARRAY(arDutyRates;$n;1)
+		DELETE FROM ARRAY(asHTSCode;$n;1)
+		DELETE FROM ARRAY(afSpecial;$n;1)
+	End if 
+End for 

@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($ndate)
+C_LONGINT($i)
+
+$ndate:=Date(Request("Set all Need By Dates to:"))
+If (ok=1)
+	WinChoice ("Are you sure you want to set all Need By Dates to "+String($ndate)+"?")
+	If (ok=1)
+		$i:=1
+		FIRST RECORD([Orders])
+		For ($i;1;Records in selection([Orders]))
+			If (Locked([Orders]))
+				WinPrompt ("PO "+String([Orders]OrderNum)+" is locked and cannot be updated at this time."+Char(13)+Char(13)+"Make a  note of this.")
+			Else 
+				[Orders]NeedByReport:=$ndate
+				SAVE RECORD([Orders])
+			End if 
+			NEXT RECORD([Orders])
+		End for 
+	End if 
+End if 

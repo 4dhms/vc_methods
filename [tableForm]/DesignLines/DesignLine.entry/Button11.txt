@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+vStyle:=""
+vDesign1:=""
+DL_RecCount 
+DL_SortOrder 

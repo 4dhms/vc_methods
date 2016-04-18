@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Size of array(asXCustomer)=0)
+	: (<>vlQuikDC>0)
+		vsCustomer:=asXCustomer{asXCustomer}
+		
+	: (vtDCCustomer="")
+	: (asXCustomer>0)
+		asCustomers{asCustomers}:=asXCustomer{asXCustomer}
+		vfOpen:=False
+		ACCEPT
+	Else 
+		WinPrompt ("Select customer from list")
+End case 

@@ -1,0 +1,123 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($background;$red;$black)
+
+$background:=15592941
+$red:=0x00FF0000
+$black:=0x0000
+
+If (FORM Get current page=7)
+	If ([Orders]Factory="")
+		OBJECT SET RGB COLORS(*;"xFactory@";$red;$background)
+	Else 
+		OBJECT SET RGB COLORS(*;"xFactory@";0x0000;$background)
+	End if 
+End if 
+
+If ([Orders]Salesperson#"")
+	OBJECT SET RGB COLORS(*;"xSalesperson@";$black;$background)
+End if 
+
+If ([Orders]OrderEntryDate#!00-00-00!)
+	OBJECT SET RGB COLORS(*;"xDate@";$black;$background)
+End if 
+
+If ([Orders]CancelDate#!00-00-00!)
+	OBJECT SET RGB COLORS(*;"xCancel@";$black;$background)
+End if 
+
+If ([Orders]PODate>!2001-01-01!)
+	OBJECT SET RGB COLORS(*;"xPODate@";$black;$background)
+End if 
+
+If ([Orders]ShipDateFactory#!00-00-00!)
+	OBJECT SET RGB COLORS(*;"xShipDate@";$black;$background)
+End if 
+
+If ([Orders]SeasonYear#"") & ([Orders]SeasonName#"")
+	OBJECT SET RGB COLORS(*;"xSeason@";$black;$background)
+End if 
+
+
+If ([Orders]ShipAir) | ([Orders]ShipSea) | ([Orders]ShipLDP) | ([Orders]ShipFOB)
+	OBJECT SET RGB COLORS([Orders]ShipAir;$black;$background)
+	OBJECT SET RGB COLORS([Orders]ShipSea;$black;$background)
+	OBJECT SET RGB COLORS([Orders]ShipLDP;$black;$background)
+	OBJECT SET RGB COLORS([Orders]ShipFOB;$black;$background)
+End if 
+
+If (cbNY+cbLA+cbOther>0)
+	OBJECT SET RGB COLORS(cbNY;-$black;$background)
+	OBJECT SET RGB COLORS(cbLA;$black;$background)
+	OBJECT SET RGB COLORS(cbOther;$black;$background)
+End if 
+
+If ([Orders]Customer#"")
+	OBJECT SET RGB COLORS(*;"xCustomer@";$black;$background)
+End if 
+
+If ([Orders]Order_Enterer#"")
+	OBJECT SET RGB COLORS(*;"xEnterer@";$black;$background)
+End if 
+
+If ([Orders]StyleNumber#"")
+	OBJECT SET RGB COLORS(*;"xStyle@";$black;$background)
+End if 
+
+If ([Orders]DesignNumber#"")
+	OBJECT SET RGB COLORS(*;"xDesign@";$black;$background)
+End if 
+
+If ([Orders]Label#"")
+	OBJECT SET RGB COLORS(*;"xLabel@";$black;$background)
+End if 
+
+If ([Orders]Price#0)
+	OBJECT SET RGB COLORS(*;"xPrice@";$black;$background)
+End if 
+
+If ([Orders]Price Tckt#"")
+	OBJECT SET RGB COLORS(*;"xTicket@";$black;$background)
+End if 
+
+If ([Orders]BrkdnCutRatio#"")
+	OBJECT SET RGB COLORS(*;"xRange@";$black;$background)
+End if 
+
+If ([Orders]LabelSource#"")
+	OBJECT SET RGB COLORS(*;"xSource@";$black;$background)
+End if 
+
+If ([Orders]Price Terms#"")
+	OBJECT SET RGB COLORS(*;"xTerms@";$black;$background)
+End if 
+
+If ([Orders]Cutting Ticket#"")
+	OBJECT SET RGB COLORS(*;"xCutting@";$black;$background)
+End if 
+
+If ([Orders]Care Label#"")
+	OBJECT SET RGB COLORS(*;"xCare@";$black;$background)
+End if 
+
+If ([Orders]KWCnS#"")
+	OBJECT SET RGB COLORS(cbWoven;$black;$background)
+	OBJECT SET RGB COLORS(cbKnit;$black;$background)
+	OBJECT SET RGB COLORS(cbCutSew;$black;$background)
+End if 
+
+If ([Orders]SizeCategory="True") | ([Orders]SizeCategory="False")
+	[Orders]SizeCategory:=""
+End if 
+
+If ([Orders]SizeCategory#"")
+	OBJECT SET RGB COLORS(rPetite;$black;$background)
+	OBJECT SET RGB COLORS(rMissy;$black;$background)
+	OBJECT SET RGB COLORS(rLarge;$black;$background)
+Else 
+	OBJECT SET RGB COLORS(rPetite;-$red;$background)
+	OBJECT SET RGB COLORS(rMissy;-$red;$background)
+	OBJECT SET RGB COLORS(rLarge;-$red;$background)
+End if 
+
+
+

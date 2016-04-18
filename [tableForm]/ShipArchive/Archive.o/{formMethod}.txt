@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	vsPart1:=""
+	vsPart2:=""
+	vsPart3:=""
+	vdStart:=!00-00-00!
+	vdEnd:=!00-00-00!
+End if 

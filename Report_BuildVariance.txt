@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alOrderVar;0)
+ARRAY REAL(arMCol1;0)
+ARRAY REAL(arMCol2;0)
+ARRAY REAL(arMCol3;0)
+ARRAY REAL(arMCol4;0)
+ARRAY REAL(arMCol5;0)
+ARRAY REAL(arPrice;0)
+C_DATE(vdStart;vdEnd)
+C_LONGINT($i;$n)
+C_BOOLEAN(<>vfPreview)
+C_LONGINT($i)
+
+vlTotQty:=0
+vlTotInvQty:=0
+vlTotNetSales:=0
+vlTotActual:=0
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	Else 
+		QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+		QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+		QUERY SELECTION([Orders];[Orders]Cancelled=False)
+		
+		ORDER BY([Orders];[Orders]OrderNum;>)
+		
+		$i:=1
+		For ($i;1;Records in selection([Orders]))
+			QUERY([Invoices];[Invoices]OrderNumber=[Orders]OrderNum)
+			$n:=1
+			FIRST RECORD([Invoices])
+			vlTotQty:=vlTotQty+[Orders]TotalOrderQuantity
+			vlTotNetSales:=vlTotNetSales+Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+			
+			For ($n;1;Records in selection([Invoices]))
+				vlTotInvQty:=vlTotInvQty+[Invoices]InvoiceQuantity
+				vlTotActual:=vlTotActual+[Invoices]InvoiceAmount
+				NEXT RECORD([Invoices])
+				
+			End for 
+			NEXT RECORD([Orders])
+		End for 
+		vlTotDiff:=vlTotQty-vlTotInvQty
+		vlTotDiffPC:=Int(Round(100*(vlTotInvQty/vlTotQty);0))
+		vlTotDiffSales:=vlTotNetSales-vlTotActual
+		vlTotDiffSalesPC:=Int(Round(100*(vlTotActual/vlTotNetSales);0))
+		
+		UNLOAD RECORD([Invoices])
+		
+		SET WINDOW TITLE(String(Records in selection([Orders]))+" Orders")
+		OBJECT SET ENABLED(bPrint;True)
+End case 
+
+

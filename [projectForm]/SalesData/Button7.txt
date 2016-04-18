@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+atFabrication:=1
+FORM GOTO PAGE(1)

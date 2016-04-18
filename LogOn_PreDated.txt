@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+C_TEXT($rem)
+C_LONGINT($i;$n)
+
+QUERY([Orders];[Orders]StyleNumber=$2)
+QUERY SELECTION([Orders];[Orders]OrderNum<$1;*)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+
+If (Records in selection([Orders])=0)
+	<>vlPriors:=-1
+Else 
+	ARRAY LONGINT($orders;0)
+	SELECTION TO ARRAY([Orders]OrderNum;$orders)
+	
+	ARRAY TEXT($cull;0)
+	$rem:=$3
+	
+	Repeat 
+		Case of 
+			: (Position(" ";$rem)<1)
+				$done:=True
+			: (Shift down)
+				$done:=True
+			: (Position(" ";$rem)>0)
+				APPEND TO ARRAY($cull;Substring($rem;1;Position(" ";$rem)-1))
+				If (Position("[c]";$rem)>0)
+					$rem:=Substring($rem;Position("[c] ";$rem)+4;999)
+				Else 
+					$done:=True
+				End if 
+		End case 
+	Until ($done)
+	
+	$i:=1
+	For ($i;1;Size of array($orders))
+		$n:=1
+		
+		For ($n;1;Size of array($cull))
+			If (Size of array($cull)=1)
+				QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=$cull{1})
+				If (Records in selection([CP_OrderXRef])>0)
+					<>vlPriors:=1
+				End if 
+			Else 
+				Case of 
+					: ($n=1)
+						QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=$cull{$n};*)
+					: ($n=Size of array($cull))
+						QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPNumber=$cull{$n})
+						QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i})
+					Else 
+						QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPNumber=$cull{$n};*)
+				End case 
+			End if 
+		End for 
+		Case of 
+			: (<>vlPriors=1)
+				  //Done
+			: (Size of array($cull)=Records in selection([CP_OrderXRef]))
+				<>vlPriors:=1
+			Else 
+				<>vlPriors:=-1
+		End case 
+	End for 
+End if 

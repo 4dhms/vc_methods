@@ -1,0 +1,111 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done;$cancel)
+C_POINTER($tablePtr;$fieldPtr)
+C_LONGINT($sampleNumber)
+
+Case of 
+	: (<>PrcQteID>0)
+		Case of 
+			: ($1=11)
+				FIRST RECORD([Orders])
+			: ($1=12)
+				PREVIOUS RECORD([Orders])
+			: ($1=13)
+				NEXT RECORD([Orders])
+			: ($1=14)
+				LAST RECORD([Orders])
+		End case 
+		
+	: (FORM Get current page=3)
+		CANCEL
+		
+	Else 
+		If (Sheet_Update )
+			vfAlreadyLoaded:=True
+			<>close:=False
+			
+			If (<>vlOrderNumber>0)
+				$tablePtr:=->[Orders]
+				$fieldPtr:=->[Orders]OrderNum
+			Else 
+				$tablePtr:=->[Samples]
+				$fieldPtr:=->[Samples]SampleNumber
+			End if 
+			
+			$done:=False
+			Repeat 
+				Case of 
+					: (Record number($tablePtr->)<0)
+						$done:=True
+						CANCEL
+					: ($1=11)
+						FIRST RECORD($tablePtr->)
+					: ($1=12)
+						PREVIOUS RECORD($tablePtr->)
+					: ($1=13)
+						NEXT RECORD($tablePtr->)
+					: ($1=14)
+						LAST RECORD($tablePtr->)
+				End case 
+				
+				If (<>vlOrderNumber>0)
+					<>vlOrderNumber:=[Orders]OrderNum
+					QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+				Else 
+					$sampleNumber:=-1*[Samples]SampleNumber
+					QUERY([Costing];[Costing]OrderNumber=$sampleNumber)
+				End if 
+				
+				QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+				Case of 
+					: (Records in selection([CostSheets])>0)
+						$done:=True
+					: (Selected record number([Orders])=Records in selection([Orders])) | (Selected record number([Orders])=1)
+						$done:=True
+						WinPrompt ("Order Number "+String([Orders]OrderNum)+" does not have a cost sheet.")
+						$cancel:=True
+					: (Records in selection([CostSheets])=0)
+						WinPrompt ("Order Number "+String([Orders]OrderNum)+" does not have a cost sheet.")
+				End case 
+				
+			Until ($done)
+			
+			  //QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			
+			If ($cancel)
+				CANCEL
+			Else 
+				If (<>vlOrderNumber>0)
+					Order_LoadFromAfar 
+				Else 
+					SG_FM_EntryOnLoad 
+					Cost_SGRouter 
+				End if 
+				
+				
+				If (Selected record number($fieldPtr->)=1) | (Records in selection($fieldPtr->)=1)
+					  // depreciated DISABLE BUTTON(bFrstHMS)
+					  //DISABLE BUTTON(bPrvHMS)
+					OBJECT SET ENABLED(bFrstHMS;False)
+					OBJECT SET ENABLED(bPrvHMS;False)
+				Else 
+					  //ENABLE BUTTON(bFrstHMS)
+					  //ENABLE BUTTON(bPrvHMS)
+					OBJECT SET ENABLED(bFrstHMS;True)
+					OBJECT SET ENABLED(bPrvHMS;True)
+				End if 
+				
+				If (Selected record number($tablePtr->)=Records in selection($tablePtr->)) | (Records in selection($tablePtr->)=1)
+					  //DISABLE BUTTON(bNxtHMS)
+					  //DISABLE BUTTON(bLstHMS)
+					OBJECT SET ENABLED(bNxtHMS;False)
+					OBJECT SET ENABLED(bLstHMS;False)
+				Else 
+					  //ENABLE BUTTON(bNxtHMS)
+					  //ENABLE BUTTON(bLstHMS)
+					OBJECT SET ENABLED(bNxtHMS;True)
+					OBJECT SET ENABLED(bLstHMS;True)
+				End if 
+			End if 
+		End if 
+End case 

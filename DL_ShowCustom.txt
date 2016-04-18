@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+OBJECT SET VISIBLE(*;"xCustom1";([DesignLinkedPages]T1=-1) & (Picture size(vxSketch1)>48))
+OBJECT SET VISIBLE(*;"xCustom2";([DesignLinkedPages]T3=-1) & (Picture size(vxSketch2)>48))
+OBJECT SET VISIBLE(*;"xCustom3";([DesignLinkedPages]T3=-1) & (Picture size(vxSketch3)>48))
+OBJECT SET VISIBLE(*;"xCustom4";([DesignLinkedPages]T4=-1) & (Picture size(vxSketch4)>48))
+OBJECT SET VISIBLE(*;"xCustom5";([DesignLinkedPages]T5=-1) & (Picture size(vxSketch5)>48))
+OBJECT SET VISIBLE(*;"xCustom6";([DesignLinkedPages]T6=-1) & (Picture size(vxSketch6)>48))
+OBJECT SET VISIBLE(*;"xCustom7";([DesignLinkedPages]T7=-1) & (Picture size(vxSketch7)>48))
+OBJECT SET VISIBLE(*;"xCustom8";([DesignLinkedPages]T8=-1) & (Picture size(vxSketch8)>48))
+
+If (Not([DesignLines]8Up))
+	OBJECT SET VISIBLE(*;"xCustom9";([DesignLinkedPages]T9=-1) & (Picture size(vxSketch9)>48))
+	OBJECT SET VISIBLE(*;"xCustom10";([DesignLinkedPages]T10=-1) & (Picture size(vxSketch10)>48))
+	OBJECT SET VISIBLE(*;"xCustom11";([DesignLinkedPages]T11=-1) & (Picture size(vxSketch11)>48))
+	OBJECT SET VISIBLE(*;"xCustom12";([DesignLinkedPages]T12=-1) & (Picture size(vxSketch12)>48))
+End if 
+

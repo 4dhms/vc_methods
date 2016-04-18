@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asPages{asPages}="Customer@")
+		QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+		ORDER BY([NeedByLib];[NeedByLib]Name;>)
+		FORM GOTO PAGE(1)
+	: (asPages{asPages}="Factor@")
+		QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+		ORDER BY([NeedByLib];[NeedByLib]Name;>)
+		FORM GOTO PAGE(2)
+	: (asPages{asPages}="Special@")
+		FORM GOTO PAGE(3)
+End case 

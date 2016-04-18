@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asSRseasonA=1)
+		SR_MonthBreak (13)
+	: (asSRseasonA=9) & (cbBreakout=0)
+		SR_MonthBreak (14)
+	: (asSRseasonA=17) & (cbBreakout=0)
+		SR_MonthBreak (15)
+		
+	: (asSRseasonA=31) & (cbBreakout=1)
+		SR_MonthBreak (14)
+	: (asSRseasonA=61) & (cbBreakout=1)
+		SR_MonthBreak (15)
+End case 

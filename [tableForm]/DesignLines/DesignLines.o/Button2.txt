@@ -1,0 +1,122 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_POINTER($route;$num)
+C_BOOLEAN($done)
+C_TEXT($design)
+C_TEXT($category)
+
+If (Current user="Designer") & (Shift down)
+	CREATE EMPTY SET([DesignLines];"DL")
+	
+	FIRST RECORD([DesignLines])
+	Repeat 
+		QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=[DesignLines]DesignLineKey)
+		$i:=1
+		FIRST RECORD([DesignLinkedPages])
+		For ($i;1;Records in selection([DesignLinkedPages]))
+			$n:=1
+			$done:=False
+			For ($n;1;12)
+				Case of 
+					: ($done)
+						  //done
+					: ($n=1)
+						$route:=->[DesignLinkedPages]N1
+						$num:=->[DesignLinkedPages]T1
+					: ($n=2)
+						$route:=->[DesignLinkedPages]N2
+						$num:=->[DesignLinkedPages]T2
+					: ($n=3)
+						$route:=->[DesignLinkedPages]N3
+						$num:=->[DesignLinkedPages]T3
+					: ($n=4)
+						$route:=->[DesignLinkedPages]N4
+						$num:=->[DesignLinkedPages]T4
+					: ($n=5)
+						$route:=->[DesignLinkedPages]N5
+						$num:=->[DesignLinkedPages]T5
+					: ($n=6)
+						$route:=->[DesignLinkedPages]N6
+						$num:=->[DesignLinkedPages]T6
+					: ($n=7)
+						$route:=->[DesignLinkedPages]N7
+						$num:=->[DesignLinkedPages]T7
+					: ($n=8)
+						$route:=->[DesignLinkedPages]N8
+						$num:=->[DesignLinkedPages]T8
+					: ($n=9)
+						$route:=->[DesignLinkedPages]N9
+						$num:=->[DesignLinkedPages]T9
+					: ($n=10)
+						$route:=->[DesignLinkedPages]N10
+						$num:=->[DesignLinkedPages]T10
+					: ($n=11)
+						$route:=->[DesignLinkedPages]N11
+						$num:=->[DesignLinkedPages]T11
+					: ($n=12)
+						$route:=->[DesignLinkedPages]N12
+						$num:=->[DesignLinkedPages]T12
+				End case 
+				
+				Case of 
+					: ($num->=1)
+						$design:=$route->
+					: ($num->=2)
+						QUERY([Samples];[Samples]SampleNumber=Num($route->))
+						$design:=[Samples]DesignNum
+					: ($num->=3)
+						QUERY([Orders];[Orders]OrderNum=Num($route->))
+						$design:=[Orders]DesignNumber
+				End case 
+				
+				If (Macintosh command down)
+					TRACE
+				End if 
+				
+				QUERY([Designs];[Designs]DesignNum=$design)
+				If ([Designs]ArchivedPict=True)
+					$done:=True
+					ADD TO SET([DesignLines];"DL")
+				End if 
+			End for 
+			NEXT RECORD([DesignLinkedPages])
+		End for 
+		NEXT RECORD([DesignLines])
+	Until (Records in set("DL")>1)
+	USE SET("DL")
+Else 
+	
+	$categrory:=""
+	QUERY([DesignLines])
+	If (ok=1)
+		If (Records in selection([DesignLines])>0)
+			Case of 
+				: (Not([DesignLines]Linked)) & (Not([DesignLines]Stock))
+					$category:="Standard"
+				: ([DesignLines]Linked) & (Not([DesignLines]Stock))
+					$category:="Linked"
+				: (Not([DesignLines]Linked)) & ([DesignLines]Stock)
+					$category:="Stock"
+			End case 
+			
+			Case of 
+				: (pOne=1)
+					QUERY SELECTION([DesignLines];[DesignLines]Linked=False;*)
+					QUERY SELECTION([DesignLines]; & ;[DesignLines]Stock=False)
+				: (pTwo=1)
+					QUERY SELECTION([DesignLines];[DesignLines]Linked=True;*)
+					QUERY SELECTION([DesignLines]; & ;[DesignLines]Stock=False)
+				: (pThree=1)
+					QUERY SELECTION([DesignLines];[DesignLines]Linked=False;*)
+					QUERY SELECTION([DesignLines]; & ;[DesignLines]Stock=True)
+			End case 
+			If (Records in selection([DesignLines])=0)
+				WinPrompt ("Search in the "+$category+" Group.")
+			End if 
+		End if 
+	End if 
+End if 
+
+  //If (cbSampleRoom=1)
+  //QUERY SELECTION([DesignLines];[DesignLines]SampleRoom=True)
+  //End if 

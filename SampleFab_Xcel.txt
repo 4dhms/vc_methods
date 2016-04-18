@@ -1,0 +1,132 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($multiArt;$multiQuant)
+C_LONGINT($i;$n)
+C_TIME($docRef)
+C_TEXT($packet)
+C_TEXT($fileName;$colors;$total)
+C_POINTER($colorPtr;$printPtr;$quantPtr;$articlePtr)
+C_LONGINT($quantityTest)
+C_TEXT($articleNumber)
+C_TEXT($articleTest)
+ARRAY TEXT($colorLines;0)
+ARRAY LONGINT($quantity;0)
+ARRAY TEXT($articles;0)
+
+$docRef:=Create document("";"TXT")
+
+If (ok=1)
+	CLOSE DOCUMENT($docRef)
+	$fileName:=Document+".xls"
+	DELETE DOCUMENT(Document)
+	$docRef:=Create document($fileName;"xls")
+	$packet:="FPO#"+Char(9)
+	$packet:=$packet+"Description"+Char(9)
+	$packet:=$packet+"Article #"+Char(9)
+	$packet:=$packet+"Color/Print"+Char(9)
+	$packet:=$packet+"Quantity"+Char(9)
+	$packet:=$packet+"NY PO Date"+Char(9)
+	$packet:=$packet+"SZ PO Date"+Char(9)
+	$packet:=$packet+"Fabric Rcvd Date"+Char(9)
+	$packet:=$packet+"Season"+Char(9)
+	$packet:=$packet+"Designer"+Char(13)
+	
+	SEND PACKET($docRef;$packet)
+	FIRST RECORD([SampleFabrics])
+	
+	$i:=1
+	For ($i;1;Records in selection([SampleFabrics]))
+		$n:=1
+		For ($n;1;15)
+			$colorPtr:=Field(10;$n+26)
+			$printPtr:=Field(10;$n+59)
+			$quantPtr:=Field(10;$n+74)
+			$articlePtr:=Field(10;$n+42)
+			
+			If ($articlePtr->#"")
+				APPEND TO ARRAY($articles;$articlePtr->)
+			End if 
+			If ($colorPtr->#"")
+				APPEND TO ARRAY($colorLines;$colorPtr->)
+			End if 
+			If ($printPtr->#"")
+				APPEND TO ARRAY($colorLines;$printPtr->)
+			End if 
+			If ($quantPtr->#0)
+				APPEND TO ARRAY($quantity;$quantPtr->)
+			End if 
+		End for 
+		
+		Case of 
+			: (Size of array($articles)<1)
+			: (Size of array($articles)=1)
+				$articleNumber:=$articles{1}
+			Else 
+				$n:=1
+				$articleTest:=$articles{1}
+				For ($n;1;Size of array($articles))
+					If ($articleTest#$articles{$n})
+						$multiArt:=True
+					End if 
+					If ($n=1)
+						$articleNumber:=$articles{1}
+					Else 
+						$articleNumber:=$articleNumber+", "+$articles{$n}
+					End if 
+					$articleTest:=$articles{$n}
+				End for 
+		End case 
+		If (Not($multiArt))
+			$articleNumber:=$articles{1}
+		End if 
+		
+		Case of 
+			: (Size of array($quantity)=1) & (Size of array($colorLines)>1)
+				$total:="Each "+String($quantity{1})
+			: (Size of array($quantity)=1)
+				$total:=String($quantity{1})
+			Else 
+				$quantityTest:=$quantity{1}
+				$n:=1
+				For ($n;1;Size of array($quantity))
+					If ($quantityTest#$quantity{$n})
+						$multiQuant:=True
+					End if 
+					If ($n=1)
+						$total:=String($quantity{1})
+					Else 
+						$total:=$total+", "+String($quantity{$n})
+					End if 
+					$quantityTest:=$quantity{$n}
+				End for 
+		End case 
+		If (Not($multiQuant))
+			$total:="Each "+String($quantity{1})
+		End if 
+		
+		$n:=1
+		For ($n;1;Size of array($colorLines))
+			If ($n=1)
+				$colors:=$colorLines{1}
+			Else 
+				$colors:=$colors+", "+$colorLines{$n}
+			End if 
+		End for 
+		
+		$packet:=String([SampleFabrics]SampleFab PO Nu)+Char(9)
+		$packet:=$packet+[SampleFabrics]Fabric+Char(9)
+		$packet:=$packet+$articleNumber+Char(9)
+		$packet:=$packet+$colors+Char(9)
+		$packet:=$packet+$total+Char(9)
+		$packet:=$packet+String([SampleFabrics]SamFabOrdrDate)+Char(9)
+		$packet:=$packet+String([SampleFabrics]SZPODate)+Char(9)
+		$packet:=$packet+String([SampleFabrics]Fab Rcv Date)+Char(9)
+		$packet:=$packet+[SampleFabrics]SeasonName+" "+[SampleFabrics]SeasonYear+Char(9)
+		$packet:=$packet+[SampleFabrics]Designer+Char(13)
+		SEND PACKET($docRef;$packet)
+		NEXT RECORD([SampleFabrics])
+	End for 
+	
+	CLOSE DOCUMENT($docRef)
+	WinPrompt ("File has been created.")
+	
+End if 

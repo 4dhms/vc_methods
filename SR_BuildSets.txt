@@ -1,0 +1,113 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_POINTER($orders;$units;$amount)
+C_LONGINT($i;$n;$netSales;<>SendingWin)
+C_TEXT($division)
+
+READ ONLY([Orders])
+SR_QueryArrays 
+
+QUERY([Orders];[Orders]CancelDate>=$1;*)
+QUERY([Orders]; & ;[Orders]CancelDate<$2)
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"cancelled")
+QUERY SELECTION([Orders];[Orders]OrderDivision#"")
+
+Case of 
+	: (Current user="Guest")
+		  //do nothing
+	: (Current user="Ed")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+	: (User in group(Current user;"DressesOnly"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="02@")
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="09@")
+		
+	: (Current user="Mark")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="01-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="02-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-Cupio@")
+		  //QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="08@")
+End case 
+
+$division:=Replace string(asDivisions{asDivisions};"_";" ")
+
+Case of 
+	: (Current user="Designer") & (asDivisions{asDivisions}="03-Cupio Only") & (Shift down)
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@")
+	: (Current user="Spenser") & (asDivisions{asDivisions}="03-Cupio Only")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@")
+	: (asDivisions{asDivisions}="05-Cupio@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="05-Cupio@")
+	: (asDivisions{asDivisions}="03-Cupio + 04-Cupio@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-Cupio@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="05@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision#"05-Cupio@")
+	: (asDivisions{asDivisions}="03-Cupio + 05-Cupio@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-Cupio@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="05@")
+	: (asDivisions{asDivisions}="03@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-Cupio@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="05@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision#"05-Cupio@")
+		
+	: (asDivisions{asDivisions}="06-C&G + 07-Ts")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+	: (asDivisions{asDivisions}#"All@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision=$division)
+End case 
+
+Case of 
+	: (pOne=1)
+		QUERY SELECTION([Orders];[Orders]SizeCategory="Petite")
+	: (pTwo=1)
+		QUERY SELECTION([Orders];[Orders]SizeCategory="Missy")
+	: (pThree=1)
+		QUERY SELECTION([Orders];[Orders]SizeCategory="Large")
+End case 
+
+If (cbStock=1)
+	QUERY SELECTION([Orders];[Orders]Customer="Stock")
+End if 
+CREATE SET([Orders];"Master")
+
+$i:=1
+For ($i;1;24)
+	<>vlCounter:=Int(($i/24)*100)
+	CALL PROCESS(<>SendingWin)
+	
+	$orders:=Get pointer("vlOrders"+String($i))
+	$units:=Get pointer("vlUnits"+String($i))
+	$amount:=Get pointer("vlDollars"+String($i))
+	USE SET("Master")
+	QUERY SELECTION([Orders];[Orders]CancelDate>=adQStart{$i};*)
+	QUERY SELECTION([Orders]; & ;[Orders]CancelDate<adQEnd{$i})
+	
+	$orders->:=0
+	$units->:=0
+	$amount->:=0
+	
+	$n:=1
+	FIRST RECORD([Orders])
+	$orders->:=Records in selection([Orders])
+	For ($n;1;Records in selection([Orders]))
+		$units->:=$units->+[Orders]TotalOrderQuantity
+		$netSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+		$amount->:=$amount->+$netSales
+		NEXT RECORD([Orders])
+	End for 
+	
+End for 
+SR_HarvestLine 
+
+
+
+
+
+
+

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($version)
+$version:=Application file
+
+Case of 
+	: (Position("v13";$version)>0)
+		<>vf13:=True
+	: (Position("v14";$version)>0)
+		<>vf13:=False
+End case 

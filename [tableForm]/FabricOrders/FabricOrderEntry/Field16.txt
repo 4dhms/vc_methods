@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([FabricOrders]FinalDelivery=!00-00-00!)
+	[FabricOrders]FinalDelivery:=Current date(*)
+	OBJECT SET VISIBLE([FabricOrders]FinalDelivery;True)
+End if 

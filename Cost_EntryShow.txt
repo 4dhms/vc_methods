@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //$1 LINE NAME
+  //$2 SUBHEAD
+  //$3 Yard
+  //$4 PRICE
+  //$5 Cost
+
+vtFabric1:=""
+vtFabric2:=""
+vtFabric3:=""
+vtFabric4:=""
+vStyle1:=""
+vStyle2:=""
+vStyle3:=""
+vStyle4:=""
+vtStitch1:=""
+vtStitch2:=""
+vtStitch3:=""
+vtStitch4:=""
+
+Cost_EntryShowField ("Self Fabric";"xCombo1";->[CostSheets]YdCombo1;->[CostSheets]PriceCombo1;->[CostSheets]Combo1Cost)
+Cost_EntryShowField ("Combo 1 Fabric";"xCombo1";->[CostSheets]YdCombo1;->[CostSheets]PriceCombo1;->[CostSheets]Combo1Cost)
+Cost_EntryShowField ("Combo 2 Fabric";"xCombo2";->[CostSheets]YdCombo2;->[CostSheets]PriceCombo2;->[CostSheets]Combo2Cost)
+Cost_EntryShowField ("Combo 3 Fabric";"xCombo3";->[CostSheets]YdCombo3;->[CostSheets]PriceCombo3;->[CostSheets]Combo3Cost)
+Cost_EntryShowField ("Lining Yardage";"xLining";->[CostSheets]YdLining;->[CostSheets]PriceLining;->[CostSheets]LiningCost)
+Cost_EntryShowField ("Fusibles Yardage";"xFusibles";->[CostSheets]YdFusibles;->[CostSheets]PriceFusibles;->[CostSheets]FusiblesCost)
+

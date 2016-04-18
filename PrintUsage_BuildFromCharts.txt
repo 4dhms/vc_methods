@@ -1,0 +1,69 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$divno;$ways)
+C_POINTER($arrayptr;$colptr;$printptr)
+C_TEXT($test;$season;$year)
+C_TIME($docref)
+
+ARRAY TEXT($p1;0)
+ARRAY TEXT($p2;0)
+ARRAY TEXT($p3;0)
+ARRAY TEXT($p4;0)
+ARRAY TEXT($p5;0)
+ARRAY TEXT($p6;0)
+ARRAY TEXT($p7;0)
+ARRAY TEXT($p8;0)
+ARRAY TEXT($p9;0)
+
+$season:=asSeasonName{asSeasonName}
+$year:=asSeasonYear{asSeasonYear}
+PrintUsage_Init (0)
+PrintUsage_Init (14)
+
+asList5{1}:="Prints / Color Ways"
+
+QUERY([PCatalog];[PCatalog]SeasonName=$season;*)
+QUERY([PCatalog]; & ;[PCatalog]SeasonYear=$year)
+QUERY SELECTION([PCatalog];[PCatalog]Division#"")
+
+$i:=1
+FIRST RECORD([PCatalog])
+For ($i;1;Records in selection([PCatalog]))
+	$divno:=Num(Substring([PCatalog]Division;1;2))
+	QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+	
+	$n:=1
+	FIRST RECORD([PCPage])
+	For ($n;1;Records in selection([PCPage]))
+		
+		$s:=1
+		For ($s;1;10)
+			$colptr:=Get pointer("$p"+String($divno))
+			
+			If ($s>8)
+				$printptr:=Field(61;$s+11)
+			Else 
+				$printptr:=Field(61;$s+1)
+			End if 
+			If ($printptr->#"")
+				$test:=Substring($printptr->;1;Position("-";$printptr->))
+				If (Find in array($colptr->;$test)<1)
+					APPEND TO ARRAY($colptr->;$test)
+				End if 
+			End if 
+		End for 
+		NEXT RECORD([PCPage])
+	End for 
+	NEXT RECORD([PCatalog])
+End for 
+
+$i:=1
+For ($i;1;9)
+	If ($i#5)
+		$arrayptr:=Get pointer("$p"+String($i))
+		ARRAY TEXT(asPrintNumber;0)
+		COPY ARRAY($arrayptr->;asPrintNumber)
+		$colptr:=Get pointer("asList"+String($i))
+		$ways:=PrintUsage_CountWays 
+		$colptr->{1}:=String(Size of array($arrayptr->))+" / "+String($ways;"###,##0")
+	End if 
+End for 

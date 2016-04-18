@@ -1,0 +1,64 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($day;$month)
+C_TEXT($year)
+C_DATE($lastBiz)
+
+Case of 
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(bPreview;<>vlNewOrdSum>0)
+		
+		Case of 
+			: (<>asStartMonth>0)
+				  //do nothing
+			: (Month of(Current date(*))=11)
+				<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+				<>asStartMonth:=12
+				<>asEndMonth:=12
+				<>asEndYear:=<>asStartYear+1
+			: (Month of(Current date(*))=12)
+				<>asStartYear:=Size of array(<>asStartYear)
+				<>asStartMonth:=12
+				<>asEndMonth:=12
+				<>asEndYear:=<>asStartYear
+			Else 
+				<>asStartMonth:=Month of(Current date(*))+1
+				<>asEndMonth:=<>asStartMonth+1
+				<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+				<>asEndYear:=<>asStartYear
+		End case 
+		<>asStartDay:=1
+		<>asEndDay:=1
+		Array_BuildDays ("Start";<>asStartMonth)
+		Array_BuildDays ("End";<>asEndMonth)
+		
+		If (Day number(Current date(*)-1)=2)
+			$lastBiz:=Current date(*)-3
+		Else 
+			$lastBiz:=Current date(*)-1
+		End if 
+		$day:=Day of($lastBiz)
+		$month:=Month of($lastBiz)
+		$year:=String(Year of($lastBiz))
+		<>asStartMonth:=$month
+		<>asStartDay:=$day
+		<>asStartYear:=Find in array(<>asStartYear;$year)
+		<>asEndMonth:=$month
+		<>asEndDay:=$day
+		<>asEndYear:=Find in array(<>asStartYear;$year)
+		
+	: (Form event=On Display Detail)
+		Case of 
+			: ([Orders]Cancelled)
+				vsPOFlag:="CANCELLED"
+			: ([Orders]RevisionNumber>0)
+				vsPOFlag:="Revision "+String([Orders]RevisionNumber)
+			Else 
+				vsPOFlag:=""
+		End case 
+		
+	: (Form event=On Unload)
+		<>vfFactory:=False
+		If (Records in set("Orders")>0)
+			CLEAR SET("Orders")
+		End if 
+End case 

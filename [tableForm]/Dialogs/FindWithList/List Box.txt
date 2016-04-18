@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	If (vsFindFlag="Double click to remove")
+		If (asAllCC>0)
+			DELETE FROM ARRAY(asAllCC;asAllCC;1)
+		End if 
+	Else 
+		Case of 
+			: (asAllCC=1)
+				FORM GOTO PAGE(2)
+				vsFindSubhead:="Enter new email address:"
+			: (asAllCC>1)
+				ACCEPT
+		End case 
+	End if 
+End if 

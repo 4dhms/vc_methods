@@ -1,0 +1,89 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+		
+	: (Form event=On Close Box)
+		If (Records in selection([DesignLinkedPages])>0)
+			SAVE RECORD([DesignLines])
+		Else 
+			WinChoice ("Do you want to save this line plan?")
+			If (ok=1)
+				SAVE RECORD([DesignLines])
+			End if 
+		End if 
+	: (Form event=On Load)
+		If (Is new record([DesignLines]))
+			[DesignLines]DLCreationDate:=Current date(*)
+			[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+			[DesignLines]DLCreator:=Current user
+			[DesignLines]Linked:=True
+		End if 
+		
+		ARRAY TEXT(asList10;0)
+		APPEND TO ARRAY(asList10;"Stitch")
+		APPEND TO ARRAY(asList10;"Factory")
+		APPEND TO ARRAY(asList10;"Article #")
+		APPEND TO ARRAY(asList10;"Article # incl combo")
+		asList10:=1
+		
+		ARRAY TEXT(asSampleTypes;4)
+		asSampleTypes{1}:="Linkage"
+		asSampleTypes{2}:="Design Library"
+		asSampleTypes{3}:="Sample Number"
+		asSampleTypes{4}:="Order Number"
+		  //asSampleTypes{5}:="Design on Sample"
+		  //asSampleTypes{6}:="Design on Order"
+		asSampleTypes:=1
+		
+		ARRAY REAL(arMcol1;0)
+		SELECTION TO ARRAY([DesignLinkedPages]PageNumber;arMcol1)
+		
+		SeasonArrays 
+		asDivisions:=1
+		<>asSeasonName:=1
+		<>asSeasonYear:=1
+		vSeason:=""
+		vGroupName:=""
+		vsDesignNumber:=""
+		vStyle:=""
+		vsCustomer:=""
+		
+		CP_BuildDivArray (0)
+		asDivisions{1}:="Division"
+		asDivisions:=1
+		
+		ARRAY PICTURE(aSketch;0)
+		ARRAY TEXT(asDesignNumbers;0)
+		ARRAY TEXT(asStyleNumbers;0)
+		
+		$i:=1
+		FIRST RECORD([DesignLinkedPages])
+		For ($i;1;Records in selection([DesignLinkedPages]))
+			[DesignLinkedPages]Print:=True
+			SAVE RECORD([DesignLinkedPages])
+			NEXT RECORD([DesignLinkedPages])
+		End for 
+		
+		ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+		
+		cbGroup:=1
+		If (Current user="Sandie") | (Current user="Designer")
+			cbComments:=1
+			cbCrec:=1
+		End if 
+		cbColors:=1
+		cbCancel:=1
+		cbPrice:=1
+		
+		DLink_CountStyles 
+		
+	: (Form event=On Unload)
+		ARRAY PICTURE(aSketch;0)
+		ARRAY TEXT(asDesignNumbers;0)
+		ARRAY TEXT(asStyleNumbers;0)
+		UNLOAD RECORD([DesignLinkedPages])
+		UNLOAD RECORD([DesignLines])
+		UNLOAD RECORD([DL_Other])
+		
+End case 

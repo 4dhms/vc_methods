@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asTypeList{alCQty}="Self")
+	[Orders]TotalOrderQuantity:=Orders_ArrayQuantity 
+Else 
+	WinPrompt ("Add quantities to the Self fabric.")
+	alCQty{alCQty}:=0
+End if 

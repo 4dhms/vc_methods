@@ -1,0 +1,34 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($p)
+
+$p:=1
+
+Case of 
+	: (vfMini)
+		FORM SET OUTPUT([Orders];"ProdStatusMini")
+	: (vfComponents)
+		FORM SET OUTPUT([Orders];"ProdStatusComp")
+	Else 
+		FORM SET OUTPUT([Orders];"ProdStatusNoComp")
+End case 
+
+
+PAGE SETUP([Orders];"ProdStatusComp")
+
+If (vfInternal)
+Else 
+End if 
+
+Order_ReturnSort 
+
+vlGrandTotal:=Sum([Orders]TotalOrderQuantity)
+vlSubtotal:=0
+vlRunningTotal:=0
+
+SG_PO 
+If (vfPDF)
+	PDF_SetPrinter (-1;->[Orders];True)
+Else 
+	Print_Selection (->[Orders])
+End if 
+

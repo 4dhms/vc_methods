@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asKWCS{asKWCS}="Knit")
+		[Quota]KW:="K"
+	: (asKWCS{asKWCS}="Woven@")
+		[Quota]KW:="W"
+	Else 
+		[Quota]KW:=""
+End case 
+SAVE RECORD([Quota])
+APPEND TO ARRAY(asDutyType;[Quota]QuotaType)
+APPEND TO ARRAY(<>asCategory;[Quota]Category)
+APPEND TO ARRAY(asNames;[Quota]Description)
+APPEND TO ARRAY(arDutyRates;[Quota]DutyRate)
+APPEND TO ARRAY(asHTSCode;[Quota]HTSCode)
+APPEND TO ARRAY(atNote;[Quota]Note)
+If (atNote{asDutyType}="")
+	APPEND TO ARRAY(alDutyColor;16777215)
+Else 
+	APPEND TO ARRAY(alDutyColor;16766935)
+End if 
+<>vsQuotaCat:=[Quota]Category
+Cost_QuotaEnter 

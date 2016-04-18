@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+WinChoice ("Are you sure you want to delete this page?")
+If (ok=1)
+	WinChoice ("This act is not reversible.";"Stop";"Continue")
+	If (ok=0)
+		CREATE SET([DesignLinkedPages];"pages")
+		DELETE RECORD([DesignLinkedPages])
+		CANCEL
+		USE SET("pages")
+		CLEAR SET("pages")
+		
+		ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+		$i:=1
+		FIRST RECORD([DesignLinkedPages])
+		For ($i;1;Records in selection([DesignLinkedPages]))
+			[DesignLinkedPages]PageNumber:=$i
+			SAVE RECORD([DesignLinkedPages])
+			NEXT RECORD([DesignLinkedPages])
+		End for 
+	End if 
+End if 

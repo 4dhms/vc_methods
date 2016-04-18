@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[FabricOrders]POExt:=vrPOExt
+FabPO_ChangedFieldList (2)
+SAVE RECORD([FabricOrders])
+If (FORM Get current page=2) | (FORM Get current page=3)
+	FORM GOTO PAGE(1)
+End if 
+
+Case of 
+	: ($1=1)
+		FIRST RECORD([FabricOrders])
+	: ($1=2)
+		PREVIOUS RECORD([FabricOrders])
+	: ($1=3)
+		NEXT RECORD([FabricOrders])
+	: ($1=4)
+		LAST RECORD([FabricOrders])
+End case 
+If (Selected record number([FabricOrders])=1) | (Records in selection([FabricOrders])=1)
+	OBJECT SET ENABLED(bFrstHMS;False)
+	OBJECT SET ENABLED(bPrvHMS;False)
+Else 
+	OBJECT SET ENABLED(bFrstHMS;True)
+	OBJECT SET ENABLED(bPrvHMS;True)
+End if 
+
+If (Selected record number([FabricOrders])=Records in selection([FabricOrders])) | (Records in selection([FabricOrders])=1)
+	OBJECT SET ENABLED(bNxtHMS;False)
+	OBJECT SET ENABLED(bLstHMS;False)
+Else 
+	OBJECT SET ENABLED(bNxtHMS;True)
+	OBJECT SET ENABLED(bLstHMS;True)
+End if 
+
+FabPO_FM_Entry 
+If ([FabricOrders]POType=0)
+	Fabric_CleanUpNumber 
+End if 
+If (FORM Get current page=5) | (FORM Get current page=6)
+	FORM GOTO PAGE(1)
+End if 

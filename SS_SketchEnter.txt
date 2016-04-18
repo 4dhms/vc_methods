@@ -1,0 +1,60 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=1)
+		<>vlPreviewSS:=0
+		
+		Case of 
+			: (vsColHead1="") & (vfNewFactory)
+				GOTO OBJECT(vsColHead1)
+			: (vsSize="") & (vfNewFactory) & (vsColHead1#"Size Run")
+				WinPrompt ("Enter SAMPLE SIZE.")
+				GOTO OBJECT(vsSize)
+			: (vlDupeOrderNumber#0)
+				ACCEPT
+			Else 
+				
+				Case of 
+						  //: (asSGOrder>0) & (asSGOrder{asSGOrder}="Old Style")
+						  //QUERY([Specs];[Specs]Design Num=asDesignNumbers{asDesignNumbers})
+						  //SS_BuildPreview 
+						  //cbPort:=1
+						  //ACCEPT
+						  //<>vlPreviewSS:=0
+					: (Records in selection([SpecSheetLines])=0)
+						If (cbKnit=0) & (cbWoven=0) & (cbCutSew=0) & (vlAddPartStatus>0)
+							WinChoice ("Select fabric type.";"Knit";"Woven";"Cut n Sew")
+							If (ok=1)
+								If (bChoice2=1)
+									[SpecTemplate]KnitWoven:="Knit"
+									cbKnit:=1
+									cbCutSew:=0
+									cbWoven:=0
+								Else 
+									[SpecTemplate]KnitWoven:="CutSew"
+									cbWoven:=0
+									cbKnit:=0
+									cbCutSew:=1
+								End if 
+								
+							Else 
+								[SpecTemplate]KnitWoven:="Woven"
+								cbKnit:=0
+								cbCutSew:=0
+								cbWoven:=1
+							End if 
+						End if 
+						cbPort:=0
+						SS_GetTemplate 
+						FORM GOTO PAGE(3)
+					Else 
+						ACCEPT
+				End case 
+		End case 
+		
+	: (FORM Get current page=3)
+		If (asSpareParts<1)
+			vsNewGarmentPart:="Empty"
+		End if 
+		
+End case 
+vfNewFactory:=False

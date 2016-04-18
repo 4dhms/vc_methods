@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(atCost7))
+	Case of 
+		: (asOrderNumbers{$i}="")
+			alSDcolor{$i}:=0
+		: (atCost7{$i}="") | (atCost7{$i}=atCost1{$i})
+			alSDcolor{$i}:=16711680
+		Else 
+			alSDcolor{$i}:=0
+	End case 
+End for 

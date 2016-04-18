@@ -1,0 +1,106 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$s;$n;$column)
+C_POINTER($thisCol)
+C_TEXT($color)
+C_LONGINT($totstart;$totend;$subtot)
+
+$i:=1
+CREATE EMPTY SET([FabPOLines];"lines")
+CREATE EMPTY SET([FabPOLines];"outstanding")
+For ($i;1;Size of array(alFabOrderKey))
+	QUERY([FabPOLines];[FabPOLines]FabOrderKey=alFabOrderKey{$i})
+	FIRST RECORD([FabPOLines])
+	$n:=1
+	For ($n;1;Records in selection([FabPOLines]))
+		ADD TO SET([FabPOLines];"lines")
+		If ([FabPOLines]Delivered<[FabPOLines]Quantity)
+			ADD TO SET([FabPOLines];"outstanding")
+		End if 
+		
+		NEXT RECORD([FabPOLines])
+	End for 
+End for 
+USE SET("lines")
+CLEAR SET("lines")
+
+RELATE MANY SELECTION([Deliveries]LineID)
+ORDER BY([Deliveries];[Deliveries]DeliveryDate)
+
+$s:=$1+1
+FabricTrack_ArrayInsert ($s;3)
+$s:=$s+1
+asMOrder{$s}:="Shipped"
+$totstart:=$s
+
+ARRAY LONGINT($pokey;0)
+
+$i:=1
+For ($i;1;Records in selection([Deliveries]))
+	RELATE ONE([Deliveries]LineID)
+	RELATE ONE([FabPOLines]FabOrderKey)
+	
+	If (Find in array($pokey;[FabPOLines]FabOrderKey)<1)
+		APPEND TO ARRAY($pokey;[FabPOLines]FabOrderKey)
+		$s:=$s+1
+		FabricTrack_ArrayInsert ($s;1)
+		adMCancel{$s}:=[Deliveries]DeliveryDate
+		asMOrder{$s}:=[FabricOrders]PONumber
+		asFactories{$s}:=""
+	End if 
+	$color:=Replace string([FabPOLines]ColorPrint;"#";"")
+	If (Position(" ";$color)>0)
+		$color:=Substring($color;1;Position(" ";$color)-1)
+	End if 
+	
+	Case of 
+		: ($color="White")
+			$column:=Find in array(asColors;"8628")
+		: ($color="Black")
+			$column:=Find in array(asColors;"8619")
+		Else 
+			$column:=Find in array(asColors;$color)
+	End case 
+	
+	If ($column<1)
+		$color:="@"+$color+"@"
+		QUERY([ColorPrintNumber];[ColorPrintNumber]MillNumber=$color)
+		$color:=[ColorPrintNumber]CPNumber
+		$column:=Find in array(asColors;[ColorPrintNumber]CPNumber)
+	End if 
+	
+	If ($column>0)
+		$thiscol:=Get pointer("arMcol"+String($column))
+		$thiscol->{$s}:=[Deliveries]DeliveredAmt
+	Else 
+		$color:=Replace string([FabPOLines]ColorPrint;"#";"")
+		If (Position(" ";$color)>0)
+			$color:=Substring($color;1;Position(" ";$color)-1)
+		End if 
+		atMNote{$s}:="w/o "+$color
+		alFabricColor{$s}:=16711690
+	End if 
+	NEXT RECORD([Deliveries])
+End for 
+  //
+
+$s:=$s+1
+FabricTrack_ArrayInsert ($s;3)
+asFactories{$s}:="Total Shipped"
+$totend:=$s
+$s:=$s+1
+
+  //totals shipped
+$i:=1
+For ($i;1;Size of array(asColors))
+	$thisCol:=Get pointer("arMCol"+String($i))
+	$n:=1
+	$subtot:=0
+	For ($n;1;$totend-$totstart)
+		$subtot:=$thisCol->{$totstart+$n}+$subtot
+	End for 
+	$thisCol->{$totend}:=$subtot
+	APPEND TO ARRAY(alTrackShipped;$subtot)
+End for 
+
+FabricTrack_Outstanding ($s)
+

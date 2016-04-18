@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($update)
+
+$i:=1
+For ($i;1;Size of array(afDelete))
+	If (alHistKey{$i}#$i)
+		$update:=True
+	End if 
+End for 
+
+
+Case of 
+	: ($update)
+		WinPrompt ("There has been a change in the pagination. Use the Update button to rebuild the order.")
+	: (Find in array(afPrint;True)<1)
+		WinPrompt ("There are no pages to print.")
+	Else 
+		  //DL_Update 
+		  //DL_BuildPageArray 
+		vfEmail:=False
+		vsEMAddress:=""
+		cbOther:=0
+		cbDL:=1
+		cbPrint:=1
+		cbEmail:=0
+		vtEmailSubject:=""
+		vtBodyText:="Attached is the design line plan for:"+Char(13)+Char(13)
+		vtBodyText:=vtBodyText+[DesignLines]Division+Char(13)+[DesignLines]Season+Char(13)+[DesignLines]Title
+		vtBodyText:=Replace string(vtBodyText;Char(13)+Char(13)+Char(13);Char(13)+Char(13);*)
+		OBJECT SET VISIBLE(cbOther;True)
+		
+		Email_BuildAddressScreen 
+		DL_Output 
+		vfPDF:=False
+		
+		FORM GOTO PAGE(2)
+End case 

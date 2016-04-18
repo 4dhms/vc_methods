@@ -1,0 +1,92 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfEmail;$continue)
+C_TEXT($folder)
+
+SAVE RECORD([SpecFactory])
+SS_SaveCol3 
+
+  //
+vfPrintTrim:=False
+vfPrintGrade:=False
+vfPrintComments:=False
+
+Case of 
+	: (FORM Get current page=4)
+		vfPrintGrade:=True
+End case 
+
+If (Not(vfEmail))  //using button for email
+	WinChoice ("Print on paper or make PDF?"+Char(13)+Char(13)+"(hold down Shift for customer copy)";"Print";"PDF")
+	If (Shift down)
+		vfOutside:=True
+	Else 
+		vfOutside:=False
+	End if 
+	If (ok=1)
+		vfPDF:=False
+	Else 
+		vfPDF:=True
+		Case of 
+			: (Current user="Roberta") & (<>vlOrderNumber>0)
+				vtPathName:=<>vsDesignNumber
+			: (Current user="Roberta")
+				vtPathName:=<>vsDesignNumber
+			: (<>vlOrderNumber>0)
+				vtPathName:="Spec_"+String(<>vlOrderNumber)
+			Else 
+				vtPathName:="Spec_SG_"+String(<>vlOrderNumber)
+		End case 
+		
+		If (<>vtPrintPath="")
+			$continue:=True
+		Else 
+			WinChoice ("Use path "+<>vtPrintPath+"?";"Yes";"No")
+			If (ok=1)
+				vtPathName:=<>vtPrintPath+vtPathName+".pdf"
+			Else 
+				$continue:=True
+			End if 
+		End if 
+		
+		If ($continue)
+			If (Current user="Roberta")
+				  //$folder:=Application file
+				  //$folder:=Substring($folder;1;Position(":";$folder))
+				  //$folder:=$folder+"4D_PDFs:"
+				$folder:=Substring(Get 4D folder;1;Position(":";Get 4D folder)+6)
+				$folder:=$folder+"Roberta:Dropbox:"
+				
+				If (Test path name($folder)=0)
+					vtPathName:=$folder+vtPathName+".pdf"
+				Else 
+					vtPathName:=Select folder("Select destination:")+vtPathName+".pdf"
+				End if 
+			Else 
+				vtPathName:=Select folder("Select destination:")+vtPathName+".pdf"
+			End if 
+		End if 
+		SET PRINT OPTION(Mac spool file format option;0)
+		SET PRINT OPTION(Destination option;3;vtPathName)
+		SET PRINT OPTION(Scale option;100)
+		SHOW ON DISK(vtPathName)
+	End if 
+End if 
+
+If (FORM Get current page=5)
+	vfPrintSpec:=True
+Else 
+	vfPrintSpec:=False
+End if 
+
+Center Window (200;150;1;"")
+DIALOG([Dialogs];"SpecPrintDialog.i")
+CLOSE WINDOW
+If (ok=1)
+	
+	SS_PrintSimpleSheet 
+	SS_SimpleSheetFM 
+	SS_PullPrevious 
+	  //Else 
+	  //SS_PrintSheet 
+	  //End if 
+End if 

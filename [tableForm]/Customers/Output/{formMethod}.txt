@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test)
+
+If (Form event=On Display Detail)
+	$test:=[Customers]CartonMU+[Customers]ColorTrimOK+[Customers]Contact+[Customers]DefaultAddress+[Customers]FitSize+[Customers]Folding
+	$test:=$test+[Customers]HangTag+[Customers]Label+[Customers]NotesInternal+[Customers]NotesPublic+[Customers]OverShort
+	$test:=$test+[Customers]Packing+[Customers]Polybag+[Customers]PPCount+[Customers]PPSize+[Customers]PriceTicket+[Customers]PriceTicketDefault
+	$test:=$test+[Customers]RN+[Customers]ShipTo+[Customers]Telephone+[Customers]Testing+[Customers]TOPCount+[Customers]TOPSize
+	$test:=Replace string($test;" ";"")
+	vDesc:=$test
+End if 

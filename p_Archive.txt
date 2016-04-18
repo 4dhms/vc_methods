@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ALL RECORDS([ShipArchive])
+ORDER BY([ShipArchive];[ShipArchive]ArchiveKey;<)
+
+FORM SET OUTPUT([ShipArchive];"Archive.o")
+FORM SET INPUT([ShipArchive];"Archive.i")
+Center Window (650;600;8;"";"WincBox")
+MODIFY SELECTION([ShipArchive];*)
+CLOSE WINDOW
+
+<>vlArchive:=0

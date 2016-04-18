@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	LISTBOX SELECT ROW(ColorList;Size of array(asBDSelf)+1)
+End if 

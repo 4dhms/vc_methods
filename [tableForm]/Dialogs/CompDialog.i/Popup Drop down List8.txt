@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($listname)
+C_TEXT(vsCSMini)
+
+If (asMini>0)
+	If (asMini=1)
+		If (vsCSName="Lining") | (vsCSName="Lining Color") | (vsCSName="Thread Color") | (vsCSName="Zipper@") | (vsCSName="Shoulder Pads") | (vsCSName="Buttons@") | (vsCSName="Buckles") | (vsCSName="Snaps")
+			If (vsCSName="Zipper@") | (vsCSName="Shoulder Pads") | (vsCSName="Buttons@")
+				$listname:=Substring(vsCSName;1;Position("(";vsCSName)-2)
+			Else 
+				$listname:=vsCSName
+			End if 
+			List_Var ($listname;->vsCSMini)
+		Else 
+			List_Var ("Comp Type";->vsCSMini)
+			$listname:="Comp Type"
+		End if 
+		vsCSMini:=vtReturn
+		
+		If (ok=1)
+			ARRAY TEXT(asMini;0)
+			QUERY([Lists];[Lists]UserName=Current user)
+			QUERY SELECTION([Lists];[Lists]ListName=$listname)
+			SELECTION TO ARRAY([Lists]ListItem;asMini)
+			SORT ARRAY(asMini;>)
+			INSERT IN ARRAY(asMini;1;1)
+			asMini{1}:="Add/edit list"
+			
+			Case of 
+				: (vsCSName="Lining")
+					APPEND TO ARRAY(<>atLining;vsCSMini)
+				: (vsCSName="Lining Color")
+					APPEND TO ARRAY(<>atLiningColor;vsCSMini)
+				: (vsCSName="Thread Color")
+					APPEND TO ARRAY(<>atThreadColor;vsCSMini)
+				: (vsCSName="Zipper@")
+					APPEND TO ARRAY(<>atZipper;vsCSMini)
+				: (vsCSName="Shoulder Pads")
+					APPEND TO ARRAY(<>atShoulderPad;vsCSMini)
+				: (vsCSName="Button@")
+					APPEND TO ARRAY(<>atButton;vsCSMini)
+				: (vsCSName="Buckles")
+					APPEND TO ARRAY(<>atBuckles;vsCSMini)
+				: (vsCSName="Snaps")
+					APPEND TO ARRAY(<>atSnaps;vsCSMini)
+				: (vsCSName="Hooks & Eyes")
+					APPEND TO ARRAY(<>atHookEyes;vsCSMini)
+				: (vsCSName="Bead Components")
+					APPEND TO ARRAY(<>atBeadComponent;vsCSMini)
+				Else 
+					APPEND TO ARRAY(<>asCompType;vsCSMini)
+			End case 
+		End if 
+	Else 
+		vsCSMini:=asMini{asMini}
+	End if 
+End if 

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked) & (asXCustomer>0)
+	If (<>vlQuikDC>0)
+		vsCustomer:=asXCustomer{asXCustomer}
+	Else 
+		asCustomers{asCustomers}:=asXCustomer{asXCustomer}
+	End if 
+	ACCEPT
+End if 

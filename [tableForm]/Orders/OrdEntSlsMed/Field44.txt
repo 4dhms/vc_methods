@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]MyFOB=True)
+	WinFind ("Enter FOB:";8)
+	Case of 
+		: (ok=0)
+			[CostSheets]MyFOB:=False
+		: (Num(vsRequeststring)>0)
+			[CostSheets]FOB:=Num(vsRequeststring)
+		Else 
+			[CostSheets]MyFOB:=False
+	End case 
+Else 
+	WinChoice ("Are you sure you want to turn off My FOB?";"Yes";"No")
+	If (ok=1)
+	Else 
+		[CostSheets]MyFOB:=True
+	End if 
+End if 
+Cost_EntryCalculate 

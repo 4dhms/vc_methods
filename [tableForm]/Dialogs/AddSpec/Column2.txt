@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($dropPos;$delete)
+C_TEXT($name)
+
+Case of 
+	: (Form event=On Double Clicked)
+		INSERT IN ARRAY(asSpareParts;1;1)
+		asSpareParts{1}:=asPart{asPart}
+		ORDER BY([SpecLibrary];[SpecLibrary]SortOrder;>)
+		DELETE FROM ARRAY(asPart;asPart;1)
+		
+	: (Form event=On Drop)
+		$dropPos:=Drop position
+		$name:=asPart{asPart}
+		If (asPart>0)
+			Case of 
+				: ($dropPos<=asPart)
+					$delete:=asPart
+				Else 
+					$delete:=asPart-1
+			End case 
+			DELETE FROM ARRAY(asPart;$delete;1)
+		Else 
+			$name:=asSpareParts{asSpareParts}
+			DELETE FROM ARRAY(asSpareParts;asSpareParts;1)
+		End if 
+		
+		If ($dropPos=-1)
+			$dropPos:=Size of array(asPart)+1
+		End if 
+		INSERT IN ARRAY(asPart;$dropPos;1)
+		asPart{$dropPos}:=$name
+End case 
+asPart:=0
+asSpareParts:=0

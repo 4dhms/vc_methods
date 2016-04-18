@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+C_DATE($daterange)
+C_LONGINT($i;$pix;$page)
+C_TEXT($filename;$message)
+$daterange:=Current date(*)+14
+
+QUERY([Orders];[Orders]Factory="")
+QUERY SELECTION([Orders];[Orders]CancelDate>=$daterange;*)
+QUERY SELECTION([Orders]; & ;[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Hold=False)
+QUERY SELECTION([Orders];[Orders]OrderDivision="03@";*)
+QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04@")
+ORDER BY([Orders];[Orders]Salesperson;>;[Orders]CancelDate;>)
+
+$filename:=String(Milliseconds)+".pdf"
+ReportFolder 
+
+vtPDFPath:=vtPDFPath+$filename
+
+
+
+SET PRINT OPTION(Scale option;100)
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+SET PRINT OPTION(Destination option;3;vtPDFPath)
+
+$page:=1
+$i:=1
+$pix:=0
+vtTitle:="Open Orders"
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	If ($pix<60)
+		If ($page>1)
+			PAGE BREAK(>)
+		End if 
+		vsPrintingHeader:="Printed "+String(Current date(*))+"   Page "+String($page)
+		$page:=$page+1
+		Print form("Header4")
+		$pix:=580
+	End if 
+	
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+	
+	Print form("OpenOrder")
+	$pix:=$pix-48
+	NEXT RECORD([Orders])
+End for 
+PAGE BREAK
+ARRAY TEXT(asSubCC;0)
+APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+APPEND TO ARRAY(asSubCC;"sara@nubby.com")
+
+$message:="If you are at HMS, view report here:"+Char(13)+"http://192.168.250.68:8081/Reports/"+$filename+Char(13)+Char(13)
+$message:=$message+"If you are off-site, view report here:"+Char(13)+"http://74.9.71.226:8081/Reports/"+$filename
+
+EMail_GetPreferences 
+
+Mail_SimpleSend ("List";"None";"Cupio Order Report";$message)
+
+
+

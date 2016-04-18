@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($doit)
+
+If (cb13=0)
+	WinChoice ("Check Show New Only box and re-Harvest if you want New Styles Only.";"Ok";"Show All")
+	If (ok=1)
+		$doit:=False
+	Else 
+		$doit:=True
+	End if 
+Else 
+	$doit:=True
+End if 
+
+
+If ($doit)
+	LogOn_SpreadX2 
+End if 
+
+

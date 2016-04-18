@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldptr)
+
+CREATE RECORD([Changes])
+[Changes]RevisionNumber:=[FabricOrders]ReviseNumber
+[Changes]OrderNumber:=-1
+[Changes]RevDate:=Current date(*)
+[Changes]RevTime:=Current time(*)
+[Changes]Writer:=Current user
+[Changes]ChangeKey:=Sequence number([Changes])
+[Changes]FabOrder:=[FabricOrders]PONumber
+
+Case of 
+	: ($1="new revision")
+		[Changes]FieldName:=$1
+		
+	: ($1="Cancelled")
+		[Changes]FieldName:=$1
+	Else 
+		$fieldptr:=Field(17;Num($1))
+		[Changes]FieldName:=Field name($fieldptr)
+		If ($1="7")
+			[Changes]OldData:=String(Old($fieldptr->))
+			[Changes]NewChange:=String($fieldptr->)
+		Else 
+			[Changes]OldData:=Old($fieldptr->)
+			[Changes]NewChange:=$fieldptr->
+		End if 
+		
+End case 
+SAVE RECORD([Changes])
+UNLOAD RECORD([Changes])

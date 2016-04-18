@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ADD RECORD([SampleTrack];*)
+QUERY([SampleTrack];[SampleTrack]EZ=True)
+QUERY SELECTION([SampleTrack];[SampleTrack]DateIn=!00-00-00!)
+ORDER BY([Samples];[SampleTrack]DateOut;>)

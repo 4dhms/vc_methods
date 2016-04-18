@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($mill)
+C_LONGINT($i)
+
+$mill:=Request("Source these "+String(Records in selection([ColorPrintNumber]))+" prints to:")
+
+If (ok=1)
+	WinChoice ("Are you sure you want to make "+$mill+" the mill?")
+	If (ok=1)
+		$i:=1
+		FIRST RECORD([ColorPrintNumber])
+		
+		For ($i;1;Records in selection([ColorPrintNumber]))
+			[ColorPrintNumber]Mill:=$mill
+			SAVE RECORD([ColorPrintNumber])
+			NEXT RECORD([ColorPrintNumber])
+		End for 
+	End if 
+End if 

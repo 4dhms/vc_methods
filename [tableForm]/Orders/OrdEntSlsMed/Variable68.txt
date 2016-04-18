@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atSub1;0)
+
+READ ONLY([Lists])
+QUERY([Lists];[Lists]ListName="FactoriesHZ")
+SELECTION TO ARRAY([Lists]ListItem;atSub1)
+SORT ARRAY(atSub1;>)
+cbGHZ:=1
+cbGSZ:=0
+cbGDom:=0
+cbGVN:=0
+vtItemName:=""
+FORM GOTO PAGE(13)

@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+
+If (vsEMAddress#"")
+	If (Position(".com";vsEMAddress)<1) & (Position(".net";vsEMAddress)<1) & (Position(".cn";vsEMAddress)<1)
+		WinChoice (vsEMAddress+" is not a valid email address. Are you sure this is correct.";"Yes";"Cancel")
+		If (ok=1)
+			$continue:=True
+		Else 
+			vsEMAddress:=""
+		End if 
+	Else 
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	INSERT IN ARRAY(asSubCC;Size of array(asSubCC)+1;1)
+	asSubCC{Size of array(asSubCC)}:=vsEMAddress
+	vsEMAddress:=""
+End if 

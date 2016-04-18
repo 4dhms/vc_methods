@@ -1,0 +1,105 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($oldSheet)
+C_BOOLEAN($continue)
+ARRAY LONGINT(alSheetKeys;0)
+ARRAY TEXT(asSheetNames;0)
+ARRAY TEXT(asColHeaders;0)
+
+$oldsheet:=False
+vfCancel:=False
+vrTestPrice:=0
+vfTestQuantity:=False
+vlTestQuantity:=0
+vfImport:=False
+vfNewCostsheet:=True
+vlNamerState:=0
+If (<>vlOrderNumber<0)
+	<>vfAir:=False
+	<>vfSea:=False
+End if 
+If (<>PrcQteID>0)
+Else 
+	QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+End if 
+
+Case of 
+	: (Records in selection([Costing])<1) & (Not(User in group(Current user;"Spreadsheets")))
+		WinPrompt ("There is no cost sheet for this order yet.")
+	: (Records in selection([Costing])<1)
+		WinChoice ("Do you want to create a new cost sheet?")
+		If (ok=1)
+			$continue:=True
+			Cost_CreateCosting 
+			CREATE EMPTY SET([CostSheets];"ThisSheet")
+		Else 
+			$continue:=False
+			CANCEL
+		End if 
+	Else 
+		$continue:=True
+		If ([Costing]ClaimNote="false")
+			[Costing]ClaimNote:=""
+			SAVE RECORD([Costing])
+		End if 
+End case 
+
+
+If (Not($continue))
+	FORM GOTO PAGE(1)
+	
+Else 
+	If (<>vlOrderNumber>0)
+		If ([Orders]CostSheet=False)
+			[Orders]CostSheet:=True
+			SAVE RECORD([Orders])
+		End if 
+	End if 
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	
+	Case of 
+		: (Records in selection([CostSheets])<1)
+			vfNew:=False
+			Cost_AddNewSheet 
+			If (vfCancel)
+				$continue:=False
+			End if 
+		: (Records in selection([CostSheets])>0)
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			CREATE SET([CostSheets];"ThisSheet")
+			SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames;[CostSheets]SheetID;alSheetKeys)
+			asSheetNames:=1
+			If (Not(vfNewCostSheet))
+				vfNew:=True
+			Else 
+				
+				Case of 
+					: (<>vfPreview)
+					: (User in group(Current user;"Warehouse"))
+						$continue:=True
+						
+					: (User in group(Current user;"SpreadSheets")) & (Not($oldSheet))
+						$continue:=True
+				End case 
+			End if 
+	End case 
+	
+	
+	If ($continue)
+		vlPreviousSheet:=-1
+		FORM SET INPUT([CostSheets];"Sheet.i")
+		
+		If (vfAlreadyLoaded)
+			LOAD RECORD([CostSheets])
+			Cost_EntryOnLoad 
+		Else 
+			vfAlreadyLoaded:=True
+			Case of 
+				: (Screen width<810) | (Current user="CK")
+					MODIFY RECORD([CostSheets])
+				Else 
+					MODIFY RECORD([CostSheets];*)
+			End case 
+		End if 
+	Else 
+	End if 
+End if 

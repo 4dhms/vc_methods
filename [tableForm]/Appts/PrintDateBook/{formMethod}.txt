@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		If (asUsers{asUsers}="All")
+			vtTitle:="All Appointments "
+		Else 
+			vtTitle:=asUsers{asUsers}+"'s Appointments "
+		End if 
+		vtTItle:=vtTitle+" ("+vtDateFlag+")"
+		vsPrintingHeader:="Printed on: "+String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		If ([Appts]ApptDate=vdPaperwork)
+			vtNotes:=""
+			OBJECT SET VISIBLE(*;"xLine";False)
+		End if 
+End case 

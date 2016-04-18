@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($digest)
+
+QUERY([Returns];[Returns]RMAkey=[RMA]RMAkey)
+
+$i:=1
+FIRST RECORD([Returns])
+For ($i;1;Records in selection([Returns]))
+	$digest:=$digest+[Returns]StyleNumber
+	If ($i<Records in selection([Returns]))
+		$digest:=$digest+", "
+	End if 
+	NEXT RECORD([Returns])
+End for 
+[RMA]Digest:=$digest
+SAVE RECORD([RMA])

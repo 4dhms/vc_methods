@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+
+Center Window (250;350;1;"")
+DIALOG("FiberContentUpdate")
+CLOSE WINDOW

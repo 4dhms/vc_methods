@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	Case of 
+		: ([Samples]ProtoRecvDate=!00-00-00!)
+			[Samples]ProtoReceived:=False
+		: ([Samples]ProtoRecvDate#!00-00-00!)
+			[Samples]ProtoReceived:=True
+	End case 
+End if 

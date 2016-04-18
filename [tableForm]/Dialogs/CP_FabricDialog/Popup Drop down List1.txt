@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atFabricList=1)
+	List_Var ("Fabric";->vtFabric)
+Else 
+	vtFabric:=<>atFabricList{<>atFabricList}
+End if 

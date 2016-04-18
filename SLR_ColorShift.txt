@@ -1,0 +1,92 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alItemNumber;0)
+ARRAY DATE(adDateIn;0)
+ARRAY REAL(alMissing;0)
+ARRAY REAL(arMCol2;0)
+ARRAY REAL(alOnHand;0)
+
+ARRAY DATE(adCreateDate;0)
+C_TEXT($color)
+C_DATE(vdWeekOne;$datebuild)
+C_BOOLEAN($fix)
+$fix:=False
+
+If (Size of array(asColors)>0)
+	QUERY([SLRColor];[SLRColor]SLRAcctKey=[SLRAcct]SLRAcctKey)
+	If (Length(asColors{asColors})>39)
+		$color:=Substring(asColors{asColors};1;39)+"@"
+	Else 
+		$color:=asColors{asColors}
+	End if 
+	QUERY SELECTION([SLRColor];[SLRColor]SLRColor=$color)
+	
+	If (Records in selection([SLRColor])=0)
+		REDUCE SELECTION([SLRWks];0)
+		vlWkNumber:=1
+	Else 
+		QUERY([SLRWks];[SLRWks]SLRColorKey=[SLRColor]SLRColorKey)
+		QUERY SELECTION([SLRWks];[SLRWks]SLRColorKey>0)
+		If (Records in selection([SLRWks])>0)
+			OBJECT SET VISIBLE(bReorder;True)
+		End if 
+		
+		ORDER BY([SLRWks];[SLRWks]SLRWkEnd;<)
+		  //ARRAY LONGINT($testcount;0)
+		  //SELECTION TO ARRAY([SLRWks]WkNumber;$testcount)
+		  //$i:=1
+		  //For ($i;1;Size of array($testcount))
+		  //Case of 
+		  //: ($i=Size of array($testcount))
+		  //  `done
+		  //: ($testcount{$i+1}>=$testcount{$i})
+		  //$fix:=True
+		  //End case 
+		  //End for 
+		  //If ($fix)
+		  //$i:=1
+		  //LAST RECORD([SLRWks])
+		  //$c:=(([SLRWks]SLRWkEnd-[SLRAcct]WeekOne)/7)+1
+		  //
+		  //For ($i;1;Records in selection([SLRWks]))
+		  //[SLRWks]WkNumber:=$c
+		  //$c:=$c+1
+		  //SAVE RECORD([SLRWks])
+		  //PREVIOUS RECORD([SLRWks])
+		  //End for 
+		  //End if 
+		
+		FIRST RECORD([SLRWks])
+		vlWkNumber:=[SLRWks]WkNumber+1
+		vdDate:=[SLRWks]SLRWkEnd+7
+		
+		If (vdDate=!00-00-00!)
+			SLR_UpdateWeeks 
+			vdDate:=vdWeekOne
+		End if 
+		
+		If (Records in selection([SLRWks])=0)
+			  //vdWeekOne:=!00/00/00!
+		End if 
+	End if 
+	
+	If (vdWeekOne=!00-00-00!)
+		$datebuild:=Current date(*)-28
+	Else 
+		$datebuild:=vdWeekOne-28
+	End if 
+	Repeat 
+		APPEND TO ARRAY(adCreateDate;$datebuild)
+		$datebuild:=$datebuild+7
+	Until ($datebuild>Current date(*))
+	
+	SELECTION TO ARRAY([SLRWks]WkNumber;alItemNumber)
+	SELECTION TO ARRAY([SLRWks]SLRWkEnd;adDateIn)
+	SELECTION TO ARRAY([SLRWks]SalesUnits;alMissing)
+	SELECTION TO ARRAY([SLRWks]SalesTot;arMCol2)
+	SELECTION TO ARRAY([SLRWks]OnHand;alOnHand)
+	
+	FORM GOTO PAGE(2)
+Else 
+	WinPrompt ("Are you sure this is a valid style number?")
+End if 
+

@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vlX:=378+(vlColSlider*44)
+vlY:=98
+POST CLICK(vlX;vlY)
+

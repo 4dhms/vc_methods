@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($borderprint)
+
+If ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor="")
+	WinPrompt ("Enter Thread Color")
+	GOTO OBJECT([ColorPrintNumber]ThreadColor)
+Else 
+	If (ColorPrint_Mandatories )
+		[ColorPrintNumber]NewCP:=False
+		SAVE RECORD([ColorPrintNumber])
+		RELATE MANY([ColorPrintNumber]CPNumberKey)
+		CREATE SET([ColorPrintNumber];"Prints")
+		If ([ColorPrintNumber]CPNumber="b@")
+			$borderprint:=True
+		End if 
+		CP_DupeNumber 
+		If ($borderprint)
+			[ColorPrintNumber]CPNumber:="b"+[ColorPrintNumber]CPNumber
+		End if 
+		
+		If (Records in set("Prints")>0)
+			ADD TO SET([ColorPrintNumber];"Prints")
+		End if 
+	End if 
+End if 

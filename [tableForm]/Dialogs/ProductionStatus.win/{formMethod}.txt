@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfProdStatus)
+
+If (Form event=On Load)
+	If (vfProdStatus)
+		OBJECT SET TITLE(bValidate;"Mail")
+	Else 
+		OBJECT SET TITLE(bValidate;"Print")
+	End if 
+	vtTitle:="Status Report"
+	ARRAY TEXT(asSortOrder;0)
+	Array_SortChoice 
+	ARRAY TEXT(asSortOrder;0)
+	
+	If (Not(vfUnapproved))
+		OBJECT SET VISIBLE(cbHistory;False)
+		OBJECT SET VISIBLE(cbStatus;False)
+		OBJECT SET VISIBLE(cbAll;False)
+		OBJECT SET VISIBLE(cbIssues;False)
+		OBJECT SET VISIBLE(cbUnresolved;False)
+		cbComments:=1
+		If (vfInternal)
+			OBJECT SET VISIBLE(cbFactory;False)
+		Else 
+			OBJECT SET VISIBLE(cbFactory;True)
+		End if 
+	Else 
+		vfUnapproved:=False
+		FORM GOTO PAGE(2)
+	End if 
+End if 

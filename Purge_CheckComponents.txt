@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$sample)
+
+$i:=1
+CREATE EMPTY SET([ComponentSheets];"Test")
+FIRST RECORD([ComponentSheets])
+For ($i;1;Records in selection([ComponentSheets]))
+	$sample:=Abs([ComponentSheets]HMSOrderNumber)
+	QUERY([Orders];[Orders]OrderNum=[ComponentSheets]HMSOrderNumber;*)
+	QUERY([Samples]; | ;[Samples]SampleNumber=$sample)
+	
+	If (Records in selection([Orders])>0) | (Records in selection([Samples])>0)
+		ADD TO SET([ComponentSheets];"test")
+	End if 
+	NEXT RECORD([ComponentSheets])
+End for 
+
+If (Records in set("test")>0)
+	USE SET("test")
+	CLEAR SET("test")
+	ALERT("Not clear")
+Else 
+	ALERT("Good")
+End if 
+

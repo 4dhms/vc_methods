@@ -1,0 +1,70 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+<>vlSpecPart:=Size of array(alPartNumber)+1
+INSERT IN ARRAY(alPartNumber;1;1)
+alPartNumber{1}:=<>vlSpecPart
+
+If (vsNewGarmentPart="Empty")
+	  //do nothing
+Else 
+	QUERY([SpecTemplate];[SpecTemplate]Template=vsNewGarmentPart)
+	Case of 
+		: (cbCutSew=1)
+			QUERY SELECTION([SpecTemplate];[SpecTemplate]KnitWoven="Cut & Sew")
+		: (cbKnit=1)
+			QUERY SELECTION([SpecTemplate];[SpecTemplate]KnitWoven="Knit")
+		: (cbWoven=1)
+			QUERY SELECTION([SpecTemplate];[SpecTemplate]KnitWoven="Woven")
+	End case 
+	
+	QUERY([SpecTempBuilder];[SpecTempBuilder]TempKey=[SpecTemplate]TempKeyNumber)
+	ORDER BY([SpecTempBuilder];[SpecTempBuilder]SortOrder;>)
+	
+	
+	SS_BuildPartCB (True)
+	
+	Case of 
+		: (<>vlSpecPart=1)
+			If ([SpecFactory]Part1="")
+				[SpecFactory]Part1:=vsNewGarmentPart
+			End if 
+			pOne:=1
+		: (<>vlSpecPart=2)
+			If ([SpecFactory]Part2="")
+				[SpecFactory]Part2:=vsNewGarmentPart
+			End if 
+			[SpecFactory]KnitWoven2:=<>vsKnitWoven
+			pTwo:=1
+		: (<>vlSpecPart=3)
+			If ([SpecFactory]Part3="")
+				[SpecFactory]Part3:=vsNewGarmentPart
+			End if 
+			[SpecFactory]KnitWoven3:=<>vsKnitWoven
+			pThree:=1
+	End case 
+	SAVE RECORD([SpecFactory])
+	
+	$i:=1
+	FIRST RECORD([SpecTempBuilder])
+	For ($i;1;Records in selection([SpecTempBuilder]))
+		QUERY([ChineseDictionary];[ChineseDictionary]LexKey=[SpecTempBuilder]SpecLibKey)
+		CREATE RECORD([SpecSheetLines])
+		[SpecSheetLines]SF_KeyNumber:=[SpecFactory]SF_KeyNumber
+		[SpecSheetLines]SpecLibKey:=[ChineseDictionary]LexKey
+		[SpecSheetLines]OtherDescription:=[ChineseDictionary]EnglishName
+		[SpecSheetLines]SpecLineKey:=Sequence number([SpecSheetLines])
+		[SpecSheetLines]PartNumber:=<>vlSpecPart
+		[SpecSheetLines]Tolerance:=[SpecTempBuilder]TempToleranceM
+		[SpecSheetLines]SortOrder:=[SpecTempBuilder]SortOrder
+		SAVE RECORD([SpecSheetLines])
+		If (Records in set("AllLines")>0)
+			ADD TO SET([SpecSheetLines];"ActiveLines")
+			ADD TO SET([SpecSheetLines];"AllLines")
+		End if 
+		NEXT RECORD([SpecTempBuilder])
+	End for 
+	
+	
+	UNLOAD RECORD([SpecTemplate])
+	UNLOAD RECORD([SpecTempBuilder])
+End if 

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($state)
+C_LONGINT($i)
+
+If (cbGroup=1)
+	$state:=True
+Else 
+	$state:=False
+End if 
+
+$i:=1
+For ($i;1;Size of array(afApproved))
+	afApproved{$i}:=$state
+End for 

@@ -1,0 +1,131 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(pOne;pTwo;pThree)
+C_BOOLEAN(vfExists;<>Done;<>vfReorderPP)
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+Case of 
+	: (Form event=On Load)
+		
+		OBJECT SET VISIBLE(*;"Style1";<>vtCustomerStyle#"")
+		OBJECT SET VISIBLE(<>vtCustomerStyle;<>vtCustomerStyle#"")
+		If (<>vlOrderNumber>0)
+			If (Current user="Kimberly") | (Current user="Jenny") | (Current user="Ly") | (Current user="FeiFei") | (Current user="Carol") | (Current user="Mandy") | (Current user="Iris") | (Current user="Cassie") | (Current user="Roberta") | (Current user="Kay") | (Current user="Vicky") | (Current user="Designer")
+				OBJECT SET VISIBLE(cbReorder;True)
+				OBJECT SET VISIBLE(cbMaster;True)
+				OBJECT SET VISIBLE(*;"xMaster";False)
+			Else 
+				OBJECT SET VISIBLE(cbReorder;False)
+				OBJECT SET VISIBLE(cbMaster;False)
+				OBJECT SET VISIBLE(*;"xMaster";[Orders]MasterSpec=True)
+				
+			End if 
+			If (<>vfMasterSpec)
+				cbMaster:=1
+			Else 
+				cbMaster:=0
+			End if 
+			If (<>vfReorderPP)
+				cbReorder:=1
+			Else 
+				cbReorder:=0
+			End if 
+		Else 
+			OBJECT SET VISIBLE(cbMaster;False)
+		End if 
+		
+		
+		vlX:=0
+		vlY:=0
+		vlColNumber:=0
+		vlTestColumn:=0
+		vlPixPos:=1
+		vfHistory:=False
+		OBJECT SET ENABLED(bFirst;False)
+		OBJECT SET ENABLED(bPrevious;False)
+		OBJECT SET ENABLED(bNext;False)
+		OBJECT SET ENABLED(bLast;False)
+		
+		SS_SimpleSheetFM 
+		SS_PullPrevious 
+		vfSimple:=True
+		Spec_ResetToleranceArray 
+		[SpecFactory]Factory:=<>vsFactory
+		[SpecFactory]XFactory:=<>vdXFactory
+		
+		If (<>vlPreviewSS=4)
+			QUERY([Designs];[Designs]DesignNum=vDesign10)
+			vxSketch:=[Designs]Sketch
+			SS_PreviewRO 
+		Else 
+			vStyle10:=<>vsStyleNumber
+			vDesign10:=<>vsDesignNumber
+		End if 
+		
+	: (Form event=On Unload)
+		ARRAY PICTURE(aSketch;0)
+		ARRAY TEXT(atNote;0)
+		
+		vxSketch1:=$empty
+		vxSketch2:=$empty
+		vxSketch3:=$empty
+		vxSketch4:=$empty
+		CLEAR SET("ThisSpecSheet")
+		ARRAY LONGINT(alPartNumber;0)
+		If (vfCancel)
+			vfCancel:=False
+		Else 
+			If (Records in set("FactSheets")>0)
+				USE SET("FactSheets")
+			End if 
+			CLEAR SET("FactSheets")
+			CLEAR SET("SampCols")
+			CLEAR SET("Sizes")
+			SS_AllLines 
+			
+			QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+			QUERY([SpecSheetLines]; & ;[SpecSheetLines]SpecLibKey=0;*)
+			QUERY([SpecSheetLines]; & ;[SpecSheetLines]OtherDescription="")
+			SampFit_RecDate 
+			If (Records in selection([SpecSheetLines])>0)
+				WinChoice ("There are "+String(Records in selection([SpecSheetLines]))+" empty POM lines."+Char(13)+"Do you want to delete them?")
+				If (ok=1)
+					DELETE SELECTION([SpecSheetLines])
+				End if 
+			End if 
+			CLEAR SET("AllLines")
+			CLEAR SET("ActiveLines")
+			If (<>vlPreviewSS>0)
+				SHOW PROCESS(<>SpecProcID)
+				BRING TO FRONT(<>SpecProcID)
+			Else 
+				CALL PROCESS(<>SalesPrcID)
+			End if 
+			<>vlPreviewSS:=0
+		End if 
+		If (Records in set("Found")>0)
+			If (<>SpecProcID>0)
+				USE SET("Found")
+				ORDER BY([SpecFactory];[SpecFactory]CreationDate;<;[SpecFactory]SF_KeyNumber;<)
+			End if 
+			CLEAR SET("Found")
+		End if 
+		
+		
+	: (Form event=On Outside Call)
+		Case of 
+			: (<>Done)
+				<>Done:=False
+				
+				SAVE RECORD([SpecFactory])
+				ACCEPT
+				
+			: (<>vlSource=1)
+				[SpecFactory]Note:=<>vtNotes
+			: (<>vlSource=2)
+				[SpecLineSample]Comments:=<>vtNotes
+		End case 
+		<>vlSource:=0
+End case 
+
+OBJECT SET VISIBLE(cbAll;Size of array(alLKey)>0)
+OBJECT SET VISIBLE(cbNone;Size of array(alLKey)>0)

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsList1Name:=""
+vsList2Name:=""
+FORM GOTO PAGE(4)

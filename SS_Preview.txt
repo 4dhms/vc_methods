@@ -1,0 +1,43 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderNumber;$findnumber;$height)
+<>vlPreviewSS:=4
+$orderNumber:=<>vlOrderNumber
+If ($1="DN@")
+	vsDesignNumber:=Substring($1;3;20)
+	QUERY([Specs];[Specs]Design Num=vsDesignNumber)
+	If (Screen height-70>730)
+		$height:=750
+	Else 
+		$height:=Screen height-70
+	End if 
+	
+	<>CloseBox:=True
+	
+	FORM SET INPUT([Specs];"SpecsInptTall")
+	Center Window (615;Screen height-70;1;"")
+	DIALOG([Specs];"SpecsInptTall")
+	CLOSE WINDOW
+Else 
+	$findnumber:=Num($1)
+	If ($findnumber>0)
+		QUERY([Orders];[Orders]OrderNum=$findnumber)
+		vDesign10:=[Orders]DesignNumber
+		vStyle10:=[Orders]StyleNumber
+	Else 
+		QUERY([Orders];[Orders]OrderNum=$findnumber)
+		vDesign10:=[Samples]DesignNum
+		vStyle10:=[Samples]StyleNum
+	End if 
+	
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=$findnumber)
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	
+	CREATE SET([SpecSheetLines];"AllLines")
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+	CREATE SET([SpecSheetLines];"ActiveLines")
+	
+	SS_OpenWindow 
+End if 
+<>vlOrderNumber:=$orderNumber
+<>vlPreviewSS:=0

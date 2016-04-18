@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlUPCProc)
+
+Case of 
+	: (<>vlUPCProc>0)
+		SHOW PROCESS(<>vlUPCProc)
+		BRING TO FRONT(<>vlUPCProc)
+	: (<>vlUPCProc=0)
+		<>vlUPCProc:=New process("UPC_Window";0;"UPC")
+	Else 
+		SHOW PROCESS(<>vlUPCProc)
+		BRING TO FRONT(<>vlUPCProc)
+End case 

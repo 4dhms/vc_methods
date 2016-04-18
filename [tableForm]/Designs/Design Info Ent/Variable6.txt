@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlMailer)
+
+If (<>vlMailer>0)
+	WinPrompt ("Mail box is busy, please try again.")
+Else 
+	If (Design_Mandatory )
+		SAVE RECORD([Designs])
+		Design_Email 
+	End if 
+End if 

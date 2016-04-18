@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($order)
+
+$order:=Num(vsOrderNumber)
+
+QUERY([Orders];[Orders]OrderNum=$order)
+If (Records in selection([Orders])>0)
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	ADD TO SET([Orders];"orders")
+	  // This is a little delayed on some POs
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	Case of 
+		: (Find in array(alPOOrder;$order)>0) | (Records in selection([Orders])=0)
+			vsOrderNumber:=""
+		: (vsOrderNumber="0") | (vsOrderNumber="")
+			
+		: (Records in selection([CostSheets])=0)
+			WinPrompt ("There is no cost sheet for "+vsOrderNumber)
+		Else 
+			CREATE SET([Costing];"temp")
+			UNION("temp";"costing";"costing")
+			CREATE SET([CostSheets];"temp")
+			UNION("temp";"costsheets";"costsheets")
+			CLEAR SET("temp")
+			
+			vsOrderNumber:=""
+			If ([CostSheets]Duty2>0)
+				WinPrompt ("The costsheet for "+String([Orders]OrderNum)+" has two duty rates."+Char(13)+Char(13)+"Please update the costsheet manually.")
+			Else 
+				WH_AppendBatch 
+			End if 
+	End case 
+End if 
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CostSheets])

@@ -1,0 +1,79 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+QUERY([VendorEmail];[VendorEmail]VendorKey=-1)
+QUERY SELECTION([VendorEmail];[VendorEmail]User=Current user)
+C_BOOLEAN($done;$create;$change)
+C_LONGINT($i)
+
+ARRAY TEXT($char;0)
+$i:=1
+
+Case of 
+	: (Records in selection([VendorEmail])=1) & (Shift down)
+		WinChoice ("Do you want to change your email address?")
+		If (ok=1)
+			Repeat 
+				vsRequestString:="@nubby.com"
+				WinFind ("Enter your email address:";5)
+				vsRequestString:=Replace string(vsRequestString;" ";"")
+				If (ok=1)
+					WinChoice ("User Name: "+Current user+Char(13)+"Address: "+vsRequestString+Char(13)+Char(13)+"Is this correct?")
+					If (ok=1)
+						$done:=True
+					End if 
+				Else 
+					$done:=True
+				End if 
+			Until ($done)
+			If (vsRequestString#"")
+				[VendorEmail]EmailAddress:=vsRequestString
+				SAVE RECORD([VendorEmail])
+			End if 
+		End if 
+		
+	: (Records in selection([VendorEmail])<1)
+		Repeat 
+			vsRequestString:="@nubby.com"
+			WinFind ("Enter your email address:";5)
+			vsRequestString:=Replace string(vsRequestString;" ";"")
+			If (ok=1)
+				WinChoice ("User Name: "+Current user+Char(13)+"Address: "+vsRequestString+Char(13)+Char(13)+"Is this correct?")
+				If (ok=1)
+					$done:=True
+					$create:=True
+				End if 
+			Else 
+				$done:=True
+			End if 
+		Until ($done)
+		
+		
+		If ($create)
+			CREATE RECORD([VendorEmail])
+			[VendorEmail]VendorKey:=-1
+			[VendorEmail]EmailAddress:=vsRequestString
+			[VendorEmail]User:=Current user
+			SAVE RECORD([VendorEmail])
+		End if 
+	: (Records in selection([VendorEmail])=1) & ([VendorEmail]EmailAddress#"") & (Shift down)
+		$i:=1
+		For ($i;1;Length([VendorEmail]EmailAddress))
+			APPEND TO ARRAY($char;[VendorEmail]EmailAddress[[$i]])
+		End for 
+		If (Count in array($char;".")<2)
+			WinChoice ("Is your email:"+Char(13)+[VendorEmail]EmailAddress+"?";"Yes";"Change It")
+			If (ok=0)
+				vsRequestString:="@nubby.com"
+				WinFind ("Enter your email address:";5)
+				vsRequestString:=Replace string(vsRequestString;" ";"")
+				[VendorEmail]EmailAddress:=vsRequestString
+				SAVE RECORD([VendorEmail])
+			End if 
+		End if 
+		
+		
+End case 
+<>vtMailFrom:=[VendorEmail]EmailAddress
+<>vsPrintBox:=[VendorEmail]PrintBox
+<>vtPrintPath:=[VendorEmail]PrintPath
+
+UNLOAD RECORD([VendorEmail])

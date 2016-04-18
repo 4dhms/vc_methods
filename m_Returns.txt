@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlReturns)
+
+Case of 
+	: (<>vlReturns>0)
+		SHOW PROCESS(<>vlReturns)
+		BRING TO FRONT(<>vlReturns)
+	: (<>vlReturns=0)
+		If (Shift down)
+			WinChoice ("Do you want to use the old system or the new system?";"Old";"New")
+			If (ok=1)
+				<>vlReturns:=New process("Returns";0;"returns")
+			Else 
+				<>vlReturns:=New process("ReturnsNew";0;"returns")
+			End if 
+		Else 
+			<>vlReturns:=New process("ReturnsNew";0;"returns")
+		End if 
+	Else 
+		SHOW PROCESS(<>vlReturns)
+		BRING TO FRONT(<>vlReturns)
+End case 

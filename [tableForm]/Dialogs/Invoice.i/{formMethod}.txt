@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asStyleWC;0)
+		ARRAY LONGINT(alOrders;0)
+		ARRAY TEXT(asCustomers;0)
+		ARRAY DATE(ADNYCANCELWC;0)
+		ARRAY LONGINT(alQuantity;0)
+		ARRAY REAL(arPrice;0)
+		ARRAY LONGINT(alUnshipped;0)
+		ARRAY LONGINT(alSales;0)
+		vsFind:=""
+		vrInvAmt:=0
+		vdInvDate:=!00-00-00!
+		vlInvQty:=0
+		vlOrderNumber:=0
+		REDUCE SELECTION([Designs];0)
+End case 

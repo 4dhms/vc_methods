@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($req;$n)
+C_TEXT($test)
+
+DC_GetColHead 
+
+QUERY([DC_Locations];[DC_Locations]DCKey=[DC_Spreads]DCKey)
+QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=[DC_Spreads]DCSheetKey)
+ORDER BY([DC_SpreadLines];[DC_SpreadLines]DCpo;>;[DC_SpreadLines]SortOrder;>;[DC_SpreadLines]DCLineKey;>)
+
+If (Records in selection([DC_SpreadLines])>0)
+	
+	$req:=50+18+(18*Records in selection([DC_SpreadLines]))
+	If ($req+vlPrintedPixels>720)
+		PrintOrder_NewPage (0;"")
+	End if 
+	
+	Print form([DC_Locations];"DC.header")
+	vlPrintedPixels:=vlPrintedPixels+60
+	
+	Print form([BreakDownLibrary];"DC.header")
+	vlPrintedPixels:=vlPrintedPixels+18
+	
+	FIRST RECORD([DC_SpreadLines])
+	  //
+	vtDCpo:=""
+	
+	$n:=1
+	For ($n;1;Records in selection([DC_SpreadLines]))
+		PrintOrder_NewPage (720;"")
+		$test:=Substring(vtDCpo;5;20)
+		
+		If ([DC_SpreadLines]DCpo#$test)
+			vtDCpo:="PO: "+[DC_SpreadLines]DCpo
+			Print form("DC_PO")
+			vlPrintedPixels:=vlPrintedPixels+50
+		End if 
+		
+		Print form([DC_SpreadLines];"DC.line")
+		vlPrintedPixels:=vlPrintedPixels+18
+		NEXT RECORD([DC_SpreadLines])
+	End for 
+	
+	vlPrintedPixels:=vlPrintedPixels+24
+	Print form("DC.Rule")
+	
+End if 

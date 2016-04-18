@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SD_SizeArray (0)
+REDUCE SELECTION([Designs];0)
+

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbComponents=1)
+	OBJECT SET VISIBLE(cbHistory;True)
+	OBJECT SET VISIBLE(cbStatus;True)
+	OBJECT SET VISIBLE(cbIssues;True)
+	cbStatus:=1
+Else 
+	OBJECT SET VISIBLE(cbHistory;False)
+	OBJECT SET VISIBLE(cbStatus;False)
+	OBJECT SET VISIBLE(cbIssues;False)
+End if 
+

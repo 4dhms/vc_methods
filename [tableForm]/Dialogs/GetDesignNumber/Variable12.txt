@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_TEXT($testNumber)
+
+$testNumber:=Substring(vsDesignNumber;1;7)+"@"
+QUERY([Designs];[Designs]DesignNum=$testNumber)
+
+
+Case of 
+	: (Records in selection([Designs])<1)
+		WinChoice (vsDesignNumber+" does not exist. Are you sure you want to use this number?")
+		If (ok=1)
+			$continue:=True
+		End if 
+	Else 
+		QUERY SELECTION([Designs];[Designs]DesignNum=vsDesignNumber)
+		If (Records in selection([Designs])<1)
+			$continue:=True
+		Else 
+			WinPrompt ("Design number: "+vsDesignNumber+" has already been created.")
+		End if 
+End case 
+
+
+If ($continue)
+	ARRAY TEXT(asDivisions;0)
+	ARRAY TEXT(<>asCategory;0)
+	ACCEPT
+End if 
+
+UNLOAD RECORD([Designs])

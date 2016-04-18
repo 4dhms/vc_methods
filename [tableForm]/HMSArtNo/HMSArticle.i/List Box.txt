@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Count in array(afListBox1;True)=1) & (Record number([HMSArtNo])>=0)
+		OBJECT SET VISIBLE(b3;True)
+		
+	: (Count in array(afListBox1;True)=1)
+		OBJECT SET VISIBLE(b2;True)
+	Else 
+		OBJECT SET VISIBLE(b2;False)
+End case 
+

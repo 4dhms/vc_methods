@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vfUnapproved:=True
+Center Window (250;500;1;"")
+DIALOG([Dialogs];"ProductionStatus.win")
+CLOSE WINDOW
+
+If (ok=1)
+	Order_ReturnSort 
+	FORM SET OUTPUT([Orders];"UnapprovedStat.o")
+	PAGE SETUP([Orders];"UnapprovedStat.o")
+	
+	Print_Selection (->[Orders])
+End if 

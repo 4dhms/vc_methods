@@ -1,0 +1,297 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$col)
+C_LONGINT(vlCurrentsheet)
+C_POINTER($colptr)
+C_TEXT($testline)
+
+$c:=47
+
+ARRAY LONGINT(alBackground;0)
+ARRAY TEXT(atCost0;0)
+ARRAY TEXT(atCost1;0)
+ARRAY TEXT(atCost2;0)
+ARRAY TEXT(atCost3;0)
+ARRAY TEXT(atCost4;0)
+ARRAY TEXT(atCost5;0)
+ARRAY TEXT(atCost6;0)
+ARRAY TEXT(atCost7;0)
+ARRAY TEXT(atCost8;0)
+ARRAY TEXT(atCost9;0)
+ARRAY TEXT(atCost10;0)
+ARRAY LONGINT(alStyle;0)
+ARRAY LONGINT(alBackground;0)
+ARRAY TEXT(atCost0;$c)
+ARRAY TEXT(atCost1;$c)
+ARRAY TEXT(atCost2;$c)
+ARRAY TEXT(atCost3;$c)
+ARRAY TEXT(atCost4;$c)
+ARRAY TEXT(atCost5;$c)
+ARRAY TEXT(atCost6;$c)
+ARRAY TEXT(atCost7;$c)
+ARRAY TEXT(atCost8;$c)
+ARRAY TEXT(atCost9;$c)
+ARRAY TEXT(atCost10;$c)
+ARRAY LONGINT(alStyle;$c)
+ARRAY LONGINT(alBackground;$c)
+alStyle{1}:=1
+vlCurrentsheet:=asSheetNames
+
+atCost0{2}:="My FOB"
+atCost0{3}:="Cushion"
+atCost0{4}:="CMT"
+atCost0{5}:="Misc"
+atCost0{6}:="Via"
+atCost0{7}:="To"
+atCost0{8}:="Boat"
+atCost0{9}:="Air"
+atCost0{10}:="Freight"
+atCost0{11}:="Brokerage"
+atCost0{12}:="NY Misc"
+atCost0{13}:="FOB 1"
+atCost0{14}:="Confirmed"
+atCost0{15}:="Category"
+atCost0{16}:="Quota"
+atCost0{17}:="Confirmed"
+atCost0{18}:="Duty"
+atCost0{19}:="FOB 2"
+atCost0{20}:="Confirmed"
+atCost0{21}:="Category"
+atCost0{22}:="Quota"
+atCost0{23}:="Confirmed"
+atCost0{24}:="Duty"
+atCost0{25}:="Misc Notes"
+atCost0{26}:="Ship Notes"
+atCost0{27}:="NY Misc Notes"
+atCost0{28}:="FOB Notes"
+atCost0{29}:="Quota Notes"
+
+atCost0{30}:="Wt Duty"
+atCost0{31}:="Amount"
+atCost0{32}:="Total Sales Net"
+atCost0{33}:="Total Sales Net Net"
+
+atCost0{34}:="LDP Boat"
+atCost0{35}:="Unit Cost"
+atCost0{36}:="Total Cost"
+atCost0{37}:="Total Profit Net"
+atCost0{38}:="Total Profit Net Net"
+atCost0{39}:="Gross Profit Net"
+atCost0{40}:="Gross Profit Net Net"
+atCost0{41}:="LDP Air"
+atCost0{42}:="Unit Cost"
+atCost0{43}:="Total Cost"
+atCost0{44}:="Total Profit Net"
+atCost0{45}:="Total Profit Net Net"
+atCost0{46}:="Gross Profit Net"
+atCost0{47}:="Gross Profit Net Net"
+
+If (Size of array(asSheetNames)>10)
+	$col:=10
+Else 
+	$col:=Size of array(asSheetNames)
+End if 
+
+$i:=1
+For ($i;1;$col)
+	$colptr:=Get pointer("atCost"+String($i))
+	CS_FindSheet (asSheetNames{$i})
+	
+	vrLDP:=[CostSheets]UnitCostSeaWC
+	vrLDPAir:=[CostSheets]UnitCostAirWC
+	
+	vrUnit1:=[CostSheets]UnitCostSeaWC
+	vrUnit2:=[CostSheets]UnitCostAirWC
+	
+	vrTotal1:=Round(([CostSheets]Quantity*[CostSheets]Price)*((100-[CostSheets]Figurer)/100);2)
+	vrTotal2:=Round(vrTotal1*((100-[CostSheets]SpecialDiscount)/100);2)
+	
+	vrNetProfit1:=Round(vrTotal1-([CostSheets]Quantity*[CostSheets]UnitCostSeaWC);2)
+	vrNetNetProfit1:=Round(vrTotal2-([CostSheets]Quantity*[CostSheets]UnitCostSeaWC);2)
+	vrNetProfit2:=Round([CostSheets]NetTotalSales-([CostSheets]Quantity*[CostSheets]UnitCostAirWC);2)
+	vrNetNetProfit2:=Round(vrTotal2-([CostSheets]Quantity*[CostSheets]UnitCostAirWC);2)
+	
+	vrNetPercent1:=Round((([CostSheets]NetUnitPrice-[CostSheets]UnitCostSeaWC)/[CostSheets]NetUnitPrice)*100;2)
+	vrNetNetPercent1:=Round((([CostSheets]NetNetUnitPrice-[CostSheets]UnitCostSeaWC)/[CostSheets]NetNetUnitPrice)*100;2)
+	vrNetPercent2:=Round((([CostSheets]NetUnitPrice-[CostSheets]UnitCostAirWC)/[CostSheets]NetUnitPrice)*100;2)
+	vrNetNetPercent2:=Round((([CostSheets]NetNetUnitPrice-[CostSheets]UnitCostAirWC)/[CostSheets]NetNetUnitPrice)*100;2)
+	
+	vlTotQty:=[CostSheets]Quantity
+	vrPrice:=[CostSheets]Price
+	
+	$colptr->{1}:=[CostSheets]SheetName
+	
+	If ([CostSheets]MyFOB)
+		$colptr->{2}:="Yes"
+	Else 
+		$colptr->{2}:=""
+	End if 
+	
+	$colptr->{3}:=String([CostSheets]Cushion;"###.00")
+	$colptr->{4}:=String([CostSheets]CMT;"###.00")
+	$colptr->{5}:=String([CostSheets]Misc;"###.00")
+	$colptr->{7}:=[CostSheets]OtherShip
+	
+	Case of 
+		: ([CostSheets]ShipSea)
+			$colptr->{6}:="Boat"
+			If ([CostSheets]FreightBOAT>0)
+				$colptr->{8}:=String([CostSheets]FreightBOAT;"###.00")
+			End if 
+		: ([CostSheets]ShipAir)
+			$colptr->{6}:="Air"
+			If ([CostSheets]FreightAIR>0)
+				$colptr->{9}:=String([CostSheets]FreightAIR;"###.00")
+			End if 
+		: ([CostSheets]ShipLDP)
+			$colptr->{6}:="LDP"
+			If ([CostSheets]FreightBOAT>0)
+				$colptr->{10}:=String([CostSheets]FreightBOAT;"###.00")
+			End if 
+		: ([CostSheets]ShipFOB)
+			$colptr->{6}:="FOB"
+			If ([CostSheets]FreightBOAT>0)
+				$colptr->{10}:=String([CostSheets]FreightBOAT;"###.00")
+			End if 
+		Else 
+	End case 
+	
+	$colptr->{11}:=String([CostSheets]BrokerageChg;"###.00")
+	$colptr->{12}:=String([CostSheets]NYMisc;"###.00")
+	$colptr->{13}:=String([CostSheets]FOB;"###.00")
+	Case of 
+		: ([CostSheets]FOBConfirmed)
+			$colptr->{14}:="Yes"
+		: ($colptr->{1}="")
+			$colptr->{14}:=""
+		Else 
+			$colptr->{14}:="No"
+	End case 
+	$colptr->{15}:=[CostSheets]QuotaCat1
+	$colptr->{16}:=String([CostSheets]Quota;"###.00")
+	Case of 
+		: ([CostSheets]Quota1Confirm)
+			$colptr->{17}:="Yes"
+		: ($colptr->{1}="")
+			$colptr->{17}:=""
+		Else 
+			$colptr->{17}:="No"
+	End case 
+	$colptr->{18}:=String([CostSheets]Duty1;"###.00")
+	
+	$colptr->{19}:=String([CostSheets]FOB;"###.00")
+	Case of 
+		: ([CostSheets]FOB2Confirmed)
+			$colptr->{20}:="Yes"
+		: ($colptr->{1}="")
+			$colptr->{20}:=""
+		Else 
+			$colptr->{20}:="No"
+	End case 
+	$colptr->{21}:=[CostSheets]QuotaCat2
+	$colptr->{22}:=String([CostSheets]Quota2;"###.00")
+	Case of 
+		: ([CostSheets]Quota2Confirm)
+			$colptr->{23}:="Yes"
+		: ($colptr->{1}="")
+			$colptr->{23}:=""
+		Else 
+			$colptr->{23}:="No"
+	End case 
+	$colptr->{24}:=String([CostSheets]Duty2;"###.00")
+	
+	$colptr->{25}:=[CostSheets]MiscNotes
+	$colptr->{26}:=[CostSheets]ShipNotes
+	$colptr->{27}:=[CostSheets]NYMiscNotes
+	$colptr->{28}:=[CostSheets]FOBNotes
+	$colptr->{29}:=[CostSheets]SpecialNotes
+	
+	$colptr->{30}:=String([CostSheets]DutyRate;"###.00")
+	$colptr->{31}:=String([CostSheets]DutyAmount;"###.00")
+	$colptr->{32}:=String(vrTotal1;"###,###,###.00")
+	$colptr->{33}:=String(vrTotal2;"###,###,###.00")
+	
+	If ([CostSheets]ShipSea) | ([CostSheets]ShipSea=[CostSheets]ShipAir)
+		$colptr->{34}:=String(vrLDP;"###,###,###.00")
+		$colptr->{35}:=String(vrUnit1;"###,###,###.00")
+		$colptr->{36}:=String(vrTotal1;"###,###,###.00")
+		$colptr->{37}:=String(vrNetProfit1;"###,###,###.00")
+		$colptr->{38}:=String(vrNetNetProfit1;"###,###,###.00")
+		$colptr->{39}:=String(Round(vrNetPercent1;1);"###,###,###.0%")
+		$colptr->{40}:=String(Round(vrNetNetPercent1;1);"###,###,###.0%")
+	End if 
+	
+	If ([CostSheets]ShipAir) | ([CostSheets]ShipSea=[CostSheets]ShipAir)
+		$colptr->{41}:=String(vrLDPAir;"###,###,###.00")
+		$colptr->{42}:=String(vrUnit2;"###,###,###.00")
+		$colptr->{43}:=String(vrTotal2;"###,###,###.00")
+		$colptr->{44}:=String(vrNetProfit2;"###,###,###.00")
+		$colptr->{45}:=String(vrNetNetProfit2;"###,###,###.00")
+		$colptr->{46}:=String(Round(vrNetPercent2;1);"###,###,###.0%")
+		$colptr->{47}:=String(Round(vrNetNetPercent2;1);"###,###,###.0%")
+	End if 
+	
+	$n:=1
+	For ($n;1;Size of array($colptr->))
+		If ($colptr->{$n}=".00")
+			$colptr->{$n}:=""
+		End if 
+	End for 
+End for 
+
+$i:=1
+For ($i;1;Size of array(atCost1))
+	Case of 
+		: ($i>6)
+			Case of 
+				: (atCost0{$i}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i-1}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i-2}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i-3}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i-4}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i-5}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i-6}="LDP Air")
+					alBackground{$i}:=16117990
+				: (atCost0{$i}="LDP Boat")
+					alBackground{$i}:=14480885
+				: (atCost0{$i-1}="LDP Boat")
+					alBackground{$i}:=14480885
+				: (atCost0{$i-2}="LDP Boat")
+					alBackground{$i}:=14480885
+				: (atCost0{$i-3}="LDP Boat")
+					alBackground{$i}:=14480885
+				: (atCost0{$i-4}="LDP Boat")
+					alBackground{$i}:=14480885
+				: (atCost0{$i-5}="LDP Boat")
+					alBackground{$i}:=14480885
+				: (atCost0{$i-6}="LDP Boat")
+					alBackground{$i}:=14480885
+				Else 
+					alBackground{$i}:=16777215
+			End case 
+		Else 
+			alBackground{$i}:=16777215
+	End case 
+End for 
+
+
+
+$i:=1
+$n:=Size of array(atCost1)
+For ($i;1;Size of array(atCost1))
+	$testline:=atCost1{$n}+atCost2{$n}+atCost3{$n}+atCost4{$n}+atCost5{$n}
+	$testline:=$testline+atCost6{$n}+atCost7{$n}+atCost8{$n}+atCost9{$n}+atCost10{$n}
+	$testline:=Replace string($testline;"0";"")
+	
+	If (Length($testline)=0)
+		  //DELETE LISTBOX ROW(Spreadsheet;$n)
+		Spreadsheet_Delete ($n)
+	End if 
+	$n:=$n-1
+End for 
+

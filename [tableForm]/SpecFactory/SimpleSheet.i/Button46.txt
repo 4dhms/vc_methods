@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (vlY>730)
+	POST CLICK(vlX;238)
+Else 
+	vlY:=vlY+24
+End if 
+POST CLICK(vlX;vlY)
+

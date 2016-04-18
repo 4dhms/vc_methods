@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfEmail:=False
+vfPDF:=False
+SS_PrintButton 
+
+If ([SpecFactory]Part2#"")
+	SS_GetPart 
+End if 

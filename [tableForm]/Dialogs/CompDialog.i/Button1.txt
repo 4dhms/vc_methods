@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+
+If (alCompOrderNumber{asCompName}=0) & (<>vlOrderNumber>0)
+	
+	$message:="Are you sure you want to delete this component from this order?"+Char(13)+"(It will remain on the sample garment component sheet.)"
+Else 
+	$message:="Are you sure you want to delete this component from this order?"
+End if 
+
+WinChoice ($message)
+If (ok=1)
+	vtOrderChanges:=vtOrderChanges+"_Components"
+	alCompDeleted{asCompName}:=16711690
+End if 
+CANCEL

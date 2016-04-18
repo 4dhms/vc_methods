@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		If (afSpecsheet{afSpecsheet}) & (Find in array(alMasterSpecSheet;alOrders{afSpecSheet})>0)
+			WinChoice ("HMS Order "+String(alOrders{afSpecsheet})+" had an open specsheet."+Char(13)+"Do you want to archive that specsheet and copy this one?";"No";"Yes")
+			If (ok=1)
+				afSpecsheet{afSpecsheet}:=False
+			End if 
+		End if 
+End case 

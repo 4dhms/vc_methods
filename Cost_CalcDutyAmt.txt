@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($amt;$amtactual)
+
+$amt:=Round([CostSheets]FOB*([CostSheets]Duty1/100);2)
+$amt:=$amt+Round([CostSheets]FOB2*([CostSheets]Duty2/100);2)
+
+If ([CostSheets]DutyActual=0)
+	$amtactual:=$amt
+Else 
+	$amtactual:=Round([CostSheets]FOB*([CostSheets]DutyActual/100);2)
+	$amtactual:=$amtactual+Round([CostSheets]FOB2*([CostSheets]DutyActual/100);2)
+End if 
+
+[CostSheets]DutyAmount:=$amt
+[CostSheets]DutyAmountActual:=$amtactual
+SAVE RECORD([CostSheets])
+
+$0:=$amt

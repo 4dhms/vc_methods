@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		If (<>asStartMonth=<>asEndMonth) & (<>asStartDay=<>asEndDay)
+			vtHeader:="Order Summary  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asEndYear{<>asEndYear}+")"
+		Else 
+			vtHeader:="Order Summary  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+" - "+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+		End if 
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Break)
+		vlTotalUnits:=Subtotal([Orders]TotalOrderQuantity)
+		vlGrandTotal:=Subtotal([Orders]TotalSales)
+End case 

@@ -1,0 +1,34 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vSeason:=[Orders]SeasonName+" "+[Orders]SeasonYear
+
+If ([Orders]SeasonName="0")
+	[Orders]SeasonName:=""
+End if 
+If ([Orders]SeasonYear="0")
+	[Orders]SeasonYear:=""
+End if 
+
+Case of 
+	: (Find in array(<>asSeasonName;[Orders]SeasonName)<1)
+		<>asSeasonName:=1
+	Else 
+		<>asSeasonName:=Find in array(<>asSeasonName;[Orders]SeasonName)
+End case 
+Case of 
+	: (Find in array(<>asSeasonYear;[Orders]SeasonYear)<1)
+		<>asSeasonYear:=1
+	Else 
+		<>asSeasonYear:=Find in array(<>asSeasonYear;[Orders]SeasonYear)
+End case 
+
+Case of 
+	: ([Orders]BlouseType=0)
+		yYes:=0
+		yNot:=0
+	: ([Orders]BlouseType=1)
+		yYes:=0
+		yNot:=1
+	: ([Orders]BlouseType=2)
+		yYes:=1
+		yNot:=0
+End case 

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsCustomer:=""
+vsStyleNumber:=""
+vdWeekOne:=!00-00-00!
+vsDIvision:=""
+vtTitle:=""
+ARRAY TEXT(asColors;0)
+REDUCE SELECTION([SLRAcct];0)
+REDUCE SELECTION([SLRWks];0)
+OBJECT SET ENABLED(bAccept;False)
+OBJECT SET VISIBLE(vdWeekOne;False)
+OBJECT SET VISIBLE(vxSketch;False)
+OBJECT SET VISIBLE(<>asDN;False)
+GOTO OBJECT(vsEmpty)

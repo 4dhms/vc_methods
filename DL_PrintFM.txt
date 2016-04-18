@@ -1,0 +1,55 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsMSRP1)
+C_TEXT(vsMSRP2)
+C_TEXT(vsMSRP3)
+C_TEXT(vsMSRP4)
+C_TEXT(vsMSRP5)
+C_TEXT(vsMSRP6)
+C_TEXT(vsMSRP7)
+C_TEXT(vsMSRP8)
+C_LONGINT(cbNoPageNos)
+
+Case of 
+	: (Form event=On Load)
+		vtFullName:=[DesignLines]Line
+		If ([DesignLines]Season#"")
+			vtFullName:=vtFullName+" -- "+[DesignLines]Season
+		End if 
+		If ([DesignLines]Title#"")
+			vtFullName:=vtFullName+" -- "+[DesignLines]Title
+		End if 
+		
+	: (Form event=On Header)
+		
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE([DLPages]PageTitle;[DLPages]PageTitle#"Added Items")
+		If (cbNoPageNos=1)
+			vsPrintingHeader:=""
+		Else 
+			vsPrintingHeader:=String([DLPages]PageNumber)+" / "+String(vlRecCount)
+		End if 
+		DL_BuildPageOnFly 
+		DL_ApplyFont 
+		OBJECT SET VISIBLE(*;"xMSRP1";vsMSRP1#"")
+		OBJECT SET VISIBLE(*;"xMSRP2";vsMSRP2#"")
+		OBJECT SET VISIBLE(*;"xMSRP3";vsMSRP3#"")
+		OBJECT SET VISIBLE(*;"xMSRP4";vsMSRP4#"")
+		OBJECT SET VISIBLE(*;"xMSRP5";vsMSRP5#"")
+		OBJECT SET VISIBLE(*;"xMSRP6";vsMSRP6#"")
+		OBJECT SET VISIBLE(*;"xMSRP7";vsMSRP7#"")
+		OBJECT SET VISIBLE(*;"xMSRP8";vsMSRP8#"")
+		  //If ([DesignLines]Stock) 
+		  //OBJECT SET VISIBLE(*;"xSoldOut1";vtColor1="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut2";vtColor2="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut3";vtColor3="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut4";vtColor4="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut5";vtColor5="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut6";vtColor6="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut7";vtColor7="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut8";vtColor8="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut9";vtColor9="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut10";vtColor10="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut11";vtColor11="")
+		  //OBJECT SET VISIBLE(*;"xSoldOut12";vtColor12="")
+		  //End if 
+End case 

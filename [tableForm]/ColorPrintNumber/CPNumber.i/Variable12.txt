@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Designer") & (Shift down)
+	SAVE RECORD([ColorPrintNumber])
+	ACCEPT
+	
+Else 
+	Case of 
+		: ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor="") & (Record number([ColorPrintNumber])<0)
+			WinChoice ("Enter Thread Color:")
+			GOTO OBJECT([ColorPrintNumber]ThreadColor)
+		: ([ColorPrintNumber]ThreadColor="DTM") | ([ColorPrintNumber]ThreadColor="TBD") & ([ColorPrintNumber]CPType=2)
+			WinPrompt ("Thread must use a number in the Color Library.")
+		Else 
+			CP_LibValidate 
+	End case 
+End if 

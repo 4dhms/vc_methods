@@ -1,0 +1,212 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //$1 Field 1=Order Number 2=Style Number 3=Design Number
+  //2 Table 1=HMS Order 2=Cost Sheet -1=Sample
+C_LONGINT($orderno)
+C_BOOLEAN($exit;$continue)
+C_TEXT($subhead)
+C_TEXT($number)
+C_TEXT($failure)
+
+If ($1>0)
+	If ($2=1)
+		SAVE RECORD([Orders])
+		SAVE RECORD([CostSheets])
+		SAVE RECORD([Costing])
+	End if 
+	
+	
+	If ($2=2)  //save cost sheet into  
+		Cost_EntryCalculate 
+		SAVE RECORD([CostSheets])
+		SAVE RECORD([Costing])
+		Cost_ExitRecord 
+	End if 
+	
+	Case of 
+		: ($1=1)
+			If (<>vlOrderNumber>0)
+				$subhead:="Enter Order Number:"
+				$failure:=Char(13)+"HMS Order "
+			Else 
+				$subhead:="Enter Sample Number:"
+				$failure:=Char(13)+"Sample Order "
+			End if 
+		: ($1=2)
+			$subhead:="Enter Style Number:"
+			$failure:=Char(13)+"Style Number "
+		: ($1=3)
+			$subhead:="Enter Design Number:"
+			$failure:=Char(13)+"Design Number "
+		: ($1=4)
+			$subhead:="Enter Customer Style Number:"
+			$failure:=Char(13)+"Customer Style Number "
+	End case 
+	
+	Repeat 
+		$continue:=False
+		WinFind ($subhead)
+		$number:=vsRequestString
+		
+		$orderno:=Num($number)
+		
+		If (ok=1)
+			If (vAddTo=1)
+				WinPrompt ("The quick find option does not support selections.")
+			End if 
+			Case of 
+				: ($1=1)
+					Case of 
+						: ($2=1) | ($2=2)
+							If (<>vlOrderNumber>0)
+								QUERY([Orders];[Orders]OrderNum=$orderno)
+							Else 
+								QUERY([Samples];[Samples]SampleNumber=$orderno)
+							End if 
+							
+						: ($2=-1)
+							QUERY([Samples];[Samples]SampleNumber=$orderno)
+					End case 
+				: ($1=2)
+					Case of 
+						: ($2=1) | ($2=2) & (<>vlOrderNumber>0)
+							QUERY([Orders];[Orders]StyleNumber=$number)
+							QUERY SELECTION([Orders];[Orders]Cancelled=False)
+							QUERY SELECTION([Orders];[Orders]LastCostSheet#"")
+						: ($2=-1) | ($2=2) & (<>vlOrderNumber<0)
+							QUERY([Samples];[Samples]StyleNum=$number)
+							QUERY SELECTION([Samples];[Samples]LastCostSheet#"")
+					End case 
+					
+				: ($1=3) | ($2=2)
+					
+					Case of 
+						: ($2=1) | ($2=2) & (<>vlOrderNumber>0)
+							QUERY([Orders];[Orders]DesignNumber=$number)
+							QUERY SELECTION([Orders];[Orders]Cancelled=False)
+							QUERY SELECTION([Orders];[Orders]LastCostSheet#"")
+						: ($2=-1) | ($2=2) & (<>vlOrderNumber<0)
+							QUERY([Samples];[Samples]DesignNum=$number)
+							QUERY SELECTION([Samples];[Samples]LastCostSheet#"")
+					End case 
+					
+				: ($1=4)
+					Case of 
+						: ($2=1) | ($2=2) & (<>vlOrderNumber>0)
+							QUERY([Orders];[Orders]CustomerStyle=$number)
+							QUERY SELECTION([Orders];[Orders]Cancelled=False)
+							  //QUERY SELECTION([Orders];[Orders]LastCostSheet#"")
+					End case 
+			End case 
+			  //TRACE
+			
+			Case of 
+				: ($2=2) & (<>vlOrderNumber>0)
+					If (Records in selection([Orders])>1)
+						ORDER BY([Orders];[Orders]OrderNum;<)
+					End if 
+					FIRST RECORD([Orders])
+					<>vlOrderNumber:=[Orders]OrderNum
+					QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum;*)
+					QUERY([Costing]; & ;[Costing]OrderNumber#0)
+					
+					If (Records in selection([Costing])<1)
+						WinPrompt ("There is no cost sheet for "+$failure+$number)
+					Else 
+						QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+						$continue:=True
+					End if 
+					
+				: ($2=2) & (<>vlOrderNumber<0)
+					If (Records in selection([Samples])>1)
+						ORDER BY([Samples];[Samples]SampleNumber;<)
+					End if 
+					
+					FIRST RECORD([Samples])
+					<>vlOrderNumber:=[Samples]SampleNumber*-1
+					QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber;*)
+					QUERY([Costing]; & ;[Costing]OrderNumber#0)
+					
+					If (Records in selection([Costing])<1)
+						WinPrompt ("There is no cost sheet for "+$failure+$number)
+					Else 
+						QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+						$continue:=True
+						
+					End if 
+				: ($2=1)
+					If (Records in selection([Orders])<1)
+						WinPrompt ("There is no order for "+$failure+$number)
+					Else 
+						$continue:=True
+					End if 
+				: ($2=-1)
+					If (Records in selection([Samples])<1)
+						WinPrompt ("There is no order for "+$failure+$number)
+					Else 
+						$continue:=True
+					End if 
+			End case 
+			
+			If ($continue)
+				$exit:=True
+				
+				Case of 
+					: ($2=1)
+						If (Records in selection([Orders])>1)
+							ACCEPT
+						Else 
+							Orders_FM_EnterOnLoad 
+							QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+						End if 
+					: ($2=-1)
+						If (Records in selection([Samples])>1)
+							ACCEPT
+						Else 
+							SG_FM_EntryOnLoad 
+						End if 
+					Else 
+						If (<>vlOrderNumber>0)
+							<>vlPrice:=[Orders]Price
+							<>vsTerms:=[Orders]Price Terms
+							<>vsDesignNumber:=[Orders]DesignNumber
+							<>vtCustomerStyle:=[Orders]CustomerStyle
+							<>vsStyleNumber:=[Orders]StyleNumber
+							<>vlQuantity:=[Orders]TotalOrderQuantity
+						Else 
+							<>vlPrice:=[Samples]Price
+							<>vsTerms:=""
+							<>vsDesignNumber:=[Samples]DesignNum
+							<>vtCustomerStyle:=""
+							<>vsStyleNumber:=[Samples]StyleNum
+							<>vlQuantity:=[Samples]SGQuantity
+						End if 
+						  //Orders_FM_EnterOnLoad 
+						vfCancel:=False
+						vrTestPrice:=0
+						vfTestQuantity:=False
+						vlTestQuantity:=0
+						vfImport:=False
+						vfNewCostsheet:=True
+						vlNamerState:=0
+						
+						ORDER BY([CostSheets];[CostSheets]SheetID;<)
+						CREATE SET([CostSheets];"ThisSheet")
+						SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames;[CostSheets]SheetID;alSheetKeys)
+						Sheet_OnLoad 
+				End case 
+			End if 
+			Case of 
+				: (Records in selection([Orders])=0) & (<>vlOrderNumber>0)
+					ACCEPT
+					ALL RECORDS([Orders])
+				: (Records in selection([Samples])=0) & (<>vlOrderNumber<0)
+					ACCEPT
+					ALL RECORDS([Samples])
+			End case 
+			
+		Else 
+			$exit:=True
+			ACCEPT
+		End if 
+	Until ($exit)
+End if 

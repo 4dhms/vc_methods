@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i)
+C_POINTER($col1;$col2;$col3;$col4;$col5;$col6;$col7)
+C_TEXT($range)
+C_TEXT($date1)
+C_TEXT($date2)
+
+$range:=<>asStartMonth{<>asStartMonth}+" - "+<>asEndMonth{<>asEndMonth}+" "+<>asStartYear{<>asStartYear}
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	
+	SEND PACKET($docref;asDivisions{asDivisions}+Char(9)+$range+Char(13)+Char(13))
+	SEND PACKET($docref;Char(9)+"Month"+Char(9)+"Orders"+Char(9)+"Units"+Char(9)+"Dollars"+Char(9))
+	SEND PACKET($docref;Char(9)+"Orders"+Char(9)+"Units"+Char(9)+"Dollars"+Char(13))
+	
+	$i:=1
+	For ($i;1;12)
+		$col1:=Get pointer("vsMonth"+String($i))
+		$col2:=Get pointer("vlOrders"+String(12+$i))
+		$col3:=Get pointer("vlUnits"+String(12+$i))
+		$col4:=Get pointer("vlDollars"+String(12+$i))
+		$col5:=Get pointer("vlOrders"+String($i))
+		$col6:=Get pointer("vlUnits"+String($i))
+		$col7:=Get pointer("vlDollars"+String($i))
+		
+		If ($i=1)
+			$date1:=vtTitle1
+			$date2:=vtTitle2
+		Else 
+			$date1:=""
+			$date2:=""
+		End if 
+		
+		If ($col1->#"")
+			SEND PACKET($docref;$date1+Char(9)+$col1->+Char(9)+String($col2->;"###,###,###")+Char(9)+String($col3->;"###,###,###")+Char(9)+String($col4->;"###,###,###")+Char(9))
+			SEND PACKET($docref;$date2+Char(9)+String($col5->;"###,###,###")+Char(9)+String($col6->;"###,###,###")+Char(9)+String($col7->;"###,###,###")+Char(13))
+		End if 
+	End for 
+	
+	SEND PACKET($docref;Char(9)+"Total"+Char(9)+String(vlOrdersGrand;"###,###,###")+Char(9)+String(vlUnitsGrand;"###,###,###")+Char(9)+String(vlDollarsGrand;"###,###,###")+Char(9))
+	SEND PACKET($docref;Char(9)+String(vlOrdersGrandx;"###,###,###")+Char(9)+String(vlUnitsGrandx;"###,###,###")+Char(9)+String(vlDollarsGrandx;"###,###,###")+Char(13))
+	
+	CLOSE DOCUMENT($docref)
+End if 

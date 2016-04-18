@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([ShipArchive];"rex")
+ADD RECORD([ShipArchive];*)
+ADD TO SET([ShipArchive];"rex")
+USE SET("rex")
+CLEAR SET("rex")

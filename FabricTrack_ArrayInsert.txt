@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+INSERT IN ARRAY(alFabricColor;$1;$2)
+$i:=1
+For ($i;1;$2)
+	alFabricColor{$1+($i-1)}:=16777215
+End for 
+
+INSERT IN ARRAY(asMOrder;$1;$2)
+INSERT IN ARRAY(adMCancel;$1;$2)
+INSERT IN ARRAY(asFactories;$1;$2)
+INSERT IN ARRAY(asMPO;$1;$2)
+INSERT IN ARRAY(arMcol1;$1;$2)
+INSERT IN ARRAY(arMcol2;$1;$2)
+INSERT IN ARRAY(arMcol3;$1;$2)
+INSERT IN ARRAY(arMcol4;$1;$2)
+INSERT IN ARRAY(arMcol5;$1;$2)
+INSERT IN ARRAY(arMcol6;$1;$2)
+INSERT IN ARRAY(arMcol7;$1;$2)
+INSERT IN ARRAY(arMcol8;$1;$2)
+INSERT IN ARRAY(arMcol9;$1;$2)
+INSERT IN ARRAY(arMcol10;$1;$2)
+INSERT IN ARRAY(arMcol11;$1;$2)
+INSERT IN ARRAY(arMcol12;$1;$2)
+INSERT IN ARRAY(arMcol13;$1;$2)
+INSERT IN ARRAY(arMcol14;$1;$2)
+INSERT IN ARRAY(arMcol15;$1;$2)
+INSERT IN ARRAY(arMcol16;$1;$2)
+INSERT IN ARRAY(arMcol17;$1;$2)
+INSERT IN ARRAY(arMcol18;$1;$2)
+INSERT IN ARRAY(arMcol19;$1;$2)
+INSERT IN ARRAY(atMNote;$1;$2)
+

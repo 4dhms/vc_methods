@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]ProdComments=Char(13))
+	[Orders]ProdComments:=""
+End if 
+If ([Orders]ProdComments=" ")
+	[Orders]ProdComments:=""
+End if 
+
+If ([Orders]Special_Instructions=Char(13))
+	[Orders]Special_Instructions:=""
+End if 
+If ([Orders]Special_Instructions=" ")
+	[Orders]Special_Instructions:=""
+End if 
+
+If ([Orders]Comments_Sales=Char(13))
+	[Orders]Comments_Sales:=""
+End if 
+If ([Orders]Comments_Sales=" ")
+	[Orders]Comments_Sales:=""
+End if 
+

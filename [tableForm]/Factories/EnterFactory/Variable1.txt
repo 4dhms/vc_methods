@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Factories]AlphaKey="")
+	WinPrompt ("You must enter an alpha key for this factory.")
+Else 
+	[Speedpost Form]To Factory:=[Factories]FactoryName+Char(13)+[Factories]FactoryAddress
+	[Speedpost Form]Package number:=[Factories]AlphaKey+String([Factories]NumberKey)
+	<>asFactories:=Find in array(<>asFactories;[Factories]FactoryName)
+	NumberKey:=NumberKey+1
+	SAVE RECORD([Factories])
+	Array_Factories 
+	ACCEPT
+End if 

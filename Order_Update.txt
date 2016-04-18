@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfFabimport)
+
+If (Order_Mandatory )
+	
+	If ([Orders]NeedBy=!00-00-00!) & ([Orders]Customer#"")
+		ALL RECORDS([Preferences])
+		FIRST RECORD([Preferences])
+		vlLong:=[Preferences]MarmaxLong
+		vlShort:=[Preferences]MarmaxShort
+		UNLOAD RECORD([Preferences])
+		
+		PreCarton_DueCalcExec 
+	End if 
+	
+	Fab_UpdateActual 
+	If (Position("Fabric";vtOrderChanges)>0)
+		Fabric_ArraySave 
+	End if 
+	
+	If (Position("Color";vtOrderChanges)>0) | (Find in array(alShadeFab;16711690)>0)
+		Color_Save 
+	End if 
+	
+	If (Position("Component";vtOrderChanges)>0)
+		Comp_Save 
+	End if 
+	
+	  //If (Position("DC";vtOrderChanges)>0)
+	  //Order_DC_Save 
+	  //End if 
+	
+	If (Position("Breakdown";vtOrderChanges)>0)
+		Order_SaveBD 
+	End if 
+	
+	Case of 
+		: (FORM Get current page=8) | (FORM Get current page=9)
+			Sheet_Update 
+	End case 
+	
+	$0:=True
+	vtOrderChanges:=""
+	
+	If (Application type>0)
+		Pix_Save 
+	End if 
+Else 
+	$0:=False
+End if 
+

@@ -1,0 +1,88 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($colors)
+C_LONGINT($i;$n;$s;$count)
+C_BOOLEAN($qty)
+
+QUERY([Orders];[Orders]OrderNum=Num(vsOrderNumber))
+If (Records in selection([Orders])=0)
+	WinPrompt ("This is no HMS Order Number "+vsOrderNumber+".")
+Else 
+	WinChoice ("Do you want to include quantities?")
+	If (ok=1)
+		$qty:=True
+		$count:=0
+	Else 
+		$qty:=False
+	End if 
+	
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum;*)
+	QUERY([OrdersFabricXRef]; & ;[OrdersFabricXRef]OrdType="Self")
+	FIRST RECORD([OrdersFabricXRef])
+	CREATE EMPTY SET([CP_OrderXRef];"CP")
+	
+	$n:=1
+	For ($n;1;Records in selection([OrdersFabricXRef]))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPOrdID;>)
+		
+		$s:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($s;1;Records in selection([CP_OrderXRef]))
+			ADD TO SET([CP_OrderXRef];"CP")
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+	  //RELATE MANY SELECTION([CP_OrderXRef]XrefID)
+	
+	$i:=1
+	FIRST RECORD([CP_OrderXRef])
+	$i:=1
+	$colors:=""
+	For ($i;1;Records in selection([CP_OrderXRef]))
+		If ([CP_OrderXRef]CPType="Self")
+			If ($i>1)
+				$colors:=$colors+", "
+			End if 
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			$colors:=$colors+[ColorPrintNumber]CPName
+			If ($qty)
+				$colors:=$colors+"="+String([CP_OrderXRef]Quantity;"###,##0")
+				$count:=$count+[CP_OrderXRef]Quantity
+			End if 
+		End if 
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	If ($qty)
+		$colors:=$colors+Char(13)+"Total="+String($count;"###,##0")
+	End if 
+	
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	CREATE RECORD([DesignLineIncluded])
+	[DesignLineIncluded]LineKey:=Sequence number([DesignLineIncluded])
+	[DesignLineIncluded]Fiber:=[Designs]Fabric
+	[DesignLineIncluded]DesignLineKey:=<>vlDLKey
+	[DesignLineIncluded]DesignNumber:=[Designs]DesignNum
+	[DesignLineIncluded]Name:=[Designs]Description
+	[DesignLineIncluded]Stitch:=[Designs]Stitch
+	[DesignLineIncluded]Colors:=$colors
+	[DesignLineIncluded]Price:=String([Orders]Price;"#0.00")
+	[DesignLineIncluded]StyleNumber:=[Orders]StyleNumber
+	[DesignLineIncluded]Size:=[Orders]BrkdnCutRatio
+	[DesignLineIncluded]MSRP:=[Orders]RetailPrice
+	[DesignLineIncluded]CancelDate:=[Orders]CancelDate
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+	If (Records in selection([OrdersFabricXRef])>0)
+		[DesignLineIncluded]Fiber:=[OrdersFabricXRef]FiberContent
+	End if 
+	SAVE RECORD([DesignLineIncluded])
+	UNLOAD RECORD([Designs])
+	UNLOAD RECORD([Orders])
+End if 
+UNLOAD RECORD([ColorPrintNumber])
+
+CANCEL
+CALL PROCESS(Current process)
+
+CALL PROCESS(<>DLProc)

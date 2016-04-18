@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_POINTER($tn;$dn)
+ARRAY BOOLEAN(afCancel;0)
+ARRAY BOOLEAN(afCancel;18)
+
+$i:=1
+If ([DesignLines]8Up)
+	$n:=8
+Else 
+	$n:=12
+End if 
+DLink_LoadNovelty 
+
+For ($i;1;$n)
+	$tn:=Field(116;$i+3)
+	$dn:=Field(116;$i+15)
+	
+	DLink_GrabDesign ($tn->;$dn->;$i)
+	
+End for 
+
+If (Not(vfPrinting))
+	$i:=1
+	For ($i;1;6)
+		$tn:=Field(49;$i+1)
+		$dn:=Field(49;$i+7)
+		DLink_GrabDesign ($tn->;$dn->;$i+12)
+	End for 
+End if 
+
+vsMSRP1:=[DesignLinkedPages]MSRP1
+vsMSRP2:=[DesignLinkedPages]MSRP2
+vsMSRP3:=[DesignLinkedPages]MSRP3
+vsMSRP4:=[DesignLinkedPages]MSRP4
+vsMSRP5:=[DesignLinkedPages]MSRP5
+vsMSRP6:=[DesignLinkedPages]MSRP6
+vsMSRP7:=[DesignLinkedPages]MSRP7
+vsMSRP8:=[DesignLinkedPages]MSRP8
+vsMSRP9:=[DesignLinkedPages]MSRP9
+vsMSRP10:=[DesignLinkedPages]MSRP10
+vsMSRP11:=[DesignLinkedPages]MSRP11
+vsMSRP12:=[DesignLinkedPages]MSRP12
+
+
+

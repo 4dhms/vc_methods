@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($title)
+C_POINTER($fieldptr)
+
+ARRAY TEXT(atList21;0)
+
+vtRemaining:=""
+
+$fieldptr:=->[Orders]Comments_Sales
+$title:="Revisions:"
+If ($fieldptr->#"")
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]Special_Instructions
+$title:="Special Instructions:"
+If ($fieldptr->#"")
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]FitNotes
+$title:="Fit Notes:"
+If ($fieldptr->#"") & (vfInternal)
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]FabricNotes
+$title:="Fabric Notes:"
+If ($fieldptr->#"") & (vfInternal)
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]TrimNotes
+$title:="Trim Notes:"
+If ($fieldptr->#"") & (vfInternal)
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]InspectionReport
+$title:="Inspection Report:"
+If ($fieldptr->#"") & (vfInternal)
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]ProdComments
+$title:="Production Status Notes:"
+If ($fieldptr->#"") & (vfInternal)
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+$fieldptr:=->[Orders]TimeActionNotes
+$title:="Time and Action Notes:"
+If ($fieldptr->#"") & (vfInternal)
+	APPEND TO ARRAY(asList21;$title)
+	vtRemaining:=vtRemaining+$title+Char(13)
+	vtRemaining:=vtRemaining+$fieldptr->+Char(13)+Char(13)
+End if 
+
+vtRemaining:=Replace string(vtRemaining;Char(13)+Char(13)+Char(13);Char(13)+Char(13))

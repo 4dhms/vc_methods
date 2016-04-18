@@ -1,0 +1,43 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+
+$i:=1
+FIRST RECORD([CS_Lines])
+For ($i;1;Records in selection([CS_Lines]))
+	If ([CS_Lines]CS_Sort=0)
+		[CS_Lines]CS_Sort:=Records in selection([CS_Lines])
+		SAVE RECORD([CS_Lines])
+	End if 
+End for 
+
+CREATE SET([CS_Lines];"clines")
+CREATE RECORD([CS_Lines])
+[CS_Lines]CS_ID:=0
+[CS_Lines]DesignNumber:=<>vsDesignNumber
+[CS_Lines]OrderNumber:=<>vlOrderNumber
+[CS_Lines]ComponentName:=""
+If (asComponents>1)
+	[CS_Lines]ComponentName:=asComponents{asComponents}
+	asComponents:=1
+End if 
+[CS_Lines]CS_LineKey:=Sequence number([CS_Lines])
+[CS_Lines]CurrentStatusDate:=Current date(*)
+[CS_Lines]CurrentStatus:="Component added"
+[CS_Lines]SpecSheet:=$1
+[CS_Lines]CS_Sort:=Records in selection([CS_Lines])
+SAVE RECORD([CS_Lines])
+ADD TO SET([CS_Lines];"clines")
+
+If ($1)
+	CREATE RECORD([CS_Status])
+	[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+	[CS_Status]ActionDate:=[CS_Lines]CurrentStatusDate
+	[CS_Status]ActionStatus:=[CS_Lines]CurrentStatus
+	[CS_Status]OKby:=Current user
+	SAVE RECORD([CS_Status])
+End if 
+
+USE SET("clines")
+CLEAR SET("clines")
+ORDER BY([CS_Lines]CS_Sort;>)

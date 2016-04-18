@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Samples];[Samples]SGStatus=1)
+If (Records in selection([Samples])>0)
+	
+	$i:=1
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		QUERY([Orders];[Orders]DesignNumber=[Samples]DesignNum;*)
+		QUERY([Orders]; & ;[Orders]StyleNumber=[Samples]StyleNum)
+		If (Records in selection([Orders])>0)
+			[Samples]IsOrder:="HMS Order"
+		Else 
+			[Samples]IsOrder:="Development"
+		End if 
+		QUERY([Specs];[Specs]Design Num=[Samples]DesignNum;*)
+		QUERY([Specs]; & ;[Specs]Style Num=[Samples]StyleNum)
+		SAVE RECORD([Samples])
+		NEXT RECORD([Samples])
+	End for 
+	
+	ORDER BY([Samples];[Samples]IsOrder;<;[Samples]StyleNum;>)
+	BREAK LEVEL(1)
+	ACCUMULATE([Samples]IsOrder)
+	FORM SET OUTPUT([Samples];"SampleGarment.print")
+	PAGE SETUP([Samples];"SampleGarment.print")
+	Print_Selection (->[Samples])
+	FORM SET OUTPUT([Samples];"LargeList.o")
+	
+Else 
+	WinPrompt ("There are no sample garments to report.")
+End if 

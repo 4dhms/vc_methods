@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$subtot)
+C_POINTER($colptr)
+
+$i:=1
+For ($i;1;15)
+	$n:=1
+	$subtot:=0
+	For ($n;1;10)
+		$colptr:=Get pointer("arMCol"+String($n))
+		Case of 
+			: ($n=5)
+				
+			: ($n=10)
+				$colptr->{$i}:=$subtot
+			Else 
+				$subtot:=$colptr->{$i}+$subtot
+		End case 
+	End for 
+End for 
+
+asList10{16}:=String(Round(Num(asList10{15})/Num(asList10{4});0);"###,##0")
+asList10{17}:=String(Round(Num(asList10{15})/(Num(asList10{4})+Num(asList10{5}));0);"###,##0")

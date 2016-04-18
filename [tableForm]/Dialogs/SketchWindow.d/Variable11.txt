@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Record number([SpecFactory])<0)
+	If (vsColHead1="Fit Sample")
+		vdSubmit1:=Current date(*)+7
+	End if 
+End if 
+
+

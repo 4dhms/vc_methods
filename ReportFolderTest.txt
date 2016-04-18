@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$folder)
+C_LONGINT($i)
+C_BOOLEAN($done)
+
+If (Application type=4)
+	  //this is testing mode
+	$folder:=Select folder
+	vtPDFPath:=$folder+"Web:Reports:"
+	
+Else 
+	  //this executed on the server
+	$path:=Structure file
+	
+	$i:=Length($path)
+	
+	Repeat 
+		If ($path[[$i]]=":")
+			vtPDFPath:=Substring($path;1;$i)
+			$done:=True
+		Else 
+			$i:=$i-1
+		End if 
+	Until ($done)
+	vtPDFPath:=vtPDFPath+"Web:Reports:"
+	If (Test path name(vtPDFPath)#0)
+		CREATE FOLDER(vtPDFPath)
+	End if 
+End if 

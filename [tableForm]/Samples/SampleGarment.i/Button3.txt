@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Do you want to generate a new style number or find samples?";"Generate";"Find")
+If (ok=1)
+	<>vsStyleNumber:=""
+	p_GetStyleNumber 
+	
+	Case of 
+		: (<>vsStyleNumber="Multiple") | ([Samples]MultipleStyles)
+			WinPrompt ("This sample has multiple style numbers."+Char(13)+"Enter Style Number "+<>vsStyleNumber+" in a self print window.")
+			
+		: (<>vsStyleNumber#"")
+			If ([Samples]Customer="")
+				[Samples]Customer:=<>vsCustomer
+			End if 
+			[Samples]StyleNum:=<>vsStyleNumber
+	End case 
+	
+Else 
+	Styles_ShowStatusProc ([Samples]StyleNum)
+End if 
+

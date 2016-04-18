@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If (Is new record([Quota]))
+		Case of 
+			: (pOne=1)
+				asKWCS:=Find in array(asKWCS;"Woven")
+				[Quota]KW:="W"
+			: (pTwo=1)
+				asKWCS:=Find in array(asKWCS;"Knit@")
+				[Quota]KW:="K"
+			: (pThree=1)
+				asKWCS:=Find in array(asKWCS;"Other")
+				[Quota]KW:="O"
+		End case 
+	Else 
+		Case of 
+			: ([Quota]KW="K")
+				asKWCS:=2
+			: ([Quota]KW="W")
+				asKWCS:=3
+			Else 
+				asKWCS:=1
+		End case 
+		
+	End if 
+End if 

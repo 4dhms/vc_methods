@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	If (User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet)
+		Entry_Frame (->[CostSheets]SpecialNotes;"Quota Notes")
+	End if 
+End if 

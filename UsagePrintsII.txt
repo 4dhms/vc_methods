@@ -1,0 +1,118 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$used;$s;$coreprint;$varprint;$varused)
+C_LONGINT($coreunits;$xunits;$offunits;$xunits;$c)
+C_TEXT($div)
+C_BOOLEAN($counted;$varcounted;$var)
+C_TEXT($corer)
+READ ONLY([Orders])
+
+$i:=1
+For ($i;1;Size of array(asDivisions))
+	USE SET("Prints")
+	$div:=Substring(asDivisions{$i};1;3)+"@"
+	
+	If ($div="03@")
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Division="03@";*)
+		QUERY SELECTION([ColorPrintNumber]; | ;[ColorPrintNumber]Division="05@")
+	Else 
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Division=$div)
+	End if 
+	QUERY SELECTION([ColorPrintNumber]; & ;[ColorPrintNumber]CPType=2)
+	
+	
+	alChartPrints{$i}:=Records in selection([ColorPrintNumber])
+	
+	$coreprint:=0
+	$used:=0
+	$coreunits:=0
+	$xunits:=0
+	$offunits:=0
+	$varprint:=0
+	$varcounted:=True
+	$varused:=0
+	CREATE EMPTY SET([Orders];"core")
+	CREATE EMPTY SET([Orders];"xtra")
+	CREATE EMPTY SET([Orders];"off")
+	
+	ARRAY TEXT($printnumbers;0)
+	SELECTION TO ARRAY([ColorPrintNumber]CPNumber;$printnumbers)
+	
+	$n:=1
+	For ($n;1;Size of array($printnumbers))
+		$varcounted:=False
+		$counted:=False
+		$corer:=Substring($printnumbers{$n};1;Position("-";$printnumbers{$n}))+"@"
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=$corer)
+		
+		ARRAY TEXT($test;0)
+		SELECTION TO ARRAY([CP_OrderXRef]CPNumber;$test)
+		$var:=False
+		$c:=1
+		For ($c;1;Size of array($test))
+			If ($test{$c}#"@-1")
+				$var:=True
+			End if 
+		End for 
+		Case of 
+			: ($var)
+				$varprint:=$varprint+1
+			: (Find in array($test;"@-1")>0)
+				$used:=$used+1
+		End case 
+		
+		$s:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($s;1;Records in selection([CP_OrderXRef]))
+			QUERY([Orders];[Orders]OrderNum>0)
+			QUERY SELECTION([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+			QUERY SELECTION([Orders];[Orders]Cancelled=False)
+			
+			Case of 
+				: ([Orders]OrderDivision="03@") & ([CP_OrderXRef]CPNumber="@-1")
+					  //ALERT([Orders]OrderDivision)
+					
+					  //: ([Orders]OrderDivision="03@") & (asDivisions{$i}="03@") & ([CP_OrderXRef]CPNumber="@-1")
+					
+					ADD TO SET([Orders];"core")
+					$coreunits:=$coreunits+[CP_OrderXRef]Quantity
+					If (Not($counted))
+						$counted:=True
+					End if 
+				: ([CP_OrderXRef]CPNumber="@-1") & ([Orders]OrderDivision=asDivisions{$i})
+					ADD TO SET([Orders];"core")
+					$coreunits:=$coreunits+[CP_OrderXRef]Quantity
+					If (Not($counted))
+						$counted:=True
+					End if 
+				: ([Orders]OrderDivision=asDivisions{$i})
+					ADD TO SET([Orders];"xtra")
+					$xunits:=$xunits+[CP_OrderXRef]Quantity
+					If (Not($varcounted))
+						$varcounted:=True
+						$varused:=$varused+1
+					End if 
+				Else 
+					ADD TO SET([Orders];"off")
+					$offunits:=$offunits+[CP_OrderXRef]Quantity
+			End case 
+			
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		NEXT RECORD([ColorPrintNumber])
+	End for 
+	USE SET("core")
+	USE SET("off")
+	alChartPrintsUsed{$i}:=$used
+	alPrintOrders{$i}:=Records in set("core")
+	alPrintUnits{$i}:=$coreunits
+	alOtherOrderTot{$i}:=Records in set("off")
+	alOtherUnitTot{$i}:=$offunits
+	alVarOrders{$i}:=Records in set("xtra")
+	alVarUnits{$i}:=$xunits
+	alVarPrints{$i}:=$varprint
+	alVarPrintsUsed{$i}:=$varused
+	
+	CLEAR SET("core")
+	CLEAR SET("off")
+End for 
+

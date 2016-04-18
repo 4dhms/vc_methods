@@ -1,0 +1,76 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbMultiStyles;$i)
+C_TEXT($style;$rec;$wait)
+ARRAY LONGINT($orders;0)
+ARRAY TEXT($stylelist;0)
+
+READ ONLY([Orders])
+READ ONLY([Samples])
+
+If (cbMultiStyles=1)
+	$style:="@"+StripToNumber (vsStyleNumber)+"@"
+Else 
+	$style:=vsStyleNumber
+End if 
+
+Styles_Init 
+QUERY([Orders];[Orders]StyleNumber=$style)
+SELECTION TO ARRAY([Orders]OrderNum;$orders;[Orders]StyleNumber;$stylelist)
+
+QUERY([Samples];[Samples]StyleNum=$style)
+FIRST RECORD([Samples])
+$i:=1
+For ($i;1;Records in selection([Samples]))
+	APPEND TO ARRAY($orders;-1*[Samples]SampleNumber)
+	APPEND TO ARRAY($stylelist;[Samples]StyleNum)
+	NEXT RECORD([Samples])
+End for 
+
+$i:=1
+For ($i;1;Size of array($orders))
+	$wait:=""
+	$rec:=""
+	
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=$orders{$i})
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+	
+	If (Records in selection([SpecFactory])>0)
+		ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+		
+		Case of 
+			: ([SpecFactory]Colhead="To Customer")
+				$wait:="At Customer"
+			: ([SpecFactory]Submit=!00-00-00!) & ([SpecFactory]Received#!00-00-00!)
+				$rec:=[SpecFactory]Colhead+" ("+String([SpecFactory]Received)+")"
+			: ([SpecFactory]Submit#!00-00-00!) & ([SpecFactory]Received#!00-00-00!)
+				$rec:=[SpecFactory]Colhead+" ("+String([SpecFactory]Received)+")"
+			: ([SpecFactory]Submit#!00-00-00!) & ([SpecFactory]Received=!00-00-00!)
+				$wait:=[SpecFactory]Colhead+" ("+String([SpecFactory]Submit)+")"
+				If (Records in selection([SpecLineSample])>0) & ([SpecLineSample]Received#!00-00-00!)
+					$rec:=[SpecLineSample]ColumnHeader+" ("+String([SpecLineSample]Received)+")"
+				End if 
+			: ([SpecFactory]Submit=!00-00-00!) & ([SpecFactory]Received=!00-00-00!)
+				If (Records in selection([SpecLineSample])>0)
+					Case of 
+						: ([SpecLineSample]Received#!00-00-00!)
+							$rec:=[SpecLineSample]ColumnHeader+" ("+String([SpecLineSample]Received)+")"
+						: ([SpecLineSample]SubmitDue#!00-00-00!)
+							$wait:=[SpecLineSample]ColumnHeader+" ("+String([SpecLineSample]SubmitDue)+")"
+						Else 
+							[Orders]SampleStatus:=[SpecFactory]Colhead+" (?)"
+					End case 
+				Else 
+					[Orders]SampleStatus:=""
+				End if 
+		End case 
+		APPEND TO ARRAY(asList11;$stylelist{$i})
+		If ($orders{$i}>0)
+			APPEND TO ARRAY(asList12;String($orders{$i}))
+		Else 
+			APPEND TO ARRAY(asList12;"SG"+String($orders{$i}))
+		End if 
+		APPEND TO ARRAY(asList13;$rec)
+		APPEND TO ARRAY(asList14;$wait)
+	End if 
+End for 

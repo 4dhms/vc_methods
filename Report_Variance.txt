@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Orders];"EstVAct.report")
+FORM SET INPUT([Orders];"OrdEntSlsMed")
+
+Array_BuildDates 
+ARRAY TEXT(asQuikfind;4)
+asQuikFind{1}:="Quik Find"
+asQuikFind{2}:="Order Number"
+asQuikFind{3}:="Style Number"
+asQuikFind{4}:="Design Number"
+
+ARRAY TEXT(asSortOrder;0)
+ARRAY TEXT(asSort;0)
+
+APPEND TO ARRAY(asSort;"Sort Up")
+APPEND TO ARRAY(asSort;"Sort Down")
+asSort:=1
+
+APPEND TO ARRAY(asSortOrder;"PO Number")
+APPEND TO ARRAY(asSortOrder;"Style Number")
+APPEND TO ARRAY(asSortOrder;"NY Cancel")
+APPEND TO ARRAY(asSortOrder;"X Factory")
+APPEND TO ARRAY(asSortOrder;"Order Qty")
+APPEND TO ARRAY(asSortOrder;"Invoice Qty")
+APPEND TO ARRAY(asSortOrder;"Difference")
+APPEND TO ARRAY(asSortOrder;"Projected Sales")
+APPEND TO ARRAY(asSortOrder;"Actual Sales")
+APPEND TO ARRAY(asSortOrder;"Difference")
+asSortOrder:=1
+
+REDUCE SELECTION([Orders];0)
+SET WINDOW TITLE("Variance Report")
+
+Center Window (940;650;4;"";"WincBox")
+MODIFY SELECTION([Orders];*)
+
+CLOSE WINDOW
+<>vlVarianceReport:=0

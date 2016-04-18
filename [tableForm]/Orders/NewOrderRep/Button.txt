@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+$choice:=Pop up menu("Filter;Excel;Style List")
+
+Case of 
+	: ($choice=1)
+		Report_CustomerList 
+	: ($choice=2)
+		Report_NewOrderExcel 
+	: ($choice=3)
+		Report_ExportStyles 
+End case 

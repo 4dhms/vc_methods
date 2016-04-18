@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Display Detail)
+	  //Picture_RestoreOnTheFly 
+	SLR_AcctStyleFM 
+End if 

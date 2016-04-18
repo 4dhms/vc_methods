@@ -1,0 +1,95 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($1;$query)
+
+If (Count parameters>0)
+	$query:=$1
+End if 
+
+QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+
+If (Records in selection([Costing])>0)
+	
+	  //If ([Costing]QCat1="0") | ([Costing]QCat1="false")
+	  //[Costing]QCat1:=""
+	  //$save:=True
+	  //End if 
+	  //If ([Costing]QHTS1="0") | ([Costing]QHTS1="false")
+	  //[Costing]QHTS1:=""
+	  //$save:=True
+	  //End if 
+	  //If ([Costing]QCat2="0") | ([Costing]QCat2="false")
+	  //[Costing]QCat2:=""
+	  //$save:=True
+	  //End if 
+	  //If ([Costing]QHTS2="0") | ([Costing]QHTS2="false")
+	  //[Costing]QHTS2:=""
+	  //$save:=True
+	  //End if 
+	  //If ($save)
+	  //SAVE RECORD([Costing])
+	  //End if 
+	
+	  //If ([Costing]QHTS1="")
+	  //SET VISIBLE(*;"xHTS";False)
+	If ($query)
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	End if 
+	If (Records in selection([CostSheets])>0)
+		[Orders]Category1:=[CostSheets]QuotaCat1
+		[Orders]Category2:=[CostSheets]QuotaCat2
+	Else 
+		[Orders]Category1:=""
+		[Orders]Category2:=""
+	End if 
+	  //SET VISIBLE([Costing]QCat1;False)
+	  //SET VISIBLE([Costing]QHTS1;False)
+	  //SET VISIBLE([Costing]QCat2;False)
+	  //SET VISIBLE([Costing]QHTS2;False)
+	  //SET VISIBLE([CostSheets]QuotaCat1;True)
+	  //SET VISIBLE([CostSheets]QuotaCat2;True)
+	  //SET VISIBLE([Orders]Category1;True)
+	  //SET VISIBLE([Orders]Category2;True)
+	  //SET VISIBLE(*;"xCategory1";True)
+	
+	  //Else 
+	  //[Orders]Category1:=""
+	  //[Orders]Category2:=""
+	  //
+	  //SET VISIBLE([Orders]Category1;False)
+	  //SET VISIBLE([Orders]Category2;False)
+	  //SET VISIBLE([CostSheets]QuotaCat1;False)
+	  //SET VISIBLE([CostSheets]QuotaCat2;False)
+	  //SET VISIBLE([Orders]Category2;False)
+	  //SET VISIBLE([Costing]QCat1;True)
+	  //SET VISIBLE([Costing]QHTS1;True)
+	  //SET VISIBLE([Costing]QCat2;[CostSheets]QuotaCat2="")
+	  //SET VISIBLE([Costing]QHTS2;[CostSheets]QuotaCat2="")
+	  //SET VISIBLE(*;"xCategory1";True)
+	  //SET VISIBLE(*;"xHTS";True)
+	  //End if 
+	
+Else 
+	[Orders]Category1:=""
+	[Orders]Category2:=""
+	
+	OBJECT SET VISIBLE([Orders]Category1;False)
+	OBJECT SET VISIBLE([Orders]Category2;False)
+	OBJECT SET VISIBLE([CostSheets]QuotaCat1;False)
+	OBJECT SET VISIBLE([CostSheets]QuotaCat2;False)
+	OBJECT SET VISIBLE([Orders]Category2;False)
+	OBJECT SET VISIBLE([Costing]QCat1;True)
+	OBJECT SET VISIBLE([Costing]QHTS1;True)
+	OBJECT SET VISIBLE([Costing]QCat2;[CostSheets]QuotaCat2="")
+	OBJECT SET VISIBLE([Costing]QHTS2;[CostSheets]QuotaCat2="")
+	OBJECT SET VISIBLE(*;"xCategory1";False)
+	OBJECT SET VISIBLE(*;"xHTS";False)
+	OBJECT SET VISIBLE(*;"xCategory1";False)
+	REDUCE SELECTION([CostSheets];0)
+End if 
+
+
+UNLOAD RECORD([Quota])
+  //UNLOAD RECORD([CostSheets])
+  //UNLOAD RECORD([Costing])
+

@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($duty)
+
+QUERY([Costing];[Costing]OrderNumber=alPOOrder{$1})
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+
+$duty:=Round((arFOB{$1}*(arMCol4{$1}/100));2)
+
+arPrice{$1}:=Round(arFOB{$1}+arMCol1{$1}+[CostSheets]NYMisc+arMCol2{$1}+arMCol3{$1}+$duty;2)
+
+afBatchList{$1}:=True
+
+

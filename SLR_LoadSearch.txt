@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (asNames>1)
+	QUERY([SLRSearches];[SLRSearches]SearchName=asNames{asNames})
+	
+	$i:=1
+	For ($i;1;Length([SLRSearches]Divisions))
+		If ([SLRSearches]Divisions[[$i]]="1")
+			afBatchList{$i}:=True
+		Else 
+			afBatchList{$i}:=False
+		End if 
+	End for 
+	BLOB TO VARIABLE([SLRSearches]Customers;asCustomers)
+	BLOB TO VARIABLE([SLRSearches]StyleNumbers;asStyleNumbers)
+	vtTitle:=[SLRSearches]Title
+	asPODate:=Find in array(asPODate;[SLRSearches]Range)
+	asSeasonName:=Find in array(asSeasonName;[SLRSearches]SeasonName)
+	asSeasonYear:=Find in array(asSeasonYear;[SLRSearches]SeasonYear)
+	If ([SLRSearches]ColorStyle="Color")
+		zYes:=1
+		zNo:=0
+	Else 
+		zYes:=0
+		zNo:=1
+	End if 
+End if 

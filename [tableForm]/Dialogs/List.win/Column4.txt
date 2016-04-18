@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Double Clicked)
+		vtReturn:=atListContents{atListContents}
+		List_Use 
+	: (Form event=On Clicked) & (Shift down) & (atListContents>0)
+		QUERY([Lists];[Lists]UserName=Current user;*)
+		QUERY([Lists]; & ;[Lists]ListName=vsList1Name)
+		QUERY SELECTION([Lists];[Lists]ListItem=atListContents{atListContents})
+		DELETE RECORD([Lists])
+		DELETE FROM ARRAY(atListContents;atListContents;1)
+	: (Form event=On Clicked)
+		vtAddToList:=""
+		If (atListContents>0)
+			vtReturn:=atListContents{atListContents}
+		End if 
+End case 
+

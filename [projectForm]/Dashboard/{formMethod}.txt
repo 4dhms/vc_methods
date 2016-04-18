@@ -1,0 +1,83 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(helloUser;welcomeText)
+C_DATE($daterange)
+C_DATE($currentDate)
+helloUser:="Lina"  //Current user
+welcomeText:="Hi, "+helloUser
+$currentDate:=Current date(*)
+$daterange:=Current date(*)+14
+totalOO:="Total "
+totalMT:="Total "
+totalMB:="Total "
+totalUR:="Total "
+
+
+  //Current User Open Orders
+Begin SQL
+	SELECT OrderEntryDate, OrderNum, Customer, TotalOrderQuantity, CancelDate, StyleNumber, Order_Enterer, OrderDivision
+	 FROM Orders 
+	 WHERE CancelDate >= :$daterange AND Cancelled = False  AND Factory = '' AND Order_Enterer = :helloUser
+	 INTO <<openOrdersLB>>
+End SQL
+
+Begin SQL
+	SELECT COUNT(*)
+	 FROM Orders 
+	 WHERE CancelDate >= :$daterange AND Cancelled = False  AND Factory = '' AND Order_Enterer = :helloUser
+	 INTO :totalOO
+End SQL
+
+
+  //Current User Missing Tickets
+Begin SQL
+	SELECT NeedBy, OrderNum, Customer, StyleNumber,  TotalOrderQuantity, CancelDate, Order_Enterer, OrderDivision
+	 FROM Orders 
+	 WHERE Cancelled = False  AND RetailPrice  < 1 AND Order_Enterer = :helloUser
+	 INTO <<missingTicketsLB>>
+End SQL
+
+Begin SQL
+	SELECT COUNT(*)
+	 FROM Orders 
+	 WHERE Cancelled = False  AND RetailPrice  < 1 AND Order_Enterer = :helloUser
+	 INTO :totalMT
+End SQL
+
+
+  //Current User Missing Breaks
+Begin SQL
+	SELECT NeedBy, OrderNum, Customer, StyleNumber,  BrkdnCutRatio, TotalOrderQuantity, CancelDate, Order_Enterer
+	 FROM Orders 
+	 WHERE Cancelled = False  AND BreakFree = False AND ShipDateFactory > :$currentDate AND Price_Tckt_Sent = '' AND Order_Enterer = :helloUser
+	 INTO <<missingBreaksLB>>
+End SQL
+
+Begin SQL
+	SELECT COUNT(*)
+	 FROM Orders 
+	 WHERE Cancelled = False  AND BreakFree = False AND ShipDateFactory > :$currentDate AND Price_Tckt_Sent = '' AND Order_Enterer = :helloUser
+	 INTO :totalMB
+End SQL
+
+  //Current User Unsent Revisions
+Begin SQL
+	SELECT RevisionNumber, OrderNum, Factory, StyleNumber, Comments_Sales,TotalOrderQuantity,CancelDate, Order_Enterer
+	 FROM Orders 
+	 WHERE Cancelled = False AND RevisionNumber > 0 AND CancelDate >= :$currentDate AND Order_Enterer = :helloUser
+	 INTO <<unsentRevisionsLB>>
+End SQL
+
+Begin SQL
+	SELECT COUNT(*)
+	 FROM Orders 
+	 WHERE Cancelled = False AND RevisionNumber > 0 AND CancelDate >= :$currentDate AND Order_Enterer = :helloUser
+	 INTO :totalUR
+End SQL
+
+
+
+
+
+
+
+

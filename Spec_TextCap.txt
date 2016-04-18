@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($imagenumbers;0)
+
+QUERY([SpecPix];[SpecPix]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+SELECTION TO ARRAY([SpecPix]ImageNumber;$imagenumbers)
+SORT ARRAY($imagenumbers;>)
+
+QUERY SELECTION([SpecPix];[SpecPix]ImageNumber=$imagenumbers{vlPixPos+($1)})
+
+Case of 
+	: ($1=1)
+		[SpecPix]Description:=vtTextField1
+		atNote{vlPixPos+($1)}:=vtTextField1
+	: ($1=2)
+		[SpecPix]Description:=vtTextField2
+		atNote{vlPixPos+($1)}:=vtTextField2
+	: ($1=3)
+		[SpecPix]Description:=vtTextField3
+		atNote{vlPixPos+($1)}:=vtTextField3
+	: ($1=4)
+		[SpecPix]Description:=vtTextField4
+		atNote{vlPixPos+($1)}:=vtTextField4
+End case 
+SAVE RECORD([SpecPix])
+
+UNLOAD RECORD([SpecPix])

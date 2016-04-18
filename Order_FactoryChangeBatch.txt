@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($message)
+C_BOOLEAN($continue)
+
+Case of 
+	: ($1="factory")
+		$message:="Are you sure you want to replace the factory for these "+String(Records in selection([Orders]))+" orders?"
+	: ($1="cancel")
+		$message:="Are you sure you want to cancel these "+String(Records in selection([Orders]))+" orders?"
+	: ($1="uncancel")
+		$message:="Are you sure you want to uncancel these "+String(Records in selection([Orders]))+" orders?"
+End case 
+
+If (Records in selection([Orders])>100)
+	WinPrompt ("You can not change more than 100 orders at one time.")
+Else 
+	WinChoice ($message)
+	If (ok=1)
+		WinChoice ("Are you really really sure?";"No";"Yes")
+		If (ok=0)
+			Case of 
+				: ($1="factory")
+					WinFindList ("Enter new factory:";25)
+					If (ok=1) & (vsRequestString#"")
+						WinChoice ("I know what I am doing, replace the factory.";"No";"Yes")
+						If (ok=0)
+							$continue:=True
+						End if 
+					End if 
+				: ($1="cancel") | ($1="uncancel")
+					If (ok=0)
+						$continue:=True
+					End if 
+			End case 
+			
+			If ($continue)
+				
+				$i:=1
+				FIRST RECORD([Orders])
+				For ($i;1;Records in selection([Orders]))
+					Case of 
+						: ($1="factory")
+							vtOldData:=[Orders]Factory
+							[Orders]Factory:=vsRequestString
+							vtNewData:=vsRequestString
+						: ($1="cancel")
+							[Orders]Cancelled:=True
+							vtOldData:=""
+							vtNewData:=$1
+						: ($1="uncancel")
+							[Orders]Cancelled:=False
+							vtOldData:=""
+							vtNewData:=$1
+					End case 
+					
+					
+					SAVE RECORD([Orders])
+					
+					CREATE RECORD([Changes])
+					[Changes]FieldName:=$1
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]Tag:="Batch"
+					[Changes]TableNum:=2
+					[Changes]FieldNum:=40
+					[Changes]OldData:=vtOldData
+					[Changes]NewChange:=vtNewData
+					SAVE RECORD([Changes])
+					
+					NEXT RECORD([Orders])
+				End for 
+			End if 
+		End if 
+	End if 
+End if 
+

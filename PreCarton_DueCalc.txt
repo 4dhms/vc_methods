@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ALL RECORDS([Preferences])
+FIRST RECORD([Preferences])
+vlLong:=[Preferences]MarmaxLong
+vlShort:=[Preferences]MarmaxShort
+UNLOAD RECORD([Preferences])
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	PreCarton_DueCalcExec 
+	SAVE RECORD([Orders])
+	NEXT RECORD([Orders])
+End for 
+UNLOAD RECORD([Preferences])

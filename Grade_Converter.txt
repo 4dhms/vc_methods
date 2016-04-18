@@ -1,0 +1,75 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($upDown;$int)
+C_REAL($frac)
+C_TEXT($raw)
+$raw:=Replace string($1;"  ";" ")
+If (Substring($raw;1;1)=" ")
+	$raw:=Substring($raw;2;20)
+End if 
+If (Substring($raw;Length($raw);1)=" ")
+	$raw:=Substring($raw;1;Length($raw)-1)
+End if 
+
+If ($1="0") | ($1="")
+	$0:=0
+Else 
+	If (Substring($raw;1;1)="-")
+		$upDown:=-1
+		$raw:=Substring($raw;2;20)
+	Else 
+		$upDown:=1
+	End if 
+	
+	Case of 
+		: (Position(" ";$raw)>0)
+			$int:=Int(Num(Substring($raw;1;Position(" ";$raw))))
+			$raw:=Substring($raw;Position(" ";$raw)+1;20)
+		: (Position("/";$raw)<1)
+			$int:=Int(Num($raw))
+		Else 
+			$int:=0
+	End case 
+	
+	Case of 
+		: (Position("1/16";$raw)>0)
+			$frac:=0.0625
+		: (Position("1/8";$raw)>0)
+			$frac:=0.125
+		: (Position("3/16";$raw)>0)
+			$frac:=0.1875
+		: (Position("1/4";$raw)>0)
+			$frac:=0.25
+		: (Position("5/16";$raw)>0)
+			$frac:=0.3125
+		: (Position("3/8";$raw)>0)
+			$frac:=0.375
+		: (Position("7/16";$raw)>0)
+			$frac:=0.4375
+		: (Position("1/2";$raw)>0)
+			$frac:=0.5
+		: (Position("9/16";$raw)>0)
+			$frac:=0.5625
+		: (Position("5/8";$raw)>0)
+			$frac:=0.625
+		: (Position("11/16";$raw)>0)
+			$frac:=0.6875
+		: (Position("3/4";$raw)>0)
+			$frac:=0.75
+		: (Position("13/16";$raw)>0)
+			$frac:=0.7125
+		: (Position("7/8";$raw)>0)
+			$frac:=0.875
+		: (Position("15/16";$raw)>0)
+			$frac:=0.9375
+		Else 
+			$frac:=0
+	End case 
+	
+	$0:=$upDown*($int+$frac)
+End if 
+
+
+
+
+
+

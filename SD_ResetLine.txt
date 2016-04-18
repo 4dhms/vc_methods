@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+afProcess{vlLine}:=False
+asOrderNumbers{vlLine}:=""
+asFactories{vlLine}:=""
+asStyleNumbers{vlLine}:=""
+atCost1{vlLine}:=""
+atCost2{vlLine}:=""
+atCost3{vlLine}:=""
+atCost4{vlLine}:=""
+atCost5{vlLine}:=""
+atCost6{vlLine}:=""
+atCost7{vlLine}:=""
+SD_FontColor 

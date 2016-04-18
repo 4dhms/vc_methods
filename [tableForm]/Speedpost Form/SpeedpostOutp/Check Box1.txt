@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([VendorEmail];[VendorEmail]User=Current user)
+If (vlNoPrintBox=1)
+	<>vsPrintBox:="no"
+Else 
+	<>vsPrintBox:="yes"
+End if 
+[VendorEmail]PrintBox:=<>vsPrintBox
+
+SAVE RECORD([VendorEmail])
+UNLOAD RECORD([VendorEmail])

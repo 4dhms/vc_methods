@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Orders];[Orders]CancelDate>=!2005-06-01!)
+CREATE EMPTY SET([Orders];"639")
+$i:=1
+FIRST RECORD([Orders])
+
+For ($i;1;Records in selection([Orders]))
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	QUERY SELECTION([CostSheets];[CostSheets]QuotaCat1="639@";*)
+	QUERY SELECTION([CostSheets]; | ;[CostSheets]QuotaCat2="639@")
+	If (Records in selection([CostSheets])>0)
+		ADD TO SET([Orders];"639")
+	End if 
+	NEXT RECORD([Orders])
+End for 
+USE SET("639")
+CLEAR SET("639")
+
+SET WINDOW TITLE("Category 639: "+String(Records in selection([Orders]))+" Orders")

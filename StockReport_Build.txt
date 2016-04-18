@@ -1,0 +1,145 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE(vdStartA;vdStartB)
+C_DATE(vdEndA;vdEndB)
+C_LONGINT($i;$n;$count;$s;$colorkey)
+C_REAL($subtot)
+C_BOOLEAN($under)
+C_REAL($ldp;$Xmarkup;$Ymarkup;$avgwt)
+C_REAL($totcount;$totXwt;$totYwt)
+C_REAL($ldpwt;$ldpavg;$priceavg)
+
+StockReport_Init 
+ARRAY TEXT($customers;0)
+
+READ ONLY([Orders])
+READ ONLY([CostSheets])
+READ ONLY([Costing])
+READ ONLY([CP_OrderXRef])
+READ ONLY([DC])
+
+vdStartA:=Date(String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asStartYear{<>asStartYear})
+vdEndA:=Date(String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear})
+
+$totXwt:=0
+$totcount:=0
+$totXwt:=0
+$totYwt:=0
+$ldpwt:=0
+
+QUERY([Lists];[Lists]ListName="DC")
+SELECTION TO ARRAY([Lists]ListCode;$customers)
+
+QUERY([Orders];[Orders]CancelDate>=vdStartA;*)
+QUERY([Orders]; & ;[Orders]CancelDate<=vdEndA;*)
+QUERY([Orders]; & ;[Orders]Customer="Stock")
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+If (Current user="Designer") & (Shift down)
+	QUERY SELECTION([Orders];[Orders]OrderNum=81899)
+End if 
+
+Case of 
+	: (asDivisions{asDivisions}="03@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="05@")
+	: (asDivisions>1)
+		QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+End case 
+  //ALERT(String(vdStartA)+"  "+String(vdEndA)+"  "+String(Records in selection([Orders])))
+
+CREATE EMPTY SET([DC];"xstock")
+
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	If (Records in selection([Costing])>0)
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		If (Records in selection([CostSheets])>0)
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			FIRST RECORD([CostSheets])
+			Case of 
+				: ([CostSheets]ShipAir)
+					$ldp:=[CostSheets]UnitCostAir
+				Else 
+					$ldp:=[CostSheets]UnitCostSea
+			End case 
+		End if 
+	End if 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	
+	$count:=0
+	$subtot:=0
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+		$s:=1
+		FIRST RECORD([DC])
+		$under:=False
+		For ($s;1;Records in selection([DC]))
+			  //If ([DC]ReportCustomer#"")  //& (Find in array($customers;[DC]ReportCustomer)>0)
+			
+			If ([DC]Count>0) & ([DC]Price>0)
+				ADD TO SET([DC];"xstock")
+				If ([DC]Price<[Orders]Price)
+					$under:=True
+				End if 
+				$count:=$count+[DC]Count
+				$subtot:=$subtot+([DC]Price*[DC]Count)
+				  //Else 
+				  //ALERT(String([DC]OrderNumber)+"  "+[DC]ReportCustomer)
+			End if 
+			
+			  //End if 
+			NEXT RECORD([DC])
+		End for 
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	
+	If ($subtot/$count>0)
+		$avgwt:=Round($subtot/$count;2)
+		$Xmarkup:=Round((([Orders]Price-$ldp)/[Orders]Price)*100;1)
+		$Ymarkup:=Round((($avgwt-$ldp)/$avgwt)*100;1)
+		
+		APPEND TO ARRAY(alOrders;[Orders]OrderNum)
+		APPEND TO ARRAY(arSalePrice;([Orders]Price*(100-([Orders]NetDiscount)*0.01)))
+		APPEND TO ARRAY(arXmarkup;$Xmarkup)
+		APPEND TO ARRAY(arAvgWt;$avgwt)
+		APPEND TO ARRAY(arYmarkup;$Ymarkup)
+		APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+		APPEND TO ARRAY(alXQty;$count)
+		APPEND TO ARRAY(arLDP;$ldp)
+	End if 
+	APPEND TO ARRAY(alXColorKey;16777215)
+	NEXT RECORD([Orders])
+End for 
+
+$i:=1
+For ($i;1;Size of array(alOrders))
+	$totcount:=$totcount+alXQty{$i}
+	$totXwt:=$totXwt+Round(arSalePrice{$i}*alXQty{$i};2)
+	$ldpwt:=$ldpwt+(arLDP{$i}*alXQty{$i})
+	$totYwt:=$totYwt+Round(arAvgWt{$i}*alXQty{$i};2)
+	If (arYmarkup{$i}<arXmarkup{$i})
+		alXColorKey{$i}:=16761795
+	Else 
+		alXColorKey{$i}:=16777215
+	End if 
+End for 
+
+$ldpavg:=Round($ldpwt/$totcount;2)
+$priceavg:=Round($totXwt/$totcount;2)
+$avgwt:=Round($totYwt/$totcount;2)
+
+APPEND TO ARRAY(alOrders;0)
+APPEND TO ARRAY(alXQty;$totcount)
+APPEND TO ARRAY(arSalePrice;Round($priceavg;2))
+APPEND TO ARRAY(arXmarkup;Round((($priceavg-$ldpavg)/$priceavg)*100;1))
+APPEND TO ARRAY(arAvgWt;$avgwt)
+APPEND TO ARRAY(arYmarkup;Round((($avgwt-$ldpavg)/$avgwt)*100;1))
+APPEND TO ARRAY(alXColorKey;16777215)
+APPEND TO ARRAY(asStyleNumbers;"Average")
+APPEND TO ARRAY(arLDP;$ldpavg)

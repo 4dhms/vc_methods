@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY TEXT($designs;0)
+
+BLOB TO VARIABLE($1;$designs)
+
+If (Size of array($designs)=1)
+	QUERY([Designs];[Designs]DesignNum=$designs{1})
+Else 
+	CREATE EMPTY SET([Designs];"rex")
+	$i:=1
+	For ($i;1;Size of array($designs))
+		QUERY([Designs];[Designs]DesignNum=$designs{$i})
+		ADD TO SET([Designs];"rex")
+	End for 
+End if 
+USE SET("rex")
+CLEAR SET("rex")
+QUERY SELECTION([Designs];[Designs]ArchivedPict=False)
+
+Picture_Archive 
+
+

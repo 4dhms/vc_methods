@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($previous)
+ARRAY TEXT(asCPFamilies;0)
+
+$previous:=[ColorPrintFamilies]CPFamilyName
+
+QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPType=[ColorPrintNumber]CPType)
+ORDER BY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyName;>)
+SELECTION TO ARRAY([ColorPrintFamilies]CPFamilyName;asCPFamilies)
+WinFindList ("Select new family:";1)
+
+If ($previous#"")
+	WinChoice ("Are you sure you want to move this to the "+vsRequestString+" family?")
+	If (ok=1)
+		QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyName=vsRequestString)
+		[ColorPrintNumber]CPFamilyKey:=[ColorPrintFamilies]CPFamilyKey
+	Else 
+		QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyName=$previous)
+	End if 
+Else 
+	QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyName=vsRequestString)
+	[ColorPrintNumber]CPFamilyKey:=[ColorPrintFamilies]CPFamilyKey
+End if 

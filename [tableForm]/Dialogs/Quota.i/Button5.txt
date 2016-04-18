@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+SAVE RECORD([Quota])
+
+$line:=asHTSCode
+If ($line=0)
+	$line:=1
+	INSERT IN ARRAY(asDutyType;1;1)
+	INSERT IN ARRAY(alDutyStyle;1;1)
+	INSERT IN ARRAY(alDutyColor;1;1)
+	INSERT IN ARRAY(<>asCategory;1;1)
+	INSERT IN ARRAY(asNames;1;1)
+	INSERT IN ARRAY(arDutyRates;1;1)
+	INSERT IN ARRAY(asHTSCode;1;1)
+	INSERT IN ARRAY(afSpecial;1;1)
+End if 
+
+asDutyType{$line}:=[Quota]QuotaType
+<>asCategory{$line}:=[Quota]Category
+asNames{$line}:=[Quota]Description
+arDutyRates{$line}:=[Quota]DutyRate
+asHTSCode{$line}:=[Quota]HTSCode
+If ([Quota]Special)
+	alDutyColor{$line}:=16766935
+	alDutyStyle{$line}:=1
+	afSpecial{$line}:=True
+Else 
+	alDutyColor{$line}:=16777215
+	alDutyStyle{$line}:=0
+	afSpecial{$line}:=False
+End if 
+
+LISTBOX SELECT ROW(categories;$line)
+UNLOAD RECORD([Quota])
+FORM GOTO PAGE(1)

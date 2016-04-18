@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TIME($start;$current;$delay)
+C_BOOLEAN($done)
+
+  //$records:=int(Records in selection(Current form table)
+
+$start:=Current time(*)
+
+If (<>vlOS>4000)
+	$delay:=?00:00:30?
+Else 
+	$delay:=?00:00:20?
+End if 
+
+Repeat 
+	$current:=Current time(*)
+	Case of 
+		: (Test path name(vtPDFPath)=1)
+			$done:=True
+			
+		: ($current-$start>$delay)
+			EMail_Log (True;-1;"Move Failure";vtPDFPath)
+			$done:=True
+	End case 
+Until ($done)

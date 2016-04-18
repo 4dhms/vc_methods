@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($currentDate)
+$currentDate:=Current date(*)
+
+  //Sandy Unsent Revisions
+Begin SQL
+	SELECT RevisionNumber, OrderNum, Factory, StyleNumber, Comments_Sales,TotalOrderQuantity,CancelDate, Order_Enterer,OrderNumber
+	 FROM Orders, OrdersFabricXRef
+	 WHERE OrdersFabricXRef.OrderNumber=Orders.OrderNum AND Orders.Cancelled = False AND Orders.RevisionNumber > 0 AND Orders.CancelDate >= :$currentDate
+	 INTO <<unsentRevisionsLB1>>
+End SQL
+
+QUERY([Changes];[Changes]ChangeKey=alHistKey{atHistField})
+
+Center Window (350;400;1;"")
+DIALOG([Changes];"ChangeDetail")
+CLOSE WINDOW

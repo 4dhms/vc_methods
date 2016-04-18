@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+If (Current user="Designer")
+	$choice:=Pop up menu("Fabric Orders;Fabric Library;HMS Article Library")  //;Fabric Track")
+Else 
+	$choice:=Pop up menu("Fabric Orders;Fabric Library")  //;Fabric Track")
+End if 
+
+Case of 
+	: ($choice=1)
+		Order_Fabric 
+	: ($choice=2)
+		m_FabLib 
+	: ($choice=3)
+		Case of 
+			: (Current user#"Designer")
+				ALERT("Under development")
+			: (<>vlHMSarProc=0)
+				<>vlHMSarProc:=New process("p_FabLib";0;"FabLibEntry";"HMS Article Library")
+			Else 
+				SHOW PROCESS(<>vlHMSarProc)
+				BRING TO FRONT(<>vlHMSarProc)
+		End case 
+		  //m_FabricTrack 
+		  //: ($choice=4)
+		  //Array_VendorTypes 
+		  //<>asVendorTypes:=Find in array(<>asVendorTypes;"Fabric")
+		  //FO_Proc 
+End case 
+

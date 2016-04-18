@@ -1,0 +1,151 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_POINTER($fieldPtr)
+C_BOOLEAN($query1;$dateQuery;$intQuery)
+C_LONGINT($i)
+C_TEXT($compare)
+C_TEXT($value;$lineStat)
+
+vsFlag:="Sample"
+$query1:=True
+
+  //gets Factory and Web Session
+vsFactory:=vtFactoryField
+  //Web_UserField 
+
+  //Pointers on these fields
+ARRAY POINTER($ar_Ptr1;5)
+ARRAY POINTER($ar_Ptr2;5)
+ARRAY POINTER($ar_Ptr3;5)
+ARRAY POINTER($ar_Ptr4;5)
+ARRAY POINTER($ar_Ptr5;5)
+
+$i:=0
+For ($i;1;Size of array($ar_Ptr1))
+	$ar_Ptr1{$i}:=Get pointer("w_ProdField"+String($i))
+	$ar_Ptr2{$i}:=Get pointer("w_ProdTest"+String($i))
+	  //$ar_Ptr3{$i}:=Get pointer("w_ProdValue"+String($i))
+	$ar_Ptr3{$i}:=Get pointer("w_ProdVal"+String($i))
+	If ($i>1)
+		$ar_Ptr4{$i}:=Get pointer("w_ProdLogic"+String($i))
+	End if 
+	$ar_Ptr5{$i}:=Get pointer("vtTextField"+String($i))
+End for 
+
+vtError:=""
+$continue:=False
+$i:=1
+For ($i;1;Size of array($ar_Ptr3))
+	If ($ar_Ptr3{$i}->#"") & ($ar_Ptr3{$i}->#"Factory List")
+		$continue:=True
+	End if 
+End for 
+
+
+If (Not($continue))
+	vtError:="You need to enter something to search for."
+Else 
+	$i:=1
+	For ($i;1;Size of array($ar_Ptr1))
+		  //gets value
+		$value:=$ar_Ptr3{$i}->
+		If ($i>1)
+			$lineStat:=$ar_Ptr4{$i}->
+		End if 
+		
+		
+		If (Position("contains";$ar_Ptr2{$i}->)>0)
+			$value:="@"+$value+"@"
+		End if 
+		
+		  //gets field   
+		$dateQuery:=False
+		$intQuery:=False
+		
+		
+		Case of 
+			: ($ar_Ptr1{$i}->="Sample Number")
+				$fieldPtr:=->[Samples]SampleNumber
+				$intQuery:=True
+				
+			: ($ar_Ptr1{$i}->="Style Number")
+				$fieldPtr:=->[Samples]StyleNum
+				
+			: ($ar_Ptr1{$i}->="Design Number")
+				$fieldPtr:=->[Samples]DesignNum
+				
+			: ($ar_Ptr1{$i}->="Factory")
+				$fieldPtr:=->[Samples]SamGarFactry
+				
+		End case 
+		
+		  //gets comparison operator
+		$compare:=Web_PDGetCompare ($ar_Ptr2{$i}->)
+		
+		  //builds the query
+		If ($value#"") & ($value#"Factory List")
+			If ($query1)
+				$query1:=False
+				Case of 
+					: ($intQuery)
+						QUERY([Samples];$fieldPtr->;$compare;Num($value);*)
+					: ($dateQuery)
+						QUERY([Samples];$fieldPtr->;$compare;Date($value);*)
+					Else 
+						QUERY([Samples];$fieldPtr->;$compare;$value;*)
+				End case 
+			Else 
+				Case of 
+					: ($intQuery) & ($lineStat="And")
+						QUERY([Samples]; & ;$fieldPtr->;$compare;Num($value);*)
+					: ($intQuery) & ($lineStat="or")
+						QUERY([Samples]; | ;$fieldPtr->;$compare;Num($value);*)
+					: ($dateQuery) & ($lineStat="And")
+						QUERY([Samples]; & ;$fieldPtr->;$compare;"!"+$value+"!";*)
+					: ($dateQuery) & ($lineStat="or")
+						QUERY([Samples]; | ;$fieldPtr->;$compare;"!"+$value+"!";*)
+					: ($lineStat="And")
+						QUERY([Samples]; & ;$fieldPtr->;$compare;$value;*)
+					Else 
+						QUERY([Samples]; | ;$fieldPtr->;$compare;$value;*)
+				End case 
+			End if 
+		End if 
+	End for 
+	QUERY([Samples])
+	Case of 
+		: (w_ProdField8="With costsheets")
+			Web_Cost_Strip (-1)
+		: (w_ProdField8="Without costsheets")
+			Web_Cost_Strip (-2)
+	End case 
+	
+	
+	ORDER BY([Samples];[Samples]SampleNumber;<)
+	
+	If (Records in selection([Samples])<1)
+		vtError:="There are no orders that match this request."
+		$continue:=False
+	Else 
+		  //CREATE SET([Samples];vsWebSession)
+		  //SAVE SET(vsWebSession;◊vtWebSetPath+vsWebSession)
+		  //CLEAR SET(vsWebSession)
+	End if 
+	
+	If ($continue)
+		  //Web_UserField 
+		SELECTION TO ARRAY([Samples]SampleNumber;alOrders)
+		Web_SaveArray 
+		
+		If (Records in selection([Samples])=1)
+			vsFoundCount:="1 Sample"
+		Else 
+			vsFoundCount:=String(Records in selection([Samples]))+" Samples"
+		End if 
+		vsUniqueWebID:=String(Tickcount)
+		WEB SEND FILE("sampleStatList.html")
+	Else 
+		Web_Error (vtError)
+	End if 
+	
+End if 

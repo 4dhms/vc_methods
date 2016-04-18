@@ -1,0 +1,5 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"FindCustomerPO")
+Center Window (200;300;1;"")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW

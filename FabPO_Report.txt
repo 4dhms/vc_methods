@@ -1,0 +1,133 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$p;$c;$qty;$ext;$qtytot;$exttot;$c;$thisqty;$subtot;$thisline;$remain;$c;$cptot)
+C_REAL($usage;$unitprice)
+C_TIME($docref)
+C_TEXT($path;$type)
+
+$docref:=Create document("";"xls")
+
+If (ok=1)
+	$path:=Document
+	SEND PACKET($docref;"Fabric"+Char(9)+Char(9)+Char(9)+Char(9)+"HMS Order"+Char(9)+"Fab Order"+Char(9)+"Used"+Char(9)+Char(9)+Char(9)+"Stock"+Char(9)+"Stock"+Char(13))
+	SEND PACKET($docref;"Order"+Char(9)+"Ordered By"+Char(9)+"PO"+Char(9)+Char(9)+"Units"+Char(9)+"Qty"+Char(9)+"Qty"+Char(9)+"Unit Price"+Char(9)+"Amount ($)"+Char(9)+"Qty"+Char(9)+"Amount"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([FabricOrders])
+	For ($i;1;Records in selection([FabricOrders]))
+		If (Shift down)
+			TRACE
+		End if 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey>0)
+		CREATE SET([CP_OrderXRef];"used")
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+		
+		FIRST RECORD([OrdersFabricXRef])
+		$c:=1
+		For ($c;1;Records in selection([OrdersFabricXRef]))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+			$p:=1
+			FIRST RECORD([CP_OrderXRef])
+			For ($p;1;Records in selection([CP_OrderXRef]))
+				ADD TO SET([CP_OrderXRef];"used")
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+		USE SET("used")
+		
+		
+		ARRAY LONGINT($orders;0)
+		DISTINCT VALUES([CP_OrderXRef]OrderNumber;$orders)
+		
+		QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+		
+		ARRAY REAL($qtyAR;0)
+		ARRAY REAL($extAR;0)
+		ARRAY TEXT($color;0)
+		ARRAY REAL($price;0)
+		$qtytot:=0
+		$exttot:=0
+		
+		SELECTION TO ARRAY([FabPOLines]Quantity;$qtyAR;[FabPOLines]LineExt;$extAR;[FabPOLines]ColorPrint;$color;[FabPOLines]UnitPrice;$price)
+		For ($n;1;Size of array($qtyAr))
+			$qtytot:=$qtytot+$qtyAR{$n}
+			$exttot:=$exttot+$extAR{$n}
+		End for 
+		
+		If (Size of array($orders)=0)
+			SEND PACKET($docref;[FabricOrders]PONumber+Char(9)+[FabricOrders]OrderWriter+Char(9)+Char(9)+Char(9)+String($qtytot;"###,##0")+Char(9)+Char(9)+Char(9)+String($exttot;"###,##0")+Char(13))
+		Else 
+			$remain:=$qtytot
+			$subtot:=$exttot
+			$n:=1
+			For ($n;1;Size of array($orders))
+				$c:=1
+				
+				If ($n=1)
+					SEND PACKET($docref;[FabricOrders]PONumber+Char(9)+[FabricOrders]OrderWriter+Char(9)+Char(9)+Char(9)+Char(9)+String($qtytot;"###,##0")+Char(9)+Char(9)+Char(9)+String($exttot;"###,##0")+Char(13))
+				Else 
+					SEND PACKET($docref;Char(13))
+				End if 
+				
+				QUERY([Orders];[Orders]OrderNum=$orders{$n})
+				
+				
+				USE SET("used")
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$n})
+				$type:=[CP_OrderXRef]CPType
+				
+				QUERY([Costing];[Costing]OrderNumber=$orders{$n})
+				QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+				ORDER BY([CostSheets];[CostSheets]SheetID;<)
+				
+				$c:=1
+				$qty:=0
+				$ext:=0
+				
+				ARRAY LONGINT($cpkey;0)
+				SELECTION TO ARRAY([CP_OrderXRef]CPOrdID;$cpkey)
+				
+				$cptot:=0
+				
+				For ($c;1;Size of array($cpkey))
+					QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$cpkey{$c})
+					Case of 
+						: ([CP_OrderXRef]CPType="Combo@") & ([CostSheets]YdCombo1>0)
+							$usage:=[CostSheets]YdCombo1
+						: (([CP_OrderXRef]CPType="Combo@")) & ([Orders]YardsCombo>0)
+							$usage:=[Orders]YardsCombo
+						: ([CP_OrderXRef]CPType="Self") & ([CostSheets]YdFabric>0)
+							$usage:=[CostSheets]YdFabric
+						: ([CP_OrderXRef]CPType="Self") & ([Orders]YardsReq>0)
+							$usage:=[Orders]YardsReq
+						Else 
+							$usage:=0
+					End case 
+					
+					QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+					
+					QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[CP_OrderXRef]SelfKey)
+					  //QUERY SELECTION([FabPOLines];[FabPOLines]FabType=[CP_OrderXRef]CPType)
+					$cptot:=$cptot+[CP_OrderXRef]Quantity
+					$thisqty:=[CP_OrderXRef]Quantity
+					$qty:=$qty+($thisqty*$usage)
+					$thisline:=($usage*$thisqty)*[FabPOLines]UnitPrice
+					$ext:=$ext+$thisline
+					$unitprice:=[FabPOLines]UnitPrice
+				End for 
+				
+				$ext:=-1*$ext
+				SEND PACKET($docref;[FabricOrders]PONumber+Char(9)+[FabricOrders]OrderWriter+Char(9)+String($orders{$n})+Char(9)+$type+Char(9)+String($cptot;"###,##0")+Char(9)+Char(9)+String($qty;"###,##0")+Char(9)+String($unitprice;"###.00")+Char(9)+String($ext;"###,##0")+Char(9))
+				$remain:=$remain-$qty
+				$subtot:=$subtot-Abs($ext)
+			End for 
+			SEND PACKET($docref;String($remain;"###,##0")+Char(9)+String($subtot;"###,##0")+Char(13))
+		End if 
+		
+		NEXT RECORD([FabricOrders])
+	End for 
+	SEND PACKET($docref;Char(13))
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 

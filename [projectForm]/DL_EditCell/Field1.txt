@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	QUERY([Designs];[Designs]DesignNum=[DL_Custom]Design)
+	[DL_Custom]Title:=[Designs]Description
+	vxSketch:=[Designs]Sketch
+End if 

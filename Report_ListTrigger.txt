@@ -1,0 +1,36 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vlReportQuantBD:=0
+vrRptNetSalesBD:=0
+vrRptNetProfitBD:=0
+vrRptNetNetSalesBD:=0
+vrRptNetNetProfitBD:=0
+vrRptSpecDiscBD:=0
+vrRptAvgNetMarkupBD:=0
+vrRptAvgNetNetMarkupBD:=0
+USE SET("SalesReport")
+  //  `saves existing report
+  //ARRAY TEXT(atFieldContents;Size of array(asDivisions))
+  //$i:=1
+  //For ($i;1;Size of array(asDivisions))
+  //atFieldContents{$i}:=asDivisions{$i}+"_"+String(alQuantity{$i})+"_"+String(arNetSales{$i})+"_"+String(arNetProfit{$i})+"_"+String(arSpecialDiscount{$i})+"_"
+  //atFieldContents{$i}:=atFieldContents{$i}+String(arNetNetSales{$i})+"_"+String(arNetNetProfit{$i})+"_"+String(arAvgNetMarkup{$i};"#0.0")+"_"+String(arAvgNetNetMarkup{$i};"#0.0")
+  //atFieldContents{$i}:=Replace string(atFieldContents{$i};"__";"_0_")
+  //End for 
+  //INSERT ELEMENT(atFieldContents;1;1)
+  //atFieldContents{1}:="##"+String(vlReportQuant)+"_"+String(vrRptNetSales)+"_"+String(vrRptNetProfit)+"_"+String(vrRptSpecDisc)+"_"+String(vrRptNetNetSales)+"_"
+  //atFieldContents{1}:=atFieldContents{1}+String(vrRptNetNetProfit)+"_"+String(vrRptAvgNetMarkUp)+"_"+String(vrRptAvgNetNetMarkUp)
+  //atFieldContents{1}:=Replace string(atFieldContents{1};"__";"_0_")
+  //
+  //USE SET("SalesReport")
+
+
+QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+vtFootnote:=""
+vlRouter:=2
+Report_SalesArray 
+Report_SalesScreenSub (2)
+
+
+
+FORM GOTO PAGE(2)
+

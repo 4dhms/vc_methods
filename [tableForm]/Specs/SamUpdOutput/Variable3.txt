@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //
+ACCEPT
+FORM SET OUTPUT([Specs];"SpecOtptShrt")
+FORM SET INPUT([Specs];"SpecsInptTall")
+MODIFY SELECTION([Specs])

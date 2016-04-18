@@ -1,0 +1,78 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$count;$dcline)
+ARRAY TEXT(asDCOrder;0)
+ARRAY TEXT(asDCCustomer;0)
+ARRAY TEXT(asDCCut;0)
+ARRAY TEXT(asDCSold;0)
+ARRAY TEXT(asDCLeft;0)
+ARRAY LONGINT(alDCShade;0)
+ARRAY LONGINT(alDCFont;0)
+ARRAY LONGINT(alDCStyle;0)
+ARRAY TEXT(asDCColor;0)
+
+QUERY([Orders];[Orders]StyleNumber=vStyle)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+ORDER BY([Orders];[Orders]OrderNum;>)
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+vxSketch:=[Designs]Sketch
+UNLOAD RECORD([Designs])
+
+If (Records in selection([Orders])=0)
+	WinPrompt ("No such style number.")
+	QuikDCInit (False)
+Else 
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		APPEND TO ARRAY(asDCOrder;String([Orders]OrderNum))
+		APPEND TO ARRAY(asDCCustomer;[Orders]Customer)
+		APPEND TO ARRAY(asDCCut;"")
+		APPEND TO ARRAY(asDCSold;"")
+		APPEND TO ARRAY(asDCLeft;"")
+		APPEND TO ARRAY(alDCShade;0)
+		APPEND TO ARRAY(alDCFont;16777215)
+		APPEND TO ARRAY(alDCStyle;1)
+		APPEND TO ARRAY(asDCColor;"")
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey>0)
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+		
+		$n:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			
+			APPEND TO ARRAY(asDCOrder;"")
+			APPEND TO ARRAY(asDCCustomer;[CP_OrderXRef]CPNumber+"  "+[ColorPrintNumber]CPName)
+			APPEND TO ARRAY(asDCCut;String([CP_OrderXRef]Quantity))
+			
+			QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]SelfKey)
+			ORDER BY([DC];[DC]DCLine;>)
+			
+			$s:=1
+			$count:=0
+			$dcline:=0
+			FIRST RECORD([DC])
+			For ($s;1;Records in selection([DC]))
+				If ($dcline#[DC]DCLine)  //duplicate data handling
+					$count:=$count+[DC]Count
+					$dcline:=[DC]DCLine
+				End if 
+				NEXT RECORD([DC])
+			End for 
+			
+			APPEND TO ARRAY(asDCSold;String($count))
+			APPEND TO ARRAY(asDCLeft;String([CP_OrderXRef]Quantity-$count))
+			APPEND TO ARRAY(alDCShade;16777215)
+			APPEND TO ARRAY(alDCFont;0)
+			APPEND TO ARRAY(alDCStyle;0)
+			APPEND TO ARRAY(asDCColor;[CP_OrderXRef]CPNumber)
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		
+		NEXT RECORD([Orders])
+	End for 
+End if 

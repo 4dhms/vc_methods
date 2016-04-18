@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+$c:=0
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	If ([Orders]KWCnS#[Designs]KWCnS) & ([Designs]KWCnS#"")
+		[Orders]KWCnS:=[Designs]KWCnS
+		SAVE RECORD([Orders])
+		$c:=$c+1
+	End if 
+	NEXT RECORD([Orders])
+End for 
+
+ALERT(String($c))

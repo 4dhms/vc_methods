@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to remove this garment?")
+If (ok=1)
+	
+	CREATE RECORD([Changes])
+	[Changes]Writer:=Current user
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]NewChange:=[DesignLineIncluded]DesignNumber+" deleted from line plan."
+	[Changes]FieldName:=[DesignLines]Line+": "+[DesignLines]Season+" ("+[DesignLines]Title+")"
+	[Changes]Tag:="Line change"
+	SAVE RECORD([Changes])
+	
+	CREATE SET([DesignLineIncluded];"garms")
+	REMOVE FROM SET([DesignLineIncluded];"garms")
+	DELETE RECORD([DesignLineIncluded])
+	USE SET("garms")
+	DL_Backgrounder 
+End if 
+DL_RecCount 

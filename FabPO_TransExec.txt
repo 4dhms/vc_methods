@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($color)
+C_TEXT($po)
+C_LONGINT($qty)
+
+$po:=$1
+$color:=$2
+$qty:=Abs($3)
+
+QUERY([FabricOrders];[FabricOrders]PONumber=$po)
+QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+QUERY SELECTION([FabPOLines];[FabPOLines]ColorPrint=$color)
+
+If (Records in selection([FabPOLines])=0)
+	<>vlSending:=-1
+Else 
+	FIRST RECORD([FabPOLines])
+	<>vlSending:=1
+	DUPLICATE RECORD([FabPOLines])
+	[FabPOLines]Quantity:=-1*$qty
+	[FabPOLines]Delivered:=-1*$qty
+	[FabPOLines]LineID:=Sequence number([FabPOLines])
+	[FabPOLines]TransPO:="To "+$4
+	SAVE RECORD([FabPOLines])
+	ARRAY TEXT(<>asFabTran;0)
+	APPEND TO ARRAY(<>asFabTran;[FabPOLines]ColorPrint)
+	APPEND TO ARRAY(<>asFabTran;[FabPOLines]POUnit)
+	APPEND TO ARRAY(<>asFabTran;[FabPOLines]POWidth)
+	APPEND TO ARRAY(<>asFabTran;String([FabPOLines]UnitPrice))
+	<>vlSending:=2
+End if 

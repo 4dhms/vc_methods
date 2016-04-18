@@ -1,0 +1,14 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($descript)
+
+$descript:=""
+If ([OrdersFabricXRef]FabArtNo#"")
+	$descript:="Art. No.: "+[OrdersFabricXRef]FabArtNo+Char(13)
+End if 
+$descript:=$descript+"Supplier: "+[OrdersFabricXRef]FabSupplier+Char(13)
+$descript:=$descript+"Fabric: "+[OrdersFabricXRef]FabricName+Char(13)
+$descript:=$descript+"Fiber: "+[OrdersFabricXRef]FiberContent+Char(13)
+If ([OrdersFabricXRef]Treatment#"")
+	$descript:=$descript+"Treatment: "+[OrdersFabricXRef]Treatment+Char(13)
+End if 
+$0:=$descript

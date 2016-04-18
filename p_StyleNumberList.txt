@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //this shows a pop-up listing of sample garments
+ALL RECORDS([StyleNumberGen])
+READ ONLY([Orders])
+
+Center Window (600;420;8;"")
+FORM SET OUTPUT([StyleNumberGen];"List")
+FORM SET INPUT([StyleNumberGen];"Style.i")
+vfContinue:=False
+MODIFY SELECTION([StyleNumberGen];*)
+CLOSE WINDOW
+<>GetStyleNumber:=0

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>CloseBox:=True
+Center Window (1100;700;0;"")
+DIALOG("LogOnPrep")
+CLOSE WINDOW
+<>vlLogOn:=0

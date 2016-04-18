@@ -1,0 +1,141 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+Case of 
+	: (bDashButtons=16)
+		If (Shift down)
+			Sys_SwitchUser 
+		Else 
+			p_Quit4D 
+		End if 
+		
+	: (bDashButtons=1)
+		CALL PROCESS(<>SamGarPrcID)
+		Case of 
+			: (Current user="Designer") | (Current user="Joann") | (Current user="William") | (Current user="CK") & (Shift down) & (Not(Macintosh command down))
+				CK_FOB 
+			: (<>SpecProcID>0)
+				WinPrompt ("Close specsheet window before entering ordering information.")
+				SHOW PROCESS(<>SpecProcID)
+				BRING TO FRONT(<>SpecProcID)
+			: (<>SamGarPrcID>0)
+				WinPrompt ("Close sample garment before entering ordering information.")
+				SHOW PROCESS(<>SamGarPrcID)
+				BRING TO FRONT(<>SamGarPrcID)
+			: (<>PrcQteID>0)
+				BRING TO FRONT(<>PrcQteID)
+				WinPrompt ("Close cost sheet screen before opening production orders.")
+			: (<>SalesPrcID>0) & (Not(Shift down))
+				SHOW PROCESS(<>SalesPrcID)
+				BRING TO FRONT(<>SalesPrcID)
+			: (<>vlLogOn>0) & (Not(Shift down))
+				SHOW PROCESS(<>vlLogOn)
+				BRING TO FRONT(<>vlLogOn)
+			: (Current user="Designer")
+				$choice:=Pop up menu("Order List;StockOrders;Style Master Update")  //;Beta")
+				Case of 
+					: ($choice=2)
+						m_StockOrders 
+					: ($choice=3)
+						m_LogOn 
+					Else 
+						m_SalesEntry 
+				End case 
+			: (Current user="Anthony") | (User in group(Current user;"Stock")) & (Not(Shift down))
+				$choice:=Pop up menu("Order List;StockOrders")  //;Beta")
+				Case of 
+					: ($choice=1)
+						m_SalesEntry 
+					Else 
+						m_StockOrders 
+				End case 
+			: (User in group(Current user;"LogOn")) | (Current user="Spenser") | (Current user="Zoe") | (Current user="Ricky") | (Current user="Arsenio")
+				$choice:=Pop up menu("Order List;Style Master Update")  //;Beta")
+				Case of 
+					: ($choice=1)
+						m_SalesEntry 
+					Else 
+						m_LogOn 
+				End case 
+			Else 
+				m_SalesEntry 
+		End case 
+	: (bDashButtons=2)
+		m_DesLib 
+	: (bDashButtons=3)
+		Dash_Samples 
+	: (bDashButtons=4)
+		m_SpeedpostEntr 
+	: (bDashButtons=5)
+		Dash_Fabric 
+	: (bDashButtons=6)
+		Dash_POs 
+	: (bDashButtons=7)
+		Dash_Colors 
+	: (bDashButtons=8)
+		If (User in group(Current user;"SalesReport"))
+			If (Current user="Designer") | (Current user="Leigh")
+				$choice:=Pop up menu("Directory;Enter Sales;Report Sales;Delete Style")
+				Case of 
+					: ($choice=1)
+						<>vfStore:=True
+						m_Calendar 
+					: ($choice=2)
+						SLR_EntryProc 
+					: ($choice=4)
+						SLR_DeleteStyle 
+					: ($choice=3)
+						SLR_ReportProc 
+				End case 
+			Else 
+				$choice:=Pop up menu("Directory;Enter Sales;Report Sales")
+				Case of 
+					: ($choice=1)
+						<>vfStore:=True
+						m_Calendar 
+					: ($choice=2)
+						SLR_EntryProc 
+					Else 
+						SLR_ReportProc 
+				End case 
+			End if 
+		Else 
+			<>vfStore:=True
+			m_Calendar 
+		End if 
+		
+	: (bDashButtons=9)
+		m_VendorsList 
+	: (bDashButtons=10)
+		m_DesignLine 
+	: (bDashButtons=11)
+		m_StyleNumberList 
+	: (bDashButtons=12)
+		<>vfStore:=False
+		m_Calendar 
+	: (bDashButtons=13)
+		m_Returns 
+	: (bDashButtons=14)
+		If (Current user="Designer") | (Current user="Claudia Chang") | (Current user="Elaine Yang") | (Current user="TC Li") | (Current user="Joseph") | (Current user="Lin Li")
+			$choice:=Pop up menu("Invoice;Update Shipping;Duty Rates;Special Garment Duty;Need By Date Library")
+			Case of 
+				: ($choice=1)
+					m_Warehouse 
+				: ($choice=2)
+					WH_ShipListProc 
+				: ($choice=3)
+					m_DutyRates 
+				: ($choice=4)
+					m_SDScreen 
+				: ($choice=5)
+					m_NeedBy 
+			End case 
+		Else 
+			m_Warehouse 
+		End if 
+	: (bDashButtons=15)
+		DashReport 
+End case 
+  //End if 
+bDashButtons:=0
+

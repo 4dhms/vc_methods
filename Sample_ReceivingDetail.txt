@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Designs];[Designs]DesignNum=asDesignNumbers{asDesignNumbers})
+vxSketch:=[Designs]Sketch
+vtDescription:="S/N: "+asStyleNumbers{asStyleNumbers}+Char(13)
+vtDescription:=vtDescription+"D/N: "+asDesignNumbers{asDesignNumbers}+Char(13)+Char(13)
+vtDescription:=vtDescription+[Designs]Description

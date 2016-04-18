@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style;$size)
+
+If (Form event=On Printing Detail)
+	If (vsPart21="Print Number")
+		$style:=1
+		$size:=7
+	Else 
+		$style:=0
+		$size:=9
+	End if 
+	OBJECT SET FONT STYLE(vsPart21;$size)
+	OBJECT SET FONT STYLE(vsPart13;$size)
+	OBJECT SET FONT STYLE(vsPart14;$size)
+	OBJECT SET FONT STYLE(vsPart15;$size)
+	OBJECT SET FONT STYLE(vsPart16;$size)
+	OBJECT SET FONT STYLE(vsPart21;$style)
+	OBJECT SET FONT STYLE(vsPart13;$style)
+	OBJECT SET FONT STYLE(vsPart14;$style)
+	OBJECT SET FONT STYLE(vsPart15;$style)
+	OBJECT SET FONT STYLE(vsPart16;$style)
+End if 

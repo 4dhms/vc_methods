@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($invoice)
+
+$invoice:=Request("Enter Factory Invoice:")
+QUERY([CostSheets];[CostSheets]PayInvoice=$invoice)
+
+If (Records in selection([CostSheets])=0)
+	WinPrompt ($invoice+" can not be found.")
+Else 
+	$i:=1
+	FIRST RECORD([CostSheets])
+	CREATE EMPTY SET([Orders];"inv")
+	
+	For ($i;1;Records in selection([CostSheets]))
+		RELATE ONE([CostSheets]SheetNumber)
+		
+		QUERY([Orders];[Orders]OrderNum=[Costing]OrderNumber)
+		ADD TO SET([Orders];"inv")
+		NEXT RECORD([CostSheets])
+	End for 
+	
+	USE SET("inv")
+	CLEAR SET("inv")
+	SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+End if 

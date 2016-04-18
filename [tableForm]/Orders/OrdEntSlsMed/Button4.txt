@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+asPOv:=Find in array(asPOv;"Edit")
+<>vlRevisionNumber:=[Orders]RevisionNumber
+vfNewRecord:=True
+<>Enter:=True
+Revise_FlagFields (True)

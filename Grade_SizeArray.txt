@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($headPtr)
+ARRAY TEXT(asSizeName;0)
+ARRAY REAL(arSizeCalc;0)
+C_POINTER($colPtr)
+C_POINTER($sampPtr)
+$i:=1
+For ($i;1;12)
+	$headPtr:=Get pointer("vsSize"+String($i))
+	
+	If ($headPtr->#"")
+		INSERT IN ARRAY(asSizeName;Size of array(asSizeName)+1;1)
+		INSERT IN ARRAY(arSizeCalc;Size of array(asSizeName)+1;1)
+		If ($1)
+			$sampPtr:=Field(88;$i+1)
+			$colPtr:=Field(88;$i+15)
+			arSizeCalc{Size of array(asSizeName)}:=$colPtr->
+		Else 
+			$colPtr:=Field(56;$i+1)
+			arSizeCalc{Size of array(asSizeName)}:=Grade_Converter ($colPtr->)
+		End if 
+		
+		asSizeName{Size of array(asSizeName)}:=$headPtr->
+	End if 
+End for 

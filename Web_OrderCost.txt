@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]OrderNum=$1)
+Case of 
+	: ([Orders]KWCnS="Woven")
+		vsKWCS:="Woven"
+	: ([Orders]KWCnS="Knit")
+		vsKWCS:="Knit"
+	: ([Orders]KWCnS="CutSew")
+		vsKWCS:="Cut and Sew"
+	Else 
+		vsKWCS:=""
+End case 
+vsPODate:=String([Orders]PODate)
+vsStartCancel:=String([Orders]CancelDate)
+Web_Costsheet ($1)
+UNLOAD RECORD([Orders])

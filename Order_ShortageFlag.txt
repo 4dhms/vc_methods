@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (Current user="Ricky") | (Current user="Designer")
+	If (Position("shortage";[Orders]ProdComments)>0) | (Position("increase";[Orders]ProdComments)>0) | (Position("decrease";[Orders]ProdComments)>0)
+		OBJECT SET COLOR([Orders]ProdComments;-(15+(256*Yellow)))
+	Else 
+		OBJECT SET COLOR([Orders]ProdComments;-(15+(256*White)))
+	End if 
+	
+	If (Position("shortage";[Orders]Special_Instructions)>0) | (Position("increase";[Orders]Special_Instructions)>0) | (Position("decrease";[Orders]Special_Instructions)>0)
+		OBJECT SET COLOR([Orders]Special_Instructions;-(15+(256*Yellow)))
+	Else 
+		OBJECT SET COLOR([Orders]Special_Instructions;-(15+(256*White)))
+	End if 
+	
+	
+	If (Position("shortage";[Orders]Comments_Sales)>0) | (Position("increase";[Orders]Comments_Sales)>0) | (Position("decrease";[Orders]Comments_Sales)>0)
+		OBJECT SET COLOR([Orders]Comments_Sales;-(15+(256*Yellow)))
+	Else 
+		OBJECT SET COLOR([Orders]Comments_Sales;-(15+(256*White)))
+	End if 
+End if 

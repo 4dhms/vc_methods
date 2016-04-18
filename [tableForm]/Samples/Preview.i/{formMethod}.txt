@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($samplenumber)
+Case of 
+	: (Form event=On Load)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		vxSketch:=[Designs]Sketch
+		vtDescription:=[Designs]Description
+		UNLOAD RECORD([Designs])
+		$samplenumber:=-1*[Samples]SampleNumber
+		vfFabImport:=False
+		
+		Fabric_ArrayBuild ($samplenumber)
+		Fabric_ColorArray ($samplenumber)
+		Order_GetComponents ($samplenumber)
+End case 

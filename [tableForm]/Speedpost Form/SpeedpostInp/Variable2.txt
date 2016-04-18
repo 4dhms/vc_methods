@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+[Speedpost Form]NewPost:=False
+SAVE RECORD([Speedpost Form])
+
+CREATE SET([Speedpost Form];"SpeedP")
+Center Window (350;100;1;"")
+DIALOG([Dashboard File];"PrtRecSelctn")
+CLOSE WINDOW
+If (ok=1)
+	SET PRINT OPTION(Orientation option;1)
+	Case of 
+		: (vPrtRec=1)
+			FORM SET OUTPUT([Speedpost Form];"PrtSpeedp")
+			PRINT RECORD([Speedpost Form])
+		: (vPrtSel=1)
+			FORM SET OUTPUT([Speedpost Form];"PrtSpeedp")
+			PRINT SELECTION([Speedpost Form])
+	End case 
+	FORM SET OUTPUT([Speedpost Form];"SpeedpostOutp")
+	USE SET("SpeedP")
+	CLEAR SET("SpeedP")
+End if 

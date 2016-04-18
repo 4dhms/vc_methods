@@ -1,0 +1,36 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfToSpenser)
+C_LONGINT($i;$c)
+C_TEXT(vtVendor)
+
+If (Size of array(asVendors)>0)
+	QUERY([Vendors];[Vendors]VendorName=vtVendor)
+	QUERY([VendorEmail];[VendorEmail]VendorKey=[Vendors]VendorKey)
+	QUERY SELECTION([VendorEmail];[VendorEmail]EmailAddress#"")
+	
+	SELECTION TO ARRAY([VendorEmail]EmailAddress;asSubCC)
+	SORT ARRAY(asSubCC;>)
+	INSERT IN ARRAY(asSubCC;1;1)
+	asSubCC{1}:=[Vendors]PrimaryEmail
+End if 
+
+$i:=1
+$c:=Size of array(asSubCC)
+
+For ($i;1;Size of array(asSubCC))
+	If (Position(Char(64);asSubCC{$c};*)<1)
+		DELETE FROM ARRAY(asSubCC;$c;1)
+	End if 
+	If (Size of array(asSubCC)>0)
+		If (Position(" ";asSubCC{$c})>0)
+			asSubCC{$c}:=Replace string(asSubCC{$c};" ";"")
+		End if 
+	End if 
+	$c:=$c-1
+End for 
+
+
+Center Window (250;500;1;"")
+DIALOG([Dialogs];"EmailList.i")
+CLOSE WINDOW
+

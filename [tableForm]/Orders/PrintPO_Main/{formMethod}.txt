@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($sgpo)
+
+$sgpo:=Num([Orders]SGPO)
+
+<>vlOrderNumber:=[Orders]OrderNum
+Case of 
+	: (Form event=On Printing Detail)
+		
+		vsPrintingHeader:="Printed "+String(Current date(*))+" "+String(Current time(*);"HH;MM")+"  Page "+String(vlPage)
+		OBJECT SET VISIBLE(*;"xHeader1";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeader2";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeader3";vOrd#"")
+		OBJECT SET VISIBLE(*;"xPO1";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeadLine";vOrd#"")
+		
+		Case of 
+			: ([Orders]KWCnS="Woven")
+				vsKWCS:="Woven"
+			: ([Orders]KWCnS="Knit")
+				vsKWCS:="Knit"
+			: ([Orders]KWCnS="CutSew")
+				vsKWCS:="Cut and Sew"
+			Else 
+				vsKWCS:=""
+		End case 
+		
+		vtRevisionNote:=[Orders]RevisionNote
+		vDesc:=""
+		SampFit_RecDate 
+		
+		
+		OBJECT SET VISIBLE(*;"xOrdDate";Not(vfPO))
+		OBJECT SET VISIBLE([Orders]OrderEntryDate;Not(vfPO))
+		
+		Order_PrintLoadHeader (True)
+		Order_HidePrint 
+		OBJECT SET VISIBLE([ChineseHeads]_SeaToLA;[Orders]ShipInfo="Sea to LA")
+		OBJECT SET VISIBLE([ChineseHeads]_FobUK;[Orders]ShipInfo="FOB to UK")
+		OBJECT SET VISIBLE([ChineseHeads]_FobChile;[Orders]ShipInfo="FOB to Chile")
+		OBJECT SET VISIBLE([ChineseHeads]_FobCanada;[Orders]ShipInfo="FOB to Canada")
+		OBJECT SET VISIBLE([ChineseHeads]_LDP LA;[Orders]ShipInfo="ldp@la")
+		OBJECT SET VISIBLE([ChineseHeads]_FlatPack;[Orders]ShipMethod="Flat pack")
+		OBJECT SET VISIBLE([ChineseHeads]_GOH;[Orders]ShipMethod="GOH")
+		If ([Orders]AfterApproval="@needs@TOP@") & ([Orders]AfterApproval#"Not required")
+			OBJECT SET VISIBLE([ChineseHeads]_CustomerNeedsTOP;True)
+		Else 
+			OBJECT SET VISIBLE([ChineseHeads]_CustomerNeedsTOP;False)
+		End if 
+		
+		If (vfPO) & ([Orders]PODate=!00-00-00!)
+			[Orders]PODate:=Current date(*)
+		End if 
+		
+		Case of 
+			: ([Orders]Hold)
+				vsPOFlag:="ON HOLD"
+			: ([Orders]Cancelled)
+				vsPOFlag:="CANCELLED"
+			: ([Orders]RevisionNumber>0)
+				vsPOFlag:="Revision "+String([Orders]RevisionNumber)
+			Else 
+				vsPOFlag:=""
+		End case 
+		
+		Revise_FlagFields 
+		
+		
+		
+		[Orders]NotPrinted:=False
+		SAVE RECORD([Orders])
+		
+		QUERY([Samples];[Samples]SampleNumber=$sgpo)
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		vxSketch:=[Designs]Sketch
+		Order_GetCategory (True)
+		
+		vsSeason:=[Orders]SeasonName+" "+[Orders]SeasonYear
+		
+End case 
+

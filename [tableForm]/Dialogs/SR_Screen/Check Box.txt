@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlOrdersSubA;vlOrdersSubB)
+
+If (vlOrdersSubA+vlOrdersSubB>0)
+	SR_ShowQs 
+End if 

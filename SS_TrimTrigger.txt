@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlOrderNumber)
+
+If (asDesignNumbers>0)
+	OBJECT SET ENABLED(bPreview;True)
+	
+	If (asSGOrder{asSGOrder}="Design")
+		vlOrderNumber:=0
+		QUERY([Designs];[Designs]DesignNum=asDesignNumbers{asDesignNumbers})
+		QUERY([CS_Lines];[CS_Lines]DesignNumber=asDesignNumbers{asDesignNumbers};*)
+		QUERY([CS_Lines]; & ;[CS_Lines]CS_ID=0;*)
+		QUERY([CS_Lines]; & ;[CS_Lines]SpecSheet=False)
+		
+	Else 
+		vlOrderNumber:=Num(asSGOrder{asSGOrder})
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=vlOrderNumber)
+		QUERY([CS_Lines];[CS_Lines]DesignNumber=asDesignNumbers{asDesignNumbers};*)
+		QUERY([CS_Lines]; & ;[CS_Lines]CS_ID=0;*)
+		QUERY([CS_Lines]; & ;[CS_Lines]SpecSheet=True)
+	End if 
+End if 
+

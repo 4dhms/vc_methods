@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(pOne;Find in array(alPartNumber;1)>0)
+OBJECT SET VISIBLE(pTwo;Find in array(alPartNumber;2)>0)
+OBJECT SET VISIBLE(pThree;Find in array(alPartNumber;3)>0)
+
+If (Not($1)) & (Not(<>ComponentSheet))
+	SS_GetPart 
+End if 

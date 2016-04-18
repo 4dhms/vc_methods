@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($invoice)
+
+
+If (Form event=On Double Clicked)
+	
+	WinChoice ("Do you want to delete the entire invoice or just this PO?";"PO";"Invoice";"Cancel")
+	
+	Case of 
+		: (ok=1) & (bChoice2=1)  //Invoice
+			$invoice:=asList1{asList1}
+			
+			QUERY([ShipInvoices];[ShipInvoices]InvNumber=$invoice)
+			DELETE SELECTION([ShipInvoices])
+			$i:=1
+			$c:=Size of array(asList1)+1
+			
+			For ($i;1;Size of array(asList1))
+				
+				If (asList1{$c-$i}=$invoice)
+					DELETE FROM ARRAY(asList1;$c-$i;1)
+					DELETE FROM ARRAY(alOrders;$c-$i;1)
+					DELETE FROM ARRAY(asSheetNames;$c-$i;1)
+				End if 
+			End for 
+			
+		: (ok=1)
+			QUERY([ShipInvoices];[ShipInvoices]ArchiveKey=[ShipArchive]ArchiveKey)
+			QUERY SELECTION([ShipInvoices];[ShipInvoices]InvNumber=asList1{asList1};*)
+			QUERY SELECTION([ShipInvoices]; & ;[ShipInvoices]PO=alOrders{asList1})
+			DELETE SELECTION([ShipInvoices])
+			
+			DELETE FROM ARRAY(asList1;asList1;1)
+			DELETE FROM ARRAY(alOrders;asList1;1)
+			DELETE FROM ARRAY(asSheetNames;asList1;1)
+	End case 
+End if 

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY SELECTION([Orders];[Orders]ApprovalDate=!00-00-00!)
+ORDER BY([Orders];[Orders]OrderNum;>)
+
+p_InputLayHMS 
+p_SetWindowHMS 

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[SpecSheetLines]StepKey:=alFieldChange{asList17}
+SAVE RECORD([SpecSheetLines])
+ACCEPT

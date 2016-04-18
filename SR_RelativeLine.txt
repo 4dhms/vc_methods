@@ -1,0 +1,53 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderDif;$quantDif;$salesDif)
+C_LONGINT($orderA;$quantA;$salesA)
+C_LONGINT($orderB;$quantB;$salesB)
+C_TEXT($message)
+
+$orderA:=alOrders{alOrders}
+$orderB:=alOrdersB{alOrdersB}
+$quantA:=alQuantity{alQuantity}
+$quantB:=alQuantityB{alQuantityB}
+$salesA:=alTotalSales{alTotalSales}
+$salesB:=alTotalSalesB{alTotalSalesB}
+
+$orderDif:=$orderA-$orderB
+$quantDif:=$quantA-$quantB
+$salesDif:=$salesA-$salesB
+
+$message:="Change"+Char(13)+Char(13)
+
+Case of 
+	: ($orderB=0)
+		$message:=$message+String($orderDif)+" orders    (zero previous)"+Char(13)
+	: ($orderA<$orderB) & ($orderA=0)
+		$message:=$message+String($orderDif)+" orders   (no current)"+Char(13)
+	: ($orderA<$orderB)
+		$message:=$message+String($orderDif)+" orders   ("+String(Round(($orderDif/$orderB)*100;1);"####.#%")+")"+Char(13)
+	: ($orderA>$orderB)
+		$message:=$message+String($orderDif)+" orders   ("+String(Round(($orderDif/$orderB)*100;1);"####.#%")+")"+Char(13)
+	: ($orderA>0)
+		$message:=$message+"No change in order number"+Char(13)
+End case 
+Case of 
+	: ($quantB=0)
+		$message:=$message+String($quantDif;"###,###,###")+Char(13)
+	: ($quantA<$quantB) & ($quantA=0)
+		$message:=$message+String($quantDif;"###,###,###")+" units "+Char(13)
+	: ($quantA<$quantB)
+		$message:=$message+String($quantDif;"###,###,###")+" units   ("+String(Round(($quantDif/$quantB)*100;1);"####.#%")+")"+Char(13)
+	: ($quantA>$quantB)
+		$message:=$message+String($quantDif;"###,###,###")+" units   ("+String(Round(($quantDif/$quantB)*100;1);"####.#%")+")"+Char(13)
+End case 
+Case of 
+	: ($salesB=0)
+		$message:=$message+String($salesDif;"###,###,###")+Char(13)
+	: ($salesA<$salesB) & ($salesA=0)
+		$message:=$message+String($salesDif;"###,###,###")+" total sales "+Char(13)
+	: ($salesA<$salesB)
+		$message:=$message+String($salesDif;"###,###,###")+" total sales   ("+String(Round(($salesDif/$salesB)*100;1);"####.#%")+")"+Char(13)
+	: ($salesA>$salesB)
+		$message:=$message+String($salesDif;"###,###,###")+" total sales   ("+String(Round(($salesDif/$salesB)*100;1);"####.#%")+")"+Char(13)
+End case 
+
+WinPrompt ($message)

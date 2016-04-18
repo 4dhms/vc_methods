@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(atArtNumber))
+	If (atArtNumber{$i}="HMS@")
+		APPEND TO ARRAY(alFabricColor;16711690)
+	Else 
+		APPEND TO ARRAY(alFabricColor;16777215)
+	End if 
+End for 

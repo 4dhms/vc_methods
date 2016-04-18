@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]YdLining>0) & ([CostSheets]PriceLining>0)
+	[CostSheets]LiningCost:=[CostSheets]YdLining*[CostSheets]PriceLining
+End if 
+Cost_EntryCalculate 

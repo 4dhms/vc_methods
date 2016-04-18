@@ -1,0 +1,274 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($fields;0)
+ARRAY TEXT($content;0)
+C_LONGINT($col)
+C_LONGINT($c;$i;$router)
+vlPrintedPixels:=0
+vlPage:=1
+
+WinChoice ("Which Special_Instructions do you want to print?";"Public";"Internal";"Both")
+Case of 
+	: (ok=1) & (bChoice2=1)
+		$router:=2
+	: (ok=1)
+		$router:=1
+	Else 
+		$router:=3
+End case 
+
+SET PRINT OPTION(Orientation option;1)
+PRINT SETTINGS
+
+If (ok=1)
+	Customer_PrintHeader 
+	
+	If ([Customers]Label#"")
+		APPEND TO ARRAY($fields;"Label")
+		APPEND TO ARRAY($content;[Customers]Label)
+	End if 
+	
+	If ([Customers]PriceTicket#"")
+		APPEND TO ARRAY($fields;"Price Ticket")
+		APPEND TO ARRAY($content;[Customers]PriceTicket)
+	End if 
+	
+	If ([Customers]HangTag#"")
+		APPEND TO ARRAY($fields;"Hang Tag")
+		APPEND TO ARRAY($content;[Customers]HangTag)
+	End if 
+	
+	If ([Customers]Packing#"")
+		APPEND TO ARRAY($fields;"Packing")
+		APPEND TO ARRAY($content;[Customers]Packing)
+	End if 
+	
+	If ([Customers]Polybag#"")
+		APPEND TO ARRAY($fields;"Polybag")
+		APPEND TO ARRAY($content;[Customers]Polybag)
+	End if 
+	
+	If ([Customers]Folding#"")
+		APPEND TO ARRAY($fields;"Folding")
+		APPEND TO ARRAY($content;[Customers]Folding)
+	End if 
+	
+	If ([Customers]RN#"")
+		APPEND TO ARRAY($fields;"RN Number")
+		APPEND TO ARRAY($content;[Customers]RN)
+	End if 
+	
+	If ([Customers]OverShort#"")
+		APPEND TO ARRAY($fields;"Overage/Shortage")
+		APPEND TO ARRAY($content;[Customers]OverShort)
+	End if 
+	
+	If ([Customers]Testing#"")
+		APPEND TO ARRAY($fields;"Testing")
+		APPEND TO ARRAY($content;[Customers]Testing)
+	End if 
+	
+	If ([Customers]ShipTo#"")
+		APPEND TO ARRAY($fields;"Ship To")
+		APPEND TO ARRAY($content;[Customers]ShipTo)
+	End if 
+	
+	If ([Customers]FitSize#"")
+		APPEND TO ARRAY($fields;"Fit Sample Size")
+		APPEND TO ARRAY($content;[Customers]FitSize)
+	End if 
+	
+	Case of 
+		: ([Customers]PPSize#"") & ([Customers]PPCount#"")
+			APPEND TO ARRAY($fields;"PP Sample Size")
+			APPEND TO ARRAY($content;[Customers]PPSize+" ("+[Customers]PPCount+")")
+		: ([Customers]PPSize#"")
+			APPEND TO ARRAY($fields;"PP Sample Size")
+			APPEND TO ARRAY($content;[Customers]PPSize)
+		: ([Customers]PPCount#"")
+			APPEND TO ARRAY($fields;"Number of PP's")
+			APPEND TO ARRAY($content;[Customers]PPCount)
+	End case 
+	
+	Case of 
+		: ([Customers]TOPSize#"") & ([Customers]TOPCount#"")
+			APPEND TO ARRAY($fields;"TOP Sample Size")
+			APPEND TO ARRAY($content;[Customers]TOPSize+" ("+[Customers]TOPCount+")")
+		: ([Customers]TOPSize#"")
+			APPEND TO ARRAY($fields;"TOP Sample Size")
+			APPEND TO ARRAY($content;[Customers]TOPSize)
+		: ([Customers]TOPCount#"")
+			APPEND TO ARRAY($fields;"Number of TOP's")
+			APPEND TO ARRAY($content;[Customers]TOPCount)
+	End case 
+	
+	$c:=Size of array($fields)
+	$i:=1
+	
+	While ($i<=$c)
+		vtType1:=$fields{$i}
+		If ($i<$c)
+			vtType2:=$fields{$i+1}
+		Else 
+			vtType2:=""
+		End if 
+		vfDetail:=True
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		
+		vfDetail:=False
+		vtType1:=$content{$i}
+		If ($i<$c)
+			vtType2:=$content{$i+1}
+		Else 
+			vtType2:=""
+		End if 
+		
+		Customer_PrintCols 
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		
+		$i:=$i+2
+	End while 
+	
+	ARRAY TEXT($fields;0)
+	ARRAY TEXT($content;0)
+	
+	If ([Customers]CartonMU#"")
+		$col:=1
+		vtRemaining:=[Customers]CartonMU
+		Repeat 
+			APPEND TO ARRAY($fields;Util_WrapManual (vtRemaining;40))
+		Until (Length(vtRemaining)<$c)
+	End if 
+	If ([Customers]ColorTrimOK#"")
+		$col:=$col+2
+		vtRemaining:=[Customers]ColorTrimOK
+		Repeat 
+			APPEND TO ARRAY($content;Util_WrapManual (vtRemaining;40))
+		Until (Length(vtRemaining)<$c)
+	End if 
+	
+	If (Size of array($fields)>0) | (Size of array($content)>0)
+		If (Size of array($fields)>0)
+			vtType1:="Carton Marking"
+		End if 
+		If (Size of array($content)>0)
+			If ($col=3)
+				vtType2:="Color/Trim Approval"
+			Else 
+				vtType1:="Color/Trim Approval"
+			End if 
+		End if 
+		vfDetail:=True
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		
+		Case of 
+			: (Size of array($fields)>Size of array($content))
+				ARRAY TEXT($content;Size of array($fields))
+			: (Size of array($fields)<Size of array($content))
+				ARRAY TEXT($fields;Size of array($content))
+		End case 
+		$i:=1
+		vfDetail:=False
+		For ($i;1;Size of array($content))
+			Case of 
+				: ($col=3)
+					vtType1:=$fields{$i}
+					vtType2:=$content{$i}
+				: ($col=1)
+					vtType1:=$fields{$i}
+				: ($col=2)
+					vtType1:=$content{$i}
+			End case 
+			
+			Customer_PrintHeader 
+			Print form([Customers];"Customers.sub")
+			vlPrintedPixels:=vlPrintedPixels-13
+		End for 
+		vtType1:=""
+		vtType2:=""
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+	End if 
+	
+	If ([Customers]POAudit) | ([Customers]FactoryAudit)
+		If ([Customers]POAudit)
+			vtType1:="PO Audit"
+		End if 
+		If ([Customers]FactoryAudit)
+			vtType2:="Factory Audit"
+		End if 
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		vtType1:=""
+		vtType2:=""
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+	End if 
+	
+	If ($router=1) | ($router=3) & ([Customers]NotesPublic#"")
+		vtType1:="Special_Instructions"
+		vfDetail:=True
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		
+		ARRAY TEXT($content;0)
+		vtRemaining:=[Customers]NotesPublic
+		vfDetail:=False
+		
+		Repeat 
+			APPEND TO ARRAY($content;Util_WrapManual (vtRemaining;110))
+		Until (Length(vtRemaining)=0) | (Shift down)
+		
+		$i:=1
+		For ($i;1;Size of array($content))
+			vtType1:=$content{$i}
+			vfDetail:=False
+			Customer_PrintHeader 
+			Print form([Customers];"Customers.sub")
+			vlPrintedPixels:=vlPrintedPixels-13
+		End for 
+		vtType1:=""
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		
+	End if 
+	
+	If ($router=2) | ($router=3) & ([Customers]NotesInternal#"")
+		vtType1:="Special_Instructions (Internal)"
+		vfDetail:=True
+		Customer_PrintHeader 
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+		
+		ARRAY TEXT($content;0)
+		vtRemaining:=[Customers]NotesInternal
+		vfDetail:=False
+		
+		Repeat 
+			APPEND TO ARRAY($content;Util_WrapManual (vtRemaining;110))
+		Until (Length(vtRemaining)=0) | (Shift down)
+		
+		$i:=1
+		For ($i;1;Size of array($content))
+			vtType1:=$content{$i}
+			vfDetail:=False
+			Customer_PrintHeader 
+			Print form([Customers];"Customers.sub")
+			vlPrintedPixels:=vlPrintedPixels-13
+		End for 
+		vtType1:=""
+		Print form([Customers];"Customers.sub")
+		vlPrintedPixels:=vlPrintedPixels-13
+	End if 
+	
+	PAGE BREAK
+End if 

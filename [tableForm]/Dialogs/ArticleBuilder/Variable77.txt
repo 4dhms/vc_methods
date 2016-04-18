@@ -1,0 +1,59 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($pref)
+C_BOOLEAN(vfTrim)
+C_LONGINT($i;$n)
+
+If (Form event=On Data Change)
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsFind+"@")
+	If (Not(vfFabPO))
+		If (vsCPType="Combo@") & (asSorP{asSorP}="Embroidery")
+			  //
+		Else 
+			QUERY SELECTION([FabricLibrary];[FabricLibrary]ArticleNumber#"NA")
+		End if 
+	Else 
+		QUERY SELECTION([FabricLibrary];[FabricLibrary]ArticleNumber#"NA")
+	End if 
+	
+	$pref:=Substring([FabricOrders]PONumber;1;2)
+	
+	ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)
+	
+	ARRAY TEXT(asFabArtNo;0)
+	ARRAY TEXT(asList2;0)
+	ARRAY TEXT(asList3;0)
+	ARRAY TEXT(asList4;0)
+	ARRAY TEXT(asList5;0)
+	ARRAY TEXT(asList6;0)
+	
+	$i:=1
+	FIRST RECORD([FabricLibrary])
+	For ($i;1;Records in selection([FabricLibrary]))
+		APPEND TO ARRAY(asFabArtNo;[FabricLibrary]ArticleNumber)
+		APPEND TO ARRAY(asList2;[FabricLibrary]FabricName)
+		APPEND TO ARRAY(asList3;[FabricLibrary]FiberContent)
+		APPEND TO ARRAY(asList5;[FabricLibrary]YarnSize)
+		APPEND TO ARRAY(asList6;[FabricLibrary]Supplier)
+		If ([FabricLibrary]Type=0)
+			APPEND TO ARRAY(asList4;"Fabric")
+		Else 
+			APPEND TO ARRAY(asList4;"Trim")
+		End if 
+		
+		QUERY([FabricLibRates];[FabricLibRates]FabricLibKey=[FabricLibrary]FabricLibKey)
+		If (Records in selection([FabricLibRates])>0)
+			FIRST RECORD([FabricLibRates])
+			$n:=1
+			For ($n;1;Records in selection([FabricLibRates]))
+				APPEND TO ARRAY(asFabArtNo;[FabricLibrary]ArticleNumber)
+				APPEND TO ARRAY(asList2;[FabricLibrary]FabricName)
+				APPEND TO ARRAY(asList3;[FabricLibRates]Content)
+				APPEND TO ARRAY(asList5;[FabricLibRates]YarnSize)
+				APPEND TO ARRAY(asList6;[FabricLibRates]Supplier)
+				APPEND TO ARRAY(asList4;"Fabric")
+				NEXT RECORD([FabricLibRates])
+			End for 
+		End if 
+		NEXT RECORD([FabricLibrary])
+	End for 
+End if 

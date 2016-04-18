@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //Sales Entry procedure
+  //
+Case of 
+	: (<>vlCalendarProc>0)
+		SHOW PROCESS(<>vlCalendarProc)
+		BRING TO FRONT(<>vlCalendarProc)
+	: (<>vlCalendarProc=0)
+		<>vlCalendarProc:=New process("Cal_Proc";0;"Calendar")
+	Else 
+		SHOW PROCESS(<>vlCalendarProc)
+		BRING TO FRONT(<>vlCalendarProc)
+End case 

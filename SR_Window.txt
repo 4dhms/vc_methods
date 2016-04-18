@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Center Window (840;570;4;"")
+
+If (User in group(Current user;"Reports")) | (Current user="Mary Jo") | (Current user="Shari") | (Current user="Andrea") | (Current user="Nicholas") | (Current user="Sharon") | (Current user="Dillon") | (Current user="Leigh") | (Current user="Lai Mun") | (Current user="Dusha") | (Current user="Ed") | (Current user="Mark") | (Current user="Prakash") | (Current user="Lorna") | (User in group(Current user;"SpenseKnits")) | (User in group(Current user;"Cupio")) | (User in group(Current user;"DressesOnly")) | (User in group(Current user;"SusansReport"))
+	FORM SET INPUT([Dialogs];"SR_Screen")
+	ADD RECORD([Dialogs];*)
+Else 
+	WinPrompt ("See Spenser for access.")
+End if 
+CLOSE WINDOW

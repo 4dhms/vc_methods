@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCustomer)
+
+Case of 
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(asCustomerBuild;False)
+		OBJECT SET ENABLED(bNewRMA;False)
+		OBJECT SET ENABLED(b1;False)
+		ARRAY TEXT(asCustomerBuild;0)
+		ARRAY TEXT(asCustomers;0)
+		ALL RECORDS([ReturnStores])
+		
+		SELECTION TO ARRAY([ReturnStores]StoreName;asCustomers)
+		SORT ARRAY(asCustomers;>)
+		
+End case 
+

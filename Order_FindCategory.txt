@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($cat)
+vsRequestString:=""
+
+WinFind ("Enter category number:";-8)
+
+$cat:=vsRequestString+"@"
+QUERY([Orders];[Orders]Category1=$cat;*)
+QUERY([Orders]; | ;[Orders]Category2=$cat;*)
+QUERY([Orders]; | ;[Orders]Category3=$cat)
+ORDER BY([Orders];[Orders]OrderNum;<)
+
+SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))

@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$order)
+C_TEXT($cat)
+
+  //ORDER BY([Samples];[Samples]KWCnS;>;[Samples]DueDate;>;[Samples]SampleNumber;>)
+
+
+$docref:=Create document("";"xls")
+
+If (ok=1)
+	SEND PACKET($docref;Char(9)+"Order #"+Char(9)+"Style #"+Char(9)+"Design #"+Char(9)+"Date"+Char(9)+"Qty"+Char(9)+"Description"+Char(9))
+	SEND PACKET($docref;"Sample Type"+Char(9)+"Fabric"+Char(9)+"Due Date"+Char(9)+"Scheduled X-Factory"+Char(9))
+	SEND PACKET($docref;"Actual X-Factory"+Char(9)+"Rcvd"+Char(9)+"Season"+Char(9)+"Group"+Char(9)+"Factory"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		$order:=[Samples]SampleNumber*-1
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+		
+		If ([Samples]KWCnS="CutSew")
+			$cat:="Cut & Sew"
+		Else 
+			$cat:=[Samples]KWCnS
+		End if 
+		
+		SEND PACKET($docref;$cat+Char(9)+String([Samples]SampleNumber)+Char(9)+[Samples]StyleNum+Char(9)+[Samples]DesignNum+Char(9)+String([Samples]SampleOrderDate)+Char(9)+String([Samples]SGQuantity)+Char(9)+[Designs]DesignNum+Char(9))
+		SEND PACKET($docref;[Samples]Sam Type+Char(9)+[OrdersFabricXRef]FabricName+Char(9)+String([Samples]DueDate)+Char(9)+String([Samples]XFactorySched)+Char(9))
+		SEND PACKET($docref;String([Samples]XFactAct)+Char(9)+String([Samples]ProtoRecvDate)+Char(9)+[Samples]SeasonName+" "+[Samples]SeasonYear+Char(9)+[Samples]Group+Char(9)+[Samples]SamGarFactry+Char(13))
+		NEXT RECORD([Samples])
+	End for 
+	CLOSE DOCUMENT($docref)
+End if 
+

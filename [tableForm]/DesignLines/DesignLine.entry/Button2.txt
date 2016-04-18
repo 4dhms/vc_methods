@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+CREATE SET([Samples];"SampleGs")
+  //flags new item build status
+$i:=1
+FIRST RECORD([Samples])
+CREATE EMPTY SET([Samples];"Move")
+For ($i;1;Records in selection([Samples]))
+	If ([Samples]Select)
+		ADD TO SET([Samples];"Move")
+		If (Records in selection([DesignLineIncluded])>0)
+			[DesignLines]BuildStatus:=2
+			SAVE RECORD([DesignLines])
+		End if 
+	End if 
+	NEXT RECORD([Samples])
+End for 
+USE SET("Move")
+CLEAR SET("Move")
+
+$i:=1
+FIRST RECORD([Samples])
+
+For ($i;1;Records in selection([Samples]))
+	DL_AddUnit 
+	
+	[Samples]Select:=False
+	SAVE RECORD([Samples])
+	REMOVE FROM SET([Samples];"SampleGs")
+	NEXT RECORD([Samples])
+End for 
+RELATE MANY([DesignLines]DesignLineKey)
+DL_RecCount 
+
+USE SET("SampleGs")
+CLEAR SET("SampleGs")

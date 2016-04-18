@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($note)
+
+SAVE RECORD([PCPage])
+FIRST RECORD([PCHistory])
+
+Case of 
+	: ([PCHistory]ApprovedDate#!00-00-00!)
+		$note:=[PCHistory]Step+" Approved "+String([PCHistory]ApprovedDate)
+	: ([PCHistory]DueDate#!00-00-00!)
+		$note:=[PCHistory]Step+" Due "+String([PCHistory]DueDate)
+	Else 
+		$note:=[PCHistory]Step
+End case 
+
+If ([PCHistory]Note#"")
+	$note:=$note+Char(13)+[PCHistory]Note
+End if 
+
+Case of 
+	: (vlPageRouter=8)
+		[PCPage]Note8:=$note
+	: (vlPageRouter=7)
+		[PCPage]Note7:=$note
+	: (vlPageRouter=6)
+		[PCPage]Note6:=$note
+	: (vlPageRouter=5)
+		[PCPage]Note5:=$note
+	: (vlPageRouter=4)
+		[PCPage]Note4:=$note
+	: (vlPageRouter=3)
+		[PCPage]Note3:=$note
+	: (vlPageRouter=2)
+		[PCPage]Note2:=$note
+	: (vlPageRouter=1)
+		[PCPage]Note1:=$note
+End case 
+
+SAVE RECORD([PCPage])
+
+FORM GOTO PAGE(1)

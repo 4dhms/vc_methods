@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;cbLP1;cbLP2;cbLP3;cbLP4)
+C_POINTER($note)
+C_POINTER($sketch)
+C_POINTER($LP)
+C_TEXT($key)
+
+
+If (<>vlOrderNumber>0)
+	$key:="B"
+Else 
+	$key:="S"
+End if 
+
+$i:=1
+For ($i;1;4)
+	$note:=Get pointer("vtField1"+String($i))
+	$sketch:=Get pointer("vxSketch"+String($i))
+	$LP:=Get pointer("cbLP"+String($i))
+	
+	If (Picture size($sketch->)>2000)
+		QUERY([SpecPix];[SpecPix]OrderNumber=<>vlOrderNumber)
+		QUERY SELECTION([SpecPix];[SpecPix]SketchNumber=$i)
+		If (Records in selection([SpecPix])=0)
+			CREATE RECORD([SpecPix])
+			[SpecPix]ImageNumber:=Sequence number([SpecPix])
+			[SpecPix]OrderNumber:=<>vlOrderNumber
+			[SpecPix]SketchNumber:=$i
+		End if 
+		  // [SpecPix]Title:=$title->
+		[SpecPix]Description:=$note->
+		
+		If ($LP->=1)
+			[SpecPix]LinePlan:=True
+		Else 
+			[SpecPix]LinePlan:=False
+		End if 
+		
+		SAVE RECORD([SpecPix])
+	End if 
+End for 
+UNLOAD RECORD([SpecPix])

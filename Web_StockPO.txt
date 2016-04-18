@@ -1,0 +1,84 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML;$strip;$centxt;$photopath)
+C_LONGINT($i;$n;$s)
+C_BOOLEAN($photo)
+C_REAL($discount)
+
+Web_StockVar 
+
+vtDLKey:=$2
+$strip:=Substring($2;Position("_";$2)+1;4)
+vlPage:=Num(Substring($strip;1;Position("_";$strip)))
+vlKey:=Num(Substring($2;1;Position("_";$2)-1))
+$strip:=Substring($2;Position("_";$2)+1;10)
+vlCount:=Num(Substring($strip;Position("_";$strip)+1;10))
+
+QUERY([Orders];[Orders]OrderNum=$1)
+QUERY([BreakDownLibrary];[BreakDownLibrary]BDKey=[Orders]BDHeaderKey)
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$1)
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=vlKey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=vlPage)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]OrderNumber=$1)
+vsMSRP:=String([DesignLineIncluded]MSRP;"###.00")
+
+
+$discount:=Num([DesignLineIncluded]Price)
+
+$i:=1
+$HTML:=Char(1)+"<select name="+Char(34)+"vsActual"+Char(34)+" id=vsActual>"
+Repeat 
+	Case of 
+		: ($i=1)
+			$HTML:=$HTML+"<option selected=selected>"+String($discount;"###.00")+"</option>"
+		Else 
+			$HTML:=$HTML+"<option>"+String($discount;"###.00")+"</option>"
+	End case 
+	If ($discount>Int($discount))
+		$discount:=Int($discount)
+	Else 
+		$discount:=$discount-0.5
+	End if 
+	$i:=$i+1
+Until ($discount<1)
+$HTML:=$HTML+"</select>"
+
+
+vsPrice:=[DesignLineIncluded]Price
+vsActual:=$HTML
+
+QUERY([DLPages];[DLPages]DLItemKey=vlKey)
+QUERY SELECTION([DLPages];[DLPages]PageNumber=vlPage)
+vtTitle:=[DLPages]PageTitle
+
+QUERY([SpecPix];[SpecPix]OrderNumber=$1)  //=True)
+QUERY SELECTION([SpecPix];[SpecPix]LinePlan=True)
+If (Records in selection([SpecPix])>0)
+	$photo:=True
+	$photopath:=String($1+([SpecPix]SketchNumber*0.1))
+Else 
+	$photo:=False
+End if 
+
+
+Web_UserField 
+vtDescription:=[Designs]Description
+If ($photo)
+	  //$HTML:=$HTML+"<IMG SRC=/4DCGI/PHOTO_"+$photopath+" width=100 height=100></a></td>"
+	vtPullPicture:=Char(1)+"<IMG SRC=/4DCGI/PHOTO_"+$photopath+" width=250 height 300 align=center>"
+Else 
+	vtPullPicture:=Char(1)+"<IMG SRC=/4DCGI/DESIGN_"+[Orders]DesignNumber+" width=250 height 300 align=center>"
+End if 
+If (Records in selection([BreakDownLibrary])=0)
+	vtBreakdown:=[Orders]BrkdnCutRatio
+Else 
+	vtBreakdown:=[BreakDownLibrary]BDName
+End if 
+
+vlOrderNumber:=$1
+vtCPList:=Web_StockPullColors (0)
+vtButton:=Char(1)+"<input type=submit name=Add id=Add value="+Char(34)+"Add to Order"+Char(34)+">"
+vsFlag:="new"
+WEB SEND FILE("stockpo.html")
+

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([DesignLineIncluded]ChangeStitch)
+	[DesignLineIncluded]Stitch:=""
+Else 
+	[DesignLineIncluded]Stitch:=[Designs]Stitch
+End if 

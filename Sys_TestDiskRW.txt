@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$s)
+C_POINTER($tableptr)
+
+$c:=Get last table number
+
+For ($i;1;$c)
+	$tableptr:=Table($i)
+	$s:=Records in table($tableptr->)
+	
+	CREATE RECORD($tableptr->)
+	If (Locked($tableptr->))
+		ALERT(Table name($tableptr->))
+	End if 
+	SAVE RECORD($tableptr->)
+	UNLOAD RECORD($tableptr->)
+	If (Shift down)
+		ALERT(Table name($tableptr)+"  "+String($s)+"/"+String(Records in table($tableptr->)))
+	End if 
+	
+End for 
+
+ALERT("Done")
+

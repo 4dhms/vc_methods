@@ -1,0 +1,45 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($sampleOrder;$i)
+C_TEXT($colorbuild)
+ARRAY LONGINT(alSamples;0)
+ARRAY TEXT(atColor;0)
+ARRAY TEXT(asStyleNumbers;0)
+
+$sampleOrder:=-1*[Samples]SampleNumber
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$sampleOrder)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="self")
+QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+
+If (bColors=1)
+	$i:=1
+	For ($i;1;Records in selection([CP_OrderXRef]))
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		$colorbuild:=$colorbuild+[ColorPrintNumber]CPName+", "
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	$colorbuild:=Replace string($colorbuild;" ,";",")
+	$colorbuild:=Substring($colorbuild;1;Length($colorbuild)-2)
+Else 
+	$colorbuild:=""
+End if 
+
+CREATE RECORD([DesignLineIncluded])
+[DesignLineIncluded]Fiber:=[Samples]Fabric SG
+[DesignLineIncluded]LineKey:=Sequence number([DesignLineIncluded])
+[DesignLineIncluded]DesignLineKey:=<>vlDLKey
+[DesignLineIncluded]DesignNumber:=[Samples]DesignNum
+[DesignLineIncluded]StyleNumber:=[Samples]StyleNum
+QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+[DesignLineIncluded]Name:=[Designs]Description
+If ([Samples]Stitch#"")
+	[DesignLineIncluded]Stitch:=[Samples]Stitch
+Else 
+	[DesignLineIncluded]Stitch:=[Designs]Stitch
+End if 
+[DesignLineIncluded]Fiber:=[OrdersFabricXRef]FiberContent
+[DesignLineIncluded]Colors:=$colorbuild
+SAVE RECORD([DesignLineIncluded])
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([ColorPrintNumber])
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([CP_OrderXRef])

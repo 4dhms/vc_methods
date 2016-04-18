@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style)
+
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:=String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		If (Substring([ColorPrintNumber]CPNumber;Length([ColorPrintNumber]CPNumber)-1;999)="-1")
+			$style:=1
+		Else 
+			$style:=6
+		End if 
+		OBJECT SET FONT STYLE([ColorPrintNumber]CPNumber;$style)
+		OBJECT SET FONT STYLE([ColorPrintNumber]CPName;$style)
+		OBJECT SET FONT STYLE(vlColSub2;$style)
+		OBJECT SET FONT STYLE(vlUnits;$style)
+		OBJECT SET FONT STYLE(vlSampleCount;$style)
+		
+		vlSampleCount:=alSamples{Find in array(asPrintNumber;[ColorPrintNumber]CPNumber)}
+		vlUnits:=alChartOrders{Find in array(asPrintNumber;[ColorPrintNumber]CPNumber)}
+		vlColSub2:=alTotalUnits{Find in array(asPrintNumber;[ColorPrintNumber]CPNumber)}
+End case 
+

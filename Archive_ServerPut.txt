@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+C_TEXT($mirror)
+C_TEXT($path;$diskName)
+C_TEXT($folderPath)
+C_TEXT($type)
+C_LONGINT($dot)
+
+$diskName:=Get 4D folder
+$diskName:=Substring($diskName;1;Position(":";$diskName))
+$folderPath:=$diskName+"4D_Archive:"
+If (Test path name($folderPath)#0)
+	CREATE FOLDER($folderPath)
+End if 
+$folderPath:=$folderPath+String(Int(Num($1)/100))+":"
+$path:=$folderPath
+$mirror:=$path
+$path:=$path+$1
+
+
+$diskName:=Get 4D folder
+$diskName:=Substring($diskName;1;Position(":";$diskName))
+$folderPath:=$diskName+"4D_Archive:"
+$mirror:="4D Backup:4D_Archive:"
+
+If (Test path name($folderPath)#0)
+	CREATE FOLDER($folderPath)
+End if 
+
+$folderPath:=$folderPath+String(Int(Num($1)/100))+":"
+If (Test path name($folderPath)#0)
+	CREATE FOLDER($folderPath)
+End if 
+
+$dot:=Length($path)-3
+BLOB TO DOCUMENT($path;$2)
+
+If ($path[[$dot]]=".")
+	$type:=Substring($path;$dot+1;3)
+	SET DOCUMENT TYPE($path;$type)
+End if 
+
+If (Test path name($mirror)=0)
+	$mirror:=$mirror+String(Int(Num($1)/100))+":"
+	If (Test path name($mirror)#0)
+		CREATE FOLDER($mirror)
+	End if 
+	$mirror:=Replace string($path;$diskname;"4D Backup:")
+	COPY DOCUMENT($path;$mirror)
+End if 
+
+$mirror:="Server:4D_Archive:"
+If (Test path name($mirror)=0)
+	$mirror:=$mirror+String(Int(Num($1)/100))+":"
+	If (Test path name($mirror)#0)
+		CREATE FOLDER($mirror)
+	End if 
+	$mirror:=Replace string($path;$diskname;"Server:")
+	COPY DOCUMENT($path;$mirror)
+End if 
+

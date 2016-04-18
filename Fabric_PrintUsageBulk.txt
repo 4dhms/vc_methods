@@ -1,0 +1,79 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pixelcount;$page)
+C_BOOLEAN($break)
+  //FabPO_PrintPrep 
+
+SET PRINT OPTION(Orientation option;1)
+$page:=1
+vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String($page)
+If (vfPDF)
+	If (Records in selection([FabricOrders])>1) | (vfPDF)
+		vtPDFPath:=PDF_FindFolder +<>pathBreak+vtPDFName+"_usage.pdf"
+	Else 
+		vtPDFPath:=PDF_FindFolder +<>pathBreak+[FabricOrders]PONumber+"_usage.pdf"
+	End if 
+	SET PRINT OPTION(Destination option;3;vtPDFPath)
+End if 
+
+If (vfExpand)
+	QUERY([FabricOrders];[FabricOrders]ArticleNo=vtArticleNumber)
+	vtFabric1:=[FabricOrders]ItemName
+	vtFabric2:=[FabricOrders]FiberContent
+	vtTitle:="Usage from "+String(vdDayOne)+" to "+String(Current date(*))
+	vtArticleNumber:=Uppercase(vtArticleNumber)
+	Print form("FabricBulkHeader")
+Else 
+	Print form([FabricOrders];"PrintUsageInfo")
+End if 
+Print form("Usage_InfoBulk")
+$pixelcount:=650
+
+$i:=1
+For ($i;1;Size of array(asXColors))
+	Case of 
+		: ($i=Size of array(asXColors))
+			
+		: ($pixelcount<140) & (asXStyleNumbers{$i+1}="Used:")
+			$break:=True
+		: ($pixelcount<120) & (asXStyleNumbers{$i}="Used:")
+			$break:=True
+		: ($pixelcount<120) & (asXStyleNumbers{$i}="Ordered:")
+			$break:=True
+			  //: ($pixelcount<104) & (asXStyleNumbers{$i}="Shipped:")
+			  //$break:=True
+			  //: ($pixelcount<104) & (asXStyleNumbers{$i}="Not Received:")
+			  //$break:=True
+		: ($pixelcount<32) & (asXStyleNumbers{$i}="Over/Under:")  //& (asXStyleNumbers{$i}#"")
+			$break:=True
+		: ($pixelcount<16)
+			$break:=True
+		Else 
+			$break:=False
+	End case 
+	
+	If ($break)
+		$page:=$page+1
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String($page)
+		PAGE BREAK(>)
+		If (vfExpand)
+			Print form("FabricBulkHeader")
+		Else 
+			Print form([FabricOrders];"PrintUsageInfo")
+		End if 
+		Print form("Usage_InfoBulk")
+		$pixelcount:=650
+	End if 
+	
+	vsPart1:=asXColors{$i}
+	vsPart2:=String(alXhmsPO{$i};"#####")
+	vsPart3:=asXStyleNumbers{$i}
+	vsPart4:=asXfabPO{$i}
+	vsPart5:=String(alXShip{$i};"###,###")
+	vsPart6:=String(alXUnits{$i};"###,###")
+	vsPart7:=asXConsumption{$i}
+	vsPart8:=String(alXTotals{$i};"###,###")
+	vsPart9:=asPOdate{$i}
+	vsPart10:=asFBdate{$i}
+	Print form("Print_InventoryBulk")
+	$pixelcount:=$pixelcount-16
+End for 

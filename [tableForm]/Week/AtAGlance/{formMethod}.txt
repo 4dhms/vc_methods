@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Unload)
+	APPLY TO SELECTION([Week];[Week]WeekDate:=!00-00-00!)
+	APPLY TO SELECTION([Week];[Week]Monday:="")
+	APPLY TO SELECTION([Week];[Week]Tuesday:="")
+	APPLY TO SELECTION([Week];[Week]Wednesday:="")
+	APPLY TO SELECTION([Week];[Week]Thursday:="")
+	APPLY TO SELECTION([Week];[Week]Friday:="")
+	APPLY TO SELECTION([Week];[Week]Saturday:="")
+	APPLY TO SELECTION([Week];[Week]Hour:=?00:00:00?)
+	APPLY TO SELECTION([Week];[Week]TimeKey:=?00:00:00?)
+	UNLOAD RECORD([Week])
+End if 

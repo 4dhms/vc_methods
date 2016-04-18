@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asCustomers>0)
+	QUERY([Customers];[Customers]CustomerName=asCustomers{asCustomers})
+	CREATE SET([Contacts];"Cus")
+	CREATE RECORD([Contacts])
+	[Contacts]MailingAddress:=[Customers]DefaultAddress
+	[Contacts]CustomerKey:=[Customers]CustomerKey
+	[Contacts]Contact:="   New contact"
+	[Contacts]ContactID:=Sequence number([Contacts])
+	SAVE RECORD([Contacts])
+	ADD TO SET([Contacts];"Cus")
+	USE SET("Cus")
+	CLEAR SET("Cus")
+	ORDER BY([Contacts];[Contacts]Contact;>)
+Else 
+	WinPrompt ("Select a store.")
+End if 

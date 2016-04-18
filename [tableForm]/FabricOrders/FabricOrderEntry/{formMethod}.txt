@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		  //If (<>vlPlatform<3)
+		FabPO_FM_Entry 
+		  //End if 
+	: (Form event=On Unload)
+End case 

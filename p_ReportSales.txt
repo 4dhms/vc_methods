@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+  //WinChoice ("Do you want the REDUCED"+Char(13)+"or the EXTENDED report?";"Extended";"Reduced")
+Array_BuildDates 
+
+
+  //If (ok=1)
+  //INPUT FORM([Dialogs];"ReportProfitability")
+  //If (Screen width>1000)
+  //Center Window (1000;380;4;"";"WincBox")
+  //Else 
+  //Center Window (Screen width-40;380;4;"";"WincBox")
+  //End if 
+
+  //Else 
+FORM SET INPUT([Dialogs];"SalesReportDiv")
+If (Screen width>800)
+	Center Window (900;380;4;"";"WincBox")
+Else 
+	Center Window (Screen width-40;380;4;"";"WincBox")
+End if 
+
+  //End if 
+
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>ReportProc:=0

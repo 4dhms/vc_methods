@@ -1,0 +1,86 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($pref)
+C_BOOLEAN(vfTrim)
+C_LONGINT($i;$n)
+
+Case of 
+	: (Form event=On Load)
+		If ([FabricOrders]POType=0)
+			vfTrim:=False
+		Else 
+			vfTrim:=True
+		End if 
+		
+		ARRAY TEXT(asFabArtNo;0)
+		ARRAY TEXT(asList2;0)
+		ARRAY TEXT(asList3;0)
+		ARRAY TEXT(asList4;0)
+		ARRAY TEXT(asList5;0)
+		ARRAY TEXT(asList6;0)
+		  //vsArticle:=""
+		vsFind:=""
+		If (vfTrim)
+			OBJECT SET TITLE(Header2;"Trim Description")
+			OBJECT SET TITLE(Header3;"Make Up")
+		Else 
+			OBJECT SET TITLE(Header2;"Fabric")
+			OBJECT SET TITLE(Header3;"Fiber")
+		End if 
+		If (Not(vfFabPO))
+			If (asSorP{asSorP}="Layout") | (asSorP{asSorP}="Embroidery") & (vsCPType="Combo@")
+				OBJECT SET ENABLED(bNone;True)
+			Else 
+				OBJECT SET ENABLED(bNone;False)
+			End if 
+		Else 
+			OBJECT SET ENABLED(bNone;False)
+		End if 
+		
+		  //: (Form event=On After Keystroke)  //| (Form event=On Before Keystroke )
+		  //If (Character code(Keystroke)=8)
+		  //  //vsArticle:=""
+		  //vsFind:=""
+		  //Else 
+		  //vsFind:=vsFind+Keystroke
+		  //End if 
+		  //QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsFind+"@")
+		  //$pref:=Substring([FabricOrders]PONumber;1;2)
+		
+		  // 
+		  //ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)
+		  //
+		  //ARRAY TEXT(asFabArtNo;0)
+		  //ARRAY TEXT(asList2;0)
+		  //ARRAY TEXT(asList3;0)
+		  //ARRAY TEXT(asList4;0)
+		  //ARRAY TEXT(asList5;0)
+		  //
+		  //$i:=1
+		  //FIRST RECORD([FabricLibrary])
+		  //For ($i;1;Records in selection([FabricLibrary]))
+		  //APPEND TO ARRAY(asFabArtNo;[FabricLibrary]ArticleNumber)
+		  //APPEND TO ARRAY(asList2;[FabricLibrary]FabricName)
+		  //APPEND TO ARRAY(asList3;[FabricLibrary]FiberContent)
+		  //APPEND TO ARRAY(asList5;[FabricLibrary]YarnSize)
+		  //If ([FabricLibrary]Type=0)
+		  //APPEND TO ARRAY(asList4;"Fabric")
+		  //Else 
+		  //APPEND TO ARRAY(asList4;"Trim")
+		  //End if 
+		  //
+		  //QUERY([FabricLibRates];[FabricLibRates]FabricLibKey=[FabricLibrary]FabricLibKey)
+		  //If (Records in selection([FabricLibRates])>0)
+		  //FIRST RECORD([FabricLibRates])
+		  //$n:=1
+		  //For ($n;1;Records in selection([FabricLibRates]))
+		  //APPEND TO ARRAY(asFabArtNo;[FabricLibrary]ArticleNumber)
+		  //APPEND TO ARRAY(asList2;[FabricLibrary]FabricName)
+		  //APPEND TO ARRAY(asList3;[FabricLibRates]Content)
+		  //APPEND TO ARRAY(asList5;[FabricLibRates]YarnSize)
+		  //APPEND TO ARRAY(asList4;"Fabric")
+		  //NEXT RECORD([FabricLibRates])
+		  //End for 
+		  //End if 
+		  //NEXT RECORD([FabricLibrary])
+		  //End for 
+End case 

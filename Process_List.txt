@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_LONGINT($i;$tasks;$count)
+  //
+  //$tasks:=Count tasks
+  //
+  //ARRAY STRING(31;asProcName;$tasks)
+  //ARRAY LONGINT(alProcNum;$tasks)
+  //
+  //$count:=0
+  //
+  //For ($i;1;$tasks)
+  //If (Process state($i)>=Executing)
+  //$count:=$count+1
+  //PROCESS PROPERTIES($count;asProcName{$i};$vlState;$vlTime)
+  //alProcNum{$i}:=$count
+  //End if 
+  //End for 
+  //
+  //
+  //$i:=1
+  //For ($i;1;Size of array(asProcName))
+  //
+  //ALERT(asProcName{$i}+" "+String(alProcNum{$i}))
+  //If (Shift down)
+  //TRACE
+  //End if 
+  //End for 

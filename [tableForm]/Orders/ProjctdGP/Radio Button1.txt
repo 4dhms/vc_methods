@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(*;"xT1";False)
+OBJECT SET VISIBLE(*;"xT2";False)
+OBJECT SET VISIBLE(<>asStartMonth;False)
+OBJECT SET VISIBLE(<>asStartDay;False)
+OBJECT SET VISIBLE(<>asStartYear;False)
+OBJECT SET VISIBLE(<>asEndMonth;False)
+OBJECT SET VISIBLE(<>asEndDay;False)
+OBJECT SET VISIBLE(<>asEndYear;False)
+
+OBJECT SET VISIBLE(<>asSeasonName;True)
+OBJECT SET VISIBLE(<>asSeasonYear;True)
+

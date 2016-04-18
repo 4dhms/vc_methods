@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Orders];"OrdEntSlsMed")
+FORM SET OUTPUT([Orders];"OrderLarge.o")
+
+QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{asStyleNumbers})
+ORDER BY([Orders];[Orders]OrderNum;<)
+DISPLAY SELECTION([Orders];*)
+

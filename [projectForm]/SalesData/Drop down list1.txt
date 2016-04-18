@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asCustomers>0)
+	UNLOAD RECORD([SLRAcct])
+	vsCustomer:=asCustomers{asCustomers}
+	
+	ARRAY TEXT(asColors;0)
+	ARRAY TEXT(<>asDN;0)
+	QUERY([SLRAcct];[SLRAcct]SLRAcct=vsCustomer)
+	QUERY SELECTION([SLRAcct];[SLRAcct]Division=vsDivision)
+	
+	If (Records in selection([SLRAcct])>0)
+		DISTINCT VALUES([SLRAcct]SLRStyleNumber;<>asDN)
+		SORT ARRAY(<>asDN;>)
+		OBJECT SET VISIBLE(<>asDN;True)
+	End if 
+	
+	UNLOAD RECORD([SLRAcct])
+	REDUCE SELECTION([SLRWks];0)
+	ARRAY TEXT(asColors;0)
+	GOTO OBJECT(vsStyleNumber)
+End if 
+

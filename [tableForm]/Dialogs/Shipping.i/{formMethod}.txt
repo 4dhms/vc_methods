@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	vsShipto:=""
+	Case of 
+		: ([Orders]ShipSea)
+			cbSea:=1
+		: ([Orders]ShipLDP)
+			cbLDP:=1
+		: ([Orders]ShipAir)
+			cbAir:=1
+		: ([Orders]ShipFOB)
+			cbFOB:=1
+	End case 
+	
+End if 

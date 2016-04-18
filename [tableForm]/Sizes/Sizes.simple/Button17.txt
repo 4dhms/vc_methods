@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_POINTER($fieldptr)
+  //C_LONGINT(vlField)
+  //
+  //If (vlField>1)
+  //$fieldptr:=Field(88;vlField)
+
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(9)
+POST KEY(97;Command key mask)
+  //End if 

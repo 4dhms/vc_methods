@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($month;$year)
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkEnd=vdSubmitDate)
+
+$month:=[SLRWkLibrary]WkMonth
+$year:=[SLRWkLibrary]WkYear
+
+vdWTD:=vdSubmitDate-6
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkMonth=$month;*)
+QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkYear=$year)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkEnd;>)
+vdMTD:=[SLRWkLibrary]WkEnd-6
+
+If ($month<7)
+	QUERY([SLRWkLibrary];[SLRWkLibrary]WkYear=$year;*)
+	QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkMonth<7)
+	ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkEnd;>)
+	vdSTD:=[SLRWkLibrary]WkEnd-6
+Else 
+	QUERY([SLRWkLibrary];[SLRWkLibrary]WkYear=$year;*)
+	QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkMonth>6)
+	ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkEnd;>)
+	vdSTD:=[SLRWkLibrary]WkEnd-6
+End if 
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkYear=$year)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkEnd;>)
+vdYTD:=[SLRWkLibrary]WkEnd-6
+

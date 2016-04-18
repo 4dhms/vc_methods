@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	If (vtDCpo="PO@")
+		OBJECT SET FONT STYLE(vtDCpo;1)
+	Else 
+		OBJECT SET FONT STYLE(vtDCpo;0)
+	End if 
+End if 

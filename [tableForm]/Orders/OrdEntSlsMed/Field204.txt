@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]NYFabSupply)
+	[Orders]NYFabNOT:=False
+	[Orders]Price_Tckt_Sent:=String(Current date(*))
+Else 
+	[Orders]NYFabNOT:=True
+End if 

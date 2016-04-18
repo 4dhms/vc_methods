@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	Rev_LoadChange 
+	Rev_PageTurner (0)
+End if 

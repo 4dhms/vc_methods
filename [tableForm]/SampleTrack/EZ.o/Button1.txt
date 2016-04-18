@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([SampleTrack];[SampleTrack]EZ=True)
+If (cbHistory=1)
+Else 
+	QUERY SELECTION([SampleTrack];[SampleTrack]DateIn=!00-00-00!)
+End if 
+
+Case of 
+	: (vsStyleNumber#"")
+		QUERY SELECTION([SampleTrack];[SampleTrack]StyleNumber=vsStyleNumber)
+	: (vsFabColor#"")
+		QUERY SELECTION([SampleTrack];[SampleTrack]Color=vsFabColor)
+	: (vsCustomer#"")
+		QUERY SELECTION([SampleTrack];[SampleTrack]Store=vsCustomer)
+End case 
+
+ORDER BY([SampleTrack];[SampleTrack]DateOut;<)
+
+If (Records in selection([SampleTrack])=1)
+	MODIFY RECORD([SampleTrack];*)
+End if 
+vsStyleNumber:=""
+vsFabColor:=""
+vsCustomer:=""

@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbDivision=1)
+	vlRouter:=1
+	OBJECT SET TITLE(*;"Header1";"Division")
+Else 
+	vlRouter:=2
+	OBJECT SET TITLE(*;"Header1";"Factory")
+End if 
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+If (Current user="Designer") | (Current user="Zoe") | (Current user="Spenser") | (Current user="August") & (User in group(Current user;"Supercostsheets")) & (<>vfSupersheet)
+	WinChoice ("Do you want to report without cushions?";"No cushion";"Cushion")
+	If (ok=1)
+		<>vfSupersheet:=True
+	Else 
+		<>vfSupersheet:=False
+	End if 
+End if 
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	Else 
+		OBJECT SET VISIBLE(vrRptAvgNetMarkUp;True)
+		OBJECT SET VISIBLE(vrRptAvgNetNetMarkUp;True)
+		Report_SalesDivNew 
+		OBJECT SET ENABLED(bPrint;True)
+		
+		RESUME PROCESS(<>SalesPrcID)
+		<>ReportsID:=0
+End case 

@@ -1,0 +1,115 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(bChange)
+C_BOOLEAN($show)
+
+If (Is new record([ColorPrintNumber]))
+	CP_NewFM 
+	OBJECT SET ENTERABLE([ColorPrintNumber]CPName;True)
+	OBJECT SET VISIBLE(*;"xNo";False)
+	vfNewColor:=True
+	OBJECT SET VISIBLE(bDel;False)
+Else 
+	If ([ColorPrintNumber]CPName="")
+		OBJECT SET ENTERABLE([ColorPrintNumber]CPName;True)
+		OBJECT SET VISIBLE(*;"xNo";False)
+		OBJECT SET VISIBLE(bDel;False)
+		vfNewColor:=True
+	Else 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+		
+		Case of 
+			: (Current user="Suzanne Corra") | (Current user="Mark A") | (Current user="Becky") | (Current user="Dominique") | (Current user="Dusha") | (Current user="Designer") & (Records in selection([Orders])=0)
+				OBJECT SET VISIBLE(bDel;([ColorPrintNumber]CPType=2) & (Not(Is new record([ColorPrintNumber]))))
+				OBJECT SET VISIBLE(bChange;True)
+			: (Records in selection([Orders])>0)
+				
+				QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+				QUERY SELECTION([Orders];[Orders]POOpen=False;*)
+				QUERY SELECTION([Orders]; | ;[Orders]RevisionNumber>0)
+				OBJECT SET ENTERABLE([ColorPrintNumber]CPName;False)
+				OBJECT SET VISIBLE(*;"xNo";True)
+				If (Current user="Suzanne Corra") | (Current user="Mark A") | (Current user="Becky") | (Current user="Dominique") | (Current user="Dusha") | (Current user="Designer")
+					OBJECT SET VISIBLE(bChange;True)
+				End if 
+				vfNewColor:=False
+				OBJECT SET VISIBLE(bDel;False)
+			Else 
+				OBJECT SET ENTERABLE([ColorPrintNumber]CPName;True)
+				OBJECT SET VISIBLE(*;"xNo";False)
+				vfNewColor:=True
+				OBJECT SET VISIBLE(bDel;False)
+		End case 
+	End if 
+End if 
+pOne:=1
+pTwo:=0
+pThree:=0
+ColorPrint_ShowSeason 
+CP_UseArray 
+  //turns off family for embroidery and layout
+vsType:=""
+OBJECT SET VISIBLE(bFamily;[ColorPrintNumber]CPType<3)
+OBJECT SET VISIBLE([ColorPrintFamilies]CPFamilyName;[ColorPrintNumber]CPType<3)
+OBJECT SET VISIBLE(*;"xFamily";[ColorPrintNumber]CPType<3)
+
+If ([ColorPrintNumber]CPType=2) | ([ColorPrintNumber]CPType=5) | ([ColorPrintNumber]CPType=6) | ([ColorPrintNumber]CPNumber="YD@") | ([ColorPrintNumber]CPNumber="WD@")
+	$show:=True
+Else 
+	$show:=False
+End if 
+OBJECT SET VISIBLE(*;"xThread";$show)
+OBJECT SET VISIBLE([ColorPrintNumber]ThreadColor;$show)
+OBJECT SET VISIBLE(vtColor;$show)
+
+vtFailureText:=""
+
+If ([ColorPrintNumber]CPType=2)
+	Color_GetNameLaunch ([ColorPrintNumber]ThreadColor)
+Else 
+	vtColor:=""
+End if 
+
+QUERY([CP_Customers];[CP_Customers]CPNumber=[ColorPrintNumber]CPNumber)
+
+If ([ColorPrintNumber]CPCreationDate=!00-00-00!)
+	[ColorPrintNumber]CPCreationDate:=Current date(*)
+End if 
+
+  //CP_BuildDivArray (1)
+  //INSERT IN ARRAY(asDivisions;1;1)
+  //asDivisions{1}:="Select Division"
+  //asDivisions:=Find in array(asDivisions;[ColorPrintNumber]Division)
+
+OBJECT SET VISIBLE([ColorPrintNumber]BuyDivision;Current user="Designer")
+OBJECT SET VISIBLE([ColorPrintNumber]BuySeason;Current user="Designer")
+
+CP_UpdateDrop 
+
+If ([ColorPrintNumber]Dropped) & ([ColorPrintNumber]CPType=2)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+	
+	If (Records in selection([CP_OrderXRef])>0)
+		OBJECT SET VISIBLE(*;"xOrder";True)
+		OBJECT SET VISIBLE(*;"xDropped";False)
+	Else 
+		OBJECT SET VISIBLE(*;"xDropped";True)
+		OBJECT SET VISIBLE(*;"xOrder";False)
+	End if 
+Else 
+	OBJECT SET VISIBLE(*;"xDropped";False)
+	OBJECT SET VISIBLE(*;"xOrder";False)
+End if 
+
+OBJECT SET VISIBLE(*;"xDropped1";[ColorPrintNumber]Dropped)
+
+OBJECT SET VISIBLE(bAdd;[ColorPrintNumber]CPType>1)
+OBJECT SET VISIBLE([ColorPrintNumber]ColorWay;[ColorPrintNumber]CPType>1)
+OBJECT SET VISIBLE(*;"xTextCW";[ColorPrintNumber]CPType>1)
+OBJECT SET VISIBLE(*;"xTextCW2";[ColorPrintNumber]CPType>1)
+
+
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Orders])
+

@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Find in array(atSub1;vtItemName)<1)
+	APPEND TO ARRAY(atSub1;vtItemName)
+	SORT ARRAY(atSub1;>)
+	CREATE RECORD([Lists])
+	Case of 
+		: (cbGHZ=1)
+			[Lists]ListName:="FactoriesHZ"
+			ARRAY TO LIST(atSub1;"FactoriesHZ")
+		: (cbGSZ=1)
+			[Lists]ListName:="FactoriesSZ"
+			ARRAY TO LIST(atSub1;"FactoriesSZ")
+		: (cbGDom=1)
+			[Lists]ListName:="FactoriesDomestic"
+			ARRAY TO LIST(atSub1;"FactoriesDomestic")
+		: (cbGVN=1)
+			[Lists]ListName:="FactoriesVietNam"
+			ARRAY TO LIST(atSub1;"FactoriesVietNam")
+	End case 
+	[Lists]ListItem:=vtItemName
+	SAVE RECORD([Lists])
+	UNLOAD RECORD([Lists])
+End if 
+vtItemName:=""

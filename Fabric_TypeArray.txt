@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSorP;6)
+asSorP{1}:="Select Type"
+asSorP{2}:="Solid"
+asSorP{3}:="Print"
+asSorP{4}:="Embroidery"
+asSorP{5}:="Layout"
+asSorP{6}:="Yarn Dye"

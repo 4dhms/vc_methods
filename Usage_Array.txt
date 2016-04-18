@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSeasonYear;0)
+COPY ARRAY(<>asSeasonYear;asSeasonYear)
+If (pOne=1)
+	ARRAY TEXT(asStartMonth;17)
+	
+	asStartMonth{1}:="January"
+	asStartMonth{2}:="February"
+	asStartMonth{3}:="March"
+	asStartMonth{4}:="April"
+	asStartMonth{5}:="May"
+	asStartMonth{6}:="June"
+	asStartMonth{7}:="July"
+	asStartMonth{8}:="August"
+	asStartMonth{9}:="September"
+	asStartMonth{10}:="October"
+	asStartMonth{11}:="November"
+	asStartMonth{12}:="December"
+	asStartMonth{13}:="Q1"
+	asStartMonth{14}:="Q2"
+	asStartMonth{15}:="Q3"
+	asStartMonth{16}:="Q4"
+	asStartMonth{17}:="Select Month"
+	asStartMonth:=17
+Else 
+	ARRAY TEXT(asStartMonth;10)
+	asStartMonth{1}:="Fall"
+	asStartMonth{2}:="Holiday"
+	asStartMonth{3}:="Resort"
+	asStartMonth{4}:="Spring"
+	asStartMonth{5}:="Spring II"
+	asStartMonth{6}:="Summer"
+	asStartMonth{7}:="Transition"
+	asStartMonth{8}:="Transition"
+	asStartMonth{9}:="Full Year"
+	asStartMonth{10}:="Select Season"
+	asStartMonth:=Size of array(asStartMonth)
+End if 
+asSeasonYear:=1
+

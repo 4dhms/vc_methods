@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{asStyleNumbers})
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	vxSketch:=[Designs]Sketch
+	vtDescription:=[Designs]Description
+	UNLOAD RECORD([Designs])
+	UNLOAD RECORD([Orders])
+End if 

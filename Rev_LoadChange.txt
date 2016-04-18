@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([Changes]Tag="Batch added")
+		vtTitle1:="Batch added:"
+	: ([Changes]Tag="Added")
+		vtTitle1:="Added:"
+	: ([Changes]Tag="Removed")
+		vtTitle1:="Removed:"
+	: ([Changes]Tag="Changed")
+		vtTitle1:="Changed from:"
+		
+	: ([Changes]FieldName="@Removed")
+		vtTitle1:="Deleted fabric:"
+	: ([Changes]FieldName="@ Changed")
+		vtTitle1:="From:"
+	: ([Changes]FieldName="@color Added@")
+		vtTitle1:="New color:"
+	: ([Changes]FieldName="@fabric Added@")
+		vtTitle1:="New fabric:"
+	Else 
+		vtTitle1:="Changed from:"
+End case 

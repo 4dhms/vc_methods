@@ -1,0 +1,69 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		Sample_ArrowInit 
+		Print_Box 
+		OBJECT SET VISIBLE(*;"xStop";<>vfSupersheet)
+		
+		If (Current user="Nubby") | (Current user="Designer")
+			OBJECT SET VISIBLE(bNubby;True)
+		Else 
+			OBJECT SET VISIBLE(bNubby;False)
+		End if 
+		vsQOrderNumber:=""
+		vsQStyle:=""
+		vsQDesign:=""
+		vfNewCostsheet:=False
+		Fabric_TypeArray 
+	: (Form event=On Display Detail)
+		If ([Designs]ArchivedPict)
+			OBJECT SET FONT STYLE([Samples]DesignNum;4)
+		Else 
+			OBJECT SET FONT STYLE([Samples]DesignNum;0)
+		End if 
+		Case of 
+			: (User in group(Current user;"SuperDuperCostsheets"))
+				Case of 
+					: ([Samples]LastCostSheet="DCS Estimate@")
+						vsFlag:="e"+String(Num([Samples]LastCostSheet))
+					: ([Samples]LastCostSheet="DCS Original@")
+						vsFlag:="q"
+					: ([Samples]LastCostSheet="DCS Confirm@")
+						vsFlag:="c"+String(Num([Samples]LastCostSheet))
+						
+					: ([Samples]NoOrder)
+						vsFlag:="N/O"
+					: ([Samples]Void)
+						vsFlag:="X"
+					: ([Samples]LastCostSheet="Estimate@")
+						vsFlag:="E"+String(Num([Samples]LastCostSheet))
+					: ([Samples]LastCostSheet="Original@")
+						vsFlag:="Q"
+					: ([Samples]LastCostSheet="Confirm@")
+						vsFlag:="C"+String(Num([Samples]LastCostSheet))
+					: ([Samples]LastCostSheet="Actual@")
+						vsFlag:=Substring([Samples]LastCostSheet;8;1)
+					Else 
+						vsFlag:=""
+				End case 
+			: ([Samples]NoOrder)
+				vsFlag:="N/O"
+			: ([Samples]Void)
+				vsFlag:="X"
+			Else 
+				vsFlag:=""
+		End case 
+		Case of 
+			: ([Samples]Sam Type="Proto@") & ([Samples]ProtoRecvDate=!00-00-00!)
+				OBJECT SET COLOR([Samples]Sam Type;-(Orange+(256*0)))
+			: ([Samples]Sam Type="Sales@") & ([Samples]SampleReceived=!00-00-00!)
+				OBJECT SET COLOR([Samples]Sam Type;-(Orange+(256*0)))
+			Else 
+				OBJECT SET COLOR([Samples]Sam Type;-(15+(256*0)))
+		End case 
+		OBJECT SET VISIBLE([Samples]Outstanding;([Samples]Sam Type="Sales@") & ([Samples]Outstanding>0))
+		OBJECT SET VISIBLE(*;"xNoOrder";(([Samples]NoOrder) & (Record number([Samples])>-1)))
+		vsSeason:=[Samples]SeasonName+" "+Substring([Samples]SeasonYear;3;2)
+	: (Form event=On Unload)
+		vfNewCostsheet:=False
+End case 

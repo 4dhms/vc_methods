@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+  //
+
+CREATE SET([FabricOrders];"OrdSet")
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	CLEAR SET("UserSet")
+	FIRST RECORD([FabricOrders])
+	For ($i;1;Records in selection([FabricOrders]))
+		FabPO_Print 
+		NEXT RECORD([FabricOrders])
+	End for 
+Else 
+	ALERT("Please highlight a record(s) first.")
+End if 
+USE SET("OrdSet")
+CLEAR SET("OrdSet")

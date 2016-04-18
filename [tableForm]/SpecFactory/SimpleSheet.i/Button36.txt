@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+SS_ReloadVar 
+For ($i;1;Size of array(afApproved))
+	If (Find in array(alMasterApproved;alOrders{$i})<0)
+		afApproved{$i}:=True
+	Else 
+		afApproved{$i}:=False
+	End if 
+End for 

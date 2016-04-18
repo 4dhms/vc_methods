@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Addesses];"Addresses.o")
+FORM SET INPUT([Addesses];"ShipToLib.i")
+
+ALL RECORDS([Addesses])
+vlWinWd:=500
+vlWinHt:=400
+vlWinType:=5
+vsWinTitle:=""
+
+
+Center Window 
+MODIFY SELECTION([Addesses];*)
+CLOSE WINDOW

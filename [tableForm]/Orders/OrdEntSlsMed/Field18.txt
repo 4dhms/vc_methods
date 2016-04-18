@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]WH_BilloLading)
+	[Orders]WH_BilloLadingDate:=Current date(*)
+End if 

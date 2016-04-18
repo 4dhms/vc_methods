@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+  //white 16777215
+  //lt grey 15790325
+  //dark grey 10197915
+  //yellow 16777165
+  //dark blue 19415
+
+  //TRACE
+
+SR_ArrayInit (0)
+If (cbBreakout=1)
+	SR_ArrayInit (60)
+	SR_SeasonCol 
+	$i:=1
+	For ($i;1;60)
+		Case of 
+			: ($i%4=2)
+				asSRmonth{$i}:="Petite"
+			: ($i%4=3)
+				asSRmonth{$i}:="Missy"
+			: ($i%4=0)
+				asSRmonth{$i}:="Large"
+		End case 
+		
+		Case of 
+			: (asSRmonth{$i}="Petite") | (asSRmonth{$i}="Missy") | (asSRmonth{$i}="Large")
+				alSRbackground{$i}:=15790325
+				alSRstyle{$i}:=2
+				alSRcolor{$i}:=19415
+			Else 
+				  //alSRbackground{$i}:=16777165
+				alSRbackground{$i}:=16777215
+				alSRstyle{$i}:=1
+				alSRcolor{$i}:=0
+		End case 
+		
+	End for 
+	
+	$i:=1
+	For ($i;1;60)
+		If ($i>4)
+			If (asSRseasonA{$i}="@total@") | (asSRseasonA{$i-1}="@total@") | (asSRseasonA{$i-2}="@total@") | (asSRseasonA{$i-3}="@total@")
+				alSRbackground{$i}:=16777215
+				If (asSRseasonA{$i}="@total@")
+					alSRstyle{$i}:=1
+				Else 
+					alSRstyle{$i}:=0
+				End if 
+				alSRcolor{$i}:=0
+			End if 
+		End if 
+	End for 
+Else 
+	SR_ArrayInit (15)
+	SR_SeasonCol 
+	$i:=1
+	For ($i;1;14)
+		  //ALERT(asSRseasonA{$i})
+		
+		alSRbackground{$i}:=16777215
+		  //If (asSRseasonA{$i}="@total@")
+		alSRstyle{$i}:=1
+		alSRcolor{$i}:=1
+		  //Else 
+		  //alSRstyle{$i}:=0
+		  //alSRcolor{$i}:=0
+		  //End if 
+	End for 
+End if 
+
+

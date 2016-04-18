@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //bSubs button
+  //
+If (Current user="Designer") & (Shift down)
+	Dev_FIndLocked 
+Else 
+	p_ShwSbstSls 
+End if 

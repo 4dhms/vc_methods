@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($order)
+
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asFactories;0)
+		vlRecCount:=0
+		GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+		vtDescription:=""
+		cb2:=1
+		cb4:=1
+		cb5:=1
+		FORM GOTO PAGE(vlRouter)
+	: (Form event=On Display Detail)
+		$order:=-1*[Samples]SampleNumber
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+		vsSeason:=[Samples]SeasonName+" "+Substring([Samples]SeasonYear;3;4)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		vxSketch:=[Designs]Sketch
+		vtDescription:=[Designs]Description
+		Case of 
+			: ([Samples]Sam Type="Proto@")
+				vsType:="Proto"
+			: ([Samples]Sam Type="sales sample@")
+				vsType:="Sales"
+		End case 
+		OBJECT SET VISIBLE([Samples]XFactAct;[Samples]XFactAct#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactoryReq;[Samples]XFactoryReq#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactorySched;[Samples]XFactorySched#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]SampleReceived;[Samples]SampleReceived#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]DueDate;[Samples]DueDate#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]ProtoRecvDate;[Samples]ProtoRecvDate#!00-00-00!)
+End case 
+

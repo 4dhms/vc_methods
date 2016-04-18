@@ -1,0 +1,6 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (Num([Orders]SGPO)=0)
+	<>vlSGPO:=-1
+Else 
+	<>vlSGPO:=Num([Orders]SGPO)*-1
+End if 

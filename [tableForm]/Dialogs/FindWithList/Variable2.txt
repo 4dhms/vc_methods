@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=1) | (FORM Get current page=7) | (FORM Get current page=8) | (FORM Get current page=10) | (FORM Get current page=11)
+		ACCEPT
+	: (FORM Get current page=9)
+		ACCEPT
+	: (FORM Get current page=2)
+		If (vsFindSubhead="Enter new email address:")
+			If (vtItemName#"")
+				  //CREATE RECORD([SpecSampleSize])
+				  //[SpecSampleSize]GradeCatKey:=-1
+				  //[SpecSampleSize]POMKey:=vtItemName
+				  //SAVE RECORD([SpecSampleSize])
+			Else 
+				CREATE RECORD([ColorPrintFamilies])
+				[ColorPrintFamilies]CPFamilyKey:=Sequence number([ColorPrintFamilies])
+				[ColorPrintFamilies]CPType:=vlRouter
+				[ColorPrintFamilies]CPFamilyName:=vtItemName
+				SAVE RECORD([ColorPrintFamilies])
+				vsRequestString:=vtItemName
+			End if 
+			ACCEPT
+		Else 
+			ACCEPT
+		End if 
+	: (FORM Get current page=3)
+		Case of 
+			: (asCPFamilies=0)
+				WinPrompt ("Select family")
+			: (pOne+pTwo=0)
+				WinPrompt ("Bought or Rented?")
+			Else 
+				ACCEPT
+		End case 
+		
+	: (FORM Get current page=4)
+		vsFindSubhead:="TO:"
+		FORM GOTO PAGE(5)
+	: (FORM Get current page=5)
+		If (vsFindFlag="Double click to remove")
+			COPY ARRAY(asAllCC;asSubCC)
+			READ ONLY([Preferences])
+			UNLOAD RECORD([Preferences])
+			
+			ACCEPT
+		End if 
+End case 

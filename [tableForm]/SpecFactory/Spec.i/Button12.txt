@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (OBJECT Get title(bHistory)="Notes")
+	OBJECT SET TITLE(bHistory;"History")
+	vfHistory:=False
+	OBJECT SET VISIBLE([SpecFactory]History;False)
+	OBJECT SET VISIBLE(*;"xHistory";False)
+	OBJECT SET VISIBLE(*;"xNotes";True)
+Else 
+	vfHistory:=True
+	OBJECT SET TITLE(bHistory;"Notes")
+	OBJECT SET VISIBLE([SpecFactory]History;True)
+	OBJECT SET VISIBLE(*;"xHistory";True)
+	OBJECT SET VISIBLE(*;"xNotes";False)
+End if 

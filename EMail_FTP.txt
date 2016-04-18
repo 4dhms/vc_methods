@@ -1,0 +1,82 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($errorcode)
+C_LONGINT($i;$n;$count)
+C_TEXT($pdfFolder)
+C_LONGINT($SMTP_ID)
+C_TEXT(vtPDFPath)
+
+  //$1 Subject
+  //$2 Body
+vtSubject:=$1
+vtFailureMessage:=$2
+vfFailure:=False
+
+$count:=Size of array(asSubCC)
+
+$errorcode:=SMTP_New ($SMTP_ID)
+EMail_Log (True;$errorcode;"New")
+
+$errorcode:=SMTP_Host ($SMTP_ID;vtEMHost)
+EMail_Log (True;$errorcode;"Host")
+
+  //$errorcode:=SMTP_From ($SMTP_ID;"4dserver@nubby.com")
+$errorcode:=SMTP_From ($SMTP_ID;<>vtMailFrom)
+EMail_Log (True;$errorcode;"From")
+
+$errorcode:=SMTP_ReplyTo ($SMTP_ID;<>vtMailFrom)
+EMail_Log (True;$errorcode;"Reply")
+
+$errorcode:=SMTP_Subject ($SMTP_ID;$1;0)  //$1 = subject
+EMail_Log (True;$errorcode;"Subject")
+
+  //$errorcode:=IT_SetPort (2;587)
+$errorcode:=IT_SetPort (2;465)
+EMail_Log (True;$errorcode;"Port")
+
+Case of 
+	: ([Spooler]Robert)
+		$errorcode:=SMTP_To ($SMTP_ID;"robert@nubby.com";0)
+		EMail_Log (True;$errorcode;"robert@persinger.com";"To  robert@nubby.com")
+		$errorcode:=SMTP_Cc ($SMTP_ID;"phil@persinger.com";0)
+		
+	: (Size of array(asSubCC)>0)
+		$errorcode:=SMTP_To ($SMTP_ID;asSubCC{1};0)
+		EMail_Log (True;$errorcode;asSubCC{1};"To  "+asSubCC{1})
+		
+		$n:=1
+		For ($n;1;$count)  //send one to many recipients
+			If ($n>1)
+				$errorcode:=SMTP_Cc ($SMTP_ID;asSubCC{$n};0)
+				EMail_Log (True;$errorcode;"CC  "+String($n))
+			End if 
+		End for 
+		
+	Else 
+		EMail_Log (True;$errorcode;"Bad asSubCC";$1)
+End case 
+
+$errorcode:=SMTP_Body ($SMTP_ID;$2;0)
+EMail_Log (True;$errorcode;"Body")
+
+If (Position("Change";$1)<1) & ($1#"Meeting Notification") & (vtPDFPath#"@usage@")
+	$i:=1
+	$pdfFolder:=PDF_FindFolder 
+	vtPDFPath:=$pdfFolder+<>pathBreak+vtPDFName+".pdf"
+	Email_Xdelay   //waits for delivery of pdf
+End if 
+
+If (vtPDFName="Meeting@")
+	  //no attachment
+Else 
+	$errorcode:=SMTP_Attachment ($SMTP_ID;vtPDFPath;vtEncoding;0)
+	EMail_Log (True;$errorcode;"Attachment";vtPDFName)
+End if 
+
+$errorcode:=SMTP_Auth ($SMTP_ID;"4dserver@nubby.com";"HMS4ds925")
+EMail_Log (True;$errorcode;"Auth")
+
+$errorcode:=SMTP_Send ($SMTP_ID;1)
+EMail_Log (True;$errorcode;"Send")
+
+$errorcode:=SMTP_Clear ($SMTP_ID)
+EMail_Log (True;$errorcode;"Clear")

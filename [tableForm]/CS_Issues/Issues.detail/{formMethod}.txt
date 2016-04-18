@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($specialOrder)
+
+If (Form event=On Load)
+	OBJECT SET VISIBLE([CS_Issues]ResolveDate;[CS_Issues]ResolveDate#!00-00-00!)
+	If ([CS_Issues]OpenDate=!00-00-00!)
+		If (<>vlOrderNumber>0)
+			WinChoice ("Does this issue pertain to the Sample Order or just to HMS Order "+String(<>vlOrderNumber)+"?";"Sample";"Production")
+			If (ok=1)
+				$specialOrder:=False
+			Else 
+				$specialOrder:=True
+			End if 
+		Else 
+			$specialOrder:=False
+		End if 
+		
+		[CS_Issues]CS_ID:=[ComponentSheets]CS_ID
+		[CS_Issues]OpenDate:=Current date(*)
+		[CS_Issues]CS_IssueKey:=Sequence number([CS_Issues])
+		If ($specialOrder)
+			[CS_Issues]FontStyle:=7
+			[CS_Issues]OrderNumber:=<>vlOrderNumber
+		Else 
+			[CS_Issues]FontStyle:=5
+		End if 
+	End if 
+	RELATE MANY([CS_Issues]CS_ID)
+End if 

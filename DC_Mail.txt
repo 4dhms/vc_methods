@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($dc)
+
+If (DC_SpreadSave )
+	$dc:=String(alDCKeys{$1})
+	Email_Confirm ("TC"+$dc;"Distribution")
+	UNLOAD RECORD([Spooler])
+End if 
+
+

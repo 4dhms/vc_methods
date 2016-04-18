@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (cbSolid=1)
+		[ColorPrintNumber]CPType:=1
+	: (cbPrint=1)
+		[ColorPrintNumber]CPType:=2
+	: (cbEmbroidery=1)
+		[ColorPrintNumber]CPType:=3
+	: (cbLayout=1)
+		[ColorPrintNumber]CPType:=4
+	: (cbYarnDye=1)
+		[ColorPrintNumber]CPType:=5
+	: (cbNovelty=1)
+		[ColorPrintNumber]CPType:=6
+End case 

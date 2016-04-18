@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If ([Specs]Spl Type 2#"")
+		[Specs]Spl Typ 2 REQ D:=Current date(*)+14
+	End if 
+End if 

@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($SMTP_ID;$errorcode;$i)
+C_TEXT(<>vtMailFrom)
+C_BOOLEAN(<>vfDevelopment)
+
+IT_MacTCPInit 
+$errorcode:=IT_SetPort (2;465)
+EMail_Log (True;$errorcode;"Port")
+
+  //$1=to $2=path to attachment $3=subject $4=body
+EMail_GetPreferences 
+
+$errorcode:=SMTP_New ($SMTP_ID)
+EMail_Log (True;$errorcode;"Cspan new")
+
+$errorcode:=SMTP_Host ($SMTP_ID;vtEMHost)
+EMail_Log (True;$errorcode;"Cspan host")
+
+If (Application type=5) | (<>vtMailFrom="")
+	$errorcode:=SMTP_From ($SMTP_ID;"4Dserver@nubby.com")
+Else 
+	$errorcode:=SMTP_From ($SMTP_ID;<>vtMailFrom)
+End if 
+EMail_Log (True;$errorcode;"Cspan from")
+
+$errorcode:=SMTP_Subject ($SMTP_ID;$3)
+EMail_Log (True;$errorcode;"Cspan subject")
+
+If ($1="List")
+	$i:=1
+	For ($i;1;Size of array(asSubCC))
+		If ($i=1)
+			$errorcode:=SMTP_To ($SMTP_ID;asSubCC{1};0)
+			EMail_Log (True;$errorcode;asSubCC{1};"To  "+String($i))
+		Else 
+			$errorcode:=SMTP_Cc ($SMTP_ID;asSubCC{$i};0)
+			EMail_Log (True;$errorcode;"CC  "+String($i))
+		End if 
+	End for 
+Else 
+	$errorcode:=SMTP_To ($SMTP_ID;$1)
+	EMail_Log (True;$errorcode;"Cspan to")
+End if 
+
+$errorcode:=SMTP_Body ($SMTP_ID;$4+Char(13))
+EMail_Log (True;$errorcode;"Cspan body")
+
+If ($2#"None")
+	$errorcode:=SMTP_Attachment ($SMTP_ID;$2;vtEncoding)
+	EMail_Log (True;$errorcode;"Attachement";$2)
+End if 
+
+If (vtEMHost#"persinger.com")
+	$errorcode:=SMTP_Auth ($SMTP_ID;vsUser;vsPassword)
+	EMail_Log (True;$errorcode;"Auth")
+End if 
+
+$errorcode:=SMTP_Send ($SMTP_ID;1)
+EMail_Log (True;$errorcode;"Send")
+
+
+$errorcode:=SMTP_Clear ($SMTP_ID)
+EMail_Log (True;$errorcode;"Clear")

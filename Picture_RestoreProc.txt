@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($fetch)
+GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+GET PICTURE FROM LIBRARY("empty.jpg";<>vxSketch)
+
+<>vfCatchFile:=True
+If (Application type=0)
+	Picture_Return (-1;[Designs]DesignNum;"")
+Else 
+	$fetch:=Execute on server("Picture_Return";1064*64;"PictureGet";-1;[Designs]DesignNum;Current machine owner)
+	Pix_Delay 
+End if 
+[Designs]ArchivedPict:=False
+[Designs]Sketch:=<>vxSketch
+SAVE RECORD([Designs])

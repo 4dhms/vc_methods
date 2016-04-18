@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	vfFabImport:=False
+	vfNewRecord:=False
+	<>vlOrderNumber:=alOrders{alOrders}
+	Order_GetFabric 
+	vlOrderRouter:=2
+	FORM SET INPUT([Orders];"SizeBreakDown.i")
+	Center Window (800;600;1984;"")
+	MODIFY RECORD([Orders];*)
+	CLOSE WINDOW
+End if 

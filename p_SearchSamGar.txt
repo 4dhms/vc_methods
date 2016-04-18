@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  // mSearchHMS - search for Sample Garment records
+SAVE RECORD([Samples])
+QUERY([Samples])
+If (OK=1)
+	ORDER BY([Samples];[Samples]SampleNumber;<)
+	SET WINDOW TITLE("Sample Garments: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))
+End if 
+
+SET WINDOW TITLE("Sample Garments: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))

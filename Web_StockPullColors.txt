@@ -1,0 +1,90 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$qty;$dc;$total;$key;$self;$n;$q;$count)
+C_TEXT($color;$name;$HTML)
+C_BOOLEAN($combo)
+
+
+$i:=1
+$color:=""
+$total:=0
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<br><table width=600 height="+String(Records in selection([CP_OrderXRef])*30)+" cellpadding=0 cellspacing=0 border=0>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td height=32 width=150 class=style1>Color/Print</td>"
+$HTML:=$HTML+"<td width=50 class=style1 align=right>Available</td>"
+$HTML:=$HTML+"<td width=100 align=right class=style1 align=right>Quantity</td>"
+$HTML:=$HTML+"<td width=100 align=right class=style1 align=right></td>"
+$HTML:=$HTML+"<td></font></td>"
+$HTML:=$HTML+"</tr>"
+
+FIRST RECORD([CP_OrderXRef])
+
+For ($i;1;Records in selection([CP_OrderXRef]))
+	QUERY([ColorConverter];[ColorConverter]CPOrdID=[CP_OrderXRef]CPOrdID)
+	If (Records in selection([ColorConverter])>0)
+		$name:=[ColorConverter]StockName
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		If ([DesignLines]Ulc)
+			$name:=Util_Ulc ([ColorPrintNumber]CPName)
+		Else 
+			$name:=[ColorPrintNumber]CPName
+		End if 
+		If ($combo)
+			$self:=[CP_OrderXRef]SelfKey
+			QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self)
+			QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Combo 1")
+			If (Records in selection([CP_OrderXRef])>0)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				If ([DesignLines]Ulc)
+					$name:=$name+"/"+Util_Ulc ([ColorPrintNumber]CPName)
+				Else 
+					$name:=$name+"/"+[ColorPrintNumber]CPName
+				End if 
+			End if 
+		End if 
+		
+	End if 
+	$qty:=[CP_OrderXRef]Quantity
+	QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+	$dc:=Sum([DC]Count)
+	$key:=[CP_OrderXRef]CPOrdID
+	
+	$count:=$qty-$dc
+	$count:=$count-($count%6)
+	If ($count>=6)
+		$HTML:=$HTML+"<tr>"
+		$HTML:=$HTML+"<td class=style2>"+$name+"</td>"
+		$HTML:=$HTML+"<td class=style2 align=right>"+String($count)+"</td>"
+		
+		$q:=$qty-$dc
+		  //If ($q<301) 
+		$n:=0
+		$HTML:=$HTML+"<td class=style2 align=right><select name="+Char(34)+"qty"+Char(34)+" id=qty>"
+		Repeat 
+			Case of 
+				: ($1=0)
+					$HTML:=$HTML+"<option>"+String($n)+"</option>"
+				: ($1=$n)
+					$HTML:=$HTML+"<option selected=selected>"+String($n)+"</option>"
+				Else 
+					$HTML:=$HTML+"<option>"+String($n)+"</option>"
+			End case 
+			
+			$n:=$n+6
+		Until ($n>$q)
+		$HTML:=$HTML+"</select></td>"
+		  //Else 
+		  //$HTML:=$HTML+"<td class=style2 align=right><INPUT TYPE=text NAME=Qty size=5></td>"
+		  //End if 
+		
+		$HTML:=$HTML+"<td class=style2 align=right><INPUT TYPE=hidden NAME=key value="+String($key)+"></td>"
+		$HTML:=$HTML+"<td class=style2 align=right><INPUT TYPE=hidden NAME=price value="+vsPrice+"></td>"
+		$HTML:=$HTML+"</tr>"
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+$HTML:=$HTML+"</Table><BR>"
+
+$0:=$HTML

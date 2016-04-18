@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Position("Total";asCustomers{atNote})<1) & (Position("OT";asCustomers{atNote})<1)
+	Notes_Capture (->atNote{atNote};"Note")
+End if 

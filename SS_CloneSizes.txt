@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ($1<0)
+	QUERY([Sizes];[Sizes]SF_KeyNumber=$1)
+Else 
+	QUERY([Sizes];[Sizes]SpecLineKey=$1)
+	QUERY SELECTION([Sizes];[Sizes]SF_KeyNumber>0)
+End if 
+
+
+DUPLICATE RECORD([Sizes])
+[Sizes]SF_KeyNumber:=$3
+[Sizes]SpecLineKey:=$2
+SAVE RECORD([Sizes])
+UNLOAD RECORD([Sizes])

@@ -1,0 +1,80 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$c;$po)
+C_TEXT($pack;$path;$fob)
+
+
+ARRAY TEXT($orders;0)
+
+$docref:=Open document("";"csv")
+If (ok=1)
+	Repeat 
+		RECEIVE PACKET($docref;$pack;Char(10))
+		
+		If ($pack=",")
+			$pack:="0"
+		End if 
+		
+		Case of 
+			: (Num($pack)>0)
+				$c:=Position(Char(9);$pack)
+				If ($c>1)
+					$pack:=Substring($pack;1;$c-1)
+				End if 
+				$c:=Position(",";$pack)
+				If ($c>1)
+					$pack:=Substring($pack;1;$c-1)
+				End if 
+				APPEND TO ARRAY($orders;$pack)
+			: (Num($pack)=0)
+				APPEND TO ARRAY($orders;$pack)
+		End case 
+	Until (ok=0)
+	CLOSE DOCUMENT($docref)
+	
+	$docref:=Create document("";"xls")
+	If (ok=1)
+		$path:=Document
+		
+		$i:=1
+		For ($i;1;Size of array($orders))
+			
+			Case of 
+				: ($orders{$i}="PO@")
+					SEND PACKET($docref;"PO no"+Char(9)+"4D FOB"+Char(9)+"4D CMT"+Char(13))
+				: (Num($orders{$i})=0)
+					SEND PACKET($docref;Char(13))
+				: (Num($orders{$i})>0)
+					QUERY([Orders];[Orders]OrderNum=Num($orders{$i}))
+					If (Records in selection([Orders])=0)
+						SEND PACKET($docref;String(Num($orders{$i}))+Char(9)+"No PO"+Char(13))
+					Else 
+						QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+						If (Records in selection([Costing])>0)
+							QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+							CREATE SET([CostSheets];"Sheet")
+							QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual A")
+							If (Records in selection([CostSheets])=0)
+								USE SET("Sheet")
+								QUERY SELECTION([CostSheets];[CostSheets]SheetName="Confirm@")
+								If (Records in selection([CostSheets])=0)
+									USE SET("Sheet")
+								End if 
+							End if 
+							
+							ORDER BY([CostSheets];[CostSheets]SheetID;<)
+							$fob:=String([CostSheets]FOB;"###.00")
+							SEND PACKET($docref;String(Num($orders{$i}))+Char(9)+$fob+Char(9)+String([CostSheets]CMT;"###.00")+Char(13))
+							
+						End if 
+					End if 
+			End case 
+		End for 
+	End if 
+End if 
+
+If (Records in set("Sheet")>0)
+	CLEAR SET("Sheet")
+End if 
+
+SHOW ON DISK($path)

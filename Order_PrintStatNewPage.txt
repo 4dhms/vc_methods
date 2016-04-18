@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vlPrintedPixels+$1>680)
+	If (End selection([Samples]))
+		vsPrintingHeader:="END"
+	Else 
+		vsPrintingHeader:="MORE"
+	End if 
+	  //Print form("Footer1")
+	
+	PAGE BREAK(>)
+	vlPageTotal:=0
+	
+	vlPrintedPixels:=35
+	vlPage:=vlPage+1
+	If (<>vlOrderNumber>0)
+		vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Orders]))+" Orders   "+"Page "+String(vlPage)
+	Else 
+		vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Samples]))+" Samples   "+"Page "+String(vlPage)
+	End if 
+	Print form("Header2")
+End if 

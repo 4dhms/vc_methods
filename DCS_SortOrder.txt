@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CREATE SET([DCS];"sort")
+QUERY SELECTION([DCS];[DCS]SortOrder=0)
+
+If (Records in selection([DCS])>0)
+	
+	FIRST RECORD([DCS])
+	For ($i;1;Records in selection([DCS]))
+		Case of 
+			: ([DCS]Item="Self")
+				[DCS]SortOrder:=1
+			: ([DCS]Item="Combo")
+				[DCS]SortOrder:=2
+			: ([DCS]Item="Duty@")
+				[DCS]SortOrder:=20
+			: ([DCS]Item="Air") | ([DCS]Item="Boat")
+				[DCS]SortOrder:=30
+			Else 
+				[DCS]SortOrder:=10
+		End case 
+		SAVE RECORD([DCS])
+		NEXT RECORD([DCS])
+	End for 
+	
+End if 
+USE SET("sort")
+CLEAR SET("sort")

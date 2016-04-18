@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($w;$h;$window)
+C_TEXT($close)
+C_TEXT($title)
+
+If (Application type#5)
+	FORM SET OUTPUT([Orders];"OrderLarge.o")
+	FORM SET INPUT([Orders];"OrdEntSlsMed")
+	
+	If (User in group(Current user;"Restricted"))
+		$close:="WincBox"
+		$window:=8
+	Else 
+		$close:=""
+		$window:=8
+	End if 
+	
+	
+	Case of 
+		: (Screen height<700)
+			$w:=Screen width-20
+			$h:=Screen height-100
+		: (Screen width<810)
+			$w:=Screen width-20
+			$h:=Screen height-100
+		Else 
+			$w:=940
+			$h:=660
+	End case 
+	Center Window ($w;$h;$window;$title;$close)
+End if 

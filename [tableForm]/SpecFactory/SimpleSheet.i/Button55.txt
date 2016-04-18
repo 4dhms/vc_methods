@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this ENTIRE specsheet?")
+If (ok=1)
+	WinChoice ("This will also delete the component sheet and the measurement grading.";"Stop";"Continue")
+	If (ok=1)
+	Else 
+		WinFind ("Type the word "+Char(34)+"DELETE"+Char(34)+" to delete.";5)
+		If (ok=1) & (vsRequestString="DELETE")
+			QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+			[SpecLineSample]SF_KeyNumber:=-1*[SpecLineSample]SF_KeyNumber
+			SAVE RECORD([SpecLineSample])
+			QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+			[SpecSheetLines]SF_KeyNumber:=-1*[SpecSheetLines]SF_KeyNumber
+			SAVE RECORD([SpecSheetLines])
+			QUERY([Sizes];[Sizes]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+			[Sizes]SF_KeyNumber:=-1*[Sizes]SF_KeyNumber
+			SAVE RECORD([Sizes])
+			[SpecFactory]OrderNumber:=[SpecFactory]OrderNumber*100
+			[SpecFactory]SF_KeyNumber:=-1*[SpecFactory]SF_KeyNumber
+			SAVE RECORD([SpecFactory])
+			CANCEL
+		End if 
+	End if 
+End if 

@@ -1,0 +1,84 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$k)
+C_TEXT($color)
+
+Case of 
+	: (Form event=On Clicked) & (Macintosh command down)
+		WinChoice ("What samples are you receiving?";"Proto";"Sales";"Cancel")
+		If (ok=1)
+			$color:=asCPNumbers{asCPNumbers}+" "+asCPColorName{asCPNumbers}
+			$k:=alSelfKey{asCPNumbers}
+			QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alSelfKey{asCPNumbers})
+			If (bChoice2=1)
+				  //[CP_OrderXRef]Received:=[CP_OrderXRef]Quantity
+				[CP_OrderXRef]ReceivedDate:=Current date(*)
+				[CP_OrderXRef]ReceivedColor:=True
+				SAVE RECORD([CP_OrderXRef])
+				UNLOAD RECORD([CP_OrderXRef])
+				CP_Outstanding 
+				
+				If ([Samples]Outstanding<1)
+					[Samples]SampleReceived:=Current date(*)
+				End if 
+			Else 
+				[Samples]ProtoRecvDate:=Current date(*)
+			End if 
+			UNLOAD RECORD([CP_OrderXRef])
+			
+			
+			$i:=1
+			For ($i;1;Size of array(alSelfKey))
+				If (alSelfKey{$i}=$k)
+					If (bChoice2=1)
+						asColorStatus{$i}:="Recd"
+					Else 
+						asColorStatus{$i}:="RCVD PROTO"
+					End if 
+					QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{$i})
+					
+					[CP_OrderXRef]CPStatus:=asColorStatus{$i}
+					SAVE RECORD([CP_OrderXRef])
+					UNLOAD RECORD([CP_OrderXRef])
+				End if 
+			End for 
+			
+			CREATE RECORD([Changes])
+			  //  [Changes]RevisionNumber:=<>vlRevisionNumber
+			  // [Changes]RevisionKey:=$revKey
+			[Changes]OrderNumber:=<>vlOrderNumber
+			[Changes]RevDate:=Current date(*)
+			[Changes]RevTime:=Current time(*)
+			[Changes]Writer:=Current user
+			[Changes]ChangeKey:=Sequence number([Changes])
+			[Changes]FieldName:="Status"
+			
+			[Changes]OldData:=$color
+			If (bChoice2=1)
+				[Changes]NewChange:="Sale Sample Recd"
+			Else 
+				[Changes]NewChange:="RCVD PROTO"
+			End if 
+			  //[Changes]RecordKey:=vlKeyNumber
+			SAVE RECORD([Changes])
+			
+		End if 
+		
+	: (Form event=On Double Clicked) & (Shift down)
+		
+		WinChoice ("Are you sure you want to delete this"+Char(13)+asTypeList{asTypeList}+"?";"No";"Yes")
+		If (ok=1)
+		Else 
+			alShadeFab{asTypeList}:=16711690
+		End if 
+		
+	: (Form event=On Double Clicked) & (asTypeList>0)
+		CP_Edit 
+		
+		If (ok=1)
+			[Samples]SGQuantity:=Orders_ArrayQuantity 
+			CP_Outstanding 
+		End if 
+		LISTBOX SELECT ROW(colorList;Size of array(asTypeList)+1)
+	: (Form event=On Data Change)
+		vtOrderChanges:=vtOrderChanges+"_Color"
+End case 

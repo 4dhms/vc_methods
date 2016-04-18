@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsQOrderNumber;vsQStyle;vtQFactory;vsQCustomer)
+C_BOOLEAN(vfIncomplete)
+
+QUERY([Orders];[Orders]CancelDate>=Current date(*))
+If (Current user="Designer") & (Shift down)
+	CONFIRM("Reset?")
+	If (ok=1)
+		QUERY SELECTION([Orders];[Orders]PriceTicket=True)
+		APPLY TO SELECTION([Orders];[Orders]PriceTicket:=False)
+	End if 
+End if 
+QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"")
+
+If (vsQOrderNumber#"")
+	QUERY SELECTION([Orders];[Orders]OrderNum=Num(vsQOrderNumber))
+End if 
+
+If (vsQStyle#"")
+	QUERY SELECTION([Orders];[Orders]StyleNumber=vsQStyle)
+End if 
+
+If (vtQFactory#"")
+	QUERY SELECTION([Orders];[Orders]Factory=vtQFactory)
+End if 
+
+If (vsQCustomer#"")
+	QUERY SELECTION([Orders];[Orders]Customer=vsQCustomer)
+End if 
+
+If (vfIncomplete=True)
+	QUERY SELECTION([Orders];[Orders]PriceTicket=True)
+End if 
+
+vtTitle:=String(Records in selection([Orders]))

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vdStart:=!00-00-00!
+vdEnd:=!00-00-00!
+vsFactory:=""
+vsCustomer:=""
+vsDivision:=""

@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ALL RECORDS([Contacts])
+$i:=1
+FIRST RECORD([Contacts])
+For ($i;1;Records in selection([Contacts]))
+	[Contacts]ContactID:=$i
+	SAVE RECORD([Contacts])
+	NEXT RECORD([Contacts])
+End for 
+UNLOAD RECORD([Contacts])
+ALERT("Done")

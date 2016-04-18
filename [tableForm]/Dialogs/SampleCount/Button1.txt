@@ -1,0 +1,76 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c;$i;$s;$grandtot;$grandcount)
+ARRAY TEXT(asMonths;0)
+ARRAY LONGINT(alCount;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY LONGINT($month;0)
+$grandtot:=0
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	: (vdEnd<=vdStart)
+		WinPrompt ("End date must follow start date.")
+	: (vdEnd-vdStart>365)
+		WinPrompt ("Report has a one year limit.")
+	Else 
+		
+		QUERY([Samples];[Samples]SampleOrderDate>=vdStart;*)
+		QUERY([Samples]; & ;[Samples]SampleOrderDate<=vdEnd)
+		QUERY SELECTION([Samples];[Samples]Void=False)
+		QUERY SELECTION([Samples];[Samples]NoOrder=False)
+		
+		If (<>asEndYear><>asStartYear)
+			$c:=13-<>asStartMonth
+			$c:=$c+<>asEndMonth
+			ARRAY TEXT(asMonths;$c)
+			ARRAY LONGINT(alCount;$c)
+			ARRAY LONGINT(alOrders;$c)
+			ARRAY LONGINT($month;$c)
+			$s:=1
+			$i:=1
+			For ($i;1;$c)
+				If (<>asStartMonth+$i<14)
+					asMonths{$i}:=<>asStartMonth{<>asStartMonth+($i-1)}
+					$month{$i}:=<>asStartMonth+($i-1)
+				Else 
+					asMonths{$i}:=<>asEndMonth{$s}
+					$month{$i}:=$s
+					$s:=$s+1
+				End if 
+			End for 
+			
+		Else 
+			$c:=(<>asEndMonth-<>asStartMonth)+1
+			ARRAY TEXT(asMonths;$c)
+			ARRAY LONGINT(alCount;$c)
+			ARRAY LONGINT(alOrders;$c)
+			ARRAY LONGINT($month;$c)
+			$i:=1
+			For ($i;1;$c)
+				asMonths{$i}:=<>asStartMonth{<>asStartMonth+($i-1)}
+				$month{$i}:=<>asStartMonth+($i-1)
+			End for 
+		End if 
+		
+		
+		$i:=1
+		FIRST RECORD([Samples])
+		For ($i;1;Records in selection([Samples]))
+			$c:=Month of([Samples]SampleOrderDate)
+			alOrders{Find in array($month;$c)}:=alOrders{Find in array($month;$c)}+1
+			alCount{Find in array($month;$c)}:=alCount{Find in array($month;$c)}+[Samples]SGQuantity
+			$grandcount:=$grandcount+[Samples]SGQuantity
+			$grandtot:=$grandtot+1
+			NEXT RECORD([Samples])
+		End for 
+		APPEND TO ARRAY(asMonths;"Total")
+		APPEND TO ARRAY(alCount;$grandcount)
+		APPEND TO ARRAY(alOrders;$grandtot)
+		
+End case 

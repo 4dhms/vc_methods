@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($season)
+
+If (<>asSeasonName>1) & (<>asSeasonYear>1)
+	$season:=<>asSeasonName{<>asSeasonName}+" "+<>asSeasonYear{<>asSeasonYear}
+	
+	If (Find in array(asSearchSeason;$season)<1)
+		APPEND TO ARRAY(asSearchSeason;$season)
+		<>asSeasonName:=1
+		<>asSeasonYear:=1
+	End if 
+End if 
+

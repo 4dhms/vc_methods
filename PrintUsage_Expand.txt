@@ -1,0 +1,214 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c)
+C_LONGINT($c1;$c2;$c3;$c4;$c5;$c6;$c7;$c8;$c9)
+C_LONGINT($cw1;$cw2;$cw3;$cw4;$cw5;$cw6;$cw7;$cw8;$cw9;$subtot)
+C_TEXT($season;$year;$core)
+C_POINTER($arr;$subC;$subCW;$display)
+
+$season:=asSeasonName{asSeasonName}
+$year:=asSeasonYear{asSeasonYear}
+PrintUsage_Init (0)
+PrintUsage_Init (17)
+
+ARRAY TEXT(atPCPrint;0)
+ARRAY TEXT(asCPNumbers;0)
+
+QUERY([PCatalog];[PCatalog]SeasonName=asSeasonName{asSeasonName};*)
+QUERY([PCatalog]; | ;[PCatalog]SeasonYear=asSeasonYear{asSeasonYear})
+
+$i:=1
+FIRST RECORD([PCatalog])
+For ($i;1;Records in selection([PCatalog]))
+	
+	QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+	FIRST RECORD([PCPage])
+	$n:=1
+	For ($n;1;Records in selection([PCPage]))
+		If ([PCPage]Print1#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print1)
+		End if 
+		If ([PCPage]Print2#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print2)
+		End if 
+		If ([PCPage]Print3#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print3)
+			
+		End if 
+		If ([PCPage]Print4#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print4)
+			
+		End if 
+		If ([PCPage]Print5#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print5)
+			
+		End if 
+		If ([PCPage]Print6#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print6)
+			
+		End if 
+		If ([PCPage]Print7#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print7)
+			
+		End if 
+		If ([PCPage]Print8#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print8)
+			
+		End if 
+		If ([PCPage]Print9#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print9)
+			
+		End if 
+		If ([PCPage]Print10#"")
+			APPEND TO ARRAY(atPCPrint;[PCPage]Print10)
+			
+		End if 
+		NEXT RECORD([PCPage])
+	End for 
+	NEXT RECORD([PCatalog])
+End for 
+
+$i:=1
+For ($i;1;9)
+	$arr:=Get pointer("$a"+String($i))
+	ARRAY TEXT($arr->;0)
+	$subC:=Get pointer("$c"+String($i))
+	$subCW:=Get pointer("$cw"+String($i))
+	$subC->:=0
+	$subCW->:=0
+End for 
+$subtot:=0
+
+ARRAY TEXT(atPCDivision;Size of array(atPCPrint))
+$i:=1
+For ($i;1;Size of array(atPCPrint))
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=atPCPrint{$i})
+	atPCDivision{$i}:=[ColorPrintNumber]Division
+	
+	$core:=Substring(atPCPrint{$i};1;Position("-";atPCPrint{$i})-1)
+	$c:=Num(Substring(atPCDivision{$i};2;1))
+	If ($c>0)
+		$arr:=Get pointer("$a"+String($c))
+		$subC:=Get pointer("$c"+String($c))
+		$subCW:=Get pointer("$cw"+String($c))
+		
+		If (Find in array($arr->;$core)<1)
+			APPEND TO ARRAY($arr->;$core)
+			$subC->:=$subC->+1
+			$subtot:=$subtot+1
+		Else 
+			$subCW->:=$subCW->+1
+		End if 
+	End if 
+End for 
+
+asList5{1}:="Developed Prints"
+$i:=1
+For ($i;1;9)
+	$arr:=Get pointer("$a"+String($i))
+	If ($i=4)
+		$subC:=Get pointer("$c"+String($i+1))
+	Else 
+		$subC:=Get pointer("$c"+String($i))
+	End if 
+	
+	If ($i=5)
+		  //skip
+	Else 
+		$display:=Get pointer("asList"+String($i))
+		$display->{1}:=String($subC->)
+	End if 
+End for 
+asList10{1}:=String($subtot)
+
+asList5{2}:="Additional Color Ways"
+$i:=1
+For ($i;1;9)
+	$arr:=Get pointer("$a"+String($i))
+	If ($i=4)
+		$subCW:=Get pointer("$cw"+String($i+1))
+	Else 
+		$subCW:=Get pointer("$cw"+String($i))
+	End if 
+	
+	If ($i=5)
+		  //skip
+	Else 
+		$display:=Get pointer("asList"+String($i))
+		$display->{2}:=String($subC->)
+	End if 
+End for 
+
+
+If (2=1)
+	
+	QUERY([PCatalog];[PCatalog]SeasonYear=asSeasonYear{asSeasonYear})
+	Case of 
+		: (asSeasonName{asSeasonName}="Spring")
+			  //do nothing
+		: (asSeasonName{asSeasonName}="Spring II")
+			QUERY SELECTION([PCatalog];[PCatalog]SeasonName="Spring")
+		: (asSeasonName{asSeasonName}="Summer")
+			QUERY SELECTION([PCatalog];[PCatalog]SeasonName="Spring";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Spring II")
+		: (asSeasonName{asSeasonName}="Transition")
+			QUERY SELECTION([PCatalog];[PCatalog]SeasonName="Spring";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Spring II";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Summer")
+		: (asSeasonName{asSeasonName}="Fall")
+			QUERY SELECTION([PCatalog];[PCatalog]SeasonName="Spring";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Spring II";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Summer";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Transition")
+		: (asSeasonName{asSeasonName}="Holiday")
+			QUERY SELECTION([PCatalog];[PCatalog]SeasonName="Spring";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Spring II";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Summer";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Transition";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Fall")
+		Else 
+			QUERY SELECTION([PCatalog];[PCatalog]SeasonName="Spring";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Spring II";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Summer";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Transition";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Fall";*)
+			QUERY SELECTION([PCatalog]; | ;[PCatalog]SeasonName="Holiday")
+	End case 
+	
+	CREATE SET([PCatalog];"thisyear")
+	
+	ARRAY TEXT($yearlist;0)
+	
+	$year:=String(Num(asSeasonYear{asSeasonYear})-1)
+	
+	Repeat 
+		APPEND TO ARRAY($yearlist;String($year))
+		$year:=String(Num($year)-1)
+	Until (Num($year)<2013)
+	
+	$i:=1
+	For ($i;1;Size of array($yearlist))
+		Case of 
+			: (Size of array($yearlist)=1)
+				QUERY([PCatalog];[PCatalog]SeasonYear=$yearlist{1})
+			: ($i=1)
+				QUERY([PCatalog];[PCatalog]SeasonYear=$yearlist{1};*)
+			: ($i=Size of array($yearlist))
+				QUERY([PCatalog]; | ;[PCatalog]SeasonYear=$yearlist{$i})
+			Else 
+				QUERY([PCatalog]; | ;[PCatalog]SeasonYear=$yearlist{$i};*)
+		End case 
+	End for 
+	
+	CREATE SET([PCatalog];"prevyear")
+	
+	UNION("prevyear";"thisyear";"all")
+	USE SET("all")
+	CLEAR SET("prevyear")
+	CLEAR SET("thisyear")
+	CLEAR SET("all")
+	
+	
+	  //$i:=1
+	  //For ($i;1;Records in selection([PCatalog]))
+	  //QUERY(
+End if 

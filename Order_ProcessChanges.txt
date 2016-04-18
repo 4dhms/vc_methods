@@ -1,0 +1,169 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($oldsize;$newsize;$message)
+C_REAL($oldprice;$newprice)
+
+
+Rev_LogChanges (->[Orders]ActualDeliveryDate)
+Rev_LogChanges (->[Orders]AfterApproval)
+Rev_LogChanges (->[Orders]ApprovalDate)
+Rev_LogChanges (->[Orders]Buttons Sent)
+
+QUERY([Extensions];[Extensions]OldCancel=Old([Orders]CancelDate))
+QUERY SELECTION([Extensions];[Extensions]Category="Cancel")
+If (Records in selection([Extensions])=0)
+	Rev_LogChanges (->[Orders]CancelDate)
+Else 
+	Rev_LogChanges (->[Orders]CancelDate;"Cancel Date Extension")
+End if 
+
+Rev_LogChanges (->[Orders]Cancelled)
+Rev_LogChanges (->[Orders]Care Label)
+Rev_LogChanges (->[Orders]Comments_Sales)
+Rev_LogChanges (->[Orders]CostNotes)
+Rev_LogChanges (->[Orders]Customer)
+Rev_LogChanges (->[Orders]CustPONumber)
+Rev_LogChanges (->[Orders]Cutting Ticket)
+Rev_LogChanges (->[Orders]Date to open LC)
+Rev_LogChanges (->[Orders]DCInfo)
+Rev_LogChanges (->[Orders]DCSent)
+Rev_LogChanges (->[Orders]DesignNumber)
+Rev_LogChanges (->[Orders]DivisionOverride)
+Rev_LogChanges (->[Orders]Fab Rcv Dt)
+Rev_LogChanges (->[Orders]FabricSupplied)
+Rev_LogChanges (->[Orders]Factory)
+Rev_LogChanges (->[Orders]FactoryOrderNumber)
+Rev_LogChanges (->[Orders]Group)
+Rev_LogChanges (->[Orders]Hold)
+Rev_LogChanges (->[Orders]KWCnS)
+Rev_LogChanges (->[Orders]Label)
+Rev_LogChanges (->[Orders]LabelSendDate)
+Rev_LogChanges (->[Orders]LabelSource)
+Rev_LogChanges (->[Orders]NetDiscount)
+Rev_LogChanges (->[Orders]Notes)
+Rev_LogChanges (->[Orders]NYFabSupply)
+Rev_LogChanges (->[Orders]Order_Enterer)
+Rev_LogChanges (->[Orders]OrderDivision)
+Rev_LogChanges (->[Orders]OrderEntryDate)
+Rev_LogChanges (->[Orders]OtherShip)
+Rev_LogChanges (->[Orders]DomesticGroup)
+Rev_LogChanges (->[Orders]VietnamGroup)
+Rev_LogChanges (->[Orders]Patt Rdy)
+Rev_LogChanges (->[Orders]Patt Source)
+Rev_LogChanges (->[Orders]PODate)
+Rev_LogChanges (->[Orders]Price)
+Rev_LogChanges (->[Orders]RetailPrice)
+Rev_LogChanges (->[Orders]Price Tckt)
+Rev_LogChanges (->[Orders]Price_Tckt_Sent)
+Rev_LogChanges (->[Orders]Price Terms)
+Rev_LogChanges (->[Orders]PriceTicket)
+Rev_LogChanges (->[Orders]ProdComments)
+Rev_LogChanges (->[Orders]RetailPrice)
+Rev_LogChanges (->[Orders]RevisionNumber)
+Rev_LogChanges (->[Orders]Salesperson)
+
+QUERY([Extensions];[Extensions]OldCancel=Old([Orders]Schedule Date))
+QUERY SELECTION([Extensions];[Extensions]Category="Ship")
+If (Records in selection([Extensions])=0)
+	Rev_LogChanges (->[Orders]Schedule Date)
+Else 
+	Rev_LogChanges (->[Orders]Schedule Date;"Schedule Date Extension")
+End if 
+Rev_LogChanges (->[Orders]PC)
+Rev_LogChanges (->[Orders]PriceTicket)
+Rev_LogChanges (->[Orders]Price_Tckt_Sent)
+Rev_LogChanges (->[Orders]DCInfo)
+Rev_LogChanges (->[Orders]DCSent)
+Rev_LogChanges (->[Orders]WH_ProofDelivery)
+Rev_LogChanges (->[Orders]WH_ProofoDeliveryDate)
+Rev_LogChanges (->[Orders]WH_BilloLading)
+Rev_LogChanges (->[Orders]WH_BilloLadingDate)
+Rev_LogChanges (->[Orders]WH_ShippingDoc)
+Rev_LogChanges (->[Orders]WH_ShippingDocDate)
+Rev_LogChanges (->[Orders]WH_Packing)
+Rev_LogChanges (->[Orders]WH_PackingDate)
+Rev_LogChanges (->[Orders]WHInvoice)
+Rev_LogChanges (->[Orders]WHInvoiceNos)
+Rev_LogChanges (->[Orders]WHNotes)
+
+Rev_LogChanges (->[Orders]OpenOrderNote)
+Rev_LogChanges (->[Orders]SeasonName)
+Rev_LogChanges (->[Orders]SeasonYear)
+Rev_LogChanges (->[Orders]SGPO)
+Rev_LogChanges (->[Orders]ShipDateFactory)
+Rev_LogChanges (->[Orders]ShipAir)
+Rev_LogChanges (->[Orders]ShipFOB)
+Rev_LogChanges (->[Orders]ShipLDP)
+Rev_LogChanges (->[Orders]ShipSea)
+Rev_LogChanges (->[Orders]ShipMethod)
+Rev_LogChanges (->[Orders]SizeCategory)
+Rev_LogChanges (->[Orders]Special_Instructions)
+Rev_LogChanges (->[Orders]StartDate)
+Rev_LogChanges (->[Orders]StyleNumber)
+Rev_LogChanges (->[Orders]TestCare)
+Rev_LogChanges (->[Orders]TestContent)
+Rev_LogChanges (->[Orders]TestDate)
+Rev_LogChanges (->[Orders]TestInvoice)
+Rev_LogChanges (->[Orders]TestNotes)
+Rev_LogChanges (->[Orders]TestNumber)
+Rev_LogChanges (->[Orders]TestProcessDate)
+Rev_LogChanges (->[Orders]TOPSample)
+Rev_LogChanges (->[Orders]TOPSampleDate)
+Rev_LogChanges (->[Orders]TOPSampleSent)
+Rev_LogChanges (->[Orders]TotalOrderQuantity)
+Rev_LogChanges (->[Orders]WHNotes)
+Rev_LogChanges (->[Orders]YardsReq)
+Rev_LogChanges (->[Orders]BrkdnCutRatio)
+Rev_LogChanges (->[Orders]ShipInfo)
+
+
+  //warn peter goldberger
+
+If ([Orders]PODate#!00-00-00!)
+	$oldsize:=Old([Orders]BrkdnCutRatio)
+	$newsize:=[Orders]BrkdnCutRatio
+	If ($oldsize#$newsize) & ($oldsize#"TBD")
+		ARRAY TEXT(asSubCC;3)
+		asSubCC{1}:="peter.goldberger@nubby.com"
+		asSubCC{2}:="phil@persinger.com"
+		asSubCC{3}:="ricky@nubby.com"
+		$message:="Style number: "+[Orders]StyleNumber+Char(13)
+		$message:=$message+"Design number: "+[Orders]DesignNumber+Char(13)
+		$message:=$message+"Order number: "+String([Orders]OrderNum)+Char(13)
+		$message:=$message+"Who: "+Current user+Char(13)
+		$message:=$message+"When: "+String(Current date(*))+"  "+String(Current time(*))+Char(13)+Char(13)
+		$message:=$message+"Changed from "+$oldsize+"  to "+$newsize
+		
+		If ([Orders]UPC=-1)
+			Mail_SimpleSend ("List";"None";"Size Change-EXISTING UPC";$message)
+			QUERY([UPCCodes];[UPCCodes]StyleNumber=[Orders]StyleNumber)
+			If (Records in selection([UPCCodes])>0)
+				[Orders]UPC:=1
+			End if 
+		Else 
+			Mail_SimpleSend ("List";"None";"Size Range Change";$message)
+		End if 
+		
+	End if 
+End if 
+
+If ([Orders]RevisionNumber>0)
+	$oldprice:=Old([Orders]Price)
+	$newprice:=[Orders]Price
+	If ($oldprice#$newprice) & ($oldprice>0)
+		ARRAY TEXT(asSubCC;1)
+		asSubCC{1}:="sheldon@persinger.com"
+		asSubCC{1}:="phil@persinger.com"
+		  //asSubCC{3}:="ricky@nubby.com"
+		$message:="Style number: "+[Orders]StyleNumber+Char(13)
+		$message:=$message+"Design number: "+[Orders]DesignNumber+Char(13)
+		$message:=$message+"Order number: "+String([Orders]OrderNum)+Char(13)
+		$message:=$message+"Who: "+Current user+Char(13)
+		$message:=$message+"When: "+String(Current date(*))+"  "+String(Current time(*))+Char(13)+Char(13)
+		$message:=$message+"Price changed from "+String($oldprice;"###.00")+"  to "+String($newprice;"###.00")
+		
+		Mail_SimpleSend ("List";"None";"Price Change";$message)
+		
+	End if 
+End if 
+Cost_ProcessChanges 
+

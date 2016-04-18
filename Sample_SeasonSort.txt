@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([Samples]SeasonName="Spring")
+		[Samples]SortOrder:=1
+	: ([Samples]SeasonName="Spring II")
+		[Samples]SortOrder:=2
+	: ([Samples]SeasonName="Summer")
+		[Samples]SortOrder:=3
+	: ([Samples]SeasonName="Transition")
+		[Samples]SortOrder:=4
+	: ([Samples]SeasonName="Fall")
+		[Samples]SortOrder:=5
+	: ([Samples]SeasonName="Holiday")
+		[Samples]SortOrder:=6
+	: ([Samples]SeasonName="Resort")
+		[Samples]SortOrder:=7
+	Else 
+		[Samples]SortOrder:=8
+End case 

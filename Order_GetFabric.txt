@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Fabric_ArrayBuild (<>vlOrderNumber)
+Fabric_ColorArray (<>vlOrderNumber)
+Fabric_FlagChange 
+
+If (<>vlOrderNumber>0)
+	[Orders]TotalOrderQuantity:=Orders_ArrayQuantity 
+Else 
+	[Samples]SGQuantity:=Orders_ArrayQuantity 
+	CP_Outstanding 
+End if 
+LISTBOX SELECT ROW(colorlist;Size of array(asTypeList)+1)
+UNLOAD RECORD([OrdersFabricXRef])

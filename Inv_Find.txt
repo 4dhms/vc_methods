@@ -1,0 +1,56 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY TEXT(asStyleWC;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY TEXT(asCustomers;0)
+ARRAY DATE(ADNYCANCELWC;0)
+ARRAY LONGINT(alQuantity;0)
+ARRAY REAL(arPrice;0)
+ARRAY LONGINT(alUnshipped;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY TEXT(asPrevDate;0)
+ARRAY TEXT(asPrevQty;0)
+ARRAY TEXT(asPrevAmt;0)
+
+QUERY([Orders];[Orders]StyleNumber=vsFind)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+If (Records in selection([Orders])>0)
+	If (vdInvDate=!00-00-00!)
+		vdInvDate:=Current date(*)
+	End if 
+	
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	Picture_RestoreOnTheFly 
+	ORDER BY([Orders];[Orders]CancelDate;>)
+	
+	SELECTION TO ARRAY([Orders]StyleNumber;asStyleWC;[Orders]OrderNum;alOrders;[Orders]Customer;asCustomers)
+	SELECTION TO ARRAY([Orders]CancelDate;adNYCancelWC;[Orders]Price;arPrice;[Orders]TotalOrderQuantity;alQuantity)
+	
+	ARRAY LONGINT(alUnshipped;Size of array(alOrders))
+	ARRAY LONGINT(alSales;Size of array(alOrders))
+	
+	$i:=1
+	For ($i;1;Size of array(alOrders))
+		QUERY([Invoices];[Invoices]OrderNumber=alOrders{$i})
+		alUnshipped{$i}:=alQuantity{$i}-Sum([Invoices]InvoiceQuantity)
+		QUERY([Costing];[Costing]OrderNumber=alOrders{$i})
+		alSales{$i}:=[Costing]ReportTotalNetSales
+	End for 
+	UNLOAD RECORD([Orders])
+	UNLOAD RECORD([Costing])
+	REDUCE SELECTION([Invoices];0)
+	
+	If (Size of array(alOrders)=1)
+		LISTBOX SELECT ROW(OrderList;1)
+		vlOrderNumber:=alOrders{1}
+	End if 
+	ARRAY TEXT(asPrevDate;1)
+	ARRAY TEXT(asPrevQty;1)
+	ARRAY TEXT(asPrevAmt;1)
+	  //GOTO AREA(vdDate)
+Else 
+	WinPrompt (vsFind+" can not be found.")
+	GOTO OBJECT(vsFind)
+End if 

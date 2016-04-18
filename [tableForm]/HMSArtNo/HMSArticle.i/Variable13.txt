@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (atCost4>1) & (vlItem4>0)
+	HMSartno_Build 
+	OBJECT SET VISIBLE(vlItem5;True)
+	OBJECT SET VISIBLE(*;"Perc4";True)
+	OBJECT SET VISIBLE(atCost5;True)
+End if 

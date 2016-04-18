@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($list)
+ARRAY TEXT($users;0)
+
+FIRST RECORD([Appts])
+$n:=1
+For ($n;1;Records in selection([Appts]))
+	RELATE MANY([Appts]ApptKey)
+	QUERY SELECTION([Attendees];[Attendees]Conflict=True)
+	If (Records in selection([Attendees])=0)
+		$list:=""
+	Else 
+		$i:=1
+		$list:="Conflicts: "
+		SELECTION TO ARRAY([Attendees]Attendee;$users)
+		For ($i;1;Size of array($users))
+			$list:=$list+$users{$i}
+			If ($i<Size of array($users))
+				$list:=$list+", "
+			End if 
+		End for 
+	End if 
+	[Appts]Conflicts:=$list
+	SAVE RECORD([Appts])
+	NEXT RECORD([Appts])
+End for 

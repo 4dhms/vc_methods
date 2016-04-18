@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($newsheet)
+
+If (Size of array(asTypeList)=0)
+	WinPrompt ("There are no colors or prints to breakdown.")
+Else 
+	If (Is new record([Orders]))
+		$newsheet:=True
+	End if 
+	
+	vtOrderChanges:=vtOrderChanges+"Breakdown"
+	
+	If (Order_Mandatory (True))
+		If (Position("Fabric";vtOrderChanges)>0) & (FORM Get current page=1)
+			  //$update:=True
+			Fabric_ArraySave 
+			  //[Orders]TotalOrderQuantity:=Orders_ArrayQuantity 
+		End if 
+		If (Position("Color";vtOrderChanges)>0) | (Find in array(alShadeFab;16711690)>0)
+			  //$update:=True
+			Color_Save 
+		End if 
+		
+		QUERY([BreakDownLibrary];[BreakDownLibrary]BDName=[Orders]BrkdnCutRatio)
+		If (Records in selection([BreakDownLibrary])>0) & ([Orders]BDHeaderKey=0)
+			[Orders]BDHeaderKey:=[BreakDownLibrary]BDKey
+			SAVE RECORD([Orders])
+		End if 
+		
+		vlOrderRouter:=1
+		FORM SET INPUT([Orders];"SizeBreakDown.i")
+		  //If (Current user="Designer")
+		  //Center Window (800;600;8;"")
+		  //Else 
+		  //Center Window (800;600;1;"")
+		  //End if 
+		MODIFY RECORD([Orders];*)
+		CLOSE WINDOW
+	End if 
+End if 

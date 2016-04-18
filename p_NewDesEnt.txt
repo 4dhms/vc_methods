@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>SalesPrcID>0)
+		WinPrompt ("Exit HMS Orders before creating a new design.")
+	: (<>SamGarPrcID>0)
+		WinPrompt ("Exit Sample Orders before creating a new design.")
+	Else 
+		
+		vsCategory:=""
+		vsDesignNumber:=""
+		vsSuffix:=""
+		
+		Design_GetNumber 
+		If (ok=1)
+			
+			If (vsDesignNumber#"")
+				vfNewDesign:=True
+				FORM SET INPUT([Designs];"Design Info Ent")
+				FORM SET INPUT([Specs];"SpecsInptTall")
+				CREATE SET([Designs];"DesiSt")
+				ADD RECORD([Designs];*)
+				ADD TO SET([Designs];"DesiSt")
+				CLOSE WINDOW
+				USE SET("DesiSt")
+				p_SetWndDesLib 
+				CLEAR SET("DesiSt")
+			End if 
+		End if 
+End case 

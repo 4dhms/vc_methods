@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$total)
+$total:=0
+
+
+$docref:=Create document("";"xls")
+$i:=1
+FIRST RECORD([Orders])
+
+SEND PACKET($docref;"Customer"+Char(9)+"Customer PO"+Char(9)+"HMS PO"+Char(9)+"Style Number"+Char(9)+"Factory"+Char(9)+"Quantity"+Char(9)+"Price"+Char(9)+"Ship Date Factory"+Char(9)+"Cancel Date"+Char(9)+"Notes"+Char(13))
+
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	SampFit_RecDate 
+	vsSampRec:=Replace string(vsSampRec;Char(13);";";*)
+	SEND PACKET($docref;[Orders]Customer+Char(9)+[Orders]CustPONumber+Char(9)+String([Orders]OrderNum)+Char(9)+[Orders]StyleNumber+Char(9)+[Orders]Factory+Char(9))
+	SEND PACKET($docref;String([Orders]TotalOrderQuantity)+Char(9)+String([Orders]Price)+Char(9)+String([Orders]ShipDateFactory)+Char(9)+String([Orders]CancelDate)+Char(9)+[Orders]Notes+Char(13))
+	
+	NEXT RECORD([Orders])
+End for 
+CLOSE DOCUMENT($docref)
+
+
+ALERT("Done")

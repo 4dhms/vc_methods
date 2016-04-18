@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($wait)
+
+WinChoice ("Show waiting or received samples?";"Received";"Waiting";"Cancel")
+
+If (ok=1)
+	$i:=1
+	If (bChoice2=1)
+		$wait:=True
+	End if 
+	
+	FIRST RECORD([Orders])
+	CREATE SET([Orders];"Status")
+	For ($i;1;Records in selection([Orders]))
+		SampFit_RecDate 
+		
+		Case of 
+			: ($wait) & (Substring(vsSampRec;Position("(";vsSampRec)+1;1)="W")
+			: (Not($wait)) & (Substring(vsSampRec;Position("(";vsSampRec)+1;1)="R")
+			Else 
+				REMOVE FROM SET([Orders];"Status")
+		End case 
+		NEXT RECORD([Orders])
+	End for 
+	USE SET("Status")
+	CLEAR SET("Status")
+	p_SetWindowHMS 
+End if 

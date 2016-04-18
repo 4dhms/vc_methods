@@ -1,0 +1,117 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtTable;$HTML;$HTML2;$HTML3;$timecode)
+C_DATE($nextDate)
+C_LONGINT($i)
+C_TEXT($nameCode)
+ARRAY TEXT($usernames;0)
+ARRAY TEXT($customerList;0)
+ARRAY TEXT($division;0)
+LIST TO ARRAY("Customer";$customerlist)
+SORT ARRAY($customerList;>)
+LIST TO ARRAY("Division Code No";$division)
+SORT ARRAY($division;>)
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vtMeetingwith size=1>"
+
+$HTML:=$HTML+"<option>"+"Select customer"+"</option>"
+$i:=1
+For ($i;1;Size of array($customerList))
+	$HTML:=$HTML+"<option>"+$customerList{$i}+"</option>"
+End for 
+$HTML:=$HTML+"</select>"
+vtField1:=$HTML
+
+
+$i:=1
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsMeetingDate size=1>"
+
+$i:=1
+$nextDate:=Current date(*)
+$HTML:=$HTML+"<option selected>Meeting date</option>"
+
+For ($i;1;60)
+	If (Day number($nextDate)>1) & (Day number($nextDate)<7)
+		$HTML:=$HTML+"<option>"+String($nextDate)+"</option>"
+	End if 
+	$nextDate:=$nextDate+1
+End for 
+
+$HTML:=$HTML+"</option>"
+$HTML:=$HTML+"</select>"
+vtField2:=$HTML
+
+$i:=1
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsStart size=1>"
+$HTML2:="<select name=vsEnd size=1>"
+
+$i:=1
+For ($i;1;96)
+	Case of 
+		: ($i%4=1)
+			$timecode:="<option>"+Substring(String((Int($i/4)+100));2;2)+":15"
+		: ($i%4=2)
+			$timecode:="<option>"+Substring(String((Int($i/4)+100));2;2)+":30"
+		: ($i%4=3)
+			$timecode:="<option>"+Substring(String((Int($i/4)+100));2;2)+":45"
+		: ($i%4=0)
+			If ($i=48)
+				$timecode:="<option selected>"+Substring(String((Int($i/4)+100));2;2)+":00"
+			Else 
+				$timecode:="<option>"+Substring(String((Int($i/4)+100));2;2)+":00"
+			End if 
+	End case 
+	
+	$HTML:=$HTML+$timecode+"</option>"
+	$HTML2:=$HTML2+$timecode+"</option>"
+End for 
+$HTML:=$HTML+"</select>"
+$HTML2:=$HTML2+"</select>"
+
+vtField3:=$HTML+$HTML2
+
+ALL RECORDS([Attendees])
+
+
+DISTINCT VALUES([Attendees]Attendee;$usernames)
+$i:=1
+
+SORT ARRAY($userNames;>)
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsName1 size=1>"
+$HTML2:=Char(1)
+$HTML2:=$HTML2+"<select name=vsName2 size=1>"
+$HTML3:=Char(1)
+$HTML3:=$HTML3+"<select name=vsName3 size=1>"
+
+
+$i:=1
+$namecode:="<option>Attendee</option>"
+For ($i;1;Size of array($userNames))
+	If (User in group($usernames{$i};"Sales"))
+		$namecode:=$namecode+"<option>"+$userNames{$i}+"</option>"
+	End if 
+End for 
+$namecode:=$namecode+"</select>"
+
+vtField4:=$HTML+$namecode
+vtField5:=$HTML2+$namecode
+vtField6:=$HTML3+$namecode
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsDivision size=1>"
+$HTML:=$HTML+"<option>Division</option>"
+
+$i:=1
+For ($i;1;Size of array($division))
+	$HTML:=$HTML+"<option>"+$division{$i}+"</option>"
+End for 
+$HTML:=$HTML+"</select>"
+vtField7:=$HTML
+
+Web_UserField 
+WEB SEND FILE("newappt.html")
+

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($timeout)
+C_BOOLEAN($done)
+<>vfCatchFile:=True
+
+$timeout:=Current time(*)
+$done:=False
+
+DELAY PROCESS(Current process;5)
+
+Repeat 
+	Case of 
+		: (Picture size(<>vxSketch)=0)
+			$done:=True
+		: (Picture size(<>vxSketch)>1600)
+			$done:=True
+		: (Shift down)
+			$done:=True
+		: (Not(<>vfCatchFile))
+			$done:=True
+		: (Current time(*)-$timeout>?00:00:15?)
+			$done:=True
+	End case 
+Until ($done)
+

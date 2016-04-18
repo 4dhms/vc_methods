@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+GOTO OBJECT(vtSLRsn)
+OBJECT SET VISIBLE(cbCustomer;cbCore=1)
+
+If (cbCore=1)
+	asDivisions:=0
+	vfByStyle:=True
+Else 
+	vfByStyle:=False
+End if 

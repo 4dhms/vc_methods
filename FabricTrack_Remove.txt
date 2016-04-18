@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+ARRAY LONGINT($selected;0)
+
+If (Find in array(afTrackShip;True)>0)
+	$i:=1
+	For ($i;1;Size of array(afTrackShip))
+		If (afTrackShip{$i})
+			APPEND TO ARRAY($selected;alSOrder{$i})
+		End if 
+	End for 
+	
+	$i:=1
+	
+	For ($i;1;Size of array($selected))
+		$n:=Find in array(alSOrder;$selected{$i})
+		APPEND TO ARRAY(alPOrder;alSOrder{$n})
+		APPEND TO ARRAY(asPStyle;asSStyle{$n})
+		APPEND TO ARRAY(asPDesign;asSDesign{$n})
+		APPEND TO ARRAY(adPCancel;adSCancel{$n})
+		APPEND TO ARRAY(asPPo;asSPo{$n})
+		APPEND TO ARRAY(asPArticle;asSArticle{$n})
+		
+		DELETE FROM ARRAY(alSOrder;$n;1)
+		DELETE FROM ARRAY(asSStyle;$n;1)
+		DELETE FROM ARRAY(asSDesign;$n;1)
+		DELETE FROM ARRAY(asSArticle;$n;1)
+		DELETE FROM ARRAY(adSCancel;$n;1)
+		DELETE FROM ARRAY(arConsumption;$n;1)
+		DELETE FROM ARRAY(asSPo;$n;1)
+	End for 
+	
+	LISTBOX SORT COLUMNS(afAllShip;1;>)
+	LISTBOX SELECT ROW(afTrackShip;Size of array(alSOrder)+1)
+Else 
+	WinPrompt ("No orders are selected to be removed.")
+End if 

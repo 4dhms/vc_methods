@@ -1,0 +1,2 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+vRecNum:=String(Records in selection([Specs]);"###,###,##0")+" Specsheets related by Design"

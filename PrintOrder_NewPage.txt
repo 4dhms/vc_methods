@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlPrintedPixels;$1)
+C_BOOLEAN(vfRoberta)
+C_LONGINT(cbStrip)
+
+Case of 
+	: (cbStrip=1) & (vlPrintedPixels>$1)
+		vfContinue:=False
+		$0:=False
+	: (vfRoberta) & (vlPrintedPixels>480)
+		vfContinue:=False
+		PAGE BREAK  //(*)
+		$0:=False
+		
+	: (vlPrintedPixels>$1)
+		While (vlPrintedPixels<636)
+			vlPrintedPixels:=vlPrintedPixels+3
+			Print form([Orders];"PrintOrder_3pt")
+		End while 
+		
+		vsPrintingFooter:="MORE"
+		  //vsPrintingFooter:=String(vlPrintedPixels)
+		
+		Print form([Orders];"PrintOrder_Foot")
+		PAGE BREAK(>)
+		
+		If (<>vlOrderNumber>0)
+			vOrd:=String([Orders]OrderNum)
+			<>vsStyleNumber:=[Orders]StyleNumber
+			<>vsDesignNumber:=[Orders]DesignNumber
+			vsFactory:=[Orders]Factory
+			vlPage:=vlPage+1
+			Print form([Orders];"PrintOrder_Page2")
+			vlPrintedPixels:=58
+		Else 
+			vOrd:=String([Samples]SampleNumber)
+			<>vsStyleNumber:=[Samples]StyleNum
+			<>vsDesignNumber:=[Samples]DesignNum
+			vsFactory:=[Samples]SamGarFactry
+			vlPage:=vlPage+1
+			Print form([Samples];"PrintSample_Page2")
+			vlPrintedPixels:=48
+		End if 
+		
+		If ($2#"")
+			vtTitle:=$2+" (continued)"
+			vsHeader:=""
+			Print form([Orders];"PrintOrder_Section")
+			vlPrintedPixels:=vlPrintedPixels+16
+			Print form([Orders];"PrintOrder_Rule")
+			vlPrintedPixels:=vlPrintedPixels+5
+			Print form([Orders];"PrintOrder_3pt")
+		End if 
+		$0:=True
+	Else 
+		$0:=False
+End case 
+

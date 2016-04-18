@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+C_TEXT($path;$user;$pass;$host;$hostPath;$hostFolder)
+C_LONGINT($i;$ftpID;$errorCode;$inarray)
+C_DATE($deleteDate)
+C_BOOLEAN($upload)
+vfUploading:=True
+$upload:=False
+
+ALL RECORDS([Preferences])
+$path:=[Preferences]Backuppath
+$host:=[Preferences]BackupFTP
+$user:=[Preferences]FTPUserName
+$pass:=[Preferences]FTPPassword
+UNLOAD RECORD([Preferences])
+
+$deleteDate:=Current date(*)-30
+
+If (Test path name($path)=0)
+	
+	ARRAY TEXT($names;0)
+	ARRAY LONGINT($sizes;0)
+	ARRAY LONGINT($kinds;0)
+	ARRAY DATE($modDates;0)
+	
+	C_TEXT($backupfile)
+	
+	If (Test path name($path)=0)
+		$backupfile:="HMSdata14[[0017].4BK"
+		
+		$path:=Replace string($path+":"+$backupfile;"::";":")
+		
+		DELAY PROCESS(Current process;240)
+		
+		$errorcode:=FTP_Login ($host;$user;$pass;$ftpID)
+		EMail_Log (True;$errorcode;"FTP Login")
+		
+		$errorcode:=FTP_GetDirList ($ftpID;$hostFolder;$names;$sizes;$kinds;$modDates)
+		EMail_Log (True;$errorcode;"FTP List")
+		$inarray:=Find in array($names;$backupfile)
+		
+		
+		vtFailureMessage:=$backupfile
+		
+		$upload:=True
+		
+		If ($upload)
+			$errorcode:=FTP_Send ($ftpID;$path;$hostFolder+$backupfile;0)
+			EMail_Log (True;$errorcode;"FTP Send")
+			
+			
+			$errorcode:=FTP_Logout ($ftpID)
+			EMail_Log (True;$errorcode;"FTP Logout")
+			vfUploading:=False
+		End if 
+	End if 
+End if 

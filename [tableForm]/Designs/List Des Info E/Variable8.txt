@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Designer")
+	WinChoice ("Select function:";"Harvest";"Archive";"Cancel")
+	If (ok=1)
+		If (bChoice2=1)
+			WinChoice ("Are you sure you want to archive these "+String(Records in selection([Designs]))+" designs?";"No";"Yes")
+			If (ok=0)
+				Picture_ArchiveSelection 
+			End if 
+		Else 
+			Picture_ArchiveCollect 
+			SET WINDOW TITLE(String(Records in selection([Designs]))+" waiting to be archived")
+		End if 
+	End if 
+End if 

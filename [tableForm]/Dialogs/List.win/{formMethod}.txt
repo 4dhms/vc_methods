@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+
+
+If (Form event=On Load)
+	If (<>vlOrderNumber>0) & (vlListRouter=2)
+		Case of 
+			: ([Orders]KWCnS="Knit")
+				Nav1:=1
+			: ([Orders]KWCnS="Woven")
+				Nav1:=2
+			: ([Orders]KWCnS="CutSew")
+				Nav1:=3
+			Else 
+				Nav1:=4
+		End case 
+	Else 
+		$show:=False
+	End if 
+	vtContent:=""
+	vsArticle:=""
+	FORM GOTO PAGE(vlListRouter)
+End if 

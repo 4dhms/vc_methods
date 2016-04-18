@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$top;$right;$bottom;$mouseX;$mouseY;$mouseZ)
+
+GET MOUSE($mouseX;$mouseY;$mouseZ;*)
+
+Case of 
+	: ($1/2>$mouseX)
+		$mouseX:=($1/2)+10
+	: ($mouseX+($1/2)>Screen width)
+		$mouseX:=Screen width-(($1/2)+10)
+End case 
+Case of 
+	: ($2/2>$mouseY)
+		$mouseY:=($2/2)+30
+	: ($mouseY+($2/2)>Screen height)
+		$mouseY:=Screen height-(($2/2)+20)
+End case 
+
+$left:=$mouseX-($1/2)
+$top:=$mouseY-($2/2)
+$right:=$mouseX+($1/2)
+$bottom:=$mouseY+($2/2)
+
+Open window($left;$top;$right;$bottom;$3)

@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($name)
+
+If (Form event=On Load)
+	ARRAY TEXT(asList1;0)
+	ARRAY TEXT(asList2;0)
+	ARRAY TEXT(asList3;0)
+	ARRAY LONGINT(alColorKey;0)
+	ARRAY LONGINT($selfkey;0)
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[DesignLineIncluded]OrderNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	DISTINCT VALUES([CP_OrderXRef]SelfKey;$selfkey)
+	
+	$i:=1
+	For ($i;1;Size of array($selfkey))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkey{$i})
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self";*)
+		QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 1")
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPType;<)
+		FIRST RECORD([CP_OrderXRef])
+		
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		If ([DesignLines]CPNumberOn) & ([ColorPrintNumber]CPType=2)
+			$name:=[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName
+		Else 
+			$name:=[ColorPrintNumber]CPName
+		End if 
+		APPEND TO ARRAY(asList1;$name)
+		APPEND TO ARRAY(alColorKey;[CP_OrderXRef]CPOrdID)
+		
+		If (Records in selection([CP_OrderXRef])>1)
+			NEXT RECORD([CP_OrderXRef])
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			If ([DesignLines]CPNumberOn) & ([ColorPrintNumber]CPType=2)
+				$name:=[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName
+			Else 
+				$name:=[ColorPrintNumber]CPName
+			End if 
+			APPEND TO ARRAY(asList2;$name)
+		Else 
+			APPEND TO ARRAY(asList2;"")
+		End if 
+		
+		QUERY([ColorConverter];[ColorConverter]CPOrdID=[CP_OrderXRef]SelfKey)
+		If (Records in selection([ColorConverter])>0)
+			APPEND TO ARRAY(asList3;[ColorConverter]StockName)
+		Else 
+			APPEND TO ARRAY(asList3;"")
+		End if 
+	End for 
+	LISTBOX SELECT ROW(afListBox1;1000)
+End if 

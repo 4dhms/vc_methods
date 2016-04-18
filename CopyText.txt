@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($start;$end)
+
+If (Count parameters>0)
+	GET HIGHLIGHT($1->;$start;$end)
+	$2->:=Substring($1->;$start;$end-$start)
+Else 
+	GET HIGHLIGHT(Focus object->;$start;$end)
+	<>vtCopyNotes:=Substring(Focus object->;$start;($end+1)-$start)
+End if 

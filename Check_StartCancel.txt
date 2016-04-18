@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If ([Orders]CancelDate<[Orders]OrderEntryDate)
+	WinPrompt ("Start Cancel date can not be earlier than Order Entry Date.")
+	[Orders]CancelDate:=!00-00-00!
+	$0:=False
+Else 
+	$0:=True
+End if 

@@ -1,0 +1,4 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ALL RECORDS([Orders])
+ORDER BY([Orders];[Orders]OrderNum;<)
+p_SetWindowHMS 

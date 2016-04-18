@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //new record for HMS Orders by sales dept
+  //
+<>vlDesignKey:=0
+<>vsDesignNumber:=""
+
+p_NewRcdSales 

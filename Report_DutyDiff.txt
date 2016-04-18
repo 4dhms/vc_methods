@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$shipped)
+C_REAL($diff;$total;$fob;$actual)
+C_TIME($docref)
+
+CREATE EMPTY SET([Designs];"dns")
+
+$docref:=Create document("";"xls")
+SEND PACKET($docref;"Design Number"+Char(9)+"PO"+Char(9)+"Cost Sheet"+Char(9)+"Factory"+Char(9)+"Customer"+Char(9)+"Division"+Char(9)+"Quantity"+Char(9))
+SEND PACKET($docref;"Comment"+Char(9)+"FOB"+Char(9)+"4D Rate"+Char(9)+"Import %"+Char(9)+"Different/Pcs"+Char(9)+"Total"+Char(13))
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	ADD TO SET([Designs];"dns")
+	
+	QUERY([CostSheets];[Costing]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual@")
+	
+	$n:=1
+	$shipped:=0
+	$total:=0
+	ORDER BY([CostSheets];[CostSheets]SheetID;>)
+	
+	FIRST RECORD([CostSheets])
+	$fob:=Round([CostSheets]FOB;2)
+	For ($n;1;Records in selection([CostSheets]))
+		
+		$diff:=Round(([CostSheets]FOB*([CostSheets]Duty1/100))-([CostSheets]FOB*([Orders]ActlDutyRate/100));2)
+		$total:=Round($diff*[CostSheets]ActualUnitsShipped;2)
+		
+		$actual:=Round([CostSheets]FOB*([Orders]ActlDutyRate/100);2)
+		$actual:=$actual+Round([CostSheets]FOB2*([Orders]ActlDutyRate/100);2)
+		
+		SEND PACKET($docref;[Orders]DesignNumber+Char(9)+String([Orders]OrderNum)+Char(9)+[CostSheets]SheetName+Char(9)+[Orders]Factory+Char(9)+[Orders]Customer+Char(9))
+		SEND PACKET($docref;[Orders]OrderDivision+Char(9)+String([CostSheets]ActualUnitsShipped)+Char(9)+[Designs]SpecialComment+Char(9)+String($fob)+Char(9))
+		SEND PACKET($docref;String([CostSheets]Duty1;"##.000")+Char(9)+String([Orders]ActlDutyRate;"###.000")+Char(9)+String($diff;"##.000")+Char(9))
+		SEND PACKET($docref;String(Round($diff*[CostSheets]ActualUnitsShipped;2);"###,##0.00")+Char(13))
+		NEXT RECORD([CostSheets])
+	End for 
+	NEXT RECORD([Orders])
+End for 
+CLOSE DOCUMENT($docref)
+USE SET("dns")
+CLEAR SET("dns")
+
+ALERT("Done")
+

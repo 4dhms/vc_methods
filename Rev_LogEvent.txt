@@ -1,0 +1,108 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($revKey)
+C_BOOLEAN($makeEntry)
+C_LONGINT(vlFieldNum;vlTableNum)
+C_TEXT(vtNewData;vtOldData)
+$makeEntry:=False
+
+If (Count parameters>3)
+	If ($4)
+		$makeEntry:=True
+	End if 
+End if 
+
+Case of 
+	: (vlTableNum=2) & (vlFieldNum=56)
+		$makeEntry:=True
+		$revKey:=<>vlOrderNumber+(<>vlRevisionNumber/100)
+		
+	: (vlTableNum=2) & (Record number([Orders])>=0)  //([Orders]RevisionNumber>0)
+		$makeEntry:=True
+		$revKey:=<>vlOrderNumber+(<>vlRevisionNumber/100)
+	: (vlTableNum=3) & (vlFieldNum=64)
+		$makeEntry:=True
+		$revKey:=<>vlOrderNumber-(<>vlRevisionNumber/100)
+	: (vlTableNum=3) & (Record number([Samples])>=0)  // ([Samples]RevisionNumber>0)
+		$makeEntry:=True
+		$revKey:=<>vlOrderNumber-(<>vlRevisionNumber/100)
+End case 
+
+If ($makeEntry)
+	CREATE RECORD([Changes])
+	  //negative number if a component sheet ID
+	[Changes]RevisionNumber:=<>vlRevisionNumber
+	[Changes]RevisionKey:=$revKey
+	[Changes]OrderNumber:=<>vlOrderNumber
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]Writer:=Current user
+	[Changes]ChangeKey:=Sequence number([Changes])
+	[Changes]Tag:=$1
+	[Changes]TableNum:=vlTableNum
+	[Changes]FieldNum:=vlFieldNum
+	Case of 
+		: ($1="new revision")
+			[Changes]FieldName:=$1
+		: (Position("Shipping change";$1)>0)
+			[Changes]FieldName:="Shipping"
+			[Changes]Tag:="Changed"
+		: (vlTableNum>0) & (vlFieldNum>0)
+			[Changes]FieldName:=Rev_NameOrdField (Field name(vlTableNum;vlFieldNum))
+		Else 
+			Case of 
+				: (Position("added";$1)>0)
+					[Changes]FieldName:=Replace string($1;" added";"")
+					[Changes]Tag:="Added"
+					vtOldData:=""
+					vtNewData:="Added"
+				: (Position("changed";$1)>0)
+					[Changes]FieldName:=Replace string($1;" changed";"")
+					[Changes]Tag:="Changed"
+				: (Position("removed";$1)>0)
+					[Changes]FieldName:=Replace string($1;" removed";"")
+					[Changes]Tag:="Removed"
+					
+				Else 
+					[Changes]Tag:="Changed"
+					[Changes]FieldName:=$1
+			End case 
+	End case 
+	
+	Case of 
+		: ($1="Revision rollback")
+			[Changes]NewChange:="Rev "+String([Orders]RevisionNumber-1)
+			[Changes]OldData:="Rev "+String([Orders]RevisionNumber)
+		: (Position("Shipping change";$1)>0)
+			[Changes]NewChange:=$1
+		: ($1="Csheet price")
+			[Changes]OldData:=String(<>vlPrice)
+			[Changes]NewChange:=String([CostSheets]Price)
+		: ($1="@color added")
+			[Changes]OldData:="New color"
+			[Changes]NewChange:=vsNewColorNumber
+		: ($1="@color number@")
+			[Changes]NewChange:=vsNewColorNumber
+			[Changes]OldData:=vsOldColorNumber
+		: (Position("fabric added";$1)>0) | (Position("fabric changed";$1)>0)
+			Case of 
+				: (vtHistory="")
+					[Changes]OldData:=Rev_HarvestFabric 
+				: ([Changes]FieldName="Fabric Added") | ([Changes]FieldName="Fabric Removed")
+					[Changes]OldData:=Rev_HarvestFabric 
+				Else 
+					[Changes]OldData:=vtHistory
+					[Changes]NewChange:=Rev_HarvestFabric 
+			End case 
+		Else 
+			[Changes]OldData:=vtOldData
+			[Changes]NewChange:=vtNewData
+	End case 
+	
+	
+	If ($1="Cancelled")
+		[Changes]OldData:="Quantity: "+String([Orders]TotalOrderQuantity)
+	End if 
+	SAVE RECORD([Changes])
+	UNLOAD RECORD([Changes])
+	  //End if 
+End if 

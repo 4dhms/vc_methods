@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+asList1:=1
+asList3:=1
+asList5:=1
+asList7:=1
+
+OBJECT SET VISIBLE(vsSuffix;True)
+OBJECT SET VISIBLE(asList1;True)
+OBJECT SET VISIBLE(asList3;True)
+OBJECT SET VISIBLE(asList5;True)
+OBJECT SET VISIBLE(asList7;True)
+
+GOTO OBJECT(vsSuffix)

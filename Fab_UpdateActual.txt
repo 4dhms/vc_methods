@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Costing]OrderNumber=<>vlOrderNumber)
+	If ([CostSheets]YdFabric>0)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+		[OrdersFabricXRef]Consumed:=[CostSheets]YdFabric
+		SAVE RECORD([OrdersFabricXRef])
+	End if 
+	
+	If ([CostSheets]YdCombo1>0)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 1")
+		[OrdersFabricXRef]Consumed:=[CostSheets]YdCombo1
+		SAVE RECORD([OrdersFabricXRef])
+	End if 
+	
+	If ([CostSheets]YdCombo2>0)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 2")
+		[OrdersFabricXRef]Consumed:=[CostSheets]YdCombo2
+		SAVE RECORD([OrdersFabricXRef])
+	End if 
+	
+	If ([CostSheets]YdCombo3>0)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 3")
+		[OrdersFabricXRef]Consumed:=[CostSheets]YdCombo3
+		SAVE RECORD([OrdersFabricXRef])
+	End if 
+	
+	UNLOAD RECORD([OrdersFabricXRef])
+	
+End if 

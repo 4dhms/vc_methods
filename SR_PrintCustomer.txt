@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ALL RECORDS([Orders])
+REDUCE SELECTION([Orders];Size of array(asMeetingCust))
+vfEmail:=False
+vfPDF:=False
+
+vtTitle:=vsDivision+"   ("+vsMonth+" & "+vsMonthLast+")"
+If (cbStock=1)
+	vtTitle:="Stock  "+vtTitle
+End if 
+
+FORM SET OUTPUT([Orders];"Customerbreak.p")
+PAGE SETUP([Orders];"Customerbreak.p")
+Print_Selection (->[Orders])
+ALL RECORDS([Orders])

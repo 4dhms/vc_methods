@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor="") & (Record number([ColorPrintNumber])<0)
+	WinPrompt ("Enter Thread Color")
+	GOTO OBJECT([ColorPrintNumber]ThreadColor)
+Else 
+	vsCPNumber:=[ColorPrintNumber]CPNumber
+	If (ColorPrint_Mandatories )
+		FORM SET OUTPUT([ColorPrintNumber];"Color.print")
+		Print_Record (->[ColorPrintNumber])
+		FORM SET OUTPUT([ColorPrintNumber];"CPNumbers.o")
+	End if 
+End if 

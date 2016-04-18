@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (atGarmentLib{atGarmentLib}="Add New")
+	CREATE RECORD([SpecialDuty])
+End if 
+[SpecialDuty]SDID:=Sequence number([SpecialDuty])
+[SpecialDuty]SDName:=vsPart
+[SpecialDuty]SDuty:=vrDutyEntry
+[SpecialDuty]HTS:=vsPart1
+[SpecialDuty]SDNote:=vtDescription
+SAVE RECORD([SpecialDuty])
+UNLOAD RECORD([SpecialDuty])
+ACCEPT

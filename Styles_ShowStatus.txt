@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsStyleNumber:=$1
+
+Styles_StatusFind 
+
+<>CloseBox:=True
+Center Window (500;350;1984;"")
+DIALOG("StyleStatus")
+CLOSE WINDOW

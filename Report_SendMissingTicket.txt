@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($missing)
+
+$missing:=Execute on server("PreCarton_MissingII";64*1064;"Missing")

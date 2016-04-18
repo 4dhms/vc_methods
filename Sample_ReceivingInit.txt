@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alPOrder;$1)
+ARRAY TEXT(asStyleNumbers;$1)
+ARRAY TEXT(asDesignNumbers;$1)
+ARRAY TEXT(asXFactory;$1)
+ARRAY TEXT(asColor1;$1)
+ARRAY TEXT(asColor2;$1)
+ARRAY TEXT(asSampleTypes;$1)
+ARRAY BOOLEAN(afReceived;$1)
+ARRAY DATE(adStatusDate;$1)
+ARRAY LONGINT(alBDColor;$1)
+ARRAY LONGINT(alXrefKeys;$1)

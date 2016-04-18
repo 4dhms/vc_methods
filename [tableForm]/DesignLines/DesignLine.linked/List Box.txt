@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	vxSketch:=aSketch{aSketch}
+	Center Window (300;300;1;"")
+	DIALOG([Dialogs];"Print.i")
+	CLOSE WINDOW
+End if 

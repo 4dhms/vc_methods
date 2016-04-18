@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($vars)
+C_LONGINT($i)
+C_TEXT($cleaner)
+ARRAY TEXT($table;0)
+
+Email_BuildAddressScreen 
+Win_EmailList 
+If (ok=1)
+	
+	APPEND TO ARRAY($table;vtArticleNumber)
+	If (vfExpand)
+		APPEND TO ARRAY($table;String(vdDayOne))
+		APPEND TO ARRAY($table;"True")
+	Else 
+		APPEND TO ARRAY($table;"")
+		APPEND TO ARRAY($table;"False")
+	End if 
+	
+	$i:=1
+	For ($i;1;Size of array(asXColors))
+		$cleaner:=asXColors{$i}+"&&"+asXfabPO{$i}+"&&"+asFBdate{$i}+"&&"+String(alXhmsPO{$i})+"&&"+asPOdate{$i}+"&&"
+		$cleaner:=$cleaner+asXStyleNumbers{$i}+"&&"+String(alXShip{$i})+"&&"+String(alXUnits{$i})+"&&"+asXConsumption{$i}+"&&"+String(alXTotals{$i})
+		$cleaner:=Replace string($cleaner;"_";" ")
+		$cleaner:=Replace string($cleaner;"&&";"_")
+		APPEND TO ARRAY($table;$cleaner)
+	End for 
+	VARIABLE TO BLOB($table;$vars)
+	
+	QUERY([Spooler];[Spooler]Waiting=False;*)
+	QUERY([Spooler]; & ;[Spooler]SpoolLog=False)
+	QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+	
+	If (Records in selection([Spooler])<1) | (Locked([Spooler]))
+		CREATE RECORD([Spooler])
+	Else 
+		Spooler_ClearSprocket 
+	End if 
+	
+	[Spooler]Genre:="FI"
+	[Spooler]SpoolKey:=Sequence number([Spooler])
+	[Spooler]Waiting:=True
+	[Spooler]Attempts:=0
+	[Spooler]ReturnAddress:=<>vtMailFrom
+	[Spooler]SpoolRouter:=1
+	  //[Spooler]OutputChoice:=$dlOutput
+	[Spooler]Status:=1
+	[Spooler]User:=Current user
+	[Spooler]MachineName:=Current machine owner
+	
+	VARIABLE TO BLOB(asSubCC;[Spooler]AddressListBlob)
+	VARIABLE TO BLOB($table;[Spooler]OrderArrayBlob)
+	SAVE RECORD([Spooler])
+	
+	UNLOAD RECORD([Spooler])
+End if 
+

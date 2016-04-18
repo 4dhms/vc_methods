@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([Samples];"Samps")
+QUERY SELECTION([Samples];[Samples]Select=True)
+
+APPLY TO SELECTION([Samples];[Samples]Select:=False)
+USE SET("Samps")
+CLEAR SET("Samps")

@@ -1,0 +1,107 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_TEXT($poTest)
+C_TEXT($packTest)
+C_TEXT($info;$line)
+C_LONGINT($i;$c;$n)
+C_TEXT($po)
+C_TEXT($pack)
+C_TEXT($break)
+C_TEXT($color)
+C_LONGINT($cartonCount;$incarton)
+
+ARRAY TEXT($raw;0)
+ARRAY TEXT($buildlist;0)
+ARRAY LONGINT($linenumber;0)
+ARRAY LONGINT($totals;0)
+ARRAY LONGINT($cartons;0)
+
+
+If ([Orders]Special_Instructions="")
+	$continue:=True
+Else 
+	
+	WinChoice ("Do you want to replace the Special_Instructions or add to them?";"Add";"Replace";"Cancel")
+	If (ok=1)
+		$continue:=True
+		If (bChoice2=1)
+			[Orders]Special_Instructions:=""
+		End if 
+	End if 
+End if 
+
+If ($continue)
+	$i:=1
+	For ($i;1;Size of array(asCtnBreak))
+		$line:=asCtnPO{$i}+"_"+asCtnPack{$i}+"_"+asCtnColor{$i}+"_"+String(alCtnIn{$i})+"_"+String(alCtnCount{$i})+"_"+asCtnBreak{$i}
+		APPEND TO ARRAY($raw;$line)
+	End for 
+	SORT ARRAY($raw;>)
+	
+	$i:=1
+	$c:=0
+	For ($i;1;Size of array($raw))
+		$line:=$raw{$i}
+		
+		$po:=Substring($line;1;Position("_";$line)-1)
+		$line:=Substring($line;Position("_";$line)+1;999)
+		$pack:=Substring($line;1;Position("_";$line)-1)
+		$line:=Substring($line;Position("_";$line)+1;999)
+		
+		$color:=Substring($line;1;Position("_";$line)-1)
+		$color:=Substring($color;Position(" ";$color)+1;999)
+		
+		$line:=Substring($line;Position("_";$line)+1;999)
+		$incarton:=Num(Substring($line;1;Position("_";$line)-1))
+		$line:=Substring($line;Position("_";$line)+1;999)
+		$cartonCount:=Num(Substring($line;1;Position("_";$line)-1))
+		$line:=Substring($line;Position("_";$line)+1;999)
+		$break:=Substring($line;1;999)
+		
+		If ($poTest#$po) | ($packTest#$pack)
+			If ($poTest#$po)
+				If ($i>2)
+					APPEND TO ARRAY($buildList;"")
+				End if 
+				APPEND TO ARRAY($buildList;"PO: "+$po)
+				If ($pack#"")
+					APPEND TO ARRAY($buildList;$pack)
+				End if 
+			Else 
+				If ($pack#"") & ($packTest#$pack)
+					If ($i>2)
+						APPEND TO ARRAY($buildList;"")
+					End if 
+					APPEND TO ARRAY($buildList;$pack)
+				End if 
+			End if 
+			$c:=$c+1
+			APPEND TO ARRAY($buildList;String($c))
+			APPEND TO ARRAY($linenumber;$c)
+			APPEND TO ARRAY($totals;0)
+			APPEND TO ARRAY($cartons;0)
+			$poTest:=$po
+			$packTest:=$pack
+		End if 
+		$totals{$c}:=$totals{$c}+$incarton
+		$cartons{$c}:=$cartonCount
+		
+		APPEND TO ARRAY($buildList;String($incarton)+" "+$color+" ("+$break+")")
+		
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($linenumber))
+		$n:=Find in array($buildList;String($linenumber{$i}))
+		$buildlist{$n}:=String($cartons{$i})+" cartons of "+String($totals{$i})+" pcs"
+	End for 
+	
+	$info:="Packing instructions:"+Char(13)
+	$i:=1
+	For ($i;1;Size of array($buildList))
+		$info:=$info+$buildList{$i}+Char(13)
+	End for 
+	[Orders]Special_Instructions:=$info+Char(13)+[Orders]Special_Instructions
+	
+End if 
+

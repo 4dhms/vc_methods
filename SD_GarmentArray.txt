@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSpecialGarment;0)
+ALL RECORDS([SpecialDuty])
+SELECTION TO ARRAY([SpecialDuty]SDName;asSpecialGarment)
+
+INSERT IN ARRAY(asSpecialGarment;1;2)
+asSpecialGarment{1}:="Special Duty"
+asSpecialGarment{2}:="No"
+asSpecialGarment:=1

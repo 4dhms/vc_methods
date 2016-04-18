@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asPrintNumber;0)
+ARRAY TEXT(asPrintName;0)
+ARRAY TEXT(asFabric;0)
+ARRAY LONGINT(alTrackOrdered;0)
+ARRAY LONGINT(alTrackShipped;0)
+ARRAY LONGINT(alTrackUsed;0)
+ARRAY LONGINT(alTrackOU;0)
+
+Center Window (800;600;4;"")
+DIALOG("PrintInventory")
+CLOSE WINDOW
+
+  //$docref:=Create document("";"xls")
+  //If (ok=1)
+  //SEND PACKET($docRef;"Print/Color"+Char(9)+"Name"+Char(9)+"Fabric"+Char(9)+"Ordered"+Char(9)+"Delivered"+Char(9)+"Used"+Char(9)+"Over/Under"+Char(13))
+  //
+  //$i:=1
+  //For ($i;1;Size of array(asPrintNumber))
+  //SEND PACKET($docRef;asPrintNumber{$i}+Char(9)+asPrintName{$i}+Char(9)+asFabric{$i}+Char(9)+String(alTrackOrdered{$i};"###,##0")+Char(9))
+  //SEND PACKET($docRef;String(alTrackDelivered{$i};"###,##0")+Char(9)+String($used{$i};"###,##0")+Char(9)+String(Round(alTrackDelivered{$i}-alTrackUsed{$i};0);"###,##0")+Char(13))
+  //End for 
+  //
+  //CLOSE DOCUMENT($docRef)
+  //End if 
+

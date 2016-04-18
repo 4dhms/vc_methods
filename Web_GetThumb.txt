@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BLOB($blob)
+C_PICTURE($xThumb)
+
+QUERY([Designs];[Designs]DesignNum=$1)
+  //PICTURE TO BLOB([Designs]Sketch;$blob;"JPG")
+  //SEND HTML BLOB($blob;"image/gif")
+CREATE THUMBNAIL([Designs]Sketch;$xThumb;100;100;6)
+PICTURE TO GIF($xThumb;$blob)
+WEB SEND BLOB($blob;"image/gif")

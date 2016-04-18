@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (arPrice>0)
+	Case of 
+		: (vsCPType="Self")
+			[CostSheets]PriceFabric:=arPrice{arPrice}
+		: (vsCPType="Combo 1")
+			[CostSheets]PriceCombo1:=arPrice{arPrice}
+		: (vsCPType="Combo 2")
+			[CostSheets]PriceCombo2:=arPrice{arPrice}
+		: (vsCPType="Combo 3")
+			[CostSheets]PriceCombo3:=arPrice{arPrice}
+	End case 
+	CANCEL
+End if 

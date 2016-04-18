@@ -1,0 +1,43 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsWebUser)
+C_TEXT(vsWebPassword;$html)
+
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+vsWebUser:=$value{1}
+vsWebPassword:=$value{2}
+vsWebSession:=String(Tickcount)
+
+If (Position(Char(64);vsWebuser)>0) | (Position(Char(64);vsWebPassword)>0)
+	Web_Error ("No access. Check your password.")
+Else 
+	
+	QUERY([Staff];[Staff]UserName=vsWebUser;*)
+	QUERY([Staff]; & ;[Staff]UserName#"")
+	  //
+	Case of 
+		: (vsWebUser="test") & (vsWebPassword="hM$tes+")
+			WebTest 
+		: (vsWebUser="Stock") & (vsWebPassword="$cupi0$")
+			vtBuyer:="None"
+			WebStock 
+		: (vsWebPassword=[Staff]Password) & (Records in selection([Staff])>0)
+			CREATE RECORD([WebLog])
+			[WebLog]WebUser:=vsWebUser
+			[WebLog]LogonDate:=Current date(*)
+			[WebLog]LogonateTime:=Current time(*)
+			SAVE RECORD([WebLog])
+			Case of 
+				: (User in group(vsWebUser;"Factory"))
+					Web_FactoryIndex 
+					  //WEB SEND FILE("newgcoc.html")
+				Else 
+					Web_Index 
+			End case 
+		Else 
+			Web_Error ("No access. Check your password.")
+	End case 
+End if 

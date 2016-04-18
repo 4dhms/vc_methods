@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($proc)
+<>vlSource:=2
+
+<>vtNotes:=[SpecLineSample]Comments
+$proc:=New process("Spec_Notes";0;"Notes")

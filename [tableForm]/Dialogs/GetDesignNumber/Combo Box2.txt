@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asList1>1)
+	vsSuffix:=vsSuffix+asList2{asList1}
+End if 
+asList1:=1

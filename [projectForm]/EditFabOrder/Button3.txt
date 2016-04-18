@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c;$i)
+C_BOOLEAN($continue)
+
+If (Find in array(asSource;"FB-@")>0)
+	WinChoice ("Colors/Prints assigned to"+Char(13)+"Fabric Orders"+Char(13)+"will not be overwritten.";"Continue";"Stop")
+	If (ok=1)
+		$continue:=True
+	End if 
+Else 
+	$continue:=True
+End if 
+
+If ($continue)
+	$i:=1
+	$c:=Size of array(asSource)
+	For ($i;1;Size of array(asSource))
+		If (asSource{$c-($i-1)}="FB-@")
+			DELETE FROM ARRAY(asCPNumbers;$c-($i-1);1)
+			DELETE FROM ARRAY(asCPColorName;$c-($i-1);1)
+			DELETE FROM ARRAY(atDType;$c-($i-1);1)
+			DELETE FROM ARRAY(asSource;$c-($i-1);1)
+			DELETE FROM ARRAY(alColorKey;$c-($i-1);1)
+		End if 
+	End for 
+	
+	vfRemove:=False
+	If (Size of array(asCPNumbers)>0)
+		Fabric_LoadColorExec 
+	End if 
+	
+	ACCEPT
+End if 
+

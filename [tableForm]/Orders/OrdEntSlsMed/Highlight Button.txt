@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($new)
+
+If (User in group(Current user;"LateCostSheet")) | (Current user="Designer")
+	
+	If (vtExtension="Get Extension") | (FORM Get current page=4)
+		
+		$new:=True
+	Else 
+		WinChoice ("Do you want to create or view extension?";"View";"Create")
+		If (ok=0)
+			$new:=True
+		Else 
+			FORM GOTO PAGE(4)
+		End if 
+	End if 
+	
+	If ($new)
+		Order_ExtendNew 
+	End if 
+End if 

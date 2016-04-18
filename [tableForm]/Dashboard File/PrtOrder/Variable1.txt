@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vPrtRec=1)
+		vPrint:=11
+	: (vPrtSel=1)
+		vPrint:=12
+	Else 
+		vPrint:=11
+End case 

@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vsFlag:=String(vdStart)+" - "+String(vdEnd)
+QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"cancelled")
+
+Case of 
+	: (pOne=1)
+		QUERY SELECTION([Orders];[Orders]SizeCategory="Petite")
+	: (pTwo=1)
+		QUERY SELECTION([Orders];[Orders]SizeCategory="Missy")
+	: (pThree=1)
+		QUERY SELECTION([Orders];[Orders]SizeCategory="Large")
+End case 
+
+If (Records in selection([Orders])<1)
+	WinPrompt ("There is nothing to report in that date range.")
+Else 
+	<>vtMessage:="Building report"+Char(13)+"(hit Shift to cancel)"
+	<>vlCounter:=0
+	EMail_SendingProc 
+	CREATE SET([Orders];"SalesReport")
+	
+	Report_SalesArray 
+	  //Report_SalesShow 
+	vtFullName:=vsFlag
+	If (vlRouter=1)
+		SET WINDOW TITLE("Sales Report by Division")
+		Report_SalesScreenSub (1)
+	Else 
+		SET WINDOW TITLE("Sales Report by Factory")
+		Report_SalesScreenSub (2)
+	End if 
+	FORM GOTO PAGE(vlRouter)
+	<>CloseDialog:=True
+	CALL PROCESS(<>SendingWin)
+End if 

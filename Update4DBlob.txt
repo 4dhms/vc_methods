@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($path)
+
+$docref:=Open document("")
+$path:=Substring(Document;1;Length(Document)-1)
+
+ALERT($path+"  "+String(Test path name($path)))
+
+CLOSE DOCUMENT($docref)
+
+CREATE RECORD([Spooler])
+[Spooler]Genre:="BLOB"
+DOCUMENT TO BLOB($path;[Spooler]SortArray)
+SAVE RECORD([Spooler])
+ALERT(String(BLOB size([Spooler]SortArray)))
+
+UNLOAD RECORD([Spooler])

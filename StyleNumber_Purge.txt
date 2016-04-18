@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($strip)
+
+FIRST RECORD([StyleNumberGen])
+$i:=1
+CREATE SET([StyleNumberGen];"start")
+For ($i;1;Records in selection([StyleNumberGen]))
+	$strip:=StripToNumber ([StyleNumberGen]StyleNumber)
+	If (Length($strip)<5)
+		REMOVE FROM SET([StyleNumberGen];"start")
+	End if 
+	NEXT RECORD([StyleNumberGen])
+End for 
+
+FIRST RECORD([StyleNumberGen])
+$i:=1
+CREATE EMPTY SET([StyleNumberGen];"over")
+For ($i;1;Records in selection([StyleNumberGen]))
+	$strip:="@"+StripToNumber ([StyleNumberGen]StyleNumber)+"@"
+	QUERY([Orders];[Orders]StyleNumber=$strip)
+	
+	If (Records in selection([Orders])>0)
+		ADD TO SET([StyleNumberGen];"over")
+	End if 
+	NEXT RECORD([StyleNumberGen])
+End for 
+
+USE SET("over")
+CLEAR SET("over")
+
+ALERT("Done")

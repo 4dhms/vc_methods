@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+C_LONGINT($i)
+C_TEXT($header)
+C_LONGINT($CSID)
+C_LONGINT($i)
+C_LONGINT($sgPO)
+ARRAY LONGINT($csKeys;0)
+
+
+If (vlOrderNumber>0)
+	$sgPO:=Num([Orders]SGPO)*-1
+	If ($sgPO#0) & (vlOrderNumber>0)
+		QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=$sgPO)
+		If (Records in selection([ComponentSheets])<1)
+			QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=vlOrderNumber)
+		End if 
+	Else 
+		QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=vlOrderNumber)
+	End if 
+Else 
+	QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=vlOrderNumber)
+	$sgPO:=-1
+End if 
+
+$CSID:=[ComponentSheets]CS_ID
+
+QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID)
+QUERY SELECTION([CS_Lines];[CS_Lines]CS_ID#0;*)
+QUERY SELECTION([CS_Lines]; & ;[CS_Lines]OrderNumber=0;*)
+QUERY SELECTION([CS_Lines]; | ;[CS_Lines]OrderNumber=vlOrderNumber)
+
+QUERY([CS_OffOrder];[CS_OffOrder]HMSOrder=vlOrderNumber)
+SELECTION TO ARRAY([CS_OffOrder]CL_LineKey;$csKeys)
+CREATE SET([CS_Lines];"Lines")
+
+$i:=1
+FIRST RECORD([CS_OffOrder])
+For ($i;1;Records in selection([CS_Lines]))
+	If (Find in array($csKeys;[CS_Lines]CS_LineKey)>0)
+		REMOVE FROM SET([CS_Lines];"Lines")
+	End if 
+	NEXT RECORD([CS_Lines])
+End for 
+
+USE SET("Lines")
+CLEAR SET("Lines")
+
+
+$i:=1
+FIRST RECORD([CS_Lines])
+If ([ComponentSheets]HMSOrderNumber<0)
+	$header:=" --  Sample Garment Order "+String(Abs([ComponentSheets]HMSOrderNumber))
+End if 
+$header:="Components"+$header
+
+
+$HTML:=Char(1)+"<span class=style1><div align=left>"+$header+"</div></sopan><br>"
+$HTML:=$HTML+"<br>"
+For ($i;1;Records in selection([CS_Lines]))
+	Web_ComponentBuildLine 
+	$HTML:=$HTML+"<span class=style2 color=#000000><div align=left>"+vtFullName+"</div></span><br><br>"
+	NEXT RECORD([CS_Lines])
+End for 
+$HTML:=$HTML+"</font>"
+
+$0:=$HTML
+

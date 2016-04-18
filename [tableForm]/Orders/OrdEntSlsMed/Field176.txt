@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		Case of 
+			: ([Orders]Price Terms="8/10")
+				[Orders]NetDiscount:=8
+			: ([Orders]Price Terms="4%@")
+				[Orders]NetDiscount:=4
+		End case 
+End case 

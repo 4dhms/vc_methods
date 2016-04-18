@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+
+Case of 
+	: (Form event=On Unload)
+		UNLOAD RECORD([Designs])
+		UNLOAD RECORD([Orders])
+		UNLOAD RECORD([Samples])
+	: (Form event=On Load)
+		If (User in group(Current user;"Admin"))
+			$show:=True
+			OBJECT SET VISIBLE(bSetUp;True)
+		Else 
+			OBJECT SET VISIBLE(bSetUp;False)
+			$show:=False
+		End if 
+		OBJECT SET VISIBLE([Preferences]FTPMachine;$show)
+		OBJECT SET VISIBLE([Preferences]User;$show)
+		OBJECT SET VISIBLE([Preferences]Password;$show)
+		OBJECT SET VISIBLE([Preferences]FTPPath;$show)
+		Array_Vendors 
+		OBJECT SET ENABLED(bLog;True)
+		OBJECT SET ENABLED(bQueue;True)
+		If (User in group(Current user;"Restricted")) | (Current user="Alex")
+			OBJECT SET ENABLED(bSetup;False)
+		Else 
+			FORM GOTO PAGE(2)
+			ALL RECORDS([EMailLog])
+			ORDER BY([EMailLog];[EMailLog]EMLogDate;<;[EMailLog]EMLogTime;<)
+			  //BUTTON TEXT(bQueue;"Remove")
+			  //BUTTON TEXT(bLog;"Clear Log")
+			  //ENABLE BUTTON(bSetup)
+		End if 
+		
+		ARRAY TEXT(asEncoding;8)
+		asEncoding{1}:="BinHex"
+		asEncoding{2}:="Base64"
+		asEncoding{3}:="AppleSingle"
+		asEncoding{4}:="AppleDouble"
+		asEncoding{5}:="AppleSingle AND Base64"
+		asEncoding{6}:="AppleDouble AND Base64"
+		asEncoding{7}:="UUEncode"
+		asEncoding{8}:="MacBinary"
+		asEncoding:=[Preferences]Encoding
+		
+		OBJECT SET VISIBLE(bSetup;$show)
+		OBJECT SET VISIBLE(bLog;$show)
+		
+End case 

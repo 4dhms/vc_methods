@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+C_BOOLEAN($done)
+C_TEXT($tc)
+
+If (Form event=On Data Change)
+	If ([ColorPrintNumber]CPType=2)
+		If (StripToNumber ([ColorPrintNumber]ThreadColor)="")
+			WinPrompt ("Enter the number for a solid color in the Color/Print Library")
+			[ColorPrintNumber]ThreadColor:=""
+			vtColor:=""
+			GOTO OBJECT([ColorPrintNumber]ThreadColor)
+		Else 
+			<>vtColorCode:=""
+			$run:=New process("Color_GetName";0;"GetName";[ColorPrintNumber]ThreadColor)
+			
+			Repeat 
+				Case of 
+					: (<>vtColorCode#"")
+						$done:=True
+					: (Shift down)
+						$done:=True
+				End case 
+			Until ($done)
+			
+			If (<>vtColorCode="NONE")
+				<>vtColorCode:=""
+				$tc:=String(Num([ColorPrintNumber]ThreadColor))
+				$run:=New process("Color_GetName";0;"GetName";$tc)
+				
+				Repeat 
+					Case of 
+						: (<>vtColorCode#"") & (<>vtColorCode#"None")
+							$done:=True
+							WinChoice ("Error Handling:"+Char(13)+Char(13)+"Is the thread color"+Char(13)+$tc+" "+<>vtColorCode+"?";"Correct";"No")
+							If (ok=1)
+								[ColorPrintNumber]ThreadColor:=$tc
+							Else 
+								vtColor:=""
+								[ColorPrintNumber]ThreadColor:=""
+							End if 
+						: (Shift down)
+							$done:=True
+					End case 
+				Until ($done)
+			End if 
+			
+			If (<>vtColorCode="NONE")
+				WinPrompt ("Enter a color number that is in the Color/Print Library")
+				GOTO OBJECT([ColorPrintNumber]ThreadColor)
+				[ColorPrintNumber]ThreadColor:=""
+				vtColor:=""
+			Else 
+				vtColor:=<>vtColorCode
+			End if 
+		End if 
+	End if 
+End if 

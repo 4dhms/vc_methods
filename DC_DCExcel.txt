@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i)
+
+SAVE RECORD([DC_Spreads])
+
+$docref:=Create document("";"xls")
+
+SEND PACKET($docref;vtDCCustomer+Char(13))
+SEND PACKET($docref;vtDCName+Char(13))
+SEND PACKET($docref;vsDCAddress+Char(13)+Char(13)+Char(13))
+
+$i:=1
+FIRST RECORD([DC_SpreadLines])
+For ($i;1;Records in selection([DC_SpreadLines]))
+	SEND PACKET($docref;[DC_SpreadLines]Note+Char(9)+[DC_SpreadLines]ColorCode+Char(9)+[DC_SpreadLines]ColorNumber+Char(9))
+	SEND PACKET($docref;[DC_SpreadLines]Sz1+Char(9)+[DC_SpreadLines]Sz2+Char(9)+[DC_SpreadLines]Sz3+Char(9)+[DC_SpreadLines]Sz4+Char(9))
+	SEND PACKET($docref;[DC_SpreadLines]Sz5+Char(9)+[DC_SpreadLines]Sz6+Char(9)+[DC_SpreadLines]Sz7+Char(9))
+	SEND PACKET($docref;[DC_SpreadLines]Sz8+Char(9)+[DC_SpreadLines]Sz9+Char(9)+[DC_SpreadLines]Sz10+Char(13))
+	NEXT RECORD([DC_SpreadLines])
+End for 
+
+CLOSE DOCUMENT($docref)

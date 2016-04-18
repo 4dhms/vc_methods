@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$n)
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	SEND PACKET($docref;"Price"+Char(9)+"Acct"+Char(9)+"Style"+Char(9)+"Color"+Char(9)+"D/N"+Char(9)+"Header"+Char(9)+"Discount"+Char(9)+"Reorder"+Char(13))
+	
+	$i:=1
+	For ($i;1;Size of array(asTableSpec))
+		$n:=1
+		For ($n;1;8)
+			SEND PACKET($docref;asTableSpec{$i}{$n}+Char(9))
+		End for 
+		SEND PACKET($docref;Char(13))
+	End for 
+	CLOSE DOCUMENT($docref)
+	
+	ALERT("Done")
+End if 

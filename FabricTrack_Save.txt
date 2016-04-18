@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+SAVE RECORD([FabricTrack])
+
+QUERY([FabricDC];[FabricDC]TrackKey=[FabricTrack]TrackKey)
+CREATE SET([FabricDC];"Fabs")
+ARRAY TEXT($orders;0)
+SELECTION TO ARRAY([FabricDC]OrderNumber;$orders)
+
+  //removes deleted lines
+For ($i;1;Size of array($orders))
+	If (Find in array(asMOrder;$orders{$i})<1)
+		USE SET("Fabs")
+		QUERY SELECTION([FabricDC];[FabricDC]OrderNumber=$orders{$i})
+		DELETE RECORD([FabricDC])
+	End if 
+End for 
+
+  //creates added lines
+$i:=1
+For ($i;1;Size of array(asMOrder))
+	USE SET("Fabs")
+	If (asMOrder{$i}#"") & (asMOrder{$i}#"Ship@") & (asMOrder{$i}#"@Total@") & (asMOrder{$i}#"On order") & (asMOrder{$i}#"FB@") & (asMOrder{$i}#"BN@") & (asMOrder{$i}#"TR@") & (asMOrder{$i}#"Order@") & (asMOrder{$i}#"Out@")
+		QUERY SELECTION([FabricDC];[FabricDC]OrderNumber=asMOrder{$i})
+		If (Records in selection([FabricDC])=0)
+			CREATE RECORD([FabricDC])
+			[FabricDC]TrackKey:=[FabricTrack]TrackKey
+			[FabricDC]OrderNumber:=asMOrder{$i}
+			[FabricDC]Note:=atMNote{$i}
+			[FabricDC]PO:=asMPo{$i}
+			SAVE RECORD([FabricDC])
+		Else 
+			If (atMNote{$i}#"")
+				[FabricDC]Note:=atMNote{$i}
+				SAVE RECORD([FabricDC])
+			End if 
+		End if 
+	End if 
+End for 
+
+UNLOAD RECORD([FabricTrack])
+UNLOAD RECORD([FabricDC])

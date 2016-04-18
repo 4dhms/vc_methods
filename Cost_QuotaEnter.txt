@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vlQuotaProc:=0
+
+vlColN:=vlTargetCol
+Cost_QuotaGet 
+Cost_CalcDutyAmt 
+Cost_EntryCalculate 
+Cost_UpdateCat (<>QuotaRouter;<>vsQuotaCat)
+UNLOAD RECORD([Quota])
+CALL PROCESS(Current process)

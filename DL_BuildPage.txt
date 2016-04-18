@@ -1,0 +1,92 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($pageNumber;$i)
+C_BOOLEAN($wholePage;vfPrinting;$build)
+
+If (Count parameters>1)
+	If ($2)
+		  //build whole page
+		$wholePage:=True
+		$pageNumber:=$1
+	Else 
+		  //Build itme
+		$wholePage:=False
+		$pageNumber:=[DLPages]PageNumber
+	End if 
+End if 
+
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey;*)
+QUERY([DLPages]; & ;[DLPages]PageNumber=$pageNumber)
+
+If (Not(vfPrinting))
+	QUERY([DesignLineIncluded];[DesignLineIncluded]PageNumber=$pageNumber;*)
+	QUERY([DesignLineIncluded]; | ;[DesignLineIncluded]ItemNumber>12;*)
+	QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey)
+Else 
+	QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey;*)
+	QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=$pageNumber)
+End if 
+
+CREATE SET([DesignLineIncluded];"Page")
+
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]NewPageNumber=0)
+
+If (Records in selection([DesignLineIncluded])>0)
+	$i:=1
+	FIRST RECORD([DesignLineIncluded])
+	For ($i;1;Records in selection([DesignLineIncluded]))
+		[DesignLineIncluded]NewPageNumber:=[DesignLineIncluded]PageNumber
+		SAVE RECORD([DesignLineIncluded])
+		NEXT RECORD([DesignLineIncluded])
+	End for 
+End if 
+USE SET("Page")
+CLEAR SET("Page")
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]ItemNumber;>)
+
+DL_HealthCare 
+FIRST RECORD([DesignLineIncluded])
+
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(AStyle;0)
+ARRAY TEXT(AStitch;0)
+ARRAY PICTURE(ASketch;0)
+ARRAY TEXT(asFabric;0)
+ARRAY TEXT(atPrice;0)
+ARRAY REAL(arMSRP;0)
+ARRAY TEXT(asSize;0)
+ARRAY TEXT(atColor;0)
+ARRAY TEXT(atTitle;0)
+ARRAY LONGINT(alPOOrder;0)
+
+C_PICTURE(vxSketch;vxSketch1;vxSketch2;vxSketch3;vxSketch4;vxSketch5;vxSketch6;vxSketch7;vxSketch8)
+C_PICTURE(vxSketch9;vxSketch10;vxSketch11;vxSketch12;vxSketch13;vxSketch14;vxSketch15;vxSketch16;vxSketch17;vxSketch18)
+ARRAY LONGINT(alItemNumber;0)
+ARRAY DATE(adCancelDate;0)
+
+SELECTION TO ARRAY([DesignLineIncluded]Name;atTitle;[DesignLineIncluded]DesignNumber;asDesignNumbers;[DesignLineIncluded]StyleNumber;aStyle)
+SELECTION TO ARRAY([DesignLineIncluded]Stitch;aStitch;[DesignLineIncluded]Fiber;asFabric;[DesignLineIncluded]Price;atPrice;[DesignLineIncluded]MSRP;arMSRP;[DesignLineIncluded]Size;asSize;[DesignLineIncluded]Colors;atColor)
+SELECTION TO ARRAY([DesignLineIncluded]ItemNumber;alItemNumber;[DesignLineIncluded]CancelDate;adCancelDate;[DesignLineIncluded]OrderNumber;alPOOrder)
+
+  //If ($wholePage)
+$i:=1
+For ($i;1;18)
+	Case of 
+		: ($i>12)
+			$build:=True
+		: ($i>8) & (Not([DesignLines]8Up))
+			$build:=True
+		: ($i<9)
+			$build:=True
+		Else 
+			$build:=False
+	End case 
+	If ($build)
+		DL_BuildItem ($i)
+	End if 
+End for 
+  //Else 
+  //  DL_BuildItem ($1)
+  //End if 
+
+asPages:=$pageNumber

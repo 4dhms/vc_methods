@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user#"Designer")
+	WinPrompt ("Maintenance function.")
+Else 
+	Restore_ImportOld 
+End if 

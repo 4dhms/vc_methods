@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY SELECTION([CostSheets];[CostSheets]SheetName="DCS Actual@")
+
+If (Records in selection([CostSheets])>0)
+	ARRAY TEXT(asRouter;1)
+	ARRAY TEXT(atFiles;1)
+	asRouter{1}:="DCS Actual "+Char(65+Records in selection([CostSheets]))
+Else 
+	
+	If (<>vlOrderNumber>0)
+		ARRAY TEXT(asRouter;4)
+		ARRAY TEXT(atFiles;4)
+		asRouter{4}:="DCS Actual A"
+	Else 
+		ARRAY TEXT(asRouter;3)
+		ARRAY TEXT(atFiles;3)
+	End if 
+	
+	USE SET("Sheets")
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName="DCS Estimate@")
+	asRouter{1}:="DCS Estimate "+String(1+Records in selection([CostSheets]))
+	USE SET("Sheets")
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName="DCS Original@")
+	If (Records in selection([CostSheets])>0)
+		asRouter{2}:="DCS Quote "+String(1+Records in selection([CostSheets]))
+	Else 
+		asRouter{2}:="DCS Quote"
+	End if 
+	
+	USE SET("Sheets")
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName="DCS Confirmed@")
+	asRouter{3}:="DCS Confirmed "+String(1+Records in selection([CostSheets]))
+End if 

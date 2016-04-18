@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($line)
+
+If (Form event=On Data Change)
+	$line:=Field(10;$1+117)
+	If ($line->=!00-00-00!)
+		$line->:=Current date(*)
+		OBJECT SET VISIBLE($line->;True)
+	End if 
+End if 
+SampFabrics_Trigger 

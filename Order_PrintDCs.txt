@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+vtHeader:=""
+vsPOFlag:=""
+
+If (vfPrintOne)
+	QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+	ORDER BY([DC_Spreads];[DC_Locations]DCPOprefix;>)
+	
+	If (vlDCKey>0)
+		QUERY SELECTION([DC_Spreads];[DC_Spreads]DCKey=vlDCKey)
+	End if 
+	
+	FIRST RECORD([DC_Spreads])
+	ORDER BY([DC_Spreads];[DC_Locations]DCPOprefix;>)
+	vlPage:=vlPage+1
+	Print form([DC_Spreads];"DC.Top")
+	vlPrintedPixels:=50
+	$n:=1
+	
+	For ($n;1;Records in selection([DC_Spreads]))
+		Order_PrintOneDC 
+		NEXT RECORD([DC_Spreads])
+	End for 
+	
+	DC_PrintPacking 
+	PAGE BREAK
+Else 
+	vlPage:=0
+	FIRST RECORD([Orders])
+	QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+	ORDER BY([DC_Spreads];[DC_Locations]DCPOprefix;>)
+	
+	$i:=1
+	For ($i;1;Records in selection([Orders]))
+		QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+		If (vlDCKey>0)
+			QUERY SELECTION([DC_Spreads];[DC_Spreads]DCKey=vlDCKey)
+		End if 
+		
+		FIRST RECORD([DC_Spreads])
+		ORDER BY([DC_Spreads];[DC_Locations]DCPOprefix;>)
+		vlPage:=vlPage+1
+		Print form([DC_Spreads];"DC.Top")
+		vlPrintedPixels:=50
+		$n:=1
+		For ($n;1;Records in selection([DC_Spreads]))
+			Order_PrintOneDC 
+			NEXT RECORD([DC_Spreads])
+		End for 
+		
+		DC_PrintPacking 
+		
+		If ($i<Records in selection([Orders]))
+			PAGE BREAK(>)
+		Else 
+			PAGE BREAK
+		End if 
+		NEXT RECORD([Orders])
+	End for 
+	FIRST RECORD([Orders])
+	<>vlCostRouter:=10
+	CALL PROCESS(Current process)
+End if 

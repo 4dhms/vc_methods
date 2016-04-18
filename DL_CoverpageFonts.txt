@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (vfPrinting)
+	DL_SpecFace (->[DesignLines]Line;[DesignLines]LineFont;[DesignLines]LineSize)
+	DL_SpecFace (->[DesignLines]Season;[DesignLines]SeasonFont;[DesignLines]SeasonSize)
+	DL_SpecFace (->[DesignLines]Title;[DesignLines]TitleFont;[DesignLines]TitleSize)
+	DL_SpecFace (->[DesignLines]Pubdate;[DesignLines]PubdateFont;[DesignLines]PubDateSize*-1)
+Else 
+	  //preview
+	vsHeader:=[DesignLines]Line
+	vsWinTitle:=[DesignLines]Season
+	vtDescription:=[DesignLines]Title
+	vdSubmitDate:=[DesignLines]Pubdate
+	
+	DL_SpecFace (->vsHeader;[DesignLines]LineFont;[DesignLines]LineSize*-1)
+	DL_SpecFace (->vsWinTitle;[DesignLines]SeasonFont;[DesignLines]SeasonSize*-1)
+	DL_SpecFace (->vtDescription;[DesignLines]TitleFont;[DesignLines]TitleSize*-1)
+	DL_SpecFace (->vdSubmitDate;[DesignLines]PubdateFont;[DesignLines]PubDateSize*-1)
+	DL_SpecFace (->[DesignLines]TextFont;[DesignLines]TextFont;[DesignLines]TextSize*-1)
+	
+End if 

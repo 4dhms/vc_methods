@@ -1,0 +1,167 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($Fabric)
+C_BOOLEAN($Trim)
+C_BOOLEAN($button)
+C_TEXT($code)
+C_LONGINT($i)
+
+ARRAY TEXT(atShipTo;0)
+ALL RECORDS([Addesses])
+DISTINCT VALUES([Addesses]Location;atShipTo)
+
+Revise_ArrayFabric 
+vsRecInSelection:=String(Selected record number([FabricOrders]))+"/"+String(Records in selection([FabricOrders]))
+vlFabPOKey:=[FabricOrders]FabOrderKey
+vfExpand:=False
+
+If ([FabricOrders]Void=True)
+	vsFlag:="VOID"
+Else 
+	vsFlag:=""
+End if 
+
+  //Case of 
+  //: ([FabricOrders]POType=0) & (Find in array(atPages;"Usage")<1)
+  //APPEND TO ARRAY(atPages;"Usage")
+  //: ([FabricOrders]POType>0) & (Find in array(atPages;"Usage")>1)
+  //DELETE FROM ARRAY(atPages;Find in array(atPages;"Usage");1)
+  //End case 
+
+QUERY([Vendors];[Vendors]VendorKey=[FabricOrders]VendorKey)
+QUERY([FabricLibrary];[FabricLibrary]FabricLibKey=[FabricOrders]FabLibKey)
+
+If ([FabricOrders]FabOrderKey<1)
+	If (vfNewFOSys)
+		[FabricOrders]NewSys:=True
+	End if 
+	[FabricOrders]PONumber:=PO_GetNumber (<>asVendorTypes{<>asVendorTypes})
+	
+	
+	[FabricOrders]FabOrderKey:=Sequence number([FabricOrders])
+	[FabricOrders]FabPODate:=Current date(*)
+	QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+	DELETE SELECTION([FabPOLines])
+	REDUCE SELECTION([OrdersFabricXRef];0)
+Else 
+	If ([FabricOrders]ReqDeliveryDate#!00-00-00!) & ([FabricOrders]Delivery="")
+		[FabricOrders]Delivery:=String([FabricOrders]ReqDeliveryDate)
+	End if 
+End if 
+Case of 
+	: ([FabricOrders]PONumber="") & (<>asVendorTypes{<>asVendorTypes}="Fabric")
+		vfTrim:=False
+	: ([FabricOrders]PONumber="")
+		vfTrim:=True
+	: ([FabricOrders]PONumber="FB@")
+		vfTrim:=False
+	Else 
+		vfTrim:=True
+End case 
+
+$code:=Substring([FabricOrders]PONumber;1;2)
+ARRAY TEXT(asVendors;0)
+Case of 
+	: ($code="FB")
+		COPY ARRAY(asFabSpler;asVendors)
+		[FabricOrders]POType:=0
+		$Fabric:=True
+		$Button:=False
+		$Trim:=False
+	: ($code="BN")
+		COPY ARRAY(asButSpler;asVendors)
+		[FabricOrders]POType:=1
+		$Fabric:=False
+		$Trim:=False
+		$Button:=True
+	: ($code="TR")
+		COPY ARRAY(asTrmSpler;asVendors)
+		[FabricOrders]POType:=2
+		$Fabric:=False
+		$Trim:=True
+		$Button:=False
+End case 
+SORT ARRAY(asVendors;>)
+  //--------->Error handling
+  // If ([FabricOrders]VendorName="")
+  //[FabricOrders]VendorName:=[Vendors]VendorName
+  //End if 
+
+  // SET VISIBLE([FabricOrders]ArticleNo;Not($Fabric))
+OBJECT SET VISIBLE([FabricOrders]FiberContent;Not($Button))
+OBJECT SET VISIBLE([FabricOrders]Treatment;$Fabric)
+OBJECT SET VISIBLE([FabricOrders]ItemName;True)
+OBJECT SET VISIBLE(*;"tText2";Not($Button))
+
+SET WINDOW TITLE(<>asVendorTypes{<>asVendorTypes}+" PO: "+[FabricOrders]PONumber)
+
+Fabric_Order_SortSubforms 
+If ([FabricOrders]Complete=True)
+	OBJECT SET VISIBLE([FabricOrders]FinalDelivery;True)
+Else 
+	OBJECT SET VISIBLE([FabricOrders]FinalDelivery;False)
+End if 
+If ([FabricOrders]Shipped=True)
+	OBJECT SET VISIBLE([FabricOrders]ShippedDate;True)
+Else 
+	OBJECT SET VISIBLE([FabricOrders]ShippedDate;False)
+End if 
+If ([FabricOrders]FinalDip=True)
+	OBJECT SET VISIBLE([FabricOrders]FinalDipDate;True)
+Else 
+	OBJECT SET VISIBLE([FabricOrders]FinalDipDate;False)
+End if 
+If (Not(vfNewFOSys))
+	asVendors:=Find in array(alVendorKeys;[FabricOrders]VendorKey)
+End if 
+
+FabPO_ChangedFieldList (1)
+Case of 
+	: ([FabricOrders]POSent) | ([FabricOrders]ReviseNumber>0)
+		FabPO_Enterable (False)
+	Else 
+		FabPO_Enterable (True)
+End case 
+
+FabPO_OrderArray 
+  // 
+
+QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+QUERY([ShipTo];[ShipTo]FabOrderKey=[FabricOrders]FabOrderKey)
+
+  //Counts related orders
+If (Records in selection([OrdersFabricXRef])=1)
+	vsOrders:="1 Related Order:"
+Else 
+	vsOrders:=String(Size of array(asOrderNumbers))+" Related Orders:"
+End if 
+
+  //Counts shipping addresses
+  //If (Records in selection([ShipTo])=1)
+  //vsAddresses:=String(Records in selection([ShipTo]))+" Ship to Address:"
+  //Else 
+  //vsAddresses:=String(Records in selection([ShipTo]))+" Ship to Addresses:"
+  //End if 
+
+
+$i:=1
+ARRAY TEXT(atOldBreakdown;Records in selection([FabPOLines]);7)
+FIRST RECORD([FabPOLines])
+For ($i;1;Records in selection([FabPOLines]))
+	atOldBreakdown{$i}{1}:=String([FabPOLines]LineID)
+	atOldBreakdown{$i}{2}:=[FabPOLines]ColorPrint
+	atOldBreakdown{$i}{3}:=String([FabPOLines]Quantity)
+	atOldBreakdown{$i}{4}:=[FabPOLines]POUnit
+	atOldBreakdown{$i}{5}:=[FabPOLines]POWidth
+	atOldBreakdown{$i}{6}:=String([FabPOLines]UnitPrice)
+	atOldBreakdown{$i}{7}:=[FabPOLines]TransPO
+	NEXT RECORD([FabPOLines])
+End for 
+
+If (vfNewFOSys)
+	QUERY([ShipTo];[ShipTo]FabOrderKey=[FabricOrders]FabOrderKey)
+	If (Records in selection([ShipTo])=0)
+		CREATE RECORD([ShipTo])
+		[ShipTo]FabOrderKey:=[FabricOrders]FabOrderKey
+		SAVE RECORD([ShipTo])
+	End if 
+End if 

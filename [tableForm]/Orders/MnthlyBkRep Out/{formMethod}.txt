@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL(vNetUnitPrc)
+C_REAL(vrTotalSales1)
+C_DATE($today;$monday)
+C_LONGINT($adj)
+
+  //
+Case of 
+	: (Form event=On Load)
+		Report_LoadArrays 
+		$today:=Current date(*)
+		$adj:=7+(Day number($today)-2)
+		$monday:=$today-$adj
+		
+		<>asStartMonth:=Month of($monday)
+		<>asStartDay:=Day of($monday)
+		<>asStartYear:=Find in array(<>asStartYear;String(Year of($monday)))
+		<>asEndMonth:=Month of($monday+4)
+		<>asEndDay:=Day of($monday+4)
+		<>asEndYear:=Find in array(<>asStartYear;String(Year of($monday+4)))
+		
+		
+		vsStyleNumber:=""
+		vsFactory:=""
+		vsCustomer:=""
+		If (Not(Shift down))
+			vrAvgPriceTot:=0
+			vlTotQty:=0
+			vlTotNetSales:=0
+		End if 
+		vsDivision:=""
+		vtTitle:=""
+	: (Form event=On Display Detail)
+		vlNetSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+End case 

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Center Window (350;200;1;"")
+DIALOG("Flashers")
+CLOSE WINDOW

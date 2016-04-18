@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asCustomerBuild>1)
+	WinChoice ("Are you sure you want to delete"+Char(13)+asCustomerBuild{asCustomerBuild}+"?")
+	If (ok=1)
+		WinChoice ("Really, really sure?";"No";"Yes")
+		If (ok=0)
+			DELETE FROM ARRAY(asCustomerBuild;asCustomerBuild;1)
+			ARRAY TO LIST(asCustomerBuild;vsList1Name)
+		End if 
+	End if 
+End if 

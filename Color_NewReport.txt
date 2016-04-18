@@ -1,0 +1,70 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($1;$2)
+C_TEXT($3)
+C_TIME($docref)
+C_LONGINT($i)
+C_TEXT($datestamp)
+C_TEXT($path)
+
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPCreationDate>=$1)
+QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPCreationDate<=$2)
+If ($3#"All")
+	QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Enterer=$3)
+End if 
+
+If (Application type=5)
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":Marmax_"+$datestamp+".xls"
+	$path:=Replace string($path;"Marmax";"Marmax_")
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	$docref:=Create document("";"xls")
+End if 
+
+SEND PACKET($docref;"Type"+Char(9)+"Number"+Char(9)+"Name"+Char(9)+"Mill Number"+Char(9)+"Season"+Char(9)+"Division"+Char(9)+"In Production"+Char(13))
+
+FIRST RECORD([ColorPrintNumber])
+$i:=1
+For ($i;1;Records in selection([ColorPrintNumber]))
+	Case of 
+		: ([ColorPrintNumber]CPType=1)
+			SEND PACKET($docref;"Solid")
+		: ([ColorPrintNumber]CPType=2)
+			SEND PACKET($docref;"Print")
+		: ([ColorPrintNumber]CPType=3)
+			SEND PACKET($docref;"Embroidery")
+		: ([ColorPrintNumber]CPType=4)
+			SEND PACKET($docref;"Layout")
+	End case 
+	
+	SEND PACKET($docref;Char(9)+[ColorPrintNumber]CPNumber+Char(9)+[ColorPrintNumber]CPName+Char(9)+[ColorPrintNumber]MillNumber+Char(9)+[ColorPrintNumber]SeasonName+" "+[ColorPrintNumber]SeasonYear+Char(9))
+	SEND PACKET($docref;[ColorPrintNumber]Division+Char(9))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+	
+	If (Records in selection([CP_OrderXRef])>0)
+		SEND PACKET($docref;"Yes")
+	End if 
+	
+	SEND PACKET($docref;Char(13))
+	NEXT RECORD([ColorPrintNumber])
+End for 
+CLOSE DOCUMENT($docref)
+
+If (Application type=5)
+	ARRAY TEXT(asSubCC;1)
+	asSubCC{1}:="phil@persinger.com"
+	  //asSubCC{2}:="peterli@nubby.com"
+	  //asSubCC{3}:="susan@nubby.com"
+	  //asSubCC{4}:="marisol@nubby.com"
+	  //asSubCC{5}:="spenser@nubby.com"
+	  //asSubCC{6}:="claudia@nubby.com"
+	  //asSubCC{7}:="mark@nubby.com"
+	  //asSubCC{8}:="bing@nubby.com"
+	  //asSubCC{10}:="phil@persinger.com"
+	
+	Mail_SimpleSend ("List";$path;"Weekly Color Report ("+String(Current date(*))+")";"Attached is the new color report.")
+End if 
+

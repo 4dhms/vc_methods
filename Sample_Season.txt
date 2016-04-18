@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ($1=1)
+	Case of 
+		: (Not(<>Enter))
+			WinPrompt ("This sample can not be modified without revising it.")
+			If (Find in array(<>asSeasonName;[Samples]SeasonName)>0)
+				<>asSeasonName:=Find in array(<>asSeasonName;[Samples]SeasonName)
+			Else 
+				<>asSeasonName:=1
+			End if 
+		: (<>asSeasonName>1)
+			[Samples]SeasonName:=<>asSeasonName{<>asSeasonName}
+		Else 
+			[Samples]SeasonName:=""
+	End case 
+Else 
+	Case of 
+		: (Not(<>Enter))
+			WinPrompt ("This sample can not be modified without revising it.")
+			If (Find in array(<>asSeasonYear;[Samples]SeasonYear)>0)
+				<>asSeasonYear:=Find in array(<>asSeasonYear;[Samples]SeasonYear)
+			Else 
+				<>asSeasonYear:=1
+			End if 
+		: (<>asSeasonYear>1)
+			[Samples]SeasonYear:=<>asSeasonYear{<>asSeasonYear}
+		Else 
+			[Samples]SeasonYear:=""
+	End case 
+End if 
+Sample_RequiredFlag 

@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Printing Detail)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[OrdersFabricXRef]OrderNumber)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=[OrdersFabricXRef]OrdType)
+		QUERY([FabricOrders];[FabricOrders]FabOrderKey=[CP_OrderXRef]FabOrderKey)
+		
+		OBJECT SET VISIBLE([FabricOrders]ReqDeliveryDate;[FabricOrders]ReqDeliveryDate#!00-00-00!)
+		OBJECT SET VISIBLE([FabricOrders]FinalDelivery;[FabricOrders]FinalDelivery#!00-00-00!)
+		OBJECT SET VISIBLE([FabricOrders]ShippedDate;Not([FabricOrders]ShippedDate=!00-00-00!))
+		
+		If ([OrdersFabricXRef]OrdType="Trim")
+			OBJECT SET VISIBLE(*;"xDiv";Not(vfShow))
+			vfShow:=True
+		Else 
+			OBJECT SET VISIBLE(*;"xDiv";False)
+		End if 
+		
+		If ([OrdersFabricXRef]FabricName="")
+			vtFullName:=[FabricOrders]ItemName
+		Else 
+			QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+			vtFullName:=[OrdersFabricXRef]FabricName+"  -  "+[OrdersFabricXRef]FiberContent+" - "+[OrdersFabricXRef]Treatment
+			If ([FabricLibrary]SecondaryFabric#"")
+				vtFullName:=vtFullName+Char(13)+"COMPOUND: "+[FabricLibrary]SecondaryFabric+" - "+[FabricLibrary]SecondaryContent
+			End if 
+			UNLOAD RECORD([FabricLibrary])
+		End if 
+		
+		If ([FabricOrders]VendorName#"")
+			vtVendor:=[FabricOrders]VendorName
+		Else 
+			vtVendor:=[OrdersFabricXRef]FabSupplier
+		End if 
+	: (Form event=On Printing Footer)
+		OBJECT SET VISIBLE(*;"xDivLine";Selected record number([CS_Lines])=Records in selection([CS_Lines]))
+End case 

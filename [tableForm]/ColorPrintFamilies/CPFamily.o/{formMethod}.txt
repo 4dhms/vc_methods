@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asFamilies;2)
+		asFamilies{1}:="Solid"
+		asFamilies{2}:="Print"
+		asFamilies:=vlRouter
+		vsSubhead:=Uppercase(asFamilies{asFamilies}+" Families")
+End case 

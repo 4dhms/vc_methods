@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($reportBLOB)
+C_TIME($docref)
+C_LONGINT($offset;cb11;cb12;cbDay1;$i)
+
+ARRAY LONGINT(alSaveSpec;0)
+
+LogOn_ArrayInit 
+vsQStyle:=""
+SET BLOB SIZE($reportBLOB;0)
+
+$docref:=Open document("")
+
+If (ok=1)
+	CLOSE DOCUMENT($docref)
+	DOCUMENT TO BLOB(Document;$reportBLOB)
+	
+	BLOB TO VARIABLE($reportBLOB;afProcess;$offset)
+	BLOB TO VARIABLE($reportBLOB;alCount;$offset)
+	BLOB TO VARIABLE($reportBLOB;asStyleNumbers;$offset)
+	BLOB TO VARIABLE($reportBLOB;asDivisions;$offset)
+	BLOB TO VARIABLE($reportBLOB;asSeasonName;$offset)
+	BLOB TO VARIABLE($reportBLOB;asGroups;$offset)
+	BLOB TO VARIABLE($reportBLOB;asXSizeRange;$offset)
+	BLOB TO VARIABLE($reportBLOB;asProcessDate;$offset)
+	BLOB TO VARIABLE($reportBLOB;asSort;$offset)
+	BLOB TO VARIABLE($reportBLOB;asColors;$offset)
+	BLOB TO VARIABLE($reportBLOB;arSalePrice;$offset)
+	BLOB TO VARIABLE($reportBLOB;atChange;$offset)
+	BLOB TO VARIABLE($reportBLOB;adActionDate;$offset)
+	BLOB TO VARIABLE($reportBLOB;asColorCodes;$offset)
+	BLOB TO VARIABLE($reportBLOB;asUsers;$offset)
+	  //BLOB TO VARIABLE($reportBLOB;$test;$offset)
+	BLOB TO VARIABLE($reportBLOB;alSaveSpec;$offset)
+	
+	<>asStartMonth:=alSaveSpec{1}
+	<>asStartDay:=alSaveSpec{2}
+	<>asStartYear:=alSaveSpec{3}
+	<>asEndMonth:=alSaveSpec{4}
+	<>asEndDay:=alSaveSpec{5}
+	<>asEndYear:=alSaveSpec{6}
+	cb11:=alSaveSpec{7}
+	cb12:=alSaveSpec{8}
+	cbDay1:=alSaveSpec{9}
+	
+	ARRAY TEXT(asSort;0)
+	ARRAY TEXT(asSort;Size of array(asStyleNumbers))
+	$i:=1
+	For ($i;1;Size of array(asSort))
+		asSort{$i}:=asColorCodes{$i}[[1]]
+	End for 
+	
+	LISTBOX SORT COLUMNS(afLogOn;2;>;13;>;3;>;8;>)
+	LogOn_Bars 
+	vsRecInSelection:=String(Size of array(asStyleNumbers))+" items"
+	
+	LISTBOX SELECT ROW(afLogOn;500)
+	
+End if 
+
+

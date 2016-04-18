@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($fieldA;$fieldB;$headerA;$headerB)
+
+$i:=1
+For ($i;1;10)
+	If (11-$i>[SpecFactory]SampleCol)
+		If ($i=1)
+		Else 
+			$headerA:=Get pointer("vsSize"+String(11-($i+1)))
+			$headerB:=Get pointer("vsSize"+String(11-$i))
+			Case of 
+				: ($headerA->="") & ($headerB->#"")
+					$fieldA:=Field(88;36-$i)
+					$fieldB:=Field(88;34-$i)
+					$fieldA->:=$fieldB->
+				: ($headerA->#"") & ($headerB->="")
+					  //skip this one
+				Else 
+					$fieldA:=Field(88;36-$i)
+					$fieldB:=Field(88;35-$i)
+					$fieldA->:=$fieldB->
+			End case 
+		End if 
+	End if 
+End for 

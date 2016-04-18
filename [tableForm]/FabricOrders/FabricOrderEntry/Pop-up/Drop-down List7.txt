@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asPOv{asPOv}="UN-cancelled")
+		WinChoice ("Do you want to UNCANCEL this order?")
+		If (ok=1)
+			[FabricOrders]Void:=False
+			[FabricOrders]ReviseNumber:=[FabricOrders]ReviseNumber+1
+			SAVE RECORD([FabricOrders])
+			ACCEPT
+			Rev_FabricOrderChange ("UN-cancelled")
+		End if 
+	: (asPOv{asPOv}="Cancelled")
+		WinChoice ("Are you sure you want to CANCEL this order?")
+		If (ok=1)
+			[FabricOrders]Void:=True
+			SAVE RECORD([FabricOrders])
+			ACCEPT
+		End if 
+	: (asPOv{asPOv}="Edit")
+		FabPO_Enterable (True)
+		  //  Rev_FabricOrderChange ("Order edited")
+		
+	: (asPOv{asPOv}="New Revision")
+		Rev_FabricOrderChange ("New Revision")
+		WinChoice ("Are you sure you want to REVISE this order?")
+		If (ok=1)
+			[FabricOrders]POSent:=False
+			[FabricOrders]ReviseNumber:=[FabricOrders]ReviseNumber+1
+			[FabricOrders]Void:=False
+			SAVE RECORD([FabricOrders])
+			
+			ARRAY TEXT(asPOv;1)
+			asPOv{1}:="Revision "+String([FabricOrders]ReviseNumber)
+			asPOv:=1
+			
+			FabPO_Enterable (True)
+		End if 
+		  // Rev_FabricOrderChange ("Changed")
+	Else 
+		  //◊Enter:=False
+		  //[Orders]RevisionKey:=[Orders]OrderNum+(0.01*(asPOv-1))
+		  //Revise_FlagFields (False)
+End case 

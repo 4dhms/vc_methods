@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+
+Case of 
+	: (Position("0";vsSuffix)>0)
+		WinPrompt ("Suffix can not contain a zero.")
+	: (Num(vsSuffix)>0)
+		WinPrompt ("Suffix can not contain a number.")
+	: (Length(vsDesignNumber+vsSuffix)>14)
+		WinPrompt ("Design Number can not exceed 14 characters.")
+	Else 
+		If (vsSuffix#"")
+			$c:=Find in array(asList2;vsSuffix)
+			If ($c>1)
+				vtHistory:=asList2{$c}+" = "+asList1{$c}
+			End if 
+			$c:=Find in array(asList4;vsSuffix)
+			If ($c>1)
+				vtHistory:=asList4{$c}+" = "+asList3{$c}
+			End if 
+			$c:=Find in array(asList6;vsSuffix)
+			If ($c>1)
+				vtHistory:=asList6{$c}+" = "+asList5{$c}
+			End if 
+			$c:=Find in array(asList8;vsSuffix)
+			If ($c>1)
+				vtHistory:=asList8{$c}+" = "+asList7{$c}
+			End if 
+		End if 
+		
+		vsDesignNumber:=vsDesignNumber+vsSuffix
+		vsDivision:=asDivisions{asDivisions}
+		Case of 
+			: (Size of array(<>asCategory)<1)
+				vsCategory:=""
+			: (<>asCategory>1)  //new design
+				vsCategory:=<>asCategory{<>asCategory}
+		End case 
+		
+		ARRAY TEXT(asDivisions;0)
+		ARRAY TEXT(<>asCategory;0)
+		ACCEPT
+End case 

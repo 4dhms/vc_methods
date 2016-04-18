@@ -1,0 +1,79 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($revKey)
+C_DATE($date)
+C_LONGINT($batch)
+
+If ($2#$3) | ($3="@deleted")
+	If ($1#"@Status date@")
+		$revKey:=$6+(<>vlRevisionNumber/100)
+		CREATE RECORD([Changes])
+		[Changes]RevisionNumber:=<>vlRevisionNumber
+		[Changes]RevisionKey:=$revKey
+		[Changes]OrderNumber:=$6
+		[Changes]RevDate:=Current date(*)
+		[Changes]RevTime:=Current time(*)
+		[Changes]Writer:=Current user
+		[Changes]ChangeKey:=Sequence number([Changes])
+		[Changes]FieldName:=$1
+		[Changes]OldData:=$2
+		If (Position("Order Number";$1)>0)
+			[Changes]NewChange:="Component added on the order level"
+		Else 
+			[Changes]NewChange:=$3
+		End if 
+		
+		If ($2="")
+			[Changes]Tag:="Added"
+		Else 
+			[Changes]Tag:="Changed"
+			
+		End if 
+		SAVE RECORD([Changes])
+	End if 
+	  //batch history recording -- royal pain in the ass
+	vtOldData:=$3
+	vtNewData:=$2
+	Case of 
+		: (<>vlOrderNumber>0) & ($3="@deleted")
+			  //Rev_LogChange ($1;"Component deleted";◊vlOrderNumber;"Component deleted")
+			$batch:=New process("Comp_BatchHistory";0;"BatchHistory";[Orders]SGPO;$1;$2;$3;"Component deleted")
+		: (<>vlOrderNumber>0)
+			Rev_LogChange ($1;"Component changed";<>vlOrderNumber)
+			$batch:=New process("Comp_BatchHistory";0;"BatchHistory";[Orders]SGPO;$1;$2;$3;"Component changed")
+		Else 
+			$batch:=New process("Comp_BatchHistory";0;"BatchHistory";String([Samples]SampleNumber);$1;$2;$3;"Component changed")
+	End case 
+	
+	If ($3="@deleted")
+		If ($6<0)
+			DELETE RECORD([CS_Lines])
+		End if 
+	Else 
+		Case of 
+			: (Position("quantity";$1)>0) | (Position("order number";$1)>0)
+				$4->:=Num($3)
+			: (Position("date";$1)>0)
+				$date:=Date($3)
+				$4->:=$date
+			Else 
+				$4->:=$3
+		End case 
+		
+		If (Position("status date";$1)>0)
+			QUERY([CS_Status];[CS_Status]CS_LineKey=[CS_Lines]CS_LineKey)
+			QUERY SELECTION([CS_Status];[CS_Lines]CurrentStatusDate=[CS_Lines]CurrentStatusDate;*)
+			QUERY SELECTION([CS_Status]; & ;[CS_Status]ActionStatus=[CS_Lines]CurrentStatus)
+			If (Records in selection([CS_Status])=0)
+				CREATE RECORD([CS_Status])
+				[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+			End if 
+			[CS_Status]ActionDate:=[CS_Lines]CurrentStatusDate
+			[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+			[CS_Status]ActionStatus:=[CS_Lines]CurrentStatus
+			[CS_Status]CS_Sort:=[CS_Lines]CS_Sort
+			[CS_Status]OKby:=Current user
+			SAVE RECORD([CS_Status])
+		End if 
+		SAVE RECORD($5->)
+	End if 
+End if 

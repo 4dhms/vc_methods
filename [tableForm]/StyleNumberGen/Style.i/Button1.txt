@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([StyleNumberGen])
+OBJECT SET ENTERABLE([StyleNumberGen]DesignNumber;False)
+If (Records in selection([StyleNumberGen])=1)
+	ALL RECORDS([StyleNumberGen])
+End if 

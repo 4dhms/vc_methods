@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>SalesPrcID>0) | (<>SamGarPrcID>0)
+	OBJECT SET ENABLED(bFrstDes;False)
+	OBJECT SET ENABLED(bPrvDes;False)
+	OBJECT SET ENABLED(bNxtDes;False)
+	OBJECT SET ENABLED(bLstDes;False)
+Else 
+	If (Selected record number([Designs])=1) | (Records in selection([Designs])=1)
+		OBJECT SET ENABLED(bFrstDes;False)
+		OBJECT SET ENABLED(bPrvDes;False)
+	Else 
+		OBJECT SET ENABLED(bFrstDes;True)
+		OBJECT SET ENABLED(bPrvDes;True)
+	End if 
+	
+	If (Selected record number([Designs])=Records in selection([Designs])) | (Records in selection([Designs])=1)
+		OBJECT SET ENABLED(bNxtDes;False)
+		OBJECT SET ENABLED(bLstDes;False)
+	Else 
+		OBJECT SET ENABLED(bNxtDes;True)
+		OBJECT SET ENABLED(bLstDes;True)
+	End if 
+End if 

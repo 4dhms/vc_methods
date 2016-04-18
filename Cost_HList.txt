@@ -1,0 +1,52 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($a;$b;$hList;$grandParentRef;$parentRef)
+C_TEXT($orderNumber)
+OBJECT SET VISIBLE(hlSheets;True)
+  // depreciated DISABLE BUTTON(bNameOk)
+OBJECT SET ENABLED(bNameOk;False)
+
+$a:=1
+FIRST RECORD([Costing])
+hlSheets:=New list
+
+For ($a;1;Records in selection([Costing]))
+	$grandParentRef:=$a
+	
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	QUERY SELECTION([CostSheets];[CostSheets]DCS=<>vfDCS)
+	If (Records in selection([CostSheets])>0)
+		
+		ORDER BY([CostSheets];[CostSheets]SheetID;<)
+		SET LIST PROPERTIES(hlSheets;0;0;15;0)
+		
+		If (Records in selection([CostSheets])>0)
+			$b:=1
+			$hList:=New list
+			SET LIST PROPERTIES($hList;1;2;12;1)
+			
+			For ($b;1;Records in selection([CostSheets]))
+				$parentRef:=[CostSheets]SheetID
+				APPEND TO LIST($hList;[CostSheets]SheetName;Record number([CostSheets]))
+				SET LIST ITEM PROPERTIES($hList;0;False;0;0)
+				NEXT RECORD([CostSheets])
+			End for 
+		End if 
+		
+		Case of 
+			: ([Costing]OrderNumber<-1000)
+				$orderNumber:=[Costing]DesignNumber+"  (SG"+String([Costing]OrderNumber)+")"
+			: ([Costing]OrderNumber>0)
+				$orderNumber:=[Costing]DesignNumber+"  ("+String([Costing]OrderNumber)+")"
+			Else 
+				$orderNumber:="Favorites"
+		End case 
+		
+		$orderNumber:=$orderNumber+"  "+[CostSheets]Details
+		APPEND TO LIST(hlSheets;$orderNumber;$a;$hList;$hList#0)
+		SET LIST ITEM PROPERTIES(hlSheets;0;False;1;0)
+	End if 
+	NEXT RECORD([Costing])
+End for 
+
+
+

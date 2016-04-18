@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vtItemName="Air") | (vtItemName="Boat")
+		vsColHead1:=""
+		vsColHead2:=""
+		vsColHead3:="Freight"
+		OBJECT SET VISIBLE(vrCCostCount;False)
+		OBJECT SET VISIBLE(vrCCostPrice;False)
+		OBJECT SET VISIBLE(vrCCostTotal;True)
+		OBJECT SET VISIBLE(*;"xPC";False)
+		GOTO OBJECT(vrCCostTotal)
+	: (vtItemName="Duty@")
+		vsColHead1:=""
+		vsColHead2:="Duty"
+		vsColHead3:=""
+		OBJECT SET VISIBLE(vrCCostCount;False)
+		OBJECT SET VISIBLE(vrCCostPrice;True)
+		OBJECT SET VISIBLE(vrCCostTotal;False)
+		OBJECT SET VISIBLE(vrCCostDuty;False)
+		OBJECT SET VISIBLE(cbDuty;False)
+		OBJECT SET VISIBLE(*;"xPC";True)
+		GOTO OBJECT(vrCCostPrice)
+	: (vtItemName="Self")
+		vsColHead1:="Yards"
+		vsColHead2:="Price"
+		vsColHead3:="Total"
+		OBJECT SET VISIBLE(vrCCostCount;True)
+		OBJECT SET VISIBLE(vrCCostPrice;True)
+		OBJECT SET VISIBLE(vrCCostTotal;True)
+		OBJECT SET VISIBLE(vrCCostDuty;False)
+		OBJECT SET VISIBLE(cbDuty;True)
+		OBJECT SET VISIBLE(*;"xPC";False)
+		GOTO OBJECT(vrCCostCount)
+	Else 
+		OBJECT SET VISIBLE(vrCCostCount;True)
+		OBJECT SET VISIBLE(vrCCostPrice;True)
+		OBJECT SET VISIBLE(vrCCostTotal;True)
+		OBJECT SET VISIBLE(cbDuty;True)
+		OBJECT SET VISIBLE(*;"xPC";False)
+		vsColHead1:="Units"
+		vsColHead2:="Price"
+		vsColHead3:="Total"
+		GOTO OBJECT(vrCCostCount)
+End case 

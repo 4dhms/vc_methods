@@ -1,0 +1,90 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($a;$b;$c;$d;$e;$f;$g)
+C_TEXT(vtTitle)
+$a:="N"
+$b:="N"
+$c:="N"
+$d:="N"
+$e:="N"
+$f:="N"
+$g:="N"
+vfInternal:=False
+vfVisible:=False
+vfComponents:=False
+vfStatus:=False
+vfIssues:=False
+vfMini:=False
+vfAll:=False
+
+If ($1=True)
+	If (Substring(vtProdStatGuide;1;1)="Y")
+		vfInternal:=True
+	End if 
+	
+	If (Substring(vtProdStatGuide;2;1)="Y")
+		vfVisible:=True
+	End if 
+	
+	If (Substring(vtProdStatGuide;3;1)="Y")
+		vfComponents:=True
+	End if 
+	
+	If (Substring(vtProdStatGuide;4;1)="Y")
+		vfStatus:=False
+	End if 
+	
+	If (Substring(vtProdStatGuide;5;1)="Y")
+		vfIssues:=False
+	End if 
+	
+	If (Substring(vtProdStatGuide;6;1)="Y")
+		vfAll:=False
+	End if 
+	If (Substring(vtProdStatGuide;7;1)="Y")
+		vfMini:=True
+	End if 
+	vtTitle:=Substring(vtProdStatGuide;Position("_";vtProdStatGuide)+1;999)
+	If (vtTitle="")
+		vtTitle:="HMS Production Status"
+	End if 
+Else 
+	If (cbMini=1)
+		vfMini:=True
+		$g:="Y"
+	Else 
+		vfMini:=False
+	End if 
+	If (cbFactory=1)
+		vfInternal:=False
+	Else 
+		vfInternal:=True
+		$a:="Y"
+	End if 
+	
+	If (cbComments=1)
+		vfVisible:=True
+		$b:="Y"
+	Else 
+		vfVisible:=False
+	End if 
+	
+	If (cbComponents=1)
+		vfComponents:=True
+		$c:="Y"
+		vtTitle:=vtTitle+" including Components"
+		If (cbStatus=1)
+			vfStatus:=True
+			vtTitle:=vtTitle+" (Current)"
+			$d:="Y"
+		Else 
+			vfStatus:=False
+			vtTitle:=vtTitle+" (History)"
+		End if 
+		
+	Else 
+		vfComponents:=False
+	End if 
+	vtProdStatGuide:=$a+$b+$c+$d+$e+$f+$g+"_"+vtTitle
+	
+End if 
+

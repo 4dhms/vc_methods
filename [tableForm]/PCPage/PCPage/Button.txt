@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbUpdate)
+
+SAVE RECORD([PCPage])
+
+If (cbUpdate=1)
+	CP_NumbersUpdate 
+End if 
+
+ACCEPT

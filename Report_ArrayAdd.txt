@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($size)
+C_REAL($netMU;$netNetMU)
+
+$size:=$1
+
+Case of 
+	: ($2=2)
+		asBDDivisions{$size}:=asBDDivisions{$size}
+		alBDQuantity{$size}:=$3
+		arBDNetSales{$size}:=$4
+		arBDNetProfit{$size}:=$5
+		arBDNetNetSales{$size}:=$6
+		arBDNetNetProfit{$size}:=$7
+		
+		$netMU:=Round(($5/$4)*100;1)
+		$netNetMU:=Round(($7/$6)*100;1)
+		
+		arBDAvgNetMarkup{$size}:=$netMU
+		arBDAvgNetNetMarkup{$size}:=$netNetMU
+		arBDSpecialDiscount{$size}:=$4-$6
+	: ($2=3) | ($2=4)
+		alBDQuantity{$size}:=$3
+		arBDNetSales{$size}:=$4
+		arBDNetProfit{$size}:=$5
+		arBDNetNetSales{$size}:=$6
+		arBDNetNetProfit{$size}:=$7
+		
+		$netMU:=Round(($5/$4)*100;1)
+		$netNetMU:=Round(($7/$6)*100;1)
+		
+		arBDAvgNetMarkup{$size}:=$netMU
+		arBDAvgNetNetMarkup{$size}:=$netNetMU
+		arBDSpecialDiscount{$size}:=$4-$6
+	Else 
+		alQuantity{$size}:=$3
+		arNetSales{$size}:=$4
+		arNetProfit{$size}:=$5
+		arNetNetSales{$size}:=$6
+		arNetNetProfit{$size}:=$7
+		
+		$netMU:=Round(($5/$4)*100;1)
+		$netNetMU:=Round(($7/$6)*100;1)
+		
+		arAvgNetMarkup{$size}:=$netMU
+		arAvgNetNetMarkup{$size}:=$netNetMU
+		arSpecialDiscount{$size}:=$4-$6
+End case 

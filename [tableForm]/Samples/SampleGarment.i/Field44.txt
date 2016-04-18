@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]MyFOB=True)
+	WinFind ("Enter FOB:";8)
+	[CostSheets]FOB:=Num(vsRequeststring)
+End if 
+Cost_EntryCalculate 

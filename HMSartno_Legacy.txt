@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([FabricLibrary];[FabricLibrary]ArticleNumber="HMS0@")
+ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)
+FIRST RECORD([FabricLibrary])
+
+$i:=1
+For ($i;1;Records in selection([FabricLibrary]))
+	QUERY([HMSArtNo];[HMSArtNo]HANumber=[FabricLibrary]ArticleNumber)
+	If (Records in selection([HMSArtNo])=0)
+		CREATE RECORD([HMSArtNo])
+		[HMSArtNo]CreateDate:=[FabricLibrary]CreationDate
+		[HMSArtNo]CreatedBy:=[FabricLibrary]CreatedBy
+		[HMSArtNo]HANkey:=Num(StripToNumber ([FabricLibrary]ArticleNumber))
+		[HMSArtNo]HANumber:=[FabricLibrary]ArticleNumber
+		SAVE RECORD([HMSArtNo])
+		[FabricLibrary]HMSANkey:=[HMSArtNo]HANkey
+		[FabricLibrary]HMSANumber:=[HMSArtNo]HANumber
+		[FabricLibrary]HMSANmaster:=True
+		SAVE RECORD([FabricLibrary])
+	End if 
+	NEXT RECORD([FabricLibrary])
+End for 

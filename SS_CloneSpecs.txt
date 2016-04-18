@@ -1,0 +1,141 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($currentNumbers;0)
+C_BOOLEAN($cancel)
+C_TEXT($buttontext)
+
+If (vlCloneRouter=3)
+	Grade_CloneOnly ($1;$2)
+Else 
+	
+	QUERY([SpecFactory];[SpecFactory]SF_KeyNumber=$2)
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	SELECTION TO ARRAY([SpecSheetLines]PartNumber;$currentNumbers)
+	
+	Case of 
+		: (Find in array($currentNumbers;2)>0)
+			vlPartNumber:=3
+			pThree:=1
+		: (Find in array($currentNumbers;1)>0)
+			vlPartNumber:=2
+			pTwo:=1
+		Else 
+			vlPartNumber:=1
+			pOne:=1
+	End case 
+	
+	QUERY([SpecFactory];[SpecFactory]SF_KeyNumber=$1)
+	vlColSlider:=[SpecFactory]SampleCol
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	
+	ARRAY LONGINT($currentNumbers;0)
+	SELECTION TO ARRAY([SpecSheetLines]PartNumber;$currentNumbers)
+	
+	Case of 
+		: (Find in array($currentNumbers;3)>0)
+			ARRAY TEXT(asNames;3)
+			ARRAY TEXT(asKnitWoven;3)
+			asNames{1}:=[SpecFactory]Part1
+			asNames{2}:=[SpecFactory]Part2
+			asNames{3}:=[SpecFactory]Part3
+			asKnitWoven{1}:=[SpecFactory]KnitWoven1
+			asKnitWoven{2}:=[SpecFactory]KnitWoven2
+			asKnitWoven{3}:=[SpecFactory]KnitWoven3
+		: (Find in array($currentNumbers;2)>0)
+			ARRAY TEXT(asNames;2)
+			ARRAY TEXT(asKnitWoven;2)
+			asNames{1}:=[SpecFactory]Part1
+			asNames{2}:=[SpecFactory]Part2
+			asKnitWoven{1}:=[SpecFactory]KnitWoven1
+			asKnitWoven{2}:=[SpecFactory]KnitWoven2
+		Else 
+			ARRAY TEXT(asNames;1)
+			ARRAY TEXT(asKnitWoven;1)
+			asNames{1}:=[SpecFactory]Part1
+			asKnitWoven{1}:=[SpecFactory]KnitWoven1
+	End case 
+	
+	If (vlAddPartStatus=1) | (vlPartNumber>1)
+		$buttonText:="Cancel"
+	Else 
+		$buttonText:="All"
+	End if 
+	
+	Case of 
+		: (Size of array(asNames)=3)
+			WinChoice ("Which do you want to copy?";asNames{1};asNames{2};asNames{3};$buttonText)
+			Case of 
+				: (bChoice2=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=2)
+					asNames:=2
+				: (bChoice3=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=3)
+					asNames:=3
+				: (ok=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=1)
+					asNames:=1
+				Else 
+					If (vlAddPartStatus=1) | (vlPartNumber>1)
+						$cancel:=True
+					Else 
+						asNames:=0
+					End if 
+			End case 
+		: (Size of array(asNames)=2) & (vlPartNumber<2)
+			WinChoice ("Which do you want to copy?";asNames{1};asNames{2};"All";"Cancel")
+			Case of 
+				: (bChoice3=1)
+					  //keep full set
+				: (bChoice2=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=2)
+					asNames:=2
+				: (ok=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=1)
+					asNames:=1
+				Else 
+					If (vlAddPartStatus=1)
+						$cancel:=True
+					Else 
+						asNames:=0
+					End if 
+			End case 
+		: (Size of array(asNames)=2)
+			WinChoice ("Which do you want to copy?";asNames{1};asNames{2};"Cancel")
+			Case of 
+				: (bChoice2=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=2)
+					asNames:=2
+				: (ok=1)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=1)
+					asNames:=1
+				Else 
+					If (vlAddPartStatus=1)
+						$cancel:=True
+					Else 
+						asNames:=0
+					End if 
+			End case 
+	End case 
+	
+	If (Not($cancel))
+		WinChoice ("Do you want to copy the entire history?";"No";"Yes")
+		If (ok=1)
+			vfCloneHistory:=False
+			SS_CloneSpecsExec ($1;$2)
+		Else 
+			vfCloneHistory:=True
+			OBJECT SET ENABLED(bHistory;True)
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+			SS_CloneSpecsExec ($1;$2)
+			SS_CloneColHead ($1;$2)
+			SS_GetArrays 
+		End if 
+	Else 
+		USE SET("ActiveLines")
+		USE SET("ThisSpecƒSheet")
+		pOne:=1
+		SS_GetPart 
+	End if 
+End if 
+
+$0:=$cancel
+

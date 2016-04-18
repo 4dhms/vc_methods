@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+
+If (Form event=On Data Change)
+	QUERY([HMSArtNoRelated];[HMSArtNoRelated]ArticleNumber=vsArt;*)
+	QUERY([HMSArtNoRelated]; | ;[HMSArtNoRelated]ArticleNumber=vsArt+" ")
+	
+	If (Records in selection([HMSArtNoRelated])=1)
+		QUERY([HMSArtNo];[HMSArtNo]HANkey=[HMSArtNoRelated]HANkey)
+		
+		WinPrompt (vsArt+" has been updated to "+[HMSArtNo]HANumber+".")
+		vsArt:=[HMSArtNo]HANumber
+		QUERY([FabricLibrary];[FabricLibrary]HMSANkey=[HMSArtNo]HANkey)
+		vtFabric:=[FabricLibrary]FabricName
+		vsFiber:=[FabricLibrary]FiberContent
+		vtSupplier:=[FabricLibrary]Supplier
+	Else 
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+		If (Records in selection([FabricLibrary])=0) & ([Orders]OrderEntryDate>!2011-05-26!)
+			WinPrompt ("Article number "+vsArt+" does not exist in the Fabric Library.")
+			vsArt:=""
+		Else 
+			If ([FabricLibrary]HMSANkey=0)
+				Case of 
+					: (<>vlOrderNumber>0) & ([FabricLibrary]Restricted#"") & ([FabricLibrary]Restricted#[Orders]OrderDivision)
+						WinPrompt ("Article # "+vsArt+Char(13)+"is restricted to division"+Char(13)+[FabricLibrary]Restricted)
+						vsArt:=""
+						vsArt:=""
+						vtFabric:=""
+						vsFiber:=""
+						vtSupplier:=""
+						vsTreatment:=""
+						vtGauge:=""
+						vtYarnSize:=""
+					: (<>vlOrderNumber<0) & ([FabricLibrary]Restricted#"") & ([FabricLibrary]Restricted#[Samples]SampleDivision)
+						WinPrompt ("Article # "+vsArt+Char(13)+"is restricted to division"+Char(13)+[FabricLibrary]Restricted)
+						vsArt:=""
+						vtFabric:=""
+						vsFiber:=""
+						vtSupplier:=""
+						vsTreatment:=""
+						vtGauge:=""
+						vtYarnSize:=""
+						
+					: (vsArt="TBD@")
+						  //do nothing
+					Else 
+						vtFabric:=[FabricLibrary]FabricName
+						vsFiber:=[FabricLibrary]FiberContent
+						vtSupplier:=[FabricLibrary]Supplier
+				End case 
+			End if 
+		End if 
+	End if 
+End if 

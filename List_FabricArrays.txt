@@ -1,0 +1,195 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY TEXT(<>atFabricList;0)
+ARRAY TEXT(<>atFiberList;0)
+ARRAY TEXT(<>atTreatmentList;0)
+ARRAY TEXT(<>atSupplierList;0)
+ARRAY TEXT(<>atPartList;0)
+ARRAY TEXT(<>atCompNote;0)
+ARRAY TEXT(<>atGauge;0)
+ARRAY TEXT(<>atYarnSize;0)
+ARRAY TEXT(<>asCompList;0)
+ARRAY TEXT(<>asCompType;0)
+ARRAY TEXT(<>asCompSource;0)
+
+ARRAY TEXT(<>atLining;0)
+ARRAY TEXT(<>atLiningColor;0)
+ARRAY TEXT(<>atThreadColor;0)
+ARRAY TEXT(<>atZipper;0)
+ARRAY TEXT(<>atShoulderPad;0)
+ARRAY TEXT(<>atButton;0)
+ARRAY TEXT(<>atBuckles;0)
+ARRAY TEXT(<>atSnaps;0)
+ARRAY TEXT(<>atHookEyes;0)
+ARRAY TEXT(<>atBeadComponent;0)
+
+
+QUERY([Lists];[Lists]UserName=Current user)
+QUERY SELECTION([Lists];[Lists]ListItem#"")
+CREATE SET([Lists];"UserList")
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="comp name")
+SELECTION TO ARRAY([Lists]ListItem;<>asCompList)
+If (Size of array(<>asCompList)=0)
+	ARRAY TEXT(<>asCompList;14)
+	<>asCompList{1}:="Lining"
+	<>asCompList{2}:="Lining Color"
+	<>asCompList{3}:="Thread Color"
+	<>asCompList{4}:="Zipper (a)"
+	<>asCompList{5}:="Zipper (b)"
+	<>asCompList{6}:="Soulder Pads"
+	<>asCompList{7}:="Buttons (a)"
+	<>asCompList{8}:="Buttons (b)"
+	<>asCompList{9}:="Buckles"
+	<>asCompList{10}:="Snaps"
+	<>asCompList{11}:="Hooks & Eyes"
+	<>asCompList{12}:="Embroidery Pattern"
+	<>asCompList{13}:="Emtroidery Thread Color"
+	<>asCompList{14}:="Bead Components"
+	$i:=1
+	For ($i;1;Size of array(<>asCompList))
+		CREATE RECORD([Lists])
+		[Lists]UserName:=Current user
+		[Lists]ListName:="Comp Name"
+		[Lists]ListItem:=<>asCompList{$i}
+		SAVE RECORD([Lists])
+	End for 
+End if 
+SORT ARRAY(<>asCompList;>)
+INSERT IN ARRAY(<>asCompList;1;1)
+<>asCompList{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="comp type")
+SELECTION TO ARRAY([Lists]ListItem;<>asCompType)
+SORT ARRAY(<>asCompType;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="comp note")
+SELECTION TO ARRAY([Lists]ListItem;<>atCompNote)
+SORT ARRAY(<>atCompNote;>)
+INSERT IN ARRAY(<>atCompNote;1;1)
+<>atCompNote{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="comp source")
+SELECTION TO ARRAY([Lists]ListItem;<>asCompSource)
+SORT ARRAY(<>asCompSource;>)
+INSERT IN ARRAY(<>asCompSource;1;1)
+<>asCompSource{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Fabric")
+SELECTION TO ARRAY([Lists]ListItem;<>atFabricList)
+SORT ARRAY(<>atFabricList;>)
+INSERT IN ARRAY(<>atFabricList;1;1)
+<>atFabricList{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Fiber")
+SELECTION TO ARRAY([Lists]ListItem;<>atFiberList)
+SORT ARRAY(<>atFiberList;>)
+INSERT IN ARRAY(<>atFiberList;1;1)
+<>atFiberList{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Treatment")
+SELECTION TO ARRAY([Lists]ListItem;<>atTreatmentList)
+SORT ARRAY(<>atTreatmentList;>)
+INSERT IN ARRAY(<>atTreatmentList;1;1)
+<>atTreatmentList{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Gauge")
+SELECTION TO ARRAY([Lists]ListItem;<>atGauge)
+SORT ARRAY(<>atGauge;>)
+INSERT IN ARRAY(<>atGauge;1;1)
+<>atGauge{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Yarn Size")
+SELECTION TO ARRAY([Lists]ListItem;<>atYarnSize)
+SORT ARRAY(<>atYarnSize;>)
+INSERT IN ARRAY(<>atYarnSize;1;1)
+<>atYarnSize{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Suppliers")
+SELECTION TO ARRAY([Lists]ListItem;<>atSupplierList)
+SORT ARRAY(<>atSupplierList;>)
+INSERT IN ARRAY(<>atSupplierList;1;1)
+<>atSupplierList{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Part")
+SELECTION TO ARRAY([Lists]ListItem;<>atPartList)
+SORT ARRAY(<>atPartList;>)
+INSERT IN ARRAY(<>atPartList;1;1)
+<>atPartList{1}:="Add/edit list"
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Lining")
+SELECTION TO ARRAY([Lists]ListItem;<>atLining)
+SORT ARRAY(<>atLining;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Lining Color")
+SELECTION TO ARRAY([Lists]ListItem;<>atLiningColor)
+SORT ARRAY(<>atLiningColor;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Thread Color")
+SELECTION TO ARRAY([Lists]ListItem;<>atThreadColor)
+SORT ARRAY(<>atThreadColor;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Zipper")
+SELECTION TO ARRAY([Lists]ListItem;<>atZipper)
+SORT ARRAY(<>atZipper;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Shoulder Pad")
+SELECTION TO ARRAY([Lists]ListItem;<>atShoulderPad)
+SORT ARRAY(<>atShoulderPad;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Button")
+SELECTION TO ARRAY([Lists]ListItem;<>atButton)
+SORT ARRAY(<>atButton;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Buckles")
+SELECTION TO ARRAY([Lists]ListItem;<>atBuckles)
+SORT ARRAY(<>atBuckles;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Snaps")
+SELECTION TO ARRAY([Lists]ListItem;<>atSnaps)
+SORT ARRAY(<>atSnaps;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Hooks & Eyes")
+SELECTION TO ARRAY([Lists]ListItem;<>atHookEyes)
+SORT ARRAY(<>atHookEyes;>)
+
+USE SET("UserList")
+QUERY SELECTION([Lists];[Lists]ListName="Bead Components")
+SELECTION TO ARRAY([Lists]ListItem;<>atBeadComponent)
+SORT ARRAY(<>atBeadComponent;>)
+
+ARRAY TEXT(<>asCompStatus;13)
+<>asCompStatus{1}:="Received"
+<>asCompStatus{2}:="Received Lab Dip"
+<>asCompStatus{3}:="Received Bulk Swatch"
+<>asCompStatus{4}:="Rejected"
+<>asCompStatus{5}:="Rejected"
+<>asCompStatus{6}:="Approved"
+<>asCompStatus{7}:="Approved as Sample"
+<>asCompStatus{8}:="Approved Lab Dip"
+<>asCompStatus{9}:="Approved Bulk"
+<>asCompStatus{10}:="Sent to Factory"
+<>asCompStatus{11}:="Sent to Customer"
+<>asCompStatus{12}:="Request Resubmit"
+<>asCompStatus{13}:="Cancelled"

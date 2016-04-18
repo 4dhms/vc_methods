@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SLR_LoadSearch 
+SLR_Range 
+asNames:=1

@@ -1,0 +1,76 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($ordernumber;$line;$1)
+
+$line:=asOrderNumbers
+  //vsCPNumber:=$2
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$1)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+If ($1<0)
+	$orderNumber:=$1
+	QUERY([Samples];[Samples]SampleNumber=Abs($orderNumber))
+	
+	If ($line=0)
+		APPEND TO ARRAY(asOrderNumbers;"SG"+String(Abs($1)))
+		APPEND TO ARRAY(adPODate;[Samples]SampleOrderDate)
+		APPEND TO ARRAY(asStyleNumbers;[Samples]StyleNum)
+		APPEND TO ARRAY(asDesignNumbers;[Samples]DesignNum)
+		APPEND TO ARRAY(asTypeList;[CP_OrderXRef]CPType)
+		APPEND TO ARRAY(asXFactory;[Samples]SamGarFactry)
+		  //APPEND TO ARRAY(asTypeLists;vsCPNumber)
+		  //APPEND TO ARRAY(asTypeLists;"Self")
+	Else 
+		asOrderNumbers{$line}:="SG"+String(Abs($1))
+		adPODate{$line}:=[Samples]SampleOrderDate
+		asStyleNumbers{$line}:=[Samples]StyleNum
+		asDesignNumbers{$line}:=[Samples]DesignNum
+		asTypeList{$line}:=[OrdersFabricXRef]OrdType
+		asXFactory{$line}:=[Samples]SamGarFactry
+		  //asTypeLists{$line}:=vsCPNumber
+		  //asTypeList{$line}:="Self"
+	End if 
+Else 
+	QUERY([Orders];[Orders]OrderNum=$1)
+	
+	If ($line=0)
+		APPEND TO ARRAY(asOrderNumbers;"PO"+String(Abs($1)))
+		APPEND TO ARRAY(adPODate;[Orders]OrderEntryDate)
+		APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+		APPEND TO ARRAY(asDesignNumbers;[Orders]DesignNumber)
+		APPEND TO ARRAY(asTypeList;[CP_OrderXRef]CPType)
+		APPEND TO ARRAY(asXFactory;[Orders]Factory)
+		  //APPEND TO ARRAY(asTypeLists;vsCPNumber)
+		  //APPEND TO ARRAY(asTypeList;"Self")
+		
+	Else 
+		asOrderNumbers{$line}:="PO"+String(Abs($1))
+		adPODate{$line}:=[Orders]OrderEntryDate
+		asStyleNumbers{$line}:=[Orders]StyleNumber
+		asDesignNumbers{$line}:=[Orders]DesignNumber
+		asTypeList{$line}:=vsPart3
+		asXFactory{$line}:=[Orders]Factory
+		  //asTypeLists{$line}:=vsCPNumber
+		  //asTypeList{$line}:="Self"
+	End if 
+End if 
+
+If ($line=0)
+	If ([OrdersFabricXRef]NewtoPO)
+		APPEND TO ARRAY(alStyleFab;1)
+		APPEND TO ARRAY(alColorChange;16711690)
+	Else 
+		APPEND TO ARRAY(alStyleFab;0)
+		APPEND TO ARRAY(alColorChange;0)
+	End if 
+Else 
+	If ([OrdersFabricXRef]NewtoPO)
+		alStyleFab{$line}:=1
+		alColorChange{$line}:=16711690
+	Else 
+		alStyleFab{$line}:=0
+		alColorChange{$line}:=0
+	End if 
+End if 
+
+UNLOAD RECORD([OrdersFabricXRef])
+
+

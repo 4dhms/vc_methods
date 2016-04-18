@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($move)
+C_LONGINT($target)
+C_LONGINT($moveKey)
+C_BOOLEAN($penultimate)
+
+Case of 
+	: (Form event=On Drop)
+		$target:=Drop position
+		Case of 
+			: ($target=Size of array(asList1)) & (asList1>0)
+				WinChoice ("Place line at end of list? Or next to last?";"End";"Penultimate")
+				If (ok=1)
+					$target:=Size of array(asList1)+1
+					$penultimate:=False
+				Else 
+					$target:=Size of array(asList1)-1
+					$penultimate:=True
+				End if 
+			: ($target<1)
+				$target:=Size of array(asList1)
+			: ($target=Size of array(asList1)) & ($target>1)
+				$target:=$target-1
+		End case 
+		
+		If (asList1>0)
+			$move:=asList1{asList1}
+			$movekey:=alItemNumber{asList1}
+			DELETE FROM ARRAY(asList1;asList1;1)
+			DELETE FROM ARRAY(alItemNumber;asList1;1)
+			If ($target>Size of array(asList1))
+				APPEND TO ARRAY(asList1;$move)
+				APPEND TO ARRAY(alItemNumber;$moveKey)
+			Else 
+				INSERT IN ARRAY(asList1;$target;1)
+				INSERT IN ARRAY(alItemNumber;$target;1)
+				asList1{$target}:=$move
+				alItemNumber{$target}:=$moveKey
+			End if 
+		Else 
+			$move:=asSpareParts{asSpareParts}
+			INSERT IN ARRAY(asList1;$target;1)
+			INSERT IN ARRAY(alItemNumber;$target;1)
+			alItemNumber{$target}:=-1
+			asList1{$target}:=$move
+			DELETE FROM ARRAY(asSpareParts;asSpareParts;1)
+		End if 
+End case 
+asList1:=0

@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue;$clear)
+C_POINTER($sizeptr)
+C_LONGINT($i)
+
+vlOldSampleCol:=[SpecFactory]SampleCol
+
+If (Shift down) & (vlColSlider=0)
+Else 
+	If (vlColSlider>0)
+		$sizeptr:=Get pointer("vsSize"+String(vlColSlider))
+		If ($sizeptr->="")
+			WinPrompt ("That column has no size.")
+			$continue:=False
+			vlColSlider:=vlOldSampleCol
+		Else 
+			If (vlOldSampleCol>0)
+				WinChoice ("Are you sure you want to"+Char(13)+"change the sample size?")
+				If (ok=1)
+					$continue:=True
+				End if 
+			Else 
+				$continue:=True
+			End if 
+		End if 
+		$continue:=True
+	End if 
+End if 
+
+
+If ($continue)
+	WinChoice ("Do you want to clear non-sample grading?")
+	If (ok=1)
+		$clear:=True
+	End if 
+	[SpecFactory]SampleCol:=vlColSlider
+	SAVE RECORD([SpecFactory])
+	$i:=1
+	FIRST RECORD([Sizes])
+	For ($i;1;Records in selection([Sizes]))
+		If ($clear)
+			[Sizes]Size1:=""
+			[Sizes]Size2:=""
+			[Sizes]Size3:=""
+			[Sizes]Size4:=""
+			[Sizes]Size5:=""
+			[Sizes]Size6:=""
+			[Sizes]Size7:=""
+			[Sizes]Size8:=""
+			[Sizes]Size9:=""
+			[Sizes]Size10:=""
+			[Sizes]Size11:=""
+			[Sizes]Size12:=""
+		End if 
+		[Sizes]Changed:=True
+		
+		SS_MovePointer (vlColSlider)
+		SAVE RECORD([Sizes])
+		NEXT RECORD([Sizes])
+	End for 
+	
+	
+Else 
+	vlColSlider:=vlOldSampleCol
+End if 
+

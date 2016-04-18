@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CREATE SET([Orders];"core")
+ARRAY TEXT($styles;0)
+SELECTION TO ARRAY([Orders]StyleNumber;$styles)
+

@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BLOB($app)
+
+QUERY([Changes];[Changes]RevDate=Current date(*))
+QUERY SELECTION([Changes];[Changes]FieldName="Upgrade")
+
+ARRAY TEXT($user;0)
+DISTINCT VALUES([Changes]NewChange;$user)
+
+If (Size of array($user)>0)
+	
+	$i:=1
+	For ($i;1;Size of array($user))
+		EXECUTE ON CLIENT($user{$i};"Update_DownloadZip")
+		  //DELAY PROCESS(Current process;3600)
+	End for 
+End if 

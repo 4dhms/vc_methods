@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([DesignLines];[DesignLines]Stock=True)
+QUERY SELECTION([DesignLines];[DesignLines]InStore=True)
+ORDER BY([DesignLines];[DesignLines]DLCreationDate;<)
+
+$i:=1
+For ($i;1;Records in selection([DesignLines]))
+	
+	  //QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+	  //QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]SoldOut=False)
+	
+	  //ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;<)
+	  //ALERT(String([DesignLines]PageCount)+"  "+String([DesignLineIncluded]PageNumber))
+	
+	QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+	  //QUERY SELECTION([DLPages];[DLPages]Stock=True)
+	ORDER BY([DLPages];[DLPages]PageNumber;<)
+	
+	If ([DesignLines]PageCount#[DLPages]PageNumber)
+		[DesignLines]PageCount:=[DLPages]PageNumber
+		SAVE RECORD([DesignLines])
+	End if 
+	NEXT RECORD([DesignLines])
+End for 
+
+WEB SEND FILE("dllist.html")

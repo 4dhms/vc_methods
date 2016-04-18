@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+ARRAY TEXT(asList3;0)
+ARRAY TEXT(asList4;0)
+ARRAY TEXT(asList5;0)
+ARRAY TEXT(asList6;0)
+ARRAY TEXT(asList7;0)
+ARRAY TEXT(asList8;0)
+
+QUERY([Lists];[Lists]ListName="Sleeves")
+ORDER BY([Lists];[Lists]ListItem;>)
+SELECTION TO ARRAY([Lists]ListItem;asList1)
+SELECTION TO ARRAY([Lists]ArticleNumber;asList2)
+
+QUERY([Lists];[Lists]ListName="Yarn & Fabric")
+ORDER BY([Lists];[Lists]ListItem;>)
+SELECTION TO ARRAY([Lists]ListItem;asList3)
+SELECTION TO ARRAY([Lists]ArticleNumber;asList4)
+
+QUERY([Lists];[Lists]ListName="Stitches")
+ORDER BY([Lists];[Lists]ListItem;>)
+SELECTION TO ARRAY([Lists]ListItem;asList5)
+SELECTION TO ARRAY([Lists]ArticleNumber;asList6)
+
+QUERY([Lists];[Lists]ListName="Misc")
+ORDER BY([Lists];[Lists]ListItem;>)
+SELECTION TO ARRAY([Lists]ListItem;asList7)
+SELECTION TO ARRAY([Lists]ArticleNumber;asList8)
+
+INSERT IN ARRAY(asList1;1;1)
+INSERT IN ARRAY(asList2;1;1)
+INSERT IN ARRAY(asList3;1;1)
+INSERT IN ARRAY(asList4;1;1)
+INSERT IN ARRAY(asList5;1;1)
+INSERT IN ARRAY(asList6;1;1)
+INSERT IN ARRAY(asList7;1;1)
+INSERT IN ARRAY(asList8;1;1)
+
+asList1{1}:="Sleeves"
+asList3{1}:="Yarn & Fabric"
+asList5{1}:="Stitches"
+asList7{1}:="Misc"
+

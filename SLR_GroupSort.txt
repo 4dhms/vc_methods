@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ($1=1)
+		QUERY([SLRReporter];[SLRReporter]Header<-1)
+End case 

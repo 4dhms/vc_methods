@@ -1,0 +1,78 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($ordernumber)
+$orderNumber:=$1
+
+ARRAY LONGINT(alCompOrderNumber;0)
+ARRAY LONGINT(alCompLineKey;0)
+ARRAY LONGINT(alCompDeleted;0)
+ARRAY LONGINT(alCompQty;0)
+ARRAY TEXT(asCompName;0)
+ARRAY TEXT(atCompNote;0)
+ARRAY TEXT(asCompArt;0)
+ARRAY TEXT(asCompSource;0)
+ARRAY TEXT(asCompStatus;0)
+ARRAY DATE(adCompStatusDate;0)
+C_BOOLEAN($alt)
+$alt:=False
+C_LONGINT($c;$i)
+
+Order_SpecVar 
+vfCancel:=False
+CS_QuerySheet ($1)
+vlCSID:=[ComponentSheets]CS_ID
+If (Records in selection([ComponentSheets])>0)
+	QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID)
+	QUERY SELECTION([CS_Lines];[CS_Lines]OrderNumber=0;*)
+	QUERY SELECTION([CS_Lines]; | ;[CS_Lines]OrderNumber=$orderNumber)
+	
+	CS_StripHidden 
+	
+	$c:=Records in selection([CS_Lines])
+	Order_CompArrayInit (0)
+	Order_CompArrayInit ($c)
+	ORDER BY([CS_Lines];[CS_Lines]CS_LineKey;>)
+	FIRST RECORD([CS_Lines])
+	$i:=1
+	
+	For ($i;1;$c)
+		If ($orderNumber<0)
+			$alt:=False
+		Else 
+			QUERY([CS_Tracking];[CS_Tracking]CS_LineKey=[CS_Lines]CS_LineKey)
+			QUERY SELECTION([CS_Tracking];[CS_Tracking]OrderNumber=$orderNumber;*)
+			QUERY SELECTION([CS_Tracking]; | ;[CS_Tracking]OrderNumber=0)
+			
+			If (Records in selection([CS_Tracking])=0)
+				$alt:=False
+			Else 
+				$alt:=True
+			End if 
+		End if 
+		If ([CS_Lines]OrderNumber>0)
+			alCompDeleted{$i}:=13500370
+		Else 
+			alCompDeleted{$i}:=16777215
+		End if 
+		alCompQty{$i}:=[CS_Lines]Count
+		alCompLineKey{$i}:=[CS_Lines]CS_LineKey
+		alCompOrderNumber{$i}:=[CS_Lines]OrderNumber
+		asCompName{$i}:=[CS_Lines]ComponentName
+		asCompArt{$i}:=[CS_Lines]ArticleNumber
+		QUERY([CS_Status];[CS_Status]CS_LineKey=[CS_Lines]CS_LineKey)
+		ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)
+		asCompStatus{$i}:=[CS_Status]ActionStatus
+		adCompStatusDate{$i}:=[CS_Status]ActionDate
+		If ($alt)
+			asCompMini{$i}:=[CS_Tracking]AltMini
+			atCompNote{$i}:=[CS_Tracking]AltDescription
+			asCompSource{$i}:=[CS_Tracking]AltSource
+		Else 
+			asCompMini{$i}:=[CS_Lines]Minidescription
+			atCompNote{$i}:=[CS_Lines]Description
+			asCompSource{$i}:=[CS_Lines]Source
+		End if 
+		NEXT RECORD([CS_Lines])
+	End for 
+	LISTBOX SELECT ROW(compBox;Size of array(asCompName)+1)
+End if 
+

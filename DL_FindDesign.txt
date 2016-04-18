@@ -1,0 +1,45 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($designNumber)
+
+ARRAY LONGINT(alPrintOrder;0)
+ARRAY TEXT(atColor;0)
+ARRAY LONGINT(alColorKey;0)
+
+$designNumber:="@"+vDesign1+"@"
+Dev_Trayce 
+
+Case of 
+	: (vDesign1#"") & (asDivisions>1)
+		QUERY([Designs];[Designs]DesignNum=$designNumber;*)
+		QUERY([Designs]; & ;[Designs]DivisionCodeN=asDivisions{asDivisions})
+	: (vDesign1#"")
+		QUERY([Designs];[Designs]DesignNum=$designNumber)
+	Else 
+		QUERY([Designs];[Designs]DivisionCodeN=asDivisions{asDivisions})
+		  //QUERY([Designs]; & ;[Designs]Customer=vsCustomer)
+End case 
+
+If (<>asSeasonName>1) & (vDesign1="")
+	If (asDivisions>0) & (vDesign1="")
+		QUERY SELECTION([Designs];[Designs]SeasonName=<>asSeasonName{<>asSeasonName};*)
+		QUERY SELECTION([Designs]; & ;[Designs]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+	Else 
+		QUERY([Designs];[Designs]SeasonName=<>asSeasonName{<>asSeasonName};*)
+		QUERY([Designs]; & ;[Designs]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+	End if 
+End if 
+
+Case of 
+	: (Records in selection([Designs])>1000)
+		vsFlag:="Item count exceeds 1000,"+Char(13)+"limit search."
+	: (Records in selection([Designs])>0)
+		
+		FORM SET OUTPUT([Designs];"DesignSourceList")
+		FORM SET INPUT([Designs];"NoLoad")
+		SET WINDOW TITLE("Design Library ("+String(Records in selection([Designs]))+")")
+		DISPLAY SELECTION([Designs];*)
+	Else 
+		vsFlag:="No items for that query."
+End case 
+
+

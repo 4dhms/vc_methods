@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Design Library entry
+
+Case of 
+	: (<>DesProcID=0)
+		<>DesProcID:=New process("p_DesInfoEntry";0;"Design Entry")
+	Else 
+		SHOW PROCESS(<>DesProcID)
+		BRING TO FRONT(<>DesProcID)
+End case 

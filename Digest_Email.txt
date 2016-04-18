@@ -1,0 +1,76 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($errorcode)
+C_TEXT($pdfFolder)
+C_LONGINT($SMTP_ID)
+C_TEXT($message)
+EMail_GetPreferences 
+
+$errorcode:=SMTP_New ($SMTP_ID)
+EMail_Log (True;$errorcode;"New Digest")
+
+$errorcode:=SMTP_Host ($SMTP_ID;vtEMHost)
+EMail_Log (True;$errorcode;"Host")
+
+$errorcode:=SMTP_From ($SMTP_ID;"4DServer@nubby.com")
+EMail_Log (True;$errorcode;"From")
+
+Case of 
+	: ($1=1)
+		$errorcode:=SMTP_Subject ($SMTP_ID;"Shipping Change Report")
+	: ($1=1)
+		$errorcode:=SMTP_Subject ($SMTP_ID;"Quantity Change Report")
+	Else 
+		$errorcode:=SMTP_Subject ($SMTP_ID;"Design Delete Report")
+End case 
+EMail_Log (True;$errorcode;"Subject")
+
+If ($1=3)
+	$errorcode:=SMTP_To ($SMTP_ID;"phil@persinger.com";0)
+	EMail_Log (True;$errorcode;"CC 2 ")
+Else 
+	$errorcode:=SMTP_To ($SMTP_ID;"spenser@nubby.com";0)
+	EMail_Log (True;$errorcode;"Digest To")
+	
+	$errorcode:=SMTP_Cc ($SMTP_ID;"dusha@nubby.com";0)
+	EMail_Log (True;$errorcode;"CC 1")
+	
+	$errorcode:=SMTP_To ($SMTP_ID;"phil@persinger.com";0)
+	EMail_Log (True;$errorcode;"CC 1")
+End if 
+
+Case of 
+	: ($1=1)
+		$message:="Attached are the shipping method and/or destination changes for "+String(Current date(*))+"."
+		$pdfFolder:=PDF_FindFolder 
+		vtPDFPath:=$pdfFolder+<>pathBreak+"Shipping Change Digest.pdf"
+	: ($1=2)
+		$message:="Attached are the quantity changes for "+String(Current date(*))+"."
+		$pdfFolder:=PDF_FindFolder 
+		vtPDFPath:=$pdfFolder+<>pathBreak+"Quantity Change Digest.pdf"
+	Else 
+		$message:="Attached are the delete designs for "+String(Current date(*))+"."
+		$pdfFolder:=PDF_FindFolder 
+		vtPDFPath:=$pdfFolder+<>pathBreak+"Deleted Designs Digest.pdf"
+End case 
+
+$errorcode:=SMTP_Body ($SMTP_ID;$message)
+EMail_Log (True;$errorcode;"Body")
+
+
+Email_Xdelay   //waits for delivery of pdf
+
+$errorcode:=SMTP_Attachment ($SMTP_ID;vtPDFPath;vtEncoding)
+EMail_Log (True;$errorcode;"Attachment";vtPDFPath)
+
+If (vtEMHost#"persinger.com")
+	$errorcode:=SMTP_Auth ($SMTP_ID;vsUser;vsPassword)
+	EMail_Log (True;$errorcode;"Auth")
+End if 
+
+
+$errorcode:=SMTP_Send ($SMTP_ID)
+EMail_Log (True;$errorcode;"Send")
+
+
+$errorcode:=SMTP_Clear ($SMTP_ID)
+EMail_Log (True;$errorcode;"Clear")

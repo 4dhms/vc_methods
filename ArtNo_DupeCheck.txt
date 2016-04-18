@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($exists)
+C_TEXT($test;$previous;$artno)
+C_LONGINT($i)
+
+ARRAY TEXT($tries;0)
+
+APPEND TO ARRAY($tries;$1)
+APPEND TO ARRAY($tries;Replace string($1;" ";""))
+$artno:=Replace string($1;" ";"")
+$i:=1
+For ($i;1;Length($artno))
+	APPEND TO ARRAY($tries;Insert string($artno;"-";$i))
+End for 
+$i:=1
+For ($i;1;Length($artno))
+	APPEND TO ARRAY($tries;Insert string($artno;"/";$i))
+End for 
+$test:=Replace string($1;"-";"")
+$test:=Replace string($test;" ";"")
+APPEND TO ARRAY($tries;$test)
+$test:=Replace string($1;"/";"")
+APPEND TO ARRAY($tries;$test)
+
+$i:=1
+For ($i;1;Size of array($tries))
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=$tries{$i})
+	If (Count parameters>1)
+		QUERY SELECTION([FabricLibrary];[FabricLibrary]FabricLibKey#$2)
+	End if 
+	If (Records in selection([FabricLibrary])>0)
+		$exists:=True
+		$previous:=[FabricLibrary]ArticleNumber
+	End if 
+End for 
+
+If ($exists)
+	<>vlPriors:=1
+	<>vtArtNumber:=$previous
+Else 
+	<>vlPriors:=-1
+End if 
+

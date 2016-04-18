@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Spooler")
+	QUIT 4D
+Else 
+	CANCEL
+End if 

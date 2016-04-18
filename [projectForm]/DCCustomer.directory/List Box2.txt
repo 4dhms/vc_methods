@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($customer)
+
+$customer:=asCustomerBuild{asCustomerBuild}
+
+If (asCustomerBuild>0)
+	WinChoice ("Are you sure you want to break out "+$customer+" into a seperate line on the customer list?")
+	If (ok=1)
+		QUERY([Lists];[Lists]ListName="DC";*)
+		QUERY([Lists]; & ;[Lists]ListCode=$customer)
+		If (Records in selection([Lists])>0)
+			WinPrompt ("There is already an entry for "+$customer+".")
+		Else 
+			CREATE RECORD([Lists])
+			[Lists]ListName:="DC"
+			[Lists]ListItem:=$customer
+			[Lists]ListCode:=$customer
+			[Lists]Division:=Current user+"  "+String(Current date(*))+"  "+String(Current time(*))
+			SAVE RECORD([Lists])
+			UNLOAD RECORD([Lists])
+		End if 
+		
+		QUERY([DC];[DC]Customer=$customer)
+		QUERY SELECTION([DC];[DC]ReportCustomer=asXCustomer{asXCustomer})
+		APPLY TO SELECTION([DC];[DC]ReportCustomer:=$customer)
+		
+		APPEND TO ARRAY(asXCustomer;$customer)
+		APPEND TO ARRAY(atCustomerSpec;$customer)
+		SORT ARRAY(asXCustomer;>)
+		SORT ARRAY(atCustomerSpec;>)
+		LISTBOX SELECT ROW(afListBox1;1000)
+		LISTBOX SELECT ROW(afListBox2;1000)
+		LISTBOX SELECT ROW(afListBox3;1000)
+		OBJECT SET VISIBLE(afListBox2;False)
+		OBJECT SET VISIBLE(*;"xClick";False)
+	End if 
+End if 

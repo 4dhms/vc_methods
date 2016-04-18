@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+APPEND TO ARRAY(alHistKey;Size of array(alHistKey)+1)
+APPEND TO ARRAY(asPages;"New Page")
+APPEND TO ARRAY(afDelete;False)
+APPEND TO ARRAY(afSpecial;False)
+APPEND TO ARRAY(afPrint;True)
+LISTBOX SELECT ROW(afDLPages;Size of array(alHistKey))
+
+CREATE RECORD([DLPages])
+[DLPages]DLItemKey:=[DesignLines]DesignLineKey
+[DLPages]PageNumber:=Size of array(asPages)
+[DLPages]NewPageNumber:=Size of array(asPages)
+[DLPages]PageTitle:="New Page"
+SAVE RECORD([DLPages])
+
+DL_BuildPage (asPages;True)

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Staff];"Defaults.i")
+QUERY([Staff];[Staff]UserName=Current user)
+If (Records in selection([Staff])=0)
+	CREATE RECORD([Staff])
+	[Staff]StaffKey:=Sequence number([Staff])+100
+	[Staff]UserName:=Current user
+	SAVE RECORD([Staff])
+End if 
+Center Window (200;390;1984;"";"WincBox")
+MODIFY RECORD([Staff];*)
+CLOSE WINDOW

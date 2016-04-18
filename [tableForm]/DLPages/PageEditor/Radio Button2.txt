@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cbOther:=0
+OBJECT SET VISIBLE(cbOther;False)
+vfPDF:=True

@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+INSERT IN ARRAY(asSRmonth;$1;1)
+
+INSERT IN ARRAY(asSRseasonA;$1;1)
+INSERT IN ARRAY(asSRavgA;$1;1)
+INSERT IN ARRAY(alSRorderA;$1;1)
+INSERT IN ARRAY(alSRunitA;$1;1)
+INSERT IN ARRAY(alSRdollarA;$1;1)
+
+INSERT IN ARRAY(asSRseasonB;$1;1)
+INSERT IN ARRAY(asSRavgB;$1;1)
+INSERT IN ARRAY(alSRorderB;$1;1)
+INSERT IN ARRAY(alSRunitB;$1;1)
+INSERT IN ARRAY(alSRdollarB;$1;1)
+
+INSERT IN ARRAY(alSRstyle;$1;1)
+INSERT IN ARRAY(alSRbackground;$1;1)
+INSERT IN ARRAY(alSRcolor;$1;1)

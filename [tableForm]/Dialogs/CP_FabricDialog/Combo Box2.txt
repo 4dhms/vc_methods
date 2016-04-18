@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asSorP{asSorP}="Zipper")
+	vsCPType:="Zipper"
+	FORM GOTO PAGE(3)
+	GOTO OBJECT(vsArt)
+End if 

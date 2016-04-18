@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCustomer)
+C_TEXT(vsDivision)
+
+Case of 
+	: (Form event=On Getting Focus)
+		ARRAY TEXT(asColors;0)
+	: (Form event=On Data Change)
+		SLR_Get 
+		If (vfNew)
+			vfNew:=False
+			CREATE RECORD([SLRAcct])
+			[SLRAcct]SLRAcct:=vsCustomer
+			[SLRAcct]SLRAcctKey:=Sequence number([SLRAcct])
+			[SLRAcct]WeekOne:=vdWeekOne
+			[SLRAcct]SLRStyleNumber:=vsStyleNumber
+			[SLRAcct]Division:=vsDivision
+			SAVE RECORD([SLRAcct])
+			OBJECT SET ENABLED(bMore;True)
+		End if 
+		  //QUERY([Orders];[Orders]StyleNumber=vsStyleNumber)
+		  //
+		  //Case of 
+		  //: (cbClose=1)
+		  //  `wait to set week one
+		  //: (Records in selection([Orders])=0)
+		  //WinPrompt ("There are no orders for style number: "+vsStyleNumber+Char(13)+Char(13)+"Are you missing a prefix or suffix?")
+		  //vsStyleNumber:=""
+		  //GOTO AREA(vsStyleNumber)
+		  //: (vsCustomer="")
+		  //WinPrompt ("Enter customer")
+		  //: (vsDivision="")
+		  //WinPrompt ("Enter division")
+		  //Else 
+		  //QUERY([SLRAcct];[SLRAcct]SLRAcct=vsCustomer;*)
+		  //QUERY([SLRAcct]; & ;[SLRAcct]Division=vsDivision;*)
+		  //QUERY([SLRAcct]; & ;[SLRAcct]SLRStyleNumber=vsStyleNumber)
+		  //SLR_SetUp 
+		  //SLR_Process 
+		  //SLR_ColorShift 
+		  //APPEND TO ARRAY(◊asDN;vsStyleNumber)
+		  //SORT ARRAY(◊asDN;>)
+		  //End case 
+End case 
+
+
+
+

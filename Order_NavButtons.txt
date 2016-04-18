@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+If (Selected record number([Orders])=1) | (Records in selection([Orders])=1) | (Is new record([Orders]))
+	OBJECT SET ENABLED(bFrstHMS;False)
+	OBJECT SET ENABLED(bPrvHMS;False)
+Else 
+	OBJECT SET ENABLED(bFrstHMS;True)
+	OBJECT SET ENABLED(bPrvHMS;True)
+End if 
+
+If (Selected record number([Orders])=Records in selection([Orders])) | (Records in selection([Orders])=1) | (Is new record([Orders]))
+	OBJECT SET ENABLED(bNxtHMS;False)
+	OBJECT SET ENABLED(bLstHMS;False)
+Else 
+	OBJECT SET ENABLED(bNxtHMS;True)
+	OBJECT SET ENABLED(bLstHMS;True)
+End if 

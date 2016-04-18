@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		If ([FabricOrders]POType=1)
+			vsColHead:="Ligne"
+		Else 
+			vsColHead:="Width"
+		End if 
+	: (Form event=On Printing Detail)
+		If ([FabricOrders]POType=1)
+			vsCol:=[FabPOLines]Ligne
+		Else 
+			vsCol:=[FabPOLines]POWidth
+		End if 
+		If ([FabPOLines]Changed)
+			FabPO_ColorCode (3)
+		Else 
+			FabPO_ColorCode (0)
+		End if 
+End case 

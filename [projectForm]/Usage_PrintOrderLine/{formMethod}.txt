@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style)
+
+If (Form event=On Printing Detail)
+	
+	OBJECT SET VISIBLE(*;"xNo";vlRouter=1)
+	OBJECT SET VISIBLE(*;"xNo1";vlRouter=2)
+	
+	OBJECT SET VISIBLE(vsValue1;vsValue1#"")
+	OBJECT SET VISIBLE(vsValue2;vsValue2#"")
+	OBJECT SET VISIBLE(vsValue3;vsValue3#"")
+	OBJECT SET VISIBLE(vsValue4;vsValue4#"")
+	OBJECT SET VISIBLE(vlItem5;vlItem5#0)
+	OBJECT SET VISIBLE(vsValue6;vsValue6#"")
+	OBJECT SET VISIBLE(vsValue7;vsValue7#"")
+	
+	If (vsValue2="Total")
+		$style:=1
+	Else 
+		$style:=0
+	End if 
+	
+	OBJECT SET FONT STYLE(vsValue2;$style)
+	OBJECT SET FONT STYLE(vlItem5;$style)
+	
+	
+End if 

@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(bInvoice)
+
+Case of 
+	: (Form event=On Load)
+		If (Current user="Designer") | (Current user="CK") | (Current user="Joann")
+			OBJECT SET VISIBLE(bInvoice;True)
+		End if 
+		
+		SeasonArrays 
+		ORDER BY([SampleFabrics];[SampleFabrics]SampleFab PO Nu;<)
+	: (Form event=On Display Detail)
+		If ([SampleFabrics]Void)
+			vsFlag:="VOID"
+		Else 
+			vsFlag:=""
+		End if 
+End case 

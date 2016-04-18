@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Records in set("UserSet")=0)
+		WinPrompt ("Select record to delete.")
+	: (Records in set("UserSet")>1)
+		WinPrompt ("You may only delete one record at a time.")
+	Else 
+		WinChoice ("Are you sure you want to delete this record?")
+		If (ok=1)
+			CREATE SET([FabricTrack];"leftover")
+			USE SET("UserSet")
+			DELETE RECORD([FabricTrack])
+			USE SET("leftover")
+			CLEAR SET("leftover")
+		End if 
+End case 

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+
+If (asList11>0)
+	Case of 
+		: (asList11%3=0)
+			$c:=asList11-2
+		: (asList11%3=2)
+			$c:=asList11-1
+		Else 
+			$c:=asList11
+	End case 
+	
+	[Orders]Label:=asList11{$c}+" "+asList13{asList11}
+	CANCEL
+End if 

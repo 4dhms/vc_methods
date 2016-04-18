@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Unload)
+	[SpecGradeCats]ACatName:=""
+	If ([SpecGradeCats]ACol1#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol1+"-"
+	End if 
+	If ([SpecGradeCats]ACol2#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol2+"-"
+	End if 
+	If ([SpecGradeCats]ACol3#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol3+"-"
+	End if 
+	If ([SpecGradeCats]ACol4#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol4+"-"
+	End if 
+	If ([SpecGradeCats]ACol5#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol5+"-"
+	End if 
+	If ([SpecGradeCats]ACol6#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol6+"-"
+	End if 
+	If ([SpecGradeCats]ACol7#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol7+"-"
+	End if 
+	If ([SpecGradeCats]ACol8#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol8+"-"
+	End if 
+	If ([SpecGradeCats]ACol9#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol9+"-"
+	End if 
+	If ([SpecGradeCats]ACol10#"")
+		[SpecGradeCats]ACatName:=[SpecGradeCats]ACatName+[SpecGradeCats]ACol10+"-"
+	End if 
+	[SpecGradeCats]ACatName:=Substring([SpecGradeCats]ACatName;1;Length([SpecGradeCats]ACatName)-1)
+	SAVE RECORD([SpecGradeCats])
+End if 

@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"Quota.i")
+<>QuotaRouter:=$1
+
+Case of 
+	: ($1=-1)
+		WinCentOnCenter (700;540;1984;"Quota "+String($1);"cb_generic")
+	: ($1=3)
+		Center Window (700;540;1984;"Quotas";"cb_generic")
+	Else 
+		WinCentOnCenter (700;540;1984;"Quota "+String($1);"cb_generic")
+End case 
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>vlDuty:=0

@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asCopySpec;0)
+COMPILER_4DSuite 
+COMPILER_Arrays 
+COMPILER_Boolean 
+COMPILER_Buttons 
+
+COMPILER_Date 
+COMPILER_Interprocess 
+COMPILER_Longint 
+COMPILER_Pictures 
+COMPILER_Pointers 
+COMPILER_Real 
+COMPILER_Text 
+COMPILER_Tools 
+Compiler_Web 
+
+cbPO:=0
+cbSF:=0
+cbSG:=0
+<>PageLoaded:=False
+<>newSGSystem:=False
+<>Close:=False
+<>vfDontShow:=False
+<>vfMTL:=False

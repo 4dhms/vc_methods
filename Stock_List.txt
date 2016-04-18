@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([StockOrders];[StockOrders]SONumber>0)
+FORM SET INPUT([StockOrders];"StockOrder.i")
+FORM SET OUTPUT([StockOrders];"StockOrder.o")
+<>CloseBox:=True
+
+Center Window (940;650;4;"")
+MODIFY SELECTION([StockOrders];*)
+CLOSE WINDOW
+<>vlStockProc:=0

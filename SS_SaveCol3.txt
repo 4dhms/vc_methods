@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+FIRST RECORD([SpecSheetLines])
+For ($i;1;Records in selection([SpecSheetLines]))
+	SS_SaveCell (alSpecNumber{asRowHeaders};"C";[SpecSheetLines]Spec2C)
+	NEXT RECORD([SpecSheetLines])
+End for 

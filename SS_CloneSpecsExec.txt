@@ -1,0 +1,153 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfCloneHistory)
+C_LONGINT($i;$lineKey;$sfKey;$arraySize;$i)
+C_LONGINT(vlCloneRouter)
+ARRAY LONGINT(alNewSpecLineKeys;0)
+ARRAY LONGINT(alOldSpecLineKeys;0)
+USE SET("ThisSpecSheet")
+
+If (vlCloneRouter=3)
+	  //do nothing sizes onlyCase of 
+Else 
+	Case of 
+		: (asNames=0)
+			Case of 
+				: ([SpecFactory]Part1="")
+					[SpecFactory]Part1:=asNames{1}
+					[SpecFactory]KnitWoven1:=asKnitWoven{1}
+					$arraySize:=1
+					If (Size of array(asNames)>1)
+						[SpecFactory]Part2:=asNames{2}
+						[SpecFactory]KnitWoven2:=asKnitWoven{2}
+						$arraySize:=2
+					End if 
+					If (Size of array(asNames)>2)
+						[SpecFactory]Part3:=asNames{3}
+						[SpecFactory]KnitWoven3:=asKnitWoven{3}
+						$arraySize:=3
+					End if 
+				: ([SpecFactory]Part2="")
+					[SpecFactory]Part2:=asNames{1}
+					[SpecFactory]KnitWoven2:=asKnitWoven{1}
+					$arraySize:=1
+					If (Size of array(asNames)>1)
+						[SpecFactory]Part3:=asNames{2}
+						[SpecFactory]KnitWoven3:=asKnitWoven{2}
+						$arraySize:=2
+					End if 
+				: ([SpecFactory]Part3="")
+					[SpecFactory]Part3:=asNames{1}
+					[SpecFactory]KnitWoven3:=asKnitWoven{1}
+					$arraySize:=3
+			End case 
+			
+		: (asNames=2)
+			Case of 
+				: ([SpecFactory]Part1="")
+					[SpecFactory]Part1:=asNames{2}
+					[SpecFactory]KnitWoven1:=asKnitWoven{2}
+					$arraySize:=1
+				: ([SpecFactory]Part2="")
+					[SpecFactory]Part2:=asNames{2}
+					[SpecFactory]KnitWoven2:=asKnitWoven{2}
+					$arraySize:=2
+				: ([SpecFactory]Part3="")
+					[SpecFactory]Part3:=asNames{2}
+					[SpecFactory]KnitWoven3:=asKnitWoven{2}
+					$arraySize:=3
+			End case 
+			
+		: (asNames=1)
+			Case of 
+				: ([SpecFactory]Part1="")
+					[SpecFactory]Part1:=asNames{1}
+					[SpecFactory]KnitWoven1:=asKnitWoven{1}
+					$arraySize:=1
+				: ([SpecFactory]Part2="")
+					[SpecFactory]Part2:=asNames{1}
+					[SpecFactory]KnitWoven2:=asKnitWoven{1}
+					$arraySize:=2
+				: ([SpecFactory]Part3="")
+					[SpecFactory]Part3:=asNames{1}
+					[SpecFactory]KnitWoven3:=asKnitWoven{1}
+					$arraySize:=3
+			End case 
+	End case 
+	SAVE RECORD([SpecFactory])
+	
+	ARRAY LONGINT(alPartNumber;$arraySize)
+	$i:=1
+	For ($i;1;Size of array(alPartNumber))
+		alPartNumber{$i}:=$i
+	End for 
+End if 
+
+ORDER BY([SpecSheetLines];[SpecSheetLines]SortOrder;>)
+Util_RecordNumberArray (Table(->[SpecSheetLines]))
+$i:=1
+If (vlCloneRouter=1) | (vlCloneRouter=2)
+	For ($i;1;Size of array(alRecordNumber))
+		GOTO RECORD([SpecSheetLines];alRecordNumber{$i})
+		
+		$lineKey:=[SpecSheetLines]SpecLineKey
+		$sfKey:=[SpecSheetLines]SF_KeyNumber
+		DUPLICATE RECORD([SpecSheetLines])
+		  //If ($previous)
+		  //[SpecSheetLines]Spec1A:=asCol1{Find in array(alLineKey;[SpecSheetLines]SpecLineKey)}
+		  //End if 
+		[SpecSheetLines]SF_KeyNumber:=$2
+		[SpecSheetLines]SpecLineKey:=Sequence number([SpecSheetLines])
+		If ([SpecSheetLines]SortOrder=0)
+			[SpecSheetLines]SortOrder:=$i
+		End if 
+		
+		If ([SpecSheetLines]OtherDescription="") & ([SpecSheetLines]SpecLibKey>0)
+			QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+			If (Records in selection([SpecLibrary])=1)
+				[SpecSheetLines]OtherDescription:=[SpecLibrary]DescriptionA+[SpecLibrary]DecriptConnect+[SpecSheetLines]SpecialMeasure+[SpecLibrary]DescriptionB
+			End if 
+		End if 
+		Case of 
+			: (asNames=0) & (vlPartNumber=1)
+				  //no changes
+			: (asNames=0) & (vlPartNumber=2)
+				If ([SpecSheetLines]PartNumber=2)
+					[SpecSheetLines]PartNumber:=3
+				Else 
+					[SpecSheetLines]PartNumber:=2
+				End if 
+			Else 
+				[SpecSheetLines]PartNumber:=vlPartNumber
+		End case 
+		SAVE RECORD([SpecSheetLines])
+		INSERT IN ARRAY(alNewSpecLineKeys;1;1)
+		INSERT IN ARRAY(alOldSpecLineKeys;1;1)
+		alOldSpecLineKeys{1}:=$lineKey
+		alNewSpecLineKeys{1}:=[SpecSheetLines]SpecLineKey
+		
+		If (vlCloneRouter=2) | (vlCloneRouter=3)
+			SS_CloneSizes ($lineKey;[SpecSheetLines]SpecLineKey;[SpecSheetLines]SF_KeyNumber)
+		End if 
+		
+		If (Records in set("AllLines")=0)
+			CREATE EMPTY SET([SpecSheetLines];"AllLines")
+			CREATE EMPTY SET([SpecSheetLines];"ActiveLines")
+		End if 
+		ADD TO SET([SpecSheetLines];"ActiveLines")
+	End for 
+End if 
+
+If (vfCloneHistory)
+	SS_CloneColLine 
+End if 
+
+If (vlCloneRouter=2) | (vlCloneRouter=3)
+	SS_CloneSizes ($sfKey*-1;[SpecSheetLines]SF_KeyNumber*-1;[SpecSheetLines]SF_KeyNumber*-1)
+End if 
+
+ARRAY LONGINT(alRecordNumber;0)
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=$2)
+
+SS_PartArray 
+SS_Build 
+SS_BuildPartCB (True)

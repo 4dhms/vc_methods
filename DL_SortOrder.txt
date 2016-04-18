@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asSortOrder{asSortOrder}="Stitch")
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]Stitch;>)
+	: (asSortOrder{asSortOrder}="Fiber")
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]Fiber;>)
+	: (asSortOrder{asSortOrder}="Line Group")
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]DLGroupName;>)
+	: (asSortOrder{asSortOrder}="Design Number")
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]DesignNumber;>)
+	: (asSortOrder{asSortOrder}="Style Number")
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]StyleNumber;>)
+End case 

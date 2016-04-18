@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asSGOrder{asSGOrder}="Season")
+		ORDER BY([Samples];[Samples]Retired;>)
+	: (asSGOrder{asSGOrder}="Stitch")
+		ORDER BY([Samples];[Designs]Stitch;>)
+	: (asSGOrder{asSGOrder}="Content")
+		ORDER BY([Samples];[Samples]Fabric SG;>)
+	: (asSGOrder{asSGOrder}="Group")
+		ORDER BY([Samples];[Samples]Group;>)
+	: (asSGOrder{asSGOrder}="Design Number")
+		ORDER BY([Samples];[Samples]DesignNum;>)
+	: (asSGOrder{asSGOrder}="Style Number")
+		ORDER BY([Samples];[Samples]StyleNum;>)
+End case 
+

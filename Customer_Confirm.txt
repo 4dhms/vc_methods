@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test;$message)
+C_BOOLEAN($done)
+$done:=False
+
+QUERY([Orders];[Orders]Customer=[Customers]CustomerName)
+
+If (Records in selection([Orders])=0)
+	$test:="The "+[Customers]CustomerName
+	QUERY([Orders];[Orders]Customer=$test)
+	If (Records in selection([Orders])>0)
+		$message:="There are no orders for "+[Customers]CustomerName+"."+Char(13)+Char(13)
+		$message:=$message+"Do you want to change it to"+Char(13)+[Orders]Customer+"?"
+		WinChoice ($message)
+		If (ok=1)
+			$done:=True
+		End if 
+	End if 
+	
+	If (Not($done))
+		$test:=[Customers]CustomerName+"@"
+		QUERY([Orders];[Orders]Customer=$test)
+		If (Records in selection([Orders])>0)
+			$message:="There are no orders for "+[Customers]CustomerName+"."+Char(13)+Char(13)
+			$message:=$message+"Do you want to change it to"+Char(13)+[Orders]Customer+"?"
+			WinChoice ($message)
+			If (ok=1)
+				$done:=True
+			End if 
+		End if 
+	End if 
+	
+	
+End if 
+

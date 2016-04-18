@@ -1,0 +1,158 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$qty;$dc;$total;$self;$min;$dif;zYes;zNo;$n)
+C_TEXT($color;$name;$prename)
+C_BOOLEAN($combo)
+
+ARRAY TEXT($cptest;0)
+SELECTION TO ARRAY([CP_OrderXRef]CPNumber;$cptest)
+
+If ($1)
+	$min:=6
+Else 
+	$min:=1
+End if 
+
+$i:=1
+For ($i;1;Size of array($cptest))
+	If (Count in array($cptest;$cptest{$i})>1)
+		$combo:=True
+	End if 
+End for 
+
+$i:=1
+$color:=""
+$total:=0
+
+ARRAY LONGINT($keys;0)
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]LineKey;>)
+SELECTION TO ARRAY([CP_OrderXRef]CPOrdID;$keys)
+
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Size of array($keys))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$keys{$i})
+	QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+	QUERY([ColorConverter];[ColorConverter]CPOrdID=$keys{$i})
+	If (Records in selection([ColorConverter])>0) & ([ColorConverter]StockName#"")
+		If ([DesignLines]Ulc)
+			$name:=Util_Ulc ([ColorConverter]StockName)
+		Else 
+			$name:=[ColorConverter]StockName
+		End if 
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		If ([DesignLines]Ulc)
+			$prename:=Util_Ulc ([ColorPrintNumber]CPName)
+		Else 
+			$prename:=[ColorPrintNumber]CPName
+		End if 
+		
+		If ([DesignLines]CPNumberOn) & ([ColorPrintNumber]CPType=2)
+			$name:=[CP_OrderXRef]CPNumber+" "+$prename
+		Else 
+			$name:=$prename
+		End if 
+		
+		$self:=[CP_OrderXRef]SelfKey
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Combo 1")
+		If (Records in selection([CP_OrderXRef])>0)
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			
+			If ([DesignLines]Ulc)
+				$prename:=Util_Ulc ([ColorPrintNumber]CPName)
+			Else 
+				$prename:=[ColorPrintNumber]CPName
+			End if 
+			
+			If ([DesignLines]CPNumberOn) & ([ColorPrintNumber]CPType=2)
+				$name:=$name+"/"+[CP_OrderXRef]CPNumber+" "+$prename
+			Else 
+				$name:=$name+"/"+$prename
+			End if 
+		End if 
+	End if 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$keys{$i})
+	$qty:=[CP_OrderXRef]Quantity
+	
+	QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+	ARRAY LONGINT($tots;0)
+	ARRAY LONGINT($lines;0)
+	ARRAY LONGINT($dupcek;0)
+	SELECTION TO ARRAY([DC]Count;$tots;[DC]DCLine;$lines)
+	
+	$n:=1
+	$dc:=0
+	For ($n;1;Size of array($tots))
+		If (Find in array($dupcek;$lines{$n})<1)
+			$dc:=$dc+$tots{$n}
+			APPEND TO ARRAY($dupcek;$lines{$n})
+		End if 
+	End for 
+	
+	  //$dc:=Sum([DC]Count)
+	
+	$dif:=$qty-$dc
+	If ($1)
+		$dif:=$dif-($dif%6)
+	End if 
+	
+	  //overage
+	
+	If ([DesignLines]ShowOver) & (Not($1))
+		If ($i>1) & ($color#"")
+			If (zYes=1)
+				$color:=$color+Char(13)
+			Else 
+				$color:=$color+", "
+			End if 
+		End if 
+		If ($dif<0)
+			$color:=$color+$name+"=("+String($dif)+")"
+		Else 
+			$color:=$color+$name+"="+String($dif)
+		End if 
+		$total:=$total+($dif)
+	Else 
+		If ($dif>=$min)
+			If (zYes=1)
+				$color:=$color+Char(13)
+			Else 
+				$color:=$color+", "
+			End if 
+			If ([DesignLines]HideUnits)
+				$color:=$color+$name
+			Else 
+				$color:=$color+$name+"="+String($dif)
+			End if 
+			$total:=$total+($dif)
+		End if 
+	End if 
+End for 
+
+If ($total<1) & (Not([DesignLines]ShowOver))
+	[DesignLineIncluded]SoldOut:=True
+	$color:="SOLD OUT"
+Else 
+	If ($total<0)
+		$color:=$color+Char(13)+"Total: ("+String($total;"###,##0")+")"
+	Else 
+		[DesignLineIncluded]SoldOut:=False
+		If (Not([DesignLines]HideUnits))
+			$color:=$color+Char(13)+"Total: "+String($total;"###,##0")
+		End if 
+	End if 
+End if 
+If (Substring($color;1;2)=", ")
+	$color:=Substring($color;3;9999)
+End if 
+$color:=Replace string($color;"  ";" ")
+[DesignLineIncluded]Colors:=Replace string($color;" =";"=")
+
+SAVE RECORD([DesignLineIncluded])
+
+If ($total>0)
+	vfShow:=True
+Else 
+	vfShow:=False
+End if 

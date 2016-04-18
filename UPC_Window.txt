@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asColors;0)
+ARRAY TEXT(asSizes;0)
+ARRAY TEXT(asColorCodes;0)
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+
+If (Current user="David") | (Current user="John Mow") | (Current user="Designer") & (Shift down)
+	WinChoice ("Do you want to import UPCs?")
+	If (ok=1)
+		UPC_Import 
+	End if 
+	<>vlUPCProc:=0
+Else 
+	<>CloseBox:=True
+	Center Window (800;600;0;"")
+	DIALOG("UPC")
+	CLOSE WINDOW
+	<>vlUPCProc:=0
+End if 

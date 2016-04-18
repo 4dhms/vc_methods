@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($articlenumber)
+C_LONGINT($ponumber)
+
+WinChoice ("How do you want to search?";"By Article #";"PO #";"Query Editor";"Cancel")
+
+Case of 
+	: (ok=1) & (bChoice2=1)
+		$ponumber:=Num(Request("Enter PO number:"))
+		QUERY([SampleFabrics];[SampleFabrics]SampleFab PO Nu=$ponumber)
+	: (ok=1) & (bChoice3=1)
+		QUERY([SampleFabrics])
+	: (ok=1)
+		$articlenumber:=Request("Enter article number:")
+		QUERY([SampleFabrics];[SampleFabrics]Sam FabArtNum 1=$articlenumber)
+End case 

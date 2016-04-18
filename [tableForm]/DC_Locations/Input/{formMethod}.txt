@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If ([DC_Locations]DCKey=0)
+		[DC_Locations]DCKey:=Sequence number([DC_Locations])
+	End if 
+End if 

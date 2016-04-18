@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	Spec_TrackChange ("Part 3";->[SpecFactory]Part3;"")
+	SAVE RECORD([SpecFactory])
+End if 

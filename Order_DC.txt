@@ -1,0 +1,95 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$line;$1;pTwo)
+C_POINTER($arrayPtr)
+C_TEXT($header)
+C_BOOLEAN($cpnumber)
+
+ARRAY LONGINT(alDCRef;0)
+ARRAY TEXT(asXColors;0)
+ARRAY TEXT(asColorCodes;0)
+vfOpen:=False
+vtDCCustomer:=""
+
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"DCCol")
+For ($i;1;Size of array(alSelfKey))
+	If (alShadeFab{$i}#16711690)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=alSelfKey{$i})
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		ADD TO SET([CP_OrderXRef];"DCCol")
+	End if 
+End for 
+
+USE SET("DCCol")
+CLEAR SET("DCCol")
+
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+SELECTION TO ARRAY([CP_OrderXRef]CPNumber;asXColors;[CP_OrderXRef]ColorCode;asColorCodes)
+ARRAY LONGINT(alDCLine;0)
+RELATE MANY SELECTION([DC]CPOrdID)
+DISTINCT VALUES([DC]DCLine;alDCLine)
+
+SORT ARRAY(alDCLine;>)
+INSERT IN ARRAY(alDCline;1;1)
+APPEND TO ARRAY(alDCLine;0)
+APPEND TO ARRAY(alDCLine;0)
+
+$s:=Size of array(alDCLine)
+Order_DC_Arrays (0)
+Order_DC_Arrays ($s)
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+asCustomers{1}:="TOTAL CUT"
+asCustomers{Size of array(asCustomers)-1}:="TOTAL"
+asCustomers{Size of array(asCustomers)}:="OTS"
+
+If (pTwo=1)
+	$cpnumber:=True
+Else 
+	$cpnumber:=False
+End if 
+
+For ($i;1;14)
+	$header:="HEADER"+String($i+22)
+	$arrayPtr:=Get pointer("asColor"+String($i))
+	If ($i>Records in selection([CP_OrderXRef]))
+		$arrayPtr->{1}:=""
+		OBJECT SET TITLE(*;$header;"")
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=asXColors{$i})
+		$arrayPtr->{1}:=String([CP_OrderXRef]Quantity)
+		If ($cpnumber)
+			OBJECT SET TITLE(*;$header;[ColorPrintNumber]CPNumber)
+		Else 
+			OBJECT SET TITLE(*;$header;[ColorPrintNumber]CPName)
+		End if 
+		APPEND TO ARRAY(alDCRef;[CP_OrderXRef]CPOrdID)
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+$i:=1
+For ($i;1;Size of array(alDCRef))
+	QUERY([DC];[DC]CPOrdID=alDCRef{$i})
+	
+	$arrayPtr:=Get pointer("asColor"+String($i))
+	$n:=1
+	FIRST RECORD([DC])
+	
+	For ($n;1;Records in selection([DC]))
+		$line:=Find in array(alDCLine;[DC]DCLine)
+		adCancel{$line}:=[DC]CancelDate
+		asCustomers{$line}:=[DC]Customer
+		atNote{$line}:=[DC]Note
+		arPrice{$line}:=[DC]Price
+		adCreateDate{$line}:=[DC]CreateDate
+		afIn{$line}:=[DC]InWarehouse
+		$arrayPtr->{$line}:=String([DC]Count)
+		NEXT RECORD([DC])
+	End for 
+End for 
+
+Order_DC_Total (True)
+
+

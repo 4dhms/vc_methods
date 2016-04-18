@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (Position("-";asCPNumbers{asCPNumbers})>0)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=asCPNumbers{asCPNumbers})
+	
+	Picture_Get ([ColorPrintNumber]CPNumberKey;"CP")
+	UNLOAD RECORD([ColorPrintNumber])
+	
+	Pix_Delay 
+	
+	vxSketch:=<>vxSketch
+	Center Window (300;300;1;"")
+	DIALOG([Dialogs];"Print.i")
+	CLOSE WINDOW
+End if 

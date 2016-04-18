@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($orderptrA;$unitptrA;$dollarptrA;$orderptrB;$unitptrB;$dollarptrB)
+
+$i:=1
+For ($i;1;24)
+	$orderptrA:=Get pointer("vlOrders"+String($i))
+	$orderptrB:=Get pointer("vsOrders"+String($i))
+	
+	$unitptrA:=Get pointer("vlUnits"+String($i))
+	$unitptrB:=Get pointer("vsUnits"+String($i))
+	
+	$dollarptrA:=Get pointer("vlDollars"+String($i))
+	$dollarptrB:=Get pointer("vsDollars"+String($i))
+	
+	$orderPtrB->:=String($orderptrA->;"#,###,###")
+	$unitptrB->:=String($unitptrA->;"###,###,###")
+	$dollarptrB->:=String($dollarptrA->;"###,###,###")
+End for 
+
+vsOrdersSubAx:=String(vlOrdersSubAx;"###,###,###")
+vsUnitsSubAx:=String(vlUnitsSubAx;"###,###,###")
+vsDollarsSubAx:=String(vlDollarsSubAx;"###,###,###")
+vsOrdersSubBx:=String(vlOrdersSubBx;"###,###,###")
+vsUnitsSubBx:=String(vlUnitsSubBx;"###,###,###")
+vsDollarsSubBx:=String(vlDollarsSubBx;"###,###,###")
+vsOrdersSubA:=String(vlOrdersSubA;"###,###,###")
+vsUnitsSubA:=String(vlUnitsSubA;"###,###,###")
+vsDollarsSubA:=String(vlDollarsSubA;"###,###,###")
+vsOrdersSubB:=String(vlOrdersSubB;"###,###,###")
+vsUnitsSubB:=String(vlUnitsSubB;"###,###,###")
+vsDollarsSubB:=String(vlDollarsSubB;"###,###,###")
+vsOrdersGrand:=String(vlOrdersGrand;"###,###,###")
+vsUnitsGrand:=String(vlUnitsGrand;"###,###,###")
+vsDollarsGrand:=String(vlDollarsGrand;"###,###,###")
+vsOrdersGrandx:=String(vlOrdersGrandx;"###,###,###")
+vsUnitsGrandx:=String(vlUnitsGrandx;"###,###,###")
+vsDollarsGrandx:=String(vlDollarsGrandx;"###,###,###")
+vsAvgA:=String(vrAvgA;"###.00")
+vsAvgB:=String(vrAvgB;"###.00")
+vsAvgAx:=String(vrAvgAx;"###.00")
+vsAvgBx:=String(vrAvgBx;"###.00")
+

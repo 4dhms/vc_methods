@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked) & (Shift down)
+		WinChoice ("Are you sure you want to delete "+Char(13)+atListArt{atListArt}+Char(13)+atListContents{atListContents}+"?")
+		If (ok=1)
+			QUERY([Lists];[Lists]ListName="Fiber")
+			QUERY SELECTION([Lists];[Lists]ListItem=atListContents{atListContents};*)
+			QUERY SELECTION([Lists]; & ;[Lists]ArticleNumber=atListArt{atListArt};*)
+			QUERY SELECTION([Lists]; & ;[Lists]UserName=Current user)
+			DELETE SELECTION([Lists])
+			LISTBOX DELETE ROWS(FiberList;atListArt)
+		End if 
+	: (Form event=On Double Clicked)
+		List_Use 
+End case 

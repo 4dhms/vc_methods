@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+DELETE FROM ARRAY(asTypeList;$1;$2)
+DELETE FROM ARRAY(asCPLetter;$1;$2)
+DELETE FROM ARRAY(asCPStyleNum;$1;$2)
+DELETE FROM ARRAY(asCPNumbers;$1;$2)
+DELETE FROM ARRAY(asCPColorName;$1;$2)
+DELETE FROM ARRAY(asMillNumber;$1;$2)
+DELETE FROM ARRAY(atThreadColor;$1;$2)
+If (<>vlOrderNumber>0)
+	DELETE FROM ARRAY(asCarton;$1;$2)
+Else 
+	  //DELETE FROM ARRAY(asCPStyleNum;$1;$2)
+End if 
+DELETE FROM ARRAY(asCC;$1;$2)
+DELETE FROM ARRAY(afCCoverride;$1;$2)
+DELETE FROM ARRAY(asColorStatus;$1;$2)
+DELETE FROM ARRAY(adStatusDate;$1;$2)
+DELETE FROM ARRAY(alCQty;$1;$2)
+DELETE FROM ARRAY(alSelfKey;$1;$2)
+DELETE FROM ARRAY(alShadeFab;$1;$2)
+DELETE FROM ARRAY(alCPXref;$1;$2)
+DELETE FROM ARRAY(alStyleFab;$1;$2)
+DELETE FROM ARRAY(alColorKey;$1;$2)
+

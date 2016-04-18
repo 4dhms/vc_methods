@@ -1,0 +1,106 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$colNumber)
+C_TEXT($colhead)
+C_TEXT($pattern)
+C_DATE($rec;$submit)
+C_BOOLEAN($show1;$show2)
+C_TEXT($comment)
+
+If (Size of array(asRowHeaders)=0)
+	  //initialize
+	APPLY TO SELECTION([SpecSheetLines];[SpecSheetLines]Spec2A:="")
+	APPLY TO SELECTION([SpecSheetLines];[SpecSheetLines]Spec2C:="")
+	APPLY TO SELECTION([SpecSheetLines];[SpecSheetLines]Spec3A:="")
+	APPLY TO SELECTION([SpecSheetLines];[SpecSheetLines]Spec3C:="")
+Else 
+	$colNumber:=alSpecNumber{asRowHeaders}
+	
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+	QUERY([SpecLineSample]; & ;[SpecLineSample]ColumnNumber=$colNumber-1)
+	$colhead:=[SpecLineSample]ColumnHeader
+	$submit:=[SpecLineSample]SubmitDue
+	$rec:=[SpecLineSample]Received
+	$pattern:=[SpecLineSample]PatternSource
+	$comment:=[SpecLineSample]Comments
+	
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+	QUERY([SpecLineSample]; & ;[SpecLineSample]ColumnNumber=$colNumber)
+	[SpecLineSample]ColHead2:=$colhead
+	[SpecLineSample]Received2:=$rec
+	[SpecLineSample]SubmitDue2:=$submit
+	[SpecLineSample]Pattern2:=$pattern
+	[SpecLineSample]Comments2:=$comment
+	SAVE RECORD([SpecLineSample])
+	
+	$i:=1
+	FIRST RECORD([SpecSheetLines])
+	For ($i;1;Records in selection([SpecSheetLines]))
+		
+		  //Column2
+		QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey)
+		QUERY SELECTION([SpecLineCols];[SpecLineCols]ColumnNumber=$colNumber)
+		
+		[SpecSheetLines]Spec2A:=[SpecLineCols]SpecA
+		[SpecSheetLines]Spec2C:=[SpecLineCols]SpecC
+		  //Column3
+		QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey)
+		QUERY SELECTION([SpecLineCols];[SpecLineCols]ColumnNumber=$colNumber-1)
+		[SpecSheetLines]Spec3A:=[SpecLineCols]SpecA
+		[SpecSheetLines]Spec3C:=[SpecLineCols]SpecC
+		
+		SAVE RECORD([SpecSheetLines])
+		NEXT RECORD([SpecSheetLines])
+	End for 
+	ORDER BY([SpecSheetLines];[SpecSheetLines]SortOrder;>)
+End if 
+
+If (asRowHeaders=Size of array(asRowHeaders))
+	OBJECT SET ENABLED(bNext;False)
+	OBJECT SET VISIBLE(*;"xNext";False)
+Else 
+	OBJECT SET ENABLED(bNext;True)
+	OBJECT SET VISIBLE(*;"xNext";True)
+End if 
+
+If (asRowHeaders<1)
+	$show1:=False
+Else 
+	$show1:=True
+End if 
+
+If (asRowHeaders<2)
+	$show2:=False
+Else 
+	$show2:=True
+End if 
+
+OBJECT SET VISIBLE(*;"xDueDate2";$show2)
+OBJECT SET VISIBLE(*;"xRec2";$show2)
+OBJECT SET VISIBLE(*;"xPatternSource2";$show2)
+OBJECT SET VISIBLE([SpecLineSample]ColHead2;$show2)
+OBJECT SET VISIBLE([SpecLineSample]SubmitDue2;$show2)
+OBJECT SET VISIBLE([SpecLineSample]Received2;$show2)
+OBJECT SET VISIBLE([SpecLineSample]Pattern2;$show2)
+OBJECT SET VISIBLE(bDupe2;$show2)
+OBJECT SET VISIBLE(*;"xny";$show2)
+OBJECT SET VISIBLE(*;"xsb";$show2)
+
+OBJECT SET VISIBLE(*;"xny1";$show1)
+OBJECT SET VISIBLE(*;"xsb1";$show1)
+OBJECT SET VISIBLE(*;"xDueDate1";$show1)
+OBJECT SET VISIBLE(*;"xRec1";$show1)
+OBJECT SET VISIBLE(*;"xPatternSource1";$show1)
+OBJECT SET VISIBLE([SpecLineSample]ColumnHeader;$show1)
+OBJECT SET VISIBLE([SpecLineSample]SubmitDue;$show1)
+OBJECT SET VISIBLE([SpecLineSample]Received;$show1)
+OBJECT SET VISIBLE([SpecLineSample]PatternSource;$show1)
+OBJECT SET VISIBLE(bDupe1;$show1)
+
+
+If (asRowHeaders-2<=0)
+	OBJECT SET ENABLED(bPrev;False)
+	OBJECT SET VISIBLE(*;"xPrev";False)
+Else 
+	OBJECT SET ENABLED(bPrev;True)
+	OBJECT SET VISIBLE(*;"xPrev";True)
+End if 

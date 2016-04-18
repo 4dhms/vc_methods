@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($styleNumbers;0)
+Case of 
+	: (Form event=On Getting Focus)
+		If ([Samples]MultipleStyles)
+			WinPrompt ("This sample has multiple style numbers, do not alter this field.")
+			OBJECT SET ENTERABLE([Samples]StyleNum;False)
+			GOTO OBJECT(vsEmpty)
+		End if 
+		vsStyleNumber:=[Samples]StyleNum
+	: (Form event=On Data Change)
+		vtNewData:=[Samples]StyleNum
+		<>vsDesignNumber:=[Samples]DesignNum
+		<>vsStyleNumber:=[Samples]StyleNum
+		SN_CheckNumber 
+		If (<>vsStyleNumber="")
+			[Samples]StyleNum:=""
+			GOTO OBJECT([Samples]StyleNum)
+		Else 
+			QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=[Samples]StyleNum)
+			Case of 
+				: ([Samples]StyleNum="")
+					  //do nothing
+				: ([Samples]DesignNum="")
+					[Samples]DesignNum:=[StyleNumberGen]DesignNumber
+					QUERY([Designs];[Designs]DesignNum=[StyleNumberGen]DesignNumber)
+					
+				: ([Samples]DesignNum#[StyleNumberGen]DesignNumber)
+					WinChoice ("The Design Number in the"+Char(13)+"Style Number Book is "+[StyleNumberGen]DesignNumber+"."+Char(13)+"Do you want to stay with "+[Samples]DesignNum+"?";"Yes";"No")
+					If (ok=0)
+						[Samples]DesignNum:=[StyleNumberGen]DesignNumber
+						QUERY([Designs];[Designs]DesignNum=[StyleNumberGen]DesignNumber)
+					End if 
+			End case 
+			Case of 
+				: ([StyleNumberGen]Primary Customer="")
+					  //do nothing
+				: ([Samples]Customer="")
+					[Samples]Customer:=[StyleNumberGen]Primary Customer
+				: ([Samples]Customer#[StyleNumberGen]Primary Customer)
+					WinChoice ("The customer in the"+Char(13)+"Style Number Book is "+[StyleNumberGen]Primary Customer+"."+Char(13)+"Do you want to stay with "+[Samples]Customer+"?";"Yes";"No")
+					If (ok=0)
+						[Samples]Customer:=[StyleNumberGen]Primary Customer
+					End if 
+			End case 
+			
+			SELECTION TO ARRAY([StyleNumberGen]DesignNumber;$styleNumbers)
+			Case of 
+				: ([Samples]DesignNum="")
+					
+				: (Find in array($styleNumbers;[Samples]DesignNum)>0)
+					
+				Else 
+					FIRST RECORD([StyleNumberGen])
+					WinPrompt ("That Style Number belongs to"+Char(13)+"Design Number "+[StyleNumberGen]DesignNumber+"."+Char(13)+"Are you sure this is correct?")
+			End case 
+			UNLOAD RECORD([StyleNumberGen])
+		End if 
+		SG_CupioFix 
+End case 

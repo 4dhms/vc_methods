@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //This shows a subset in HMS Orders
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	SET WINDOW TITLE("Fabric Orders: "+String(Records in selection([FabricOrders]))+" of "+String(Records in table([FabricOrders])))
+Else 
+	ALERT("Please highlight some records first.")
+End if 

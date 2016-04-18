@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($desNumber)
+  //global procedure to search for style in Sam Fabrics
+SAVE RECORD([SampleFabrics])
+$desNumber:=Request("Find Design Num:")
+If (OK=1)
+	QUERY([SampleFabrics];[SampleFabrics]Design Num=$desNumber)
+End if 
+p_SetWndwSamF 

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($pricerptr)
+C_POINTER($msrp)
+
+$i:=1
+For ($i;1;12)
+	$pricerptr:=Get pointer("vsPrice"+String($i))
+	$pricerptr:=Get pointer("vsMSRP"+String($i))
+	OBJECT SET VISIBLE($pricerptr->;cbPrice=1)
+	OBJECT SET VISIBLE($msrp->;cbPrice=1)
+End for 

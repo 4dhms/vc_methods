@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docref)
+
+  //$docref:=Create document("";"txt")
+$docref:=Create document("";"xls")
+
+If (ok=1)
+	SEND PACKET($docref;"Customer"+Char(9)+vtHeader1a+Char(9)+vtHeader1b+Char(9)+"+ / -"+Char(9)+vtHeader2a+Char(9)+vtHeader2b+Char(9)+"+/-"+Char(9))
+	SEND PACKET($docref;vtHeader3a+Char(9)+vtHeader3b+Char(9)+"+ / -"+Char(9)+vtHeader4a+Char(9)+vtHeader4b+Char(9)+"+/-"+Char(9))
+	SEND PACKET($docref;"% + / - ly"+Char(13))
+	
+	$i:=1
+	For ($i;1;Size of array(asCustomers))
+		SEND PACKET($docref;asCustomers{$i}+Char(9)+String(arMCol1{$i};"##,###,###")+Char(9)+String(arMCol2{$i};"##,###,###")+Char(9)+String(arMCol3{$i};"##,###,###")+Char(9))
+		SEND PACKET($docref;String(arMCol4{$i};"##,###,###")+Char(9)+String(arMCol5{$i};"##,###,###")+Char(9)+String(arMCol6{$i};"##,###,###")+Char(9))
+		SEND PACKET($docref;String(arMCol7{$i};"##,###,###")+Char(9)+String(arMCol8{$i};"##,###,###")+Char(9)+String(arMCol9{$i};"##,###,###")+Char(9))
+		SEND PACKET($docref;String(arMCol10{$i};"##,###,###")+Char(9)+String(arMCol11{$i};"##,###,###")+Char(9)+String(arMCol12{$i};"##,###,###")+Char(9))
+		SEND PACKET($docref;String(arMCol13{$i};"##,###,###")+Char(13))
+	End for 
+End if 
+
+CLOSE DOCUMENT($docref)
+

@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Speedpost form entry
+Case of 
+	: (<>SpdpstID=0)
+		<>SpdpstID:=New process("p_SpeedpEntry";0;"Speedpost Entry")
+	Else 
+		SHOW PROCESS(<>SpdpstID)
+		BRING TO FRONT(<>SpdpstID)
+End case 

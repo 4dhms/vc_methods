@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Records in selection([Costing])=0)
+		ADD TO SET([Orders];"NoFOB")
+		ADD TO SET([Orders];"unconfirmed")
+	: (Records in selection([CostSheets])>0)
+		Case of 
+			: ([CostSheets]FOBConfirmed=True) & ([CostSheets]FOB2Confirmed=True)
+				ADD TO SET([Orders];"Confirmed")
+			: ([CostSheets]FOBConfirmed=True) & ([CostSheets]FOB2=0)
+				ADD TO SET([Orders];"Confirmed")
+			: ([CostSheets]FOB=0) & ([CostSheets]FOB2=0)
+				ADD TO SET([Orders];"unconfirmed")
+				ADD TO SET([Orders];"NoFOB")
+			Else 
+				ADD TO SET([Orders];"unconfirmed")
+		End case 
+	Else 
+		ADD TO SET([Orders];"NoFOB")
+		ADD TO SET([Orders];"unconfirmed")
+End case 
+

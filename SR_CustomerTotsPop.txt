@@ -1,0 +1,93 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start1;$end1;$start2;$end2)
+C_LONGINT($month;$year1;$year2;)
+C_TEXT($divnum)
+
+READ ONLY([Orders])
+
+$year1:=alYearA{alYearA}
+$year2:=$year1-1
+
+Case of 
+	: (atQueryText{atQueryText}="Q1") & (asSeasonA=1)
+		$start1:=Date("1/1/"+String($year1))
+		$end1:=Date("3/31/"+String($year1))
+		$start2:=Date("1/1/"+String($year2))
+		$end2:=Date("3/31/"+String($year2))
+		$month:=1
+	: (atQueryText{atQueryText}="Q1")
+		$start1:=Date("1/1/"+String($year1+1))
+		$end1:=Date("3/31/"+String($year1+1))
+		$start2:=Date("1/1/"+String($year2+1))
+		$end2:=Date("3/31/"+String($year2+1))
+		$month:=1
+	: (atQueryText{atQueryText}="Q2") & (asSeasonA=1)
+		$start1:=Date("4/1/"+String($year1))
+		$end1:=Date("6/30/"+String($year1))
+		$start2:=Date("4/1/"+String($year2))
+		$end2:=Date("6/30/"+String($year2))
+		$month:=4
+	: (atQueryText{atQueryText}="Q2")
+		$start1:=Date("4/1/"+String($year1+1))
+		$end1:=Date("6/30/"+String($year1+1))
+		$start2:=Date("4/1/"+String($year2+1))
+		$end2:=Date("6/30/"+String($year2+1))
+		$month:=4
+	: (atQueryText{atQueryText}="Q3")
+		$start1:=Date("7/1/"+String($year1))
+		$end1:=Date("9/30/"+String($year1))
+		$start2:=Date("7/1/"+String($year2))
+		$end2:=Date("9/30/"+String($year2))
+		$month:=7
+	: (atQueryText{atQueryText}="Q4")
+		$start1:=Date("10/1/"+String($year1))
+		$end1:=Date("12/31/"+String($year1))
+		$start2:=Date("10/1/"+String($year2))
+		$end2:=Date("12/31/"+String($year2))
+		$month:=10
+End case 
+
+QUERY([Orders];[Orders]CancelDate>=$start1;*)
+QUERY([Orders]; & ;[Orders]CancelDate<=$end1)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+CREATE SET([Orders];"quarter")
+
+QUERY([Orders];[Orders]CancelDate>=$start2;*)
+QUERY([Orders]; & ;[Orders]CancelDate<=$end2)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+CREATE SET([Orders];"temp")
+UNION("temp";"quarter";"quarter")
+CLEAR SET("temp")
+USE SET("quarter")
+
+Case of 
+	: (Current user="Guest")
+		  //do nothing
+	: (Current user="Ed")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+	: (User in group(Current user;"DressesOnly"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="02@")
+	: (Current user="Mark")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="01-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="02-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-@")
+		  //QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="08@")
+End case 
+
+Case of 
+	: (asDivisions{asDivisions}="06-C&G + 07-Ts")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+	: (asDivisions{asDivisions}#"All@")
+		$divnum:=Substring(asDivisions{asDivisions};1;Position("-";asDivisions{asDivisions}))+"@"
+		QUERY SELECTION([Orders];[Orders]OrderDivision=$divnum)
+End case 
+CREATE SET([Orders];"quarter")
+
+SR_Quarters ($month;$year1)
+SR_QDiff 
+
+CLEAR SET("quarter")
+

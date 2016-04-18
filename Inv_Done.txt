@@ -1,0 +1,28 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($good)
+$good:=False
+
+Case of 
+	: (vrInvAmt=0) & (vlInvQty=0)
+		CANCEL
+	: (vlOrderNumber=0)
+		WinPrompt ("Select order.")
+	: (vdInvDate=!00-00-00!)
+		WinPrompt ("Enter invoice date.")
+	: (vlInvQty=0)
+		WinPrompt ("Enter invoice quantity.")
+	: (vrInvAmt<1)
+		WinPrompt ("Enter invoice amount.")
+	Else 
+		$good:=True
+		CREATE RECORD([Invoices])
+		[Invoices]InvoiceAmount:=vrInvAmt
+		[Invoices]InvoiceDate:=vdInvDate
+		[Invoices]InvoiceKey:=Sequence number([Invoices])
+		[Invoices]InvoiceQuantity:=vlInvQty
+		[Invoices]OrderNumber:=vlOrderNumber
+		SAVE RECORD([Invoices])
+		UNLOAD RECORD([Invoices])
+End case 
+
+$0:=$good

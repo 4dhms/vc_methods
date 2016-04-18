@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test;$artno)
+C_LONGINT($i;$run)
+
+If (Form event=On Data Change)
+	If ([FabricLibrary]ArticleNumber#"")
+		<>vtArtNumber:=""
+		<>vlPriors:=0
+		$run:=New process("ArtNo_DupeCheck";0;"DupeCheck";[FabricLibrary]ArticleNumber)
+		Repeat 
+		Until (<>vlPriors#0) | (Shift down)
+		
+		If (<>vlPriors>0)
+			WinPrompt (<>vtArtNumber+" already exists.")
+			[FabricLibrary]ArticleNumber:=""
+			GOTO OBJECT([FabricLibrary]ArticleNumber)
+		End if 
+	End if 
+	OBJECT SET VISIBLE(*;"xRestricted";[FabricLibrary]ArticleNumber="HMS@")
+	OBJECT SET VISIBLE([FabricLibrary]Restricted;[FabricLibrary]ArticleNumber="HMS@")
+End if 

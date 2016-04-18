@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+vlPage:=1
+vlLastPage:=1
+vlRecCount:=1
+Email_Confirm ("SG";"Sample Garment")
+CANCEL

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+
+If (Current user#"Spooler")
+	  //QUERY([Changes];[Changes]OrderNumber=-123)
+	  //If (Records in selection([Changes])=1)
+	  //$message:=[Changes]NewChange
+	  //UNLOAD RECORD([Changes])
+	ALERT($1)
+End if 

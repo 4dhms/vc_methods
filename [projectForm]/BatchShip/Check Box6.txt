@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(afBatchList))
+	If (cb999=1)
+		afBatchList{$i}:=True
+	Else 
+		afBatchList{$i}:=False
+	End if 
+End for 

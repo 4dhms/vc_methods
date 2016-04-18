@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		
+		Case of 
+			: (vtSubject="Fabric") | (vtSubject="Shortcuts") | (vtSubject="Duty Note")
+				FORM GOTO PAGE(2)
+				OBJECT SET ENTERABLE(<>vtNotes;False)
+			: (vtSubject="Add to notes@")
+				FORM GOTO PAGE(3)
+				c1:=0
+				c2:=0
+				c3:=0
+				dadd:=1
+				dinsert:=0
+				OBJECT SET ENTERABLE(<>vtNotes;Not(<>vfPreview))
+		End case 
+		OBJECT SET VISIBLE(bChoice1;Not(<>vfPreview))
+		OBJECT SET VISIBLE(bChoice2;Not(<>vfPreview))
+		
+End case 

@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($update)
+C_LONGINT($selfcount)
+
+$selfcount:=Count in array(asTypeList;"Self")
+
+If (Order_Mandatory (True))
+	If ($selfcount>14)
+		WinPrompt ("This order contains "+String($selfcount)+" colors."+Char(13)+Char(13)+"The DC can only process up to 14.")
+	End if 
+	
+	If (Position("Fabric";vtOrderChanges)>0) & (FORM Get current page=1)
+		$update:=True
+		Fabric_ArraySave 
+	End if 
+	If (Position("Color";vtOrderChanges)>0) | (Find in array(alShadeFab;16711690)>0)
+		$update:=True
+		Color_Save 
+	End if 
+	
+	
+	vtOrderChanges:=vtOrderChanges+"_DC"
+	vlOrderRouter:=2
+	FORM SET INPUT([Orders];"SizeBreakDown.i")
+	  //Center Window (800;600;1;"")
+	MODIFY RECORD([Orders];*)
+	CLOSE WINDOW
+End if 

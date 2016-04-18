@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	cbAll:=1
+	vtDescription:=""
+	GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+	GOTO OBJECT(vsStyleNumber)
+	ARRAY TEXT(asXStyleNumbers;0)
+	OBJECT SET VISIBLE(bDelete;(Current user="Designer") | (Current user="Peter G"))
+End if 

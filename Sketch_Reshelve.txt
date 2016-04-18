@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($folder;$folder1;$folder2;$from;$to)
+C_LONGINT($i;$n;$s)
+
+ARRAY TEXT($folderlist;0)
+
+$folder:=Substring(Application file;1;Position(":";Application file))+"4D Sketches:"
+
+FOLDER LIST($folder;$folderlist)
+
+$i:=1
+For ($i;1;Size of array($folderlist))
+	$folder1:=$folder+$folderlist{$i}+":"
+	ARRAY TEXT($filelist1;0)
+	DOCUMENT LIST($folder1;$filelist)
+	
+	$n:=1
+	For ($n;1;Size of array($filelist))
+		$folder2:=$folder1+Substring($filelist{$n};1;5)+":"
+		If (Test path name($folder2)#0)
+			CREATE FOLDER($folder2)
+		End if 
+		
+		$from:=$folder1+$filelist{$n}
+		$to:=$folder2+$filelist{$n}
+		
+		  //  ALERT("From: "+$from+"  To: "+$to)
+		  //  If (Shift down)
+		  //  TRACE
+		  //  End if 
+		
+		If (Test path name($to)=1)
+			Repeat 
+				DELETE DOCUMENT($to)
+			Until (Test path name($to)#1) | (Shift down)
+		End if 
+		
+		MOVE DOCUMENT($from;$to)
+		
+		  //End if 
+	End for 
+End for 
+
+ALERT("Done")
+

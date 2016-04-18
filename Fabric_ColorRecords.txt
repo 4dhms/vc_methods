@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$selfkey)
+
+$i:=1
+For ($i;1;Size of array(asOrderType))
+	CREATE RECORD([OrdersFabricXRef])
+	[OrdersFabricXRef]OrdType:=asOrderType{$i}
+	[OrdersFabricXRef]SolidPrint:=asSolidPrint{$i}
+	[OrdersFabricXRef]FabricName:=asFabric{$i}
+	[OrdersFabricXRef]FiberContent:=asFiber{$i}
+	[OrdersFabricXRef]Treatment:=asTreatment{$i}
+	[OrdersFabricXRef]FabArtNo:=atArtNumber{$i}
+	[OrdersFabricXRef]FabCode:=Fabric_ArtCode ([OrdersFabricXRef]FabArtNo)
+	[OrdersFabricXRef]FabSupplier:=asFabSpler{$i}
+	[OrdersFabricXRef]Part:=asGarPart{$i}
+	[OrdersFabricXRef]Usage:=arUsage{$i}
+	[OrdersFabricXRef]Usage:=arActual{$i}
+	[OrdersFabricXRef]XrefID:=10000+Sequence number([OrdersFabricXRef])
+	[OrdersFabricXRef]FabOrdType:=Num(asOrderType{$i})
+	[OrdersFabricXRef]OrderNumber:=<>vlOrderNumber
+	[OrdersFabricXRef]Gauge:=asGauge{$i}
+	[OrdersFabricXRef]YarnSize:=asYarnSize{$i}
+	SAVE RECORD([OrdersFabricXRef])
+	alXrefKeys{$i}:=[OrdersFabricXRef]XrefID
+End for 
+
+$i:=1
+For ($i;1;Size of array(asCPNumbers))
+	CREATE RECORD([CP_OrderXRef])
+	[CP_OrderXRef]CPNumber:=asCPNumbers{$i}
+	[CP_OrderXRef]Quantity:=alCQty{$i}
+	[CP_OrderXRef]CPOrdID:=Sequence number([CP_OrderXRef])
+	[CP_OrderXRef]CPType:=asTypeList{$i}
+	[CP_OrderXRef]XrefID:=alXrefKeys{Find in array(asOrderType;[CP_OrderXRef]CPType)}
+	[CP_OrderXRef]CreateDate:=Current date(*)
+	[CP_OrderXRef]CPStatus:=asColorStatus{$i}
+	[CP_OrderXRef]CPStatusDate:=adStatusDate{$i}
+	[CP_OrderXRef]LineKey:=asCPLetter{$i}
+	[CP_OrderXRef]OrderNumber:=<>vlOrderNumber
+	If (asTypeList{$i}="Self")
+		[CP_OrderXRef]SelfKey:=[CP_OrderXRef]CPOrdID
+		$selfkey:=[CP_OrderXRef]SelfKey
+		[CP_OrderXRef]OrderNumber:=<>vlOrderNumber
+	Else 
+		[CP_OrderXRef]SelfKey:=$selfkey
+	End if 
+	SAVE RECORD([CP_OrderXRef])
+	alSelfKey{$i}:=[CP_OrderXRef]SelfKey
+	alCPXref{$i}:=[CP_OrderXRef]XrefID
+	alColorKey{$i}:=[CP_OrderXRef]CPOrdID
+End for 

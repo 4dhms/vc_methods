@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asChartDivisions=1)
+	CP_BuildDivArray (4)
+	OBJECT SET VISIBLE(cb11;False)
+	OBJECT SET TITLE(Header1;"Division")
+Else 
+	OBJECT SET VISIBLE(cb11;True)
+	ARRAY TEXT(asDivisions;0)
+	UsageInitArrays (0)
+	ARRAY TEXT(asDivisions;1)
+End if 

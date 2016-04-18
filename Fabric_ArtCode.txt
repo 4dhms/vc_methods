@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($code)
+
+$code:=Replace string($1;"#";"")
+$code:=Replace string($code;"-";"")
+$code:=Replace string($code;"(";"")
+$code:=Replace string($code;")";"")
+If (Position(" ";$code)>0)
+	$code:=Substring($code;1;Position(" ";$code))
+	$code:=Replace string($code;" ";"@")
+Else 
+	$code:=$code+"@"
+End if 
+$0:=$code

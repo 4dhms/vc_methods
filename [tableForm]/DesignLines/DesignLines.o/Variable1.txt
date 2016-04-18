@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to create a new design line plan?")
+If (ok=1)
+	SET WINDOW TITLE("New Design Line Plan")
+	vsHeader:=""
+	vsWinTitle:=""
+	vtDescription:=""
+	vdSubmitDate:=!00-00-00!
+	CREATE SET([DesignLines];"lines")
+	ADD RECORD([DesignLines];*)
+	ADD TO SET([DesignLines];"lines")
+	USE SET("lines")
+	CLEAR SET("lines")
+End if 

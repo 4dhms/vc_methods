@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($season)
+C_TEXT($year)
+
+If (asSearchSeason>1)
+	$season:=Substring(asSearchSeason{asSearchSeason};1;Length(asSearchSeason{asSearchSeason})-5)
+	$year:=Substring(asSearchSeason{asSearchSeason};Length(asSearchSeason{asSearchSeason})-3;4)
+	
+	QUERY([Orders];[Orders]SeasonYear=$year;*)
+	QUERY([Orders]; & ;[Orders]SeasonName=$season)
+	ORDER BY([Orders];[Orders]OrderDivision;>)
+	SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+	
+End if 

@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CREATE SET([SpecTempBuilder];"Stripped")
+QUERY SELECTION([SpecTempBuilder];[SpecTempBuilder]Delete=True)
+DELETE SELECTION([SpecTempBuilder])
+USE SET("Stripped")
+CLEAR SET("Stripped")
+ORDER BY([SpecTempBuilder];[SpecTempBuilder]SortOrder;>)
+
+
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList1;Records in selection([SpecTempBuilder]))
+ARRAY LONGINT(alItemNumber;0)
+ARRAY LONGINT(alItemNumber;Records in selection([SpecTempBuilder]))
+FIRST RECORD([SpecTempBuilder])
+
+$i:=1
+For ($i;1;Records in selection([SpecTempBuilder]))
+	QUERY([ChineseDictionary];[ChineseDictionary]LexKey=[SpecTempBuilder]SpecLibKey)
+	asList1{$i}:=[ChineseDictionary]EnglishName
+	alItemNumber{$i}:=[SpecTempBuilder]SpecTempBuildKey
+	NEXT RECORD([SpecTempBuilder])
+End for 
+
+FORM GOTO PAGE(4)

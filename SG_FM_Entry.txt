@@ -1,0 +1,60 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCurrentTab)
+C_BOOLEAN(<>vfGuideFlag)
+
+Case of 
+	: (Form event=On Close Box)
+		SAVE RECORD([Samples])
+		If (<>SalesPrcID>0)
+			Order_NavButtons 
+			OBJECT SET ENABLED(bCancelSample;True)
+			OBJECT SET ENABLED(bDupe;True)
+		End if 
+	: (Form event=On Unload)
+		vtHistory:=""
+		If (Records in set("ThisSheet")>0)
+			CLEAR SET("ThisSheet")
+		End if 
+		  //
+		If (Records in set("SG")>0)
+			USE SET("SG")
+			CLEAR SET("SG")
+		End if 
+		p_SetWndwSamGar 
+		Spec_Close 
+		
+	: (Form event=On Load)
+		OBJECT SET ENABLED(bComp;False)
+		Dev_TrackLock (->[Samples])
+		OBJECT SET VISIBLE(vrTestPrice;False)
+		<>vlOrderNumber:=-1*[Samples]SampleNumber
+		Rev_MakeArray (3)
+		
+		OBJECT SET VISIBLE([CostSheets]MyFOB;User in group(Current user;"SuperDuperCostSheets"))
+		OBJECT SET ENTERABLE([CostSheets]FOB;User in group(Current user;"SuperDuperCostSheets"))
+		OBJECT SET ENTERABLE([CostSheets]FOB2;User in group(Current user;"SuperDuperCostSheets"))
+		vfFabImport:=False
+		vtOrderChanges:=""
+		OBJECT SET ENABLED(bCancelSample;True)
+		
+		If (vsCurrentTab="")
+			Tabber_Setup 
+			FORM GOTO PAGE(1)
+		Else 
+			Order_Tabber 
+		End if 
+		
+		If (Current user#"Designer")
+			LISTBOX DELETE COLUMN(fabriclist;13)
+			LISTBOX DELETE COLUMN(colorlist;9;3)
+		End if 
+		SG_FM_EntryOnLoad 
+		
+	: (Form event=On Outside Call)
+		<>vlSGPO:=-1*[Samples]SampleNumber
+		Case of 
+			: (<>Close) | (<>vlCostRouter=10)
+				<>Close:=False
+				ACCEPT
+		End case 
+End case 

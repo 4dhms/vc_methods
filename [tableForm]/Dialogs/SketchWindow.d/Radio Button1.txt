@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (ssApproved=1)
+	[SpecFactory]ApprovedForProd:=True
+	[SpecFactory]ApproveDate:=Current date(*)
+	WinChoice ("Do you want to request another sample?")
+End if 
+
+SS_Show 

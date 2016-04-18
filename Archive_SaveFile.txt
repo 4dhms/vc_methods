@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_BLOB($mover)
+C_LONGINT($i;$run)
+C_TEXT($docname)
+C_TEXT($type)
+C_LONGINT($dot)
+
+ARRAY TEXT($files;0)
+
+[ShipArchive]AirwayBill:=vsArticle
+[ShipArchive]ArchiveDate:=vdCreateDate
+[ShipArchive]ArchiveKey:=Sequence number([ShipArchive])
+[ShipArchive]Archivist:=vsUser
+[ShipArchive]Invoices:=vsArticle
+[ShipArchive]Factory:=vtVendor
+[ShipArchive]ShipNote:=vtNote
+[ShipArchive]POs:=vtSupplier
+
+$docref:=Open document("")
+CLOSE DOCUMENT($docref)
+DOCUMENT TO BLOB(Document;$mover)
+
+$docName:=Document
+
+$i:=Length($docName)
+
+While ($docName[[$i]]#":")
+	$i:=$i-1
+End while 
+
+$dot:=Length(Document)-3
+
+If (Document[[$dot]]=".")
+	$type:="."+Substring(Document;$dot+1;3)
+Else 
+	$type:=""
+End if 
+
+
+[ShipArchive]FileName:=Substring($docName;$i+1;40)
+[ShipArchive]FilePath:="4D_Archive:"+String(Int([ShipArchive]ArchiveKey/100))+":"+String([ShipArchive]ArchiveKey)+$type
+SAVE RECORD([ShipArchive])
+DOCUMENT LIST(Document;$files)
+
+
+$run:=Execute on server("Archive_ServerPut";32*1024;"ArchiveProc";String([ShipArchive]ArchiveKey)+$type;$mover)
+

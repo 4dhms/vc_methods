@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([SLRReporter];[SLRReporter]User#"")
+FIRST RECORD([SLRReporter])
+
+$i:=1
+For ($i;1;Records in selection([SLRReporter]))
+	[SLRReporter]User:=""
+	SAVE RECORD([SLRReporter])
+	NEXT RECORD([SLRReporter])
+End for 

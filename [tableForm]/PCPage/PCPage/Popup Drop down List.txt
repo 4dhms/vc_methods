@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($step;$newstep)
+
+If (atSteps>1)
+	$step:=atSteps{atSteps}
+	atSteps:=1
+	
+	ARRAY TEXT($test;0)
+	SELECTION TO ARRAY([PCHistory]Step;$test)
+	
+	Case of 
+		: ($step="S/O")
+			Case of 
+				: (Find in array($test;"3rd S/O")>0)
+					$newstep:="4th S/O"
+				: (Find in array($test;"2nd S/O")>0)
+					$newstep:="3rd S/O"
+				: (Find in array($test;"1st S/O")>0)
+					$newstep:="2nd S/O"
+				: (Find in array($test;"@ S/O")<0)
+					$newstep:="1st S/O"
+			End case 
+			
+		: ($step="S/Y")
+			Case of 
+				: (Find in array($test;"3rd S/Y")>0)
+					$newstep:="4th S/Y"
+				: (Find in array($test;"2nd S/Y")>0)
+					$newstep:="3rd S/Y"
+				: (Find in array($test;"1st S/Y")>0)
+					$newstep:="2nd S/Y"
+				: (Find in array($test;"@ S/Y")<0)
+					$newstep:="1st S/Y"
+			End case 
+			
+		: ($step="SS")
+			$newstep:="SS"
+	End case 
+	CREATE SET([PCHistory];"PC")
+	CREATE RECORD([PCHistory])
+	[PCHistory]PCKey:=[PCatalog]PCKey
+	[PCHistory]Step:=$newstep
+	[PCHistory]PrintNumber:=vsNewColorNumber
+	[PCHistory]Serial:=Sequence number([PCHistory])
+	SAVE RECORD([PCHistory])
+	
+	ADD TO SET([PCHistory];"PC")
+	USE SET("PC")
+	CLEAR SET("PC")
+	ORDER BY([PCHistory];[PCHistory]Serial;<)
+	
+End if 

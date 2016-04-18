@@ -1,0 +1,99 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY REAL(arMCol1;0)
+ARRAY REAL(arMCol2;0)
+ARRAY REAL(arMCol3;0)
+ARRAY REAL(arMCol4;0)
+ARRAY REAL(arMCol5;0)
+ARRAY REAL(arMCol6;0)
+ARRAY REAL(arMCol7;0)
+ARRAY REAL(arMCol8;0)
+ARRAY REAL(arMCol9;0)
+ARRAY REAL(arMCol10;0)
+ARRAY REAL(arMCol11;0)
+ARRAY REAL(arMCol12;0)
+ARRAY REAL(arMCol13;0)
+ARRAY TEXT(asCustomers;0)
+
+C_TEXT($header1;$header2;$header3)
+C_LONGINT($year;$n)
+C_BOOLEAN($fall)
+
+If (asSeasonA{asSeasonA}="Fall")
+	$fall:=True
+Else 
+	$fall:=False
+End if 
+
+Case of 
+	: (atQueryText{atQueryText}="Q1")
+		$header1:="JAN"
+		$header2:="FEB"
+		$header3:="MAR"
+		If ($fall)
+			$year:=alYearA{alYearA}+1
+		Else 
+			$year:=alYearA{alYearA}
+		End if 
+	: (atQueryText{atQueryText}="Q2")
+		$header1:="APR"
+		$header2:="MAY"
+		$header3:="JUN"
+		If ($fall)
+			$year:=alYearA{alYearA}+1
+		Else 
+			$year:=alYearA{alYearA}
+		End if 
+	: (atQueryText{atQueryText}="Q3")
+		$header1:="JUL"
+		$header2:="AUG"
+		$header3:="SEP"
+		$year:=alYearA{alYearA}
+	: (atQueryText{atQueryText}="Q4")
+		$header1:="OCT"
+		$header2:="NOV"
+		$header3:="DEC"
+		$year:=alYearA{alYearA}
+End case 
+
+vtHeader1a:=$header1+" "+String($year)
+vtHeader1b:=$header1+" "+String($year-1)
+vtHeader2a:=$header2+" "+String($year)
+vtHeader2b:=$header2+" "+String($year-1)
+vtHeader3a:=$header3+" "+String($year)
+vtHeader3b:=$header3+" "+String($year-1)
+vtHeader4a:="Total "+atQueryText{atQueryText}+" "+String($year)
+vtHeader4b:="Total "+atQueryText{atQueryText}+" "+String($year-1)
+
+OBJECT SET TITLE(Header1a;vtHeader1a)
+OBJECT SET TITLE(Header1b;vtHeader1b)
+OBJECT SET TITLE(Header2a;vtHeader2a)
+OBJECT SET TITLE(Header2b;vtHeader2b)
+OBJECT SET TITLE(Header3a;vtHeader3a)
+OBJECT SET TITLE(Header3b;vtHeader3b)
+OBJECT SET TITLE(Header4a;vtHeader4a)
+OBJECT SET TITLE(Header4b;vtHeader4b)
+
+USE SET("Master")
+DISTINCT VALUES([Orders]Customer;asCustomers)
+SORT ARRAY(asCustomers;>)
+$n:=Size of array(asCustomers)
+
+ARRAY REAL(arMCol1;$n)
+ARRAY REAL(arMCol2;$n)
+ARRAY REAL(arMCol3;$n)
+ARRAY REAL(arMCol4;$n)
+ARRAY REAL(arMCol5;$n)
+ARRAY REAL(arMCol6;$n)
+ARRAY REAL(arMCol7;$n)
+ARRAY REAL(arMCol8;$n)
+ARRAY REAL(arMCol9;$n)
+ARRAY REAL(arMCol10;$n)
+ARRAY REAL(arMCol11;$n)
+ARRAY REAL(arMCol12;$n)
+ARRAY REAL(arMCol13;$n)
+
+SR_CustomerTotsPop 
+
+atQueryText:=1
+FORM GOTO PAGE(4)
+

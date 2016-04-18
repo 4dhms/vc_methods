@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (Form event=On Double Clicked) & (asCompName>0)
+	vfNew:=False
+	Comp_GetInfo 
+End if 
+LISTBOX SELECT ROW(compBox;Size of array(asCompName)+1)

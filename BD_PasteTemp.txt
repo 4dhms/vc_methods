@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($newtemplate;$rem)
+C_LONGINT($i;$n)
+C_BOOLEAN($batch;$done;$paste)
+C_POINTER($col)
+
+ARRAY LONGINT($bd;0)
+
+Case of 
+	: (asTemplates=2)
+		$newtemplate:=Request("New Template (ex: 1-2-2-1)")
+		If (ok=1) & ($newtemplate#"")
+			QUERY([BDTemplates];[BDTemplates]Template=$newtemplate)
+			If (Records in selection([BDTemplates])=0)
+				CREATE RECORD([BDTemplates])
+				[BDTemplates]Template:=$newtemplate
+				SAVE RECORD([BDTemplates])
+				UNLOAD RECORD([BDTemplates])
+				APPEND TO ARRAY(asTemplates;$newtemplate)
+				asTemplates:=1
+			End if 
+		End if 
+		
+	: (asTemplates>2)
+		$rem:=asTemplates{asTemplates}
+		If (Position("-";$rem)<1)
+			WinPrompt ($rem+" is an invalid Breakdown.")
+		Else 
+			
+			Repeat 
+				Case of 
+					: (Shift down)
+						$done:=True
+					: (Position("-";$rem)<1)
+						APPEND TO ARRAY($bd;Num($rem))
+						$done:=True
+					: (Position("-";$rem)>0)
+						APPEND TO ARRAY($bd;Num(Substring($rem;1;Position("-";$rem)-1)))
+						$rem:=Substring($rem;Position("-";$rem)+1;100)
+				End case 
+			Until ($done)
+			
+			Case of 
+				: (Size of array(asBDSelf)=1)
+					$batch:=True
+				: (Breakdown=0)
+					$batch:=True
+				Else 
+					WinChoice ("Do you want to add template to all or selected lines?";"All";"Selected")
+					If (ok=1)
+						$batch:=True
+					End if 
+			End case 
+		End if 
+		$i:=1
+		For ($i;1;Size of array(alBD1))
+			$n:=1
+			If (alBD1{$i}+alBD2{$i}+alBD3{$i}+alBD4{$i}+alBD5{$i}+alBD6{$i}=0)
+				$paste:=True
+			Else 
+				$paste:=False
+			End if 
+			For ($n;1;Size of array($bd))
+				
+				If (Breakdown{$i}=True) | ($batch) & ($paste) & (asBDLetter{$i}#"@Total@")
+					$col:=Get pointer("alBD"+String($n))
+					$col->{$i}:=$bd{$n}
+				End if 
+			End for 
+		End for 
+		Order_BDTotals 
+		asTemplates:=1
+End case 

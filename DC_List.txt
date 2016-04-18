@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($customers;0)
+
+QUERY([Lists];[Lists]ListName="DC")
+SELECTION TO ARRAY([Lists]ListItem;$customers)
+SORT ARRAY($customers;>)
+
+ARRAY TO LIST($customers;"DC List")
+UNLOAD RECORD([Lists])

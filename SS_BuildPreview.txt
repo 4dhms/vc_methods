@@ -1,0 +1,95 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSpec;0)
+ARRAY TEXT(asShouldM;0)
+ARRAY TEXT(asSampleM;0)
+C_TEXT($workline;$mLine;vtFootnote)
+C_LONGINT($return;$arraySize)
+C_BOOLEAN($done)
+
+vtPOM:=[Specs]MsmtTermText
+
+Case of 
+	: ([Specs]ShouldMeas6#"")
+		vtSampleM:=[Specs]Spl Msr 6
+		vtShouldM:=[Specs]ShouldMeas6
+		vtFootnote:=[Specs]Cmmts 6
+	: ([Specs]ShouldMeas5#"")
+		vtSampleM:=[Specs]Spl Msr 5
+		vtFootnote:=[Specs]Cmmts 5
+		vtShouldM:=[Specs]ShouldMeas5
+	: ([Specs]ShouldMeas4#"")
+		vtSampleM:=[Specs]Spl Msr 4
+		vtFootnote:=[Specs]Cmmts 4
+		vtShouldM:=[Specs]ShouldMeas4
+	: ([Specs]ShouldMeas3#"")
+		vtSampleM:=[Specs]Spl Msr 3
+		vtFootnote:=[Specs]Cmmts 3
+		vtShouldM:=[Specs]ShouldMeas3
+	: ([Specs]ShouldMeas2#"")
+		vtSampleM:=[Specs]Spl Msr 2
+		vtFootnote:=[Specs]Cmmts 2
+		vtShouldM:=[Specs]ShouldMeas2
+	: ([Specs]ShouldMeas1#"")
+		vtSampleM:=[Specs]Spl Msr 1
+		vtFootnote:=[Specs]Cmmts 1
+		vtShouldM:=[Specs]ShouldMeas1
+	Else 
+		vtSampleM:=""
+		vtFootnote:=""
+		vtShouldM:=""
+End case 
+
+$arraySize:=1
+
+If ([Specs]Cmmts 6#"")
+	vtSpecNotes:=[Specs]Spl Type 6+": "+[Specs]Cmmts 6+Char(13)
+End if 
+If ([Specs]Cmmts 5#"")
+	vtSpecNotes:=vtSpecNotes+[Specs]Spl Type 5+": "+[Specs]Cmmts 5+Char(13)
+End if 
+If ([Specs]Cmmts 4#"")
+	vtSpecNotes:=vtSpecNotes+[Specs]Spl Type 4+": "+[Specs]Cmmts 4+Char(13)
+End if 
+If ([Specs]Cmmts 3#"")
+	vtSpecNotes:=vtSpecNotes+[Specs]Spl Type 3+": "+[Specs]Cmmts 3+Char(13)
+End if 
+If ([Specs]Cmmts 2#"")
+	vtSpecNotes:=vtSpecNotes+[Specs]Spl Type 2+": "+[Specs]Cmmts 2+Char(13)
+End if 
+If ([Specs]Cmmts 1#"")
+	vtSpecNotes:=vtSpecNotes+[Specs]Spl Type 1+": "+[Specs]Cmmts 1+Char(13)
+End if 
+
+
+Repeat 
+	INSERT IN ARRAY(asSpec;$arraySize;1)
+	INSERT IN ARRAY(asShouldM;$arraySize;1)
+	INSERT IN ARRAY(asSampleM;$arraySize;1)
+	
+	$mLine:=""
+	If (Position(Char(13);vtPom;*)<1)
+		$done:=True
+		$workline:=vtPom
+		vtPom:=""
+		asSpec{$arraySize}:=$workLine
+	Else 
+		$return:=Position(Char(13);vtPom;*)
+		$workline:=Substring(vtPom;1;$return-1)
+		vtPom:=Substring(vtPom;$return+1;999)
+		asSpec{$arraySize}:=$workLine
+	End if 
+	
+	If (Position(Char(13);vtShouldM;*)<1)
+		$mLine:=vtShouldM
+		vtShouldM:=""
+		asShouldM{$arraySize}:=$mLine
+	Else 
+		$return:=Position(Char(13);vtShouldM;*)
+		$mLine:=Substring(vtShouldM;1;$return-1)
+		vtShouldM:=Substring(vtShouldM;$return+1;999)
+		asShouldM{$arraySize}:=$mLine
+	End if 
+	
+	$arraySize:=$arraySize+1
+	
+Until ($done)

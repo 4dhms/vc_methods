@@ -1,0 +1,162 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($netSea;$netAir;$netnetSea;$netnetAir)
+C_BOOLEAN($readWrite)
+
+vrTestPrice:=0
+vfTestPrice:=False
+vlTestQuantity:=0
+vfTestQuantity:=False
+OBJECT SET VISIBLE(*;"xAir7";False)
+OBJECT SET VISIBLE(*;"xCushion";(User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet))
+OBJECT SET VISIBLE(*;"xCushion1";(User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet))
+OBJECT SET VISIBLE([CostSheets]Cushion;(User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet))
+OBJECT SET VISIBLE([CostSheets]DutyActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+OBJECT SET VISIBLE([CostSheets]DutyAmountActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+Case of 
+	: ([CostSheets]ShipLDP)
+		OBJECT SET VISIBLE(*;"xAir7";False)
+		vsHead3:="LDP Only"
+	: ([CostSheets]ShipFOB)
+		OBJECT SET VISIBLE(*;"xAir7";False)
+		vsHead3:="FOB Only"
+	: ([CostSheets]ShipAir=[CostSheets]ShipSea)
+		OBJECT SET VISIBLE(*;"xAir7";True)
+		vsHead3:="Sea"
+	Else 
+		OBJECT SET VISIBLE(*;"xAir7";False)
+		OBJECT SET VISIBLE(vrUnit2;False)
+		OBJECT SET VISIBLE(vrTotal2;False)
+		OBJECT SET VISIBLE(vrNetProfit2;False)
+		OBJECT SET VISIBLE(vrNetNetProfit2;False)
+		OBJECT SET VISIBLE(vrNetPercent2;False)
+		OBJECT SET VISIBLE(vrNetNetPercent2;False)
+		Case of 
+			: ([CostSheets]ShipAir)
+				vsHead3:="Air"
+			: ([CostSheets]ShipSea=True)
+				vsHead3:="Sea"
+		End case 
+End case 
+
+  //Preview_CostCalc 
+Cost_EntryCalculate 
+Cost_EntryShow 
+AirSeaToggle 
+
+  //PROFIT
+C_REAL($subtot;$netSea;$netAir;$netNetSea;$netNetAir)
+[CostSheets]NetTotalSales:=Round(([CostSheets]Quantity*[CostSheets]Price)*((100-[CostSheets]Figurer)/100);2)
+[CostSheets]NetNetTotalSales:=Round([CostSheets]NetTotalSales*((100-[CostSheets]SpecialDiscount)/100);2)
+$subTot:=[CostSheets]NetTotalSales-([CostSheets]Quantity*[CostSheets]UnitCostSea)
+
+[CostSheets]NetTotalProfitSea:=$subTot
+SAVE RECORD([CostSheets])
+
+C_REAL($netAir;$netSea;$netSea;$netNetSea)
+vrNetProfit1:=0
+vrNetProfit2:=0
+
+$netSea:=[CostSheets]NetTotalSales-([CostSheets]Quantity*[CostSheets]UnitCostSea)
+
+$netAir:=[CostSheets]NetTotalSales-([CostSheets]Quantity*[CostSheets]UnitCostAir)
+
+$netNetSea:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*[CostSheets]UnitCostSea)
+$netNetAir:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*[CostSheets]UnitCostAir)
+[CostSheets]NetTotalProfitSea:=$netSea
+[CostSheets]NetNetTotalProfitSea:=$netNetSea
+[CostSheets]NetTotalProfitAir:=$netAir
+[CostSheets]NetNetTotalProfitAir:=$netNetAir
+
+Case of 
+	: (vlOrderNumber<0) | ([CostSheets]SheetName="Weighted")
+		vrNetProfit1:=$netSea
+		vrNetProfit2:=$netAir
+		vrNetNetProfit1:=$netNetSea
+		vrNetNetProfit2:=$netNetAir
+	: (Not([CostSheets]ShipAir)) & (Not([CostSheets]ShipSea))
+		vrNetProfit1:=$netSea
+		vrNetProfit2:=$netAir
+		vrNetNetProfit1:=$netNetSea
+		vrNetNetProfit2:=$netNetAir
+	: ([CostSheets]ShipAir)
+		vrNetProfit1:=$netAir
+		vrNetNetProfit1:=$netNetAir
+		[CostSheets]NetTotalProfitAir:=$netAir
+		[CostSheets]NetNetTotalProfitAir:=$netNetAir
+		SAVE RECORD([CostSheets])
+	: ([CostSheets]ShipSea)
+		vrNetProfit1:=$netSea
+		vrNetNetProfit1:=$netNetSea
+		[CostSheets]NetTotalProfitSea:=$netSea
+		[CostSheets]NetNetTotalProfitSea:=$netNetSea
+		SAVE RECORD([CostSheets])
+End case 
+
+vrNetPercent1:=Round((([CostSheets]NetUnitPrice-vrLDPBoat)/[CostSheets]NetUnitPrice)*100;2)
+vrNetPercent2:=Round((([CostSheets]NetUnitPrice-vrLDPAir)/[CostSheets]NetUnitPrice)*100;2)
+vrNetNetPercent1:=Round((([CostSheets]NetNetUnitPrice-vrLDPBoat)/[CostSheets]NetNetUnitPrice)*100;2)
+vrNetNetPercent2:=Round((([CostSheets]NetNetUnitPrice-vrLDPAir)/[CostSheets]NetNetUnitPrice)*100;2)
+
+If (vlOrderNumber<0)
+	vsHeader:="Sample Order"
+	vsType:="Order Date"
+	QUERY([Samples];[Samples]SampleNumber=Abs(vlOrderNumber))
+	vsStyleNumber:=[Samples]StyleNum
+	vsDesignNumber:=[Samples]DesignNum
+Else 
+	vsHeader:="HMS Order"
+	vsType:="PO Date"
+	QUERY([Orders];[Orders]OrderNum=vlOrderNumber)
+	vsStyleNumber:=[Orders]StyleNumber
+	vsDesignNumber:=[Orders]DesignNumber
+End if 
+vlOrderNumber:=Abs(vlOrderNumber)
+SET WINDOW TITLE(String(Records in selection([CostSheets]))+" Cost Sheets")
+
+Case of 
+	: (vlOrderNumber>0)
+		vRecNum:=String(Selected record number([Orders]))+" / "+String(Records in selection([Orders]))
+	Else 
+		vRecNum:=String(Selected record number([Samples]))+" / "+String(Records in selection([Samples]))
+End case 
+
+Case of 
+	: (Not(User in group(Current user;"SpreadSheets")))
+		$readwrite:=False
+	: ([CostSheets]KeepOpen)
+		$readWrite:=True
+	: ([Costing]OpenSheetID=[CostSheets]SheetID)
+		$readWrite:=True
+	Else 
+		$readWrite:=False
+End case 
+
+If ([Costing]TypeSizePC=0)
+	[Costing]TypeSizePC:=9
+End if 
+If ([Costing]TypeSizeMac=0)
+	[Costing]TypeSizeMac:=11
+End if 
+
+If ([Costing]FactoryAPTerms<1)
+	[Costing]FactoryAPTerms:=60
+	SAVE RECORD([Costing])
+End if 
+
+QUERY([Designs];[Designs]DesignNum=[Costing]DesignNumber)
+Picture_RestoreOnTheFly 
+
+OBJECT SET VISIBLE([Designs]Sketch;[CostSheets]SheetNumber#-1)
+OBJECT SET VISIBLE(*;"xTemplate";[CostSheets]SheetNumber=-1)
+
+Cost_FreightToggle 
+Cost_NYLA 
+Inv_UpdateSubtot 
+  // depreciated DISABLE BUTTON(cbCostNY)
+  //DISABLE BUTTON(cbCostLA)
+  //DISABLE BUTTON(cbCostOther)
+OBJECT SET ENABLED(cbCostNY;False)
+OBJECT SET ENABLED(cbCostLA;False)
+OBJECT SET ENABLED(cbCostOther;False)
+
+

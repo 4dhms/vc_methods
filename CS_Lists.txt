@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([CS_Lines]ComponentName="Lining")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Lining")
+	: ([CS_Lines]ComponentName="Lining Color")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Lining Color")
+	: ([CS_Lines]ComponentName="Thread Color")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Thread Color")
+	: (Position("Zipper";[CS_Lines]ComponentName)>0)
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Zipper")
+	: ([CS_Lines]ComponentName="Shoulder Pads")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Shoulder Pad")
+	: (Position("Button";[CS_Lines]ComponentName)>0)
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Button")
+	: ([CS_Lines]ComponentName="Buckles")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Buckles")
+	: ([CS_Lines]ComponentName="Snaps")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Snaps")
+	: ([CS_Lines]ComponentName="Hooks & Eyes")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Hook Eyes")
+	: ([CS_Lines]ComponentName="Bead Components")
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"Lining")
+	Else 
+		OBJECT SET LIST BY NAME([CS_Lines]Minidescription;"<None>")
+End case 

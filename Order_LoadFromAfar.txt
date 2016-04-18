@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Orders_FM_Prep 
+
+asQuikFind:=1
+<>vlOrderNumber:=[Orders]OrderNum
+Cost_RouterLaunch 
+Order_LoadPO 
+Revise_Array 
+Order_GetCategory 
+
+
+If (<>vsDesignNumber="")
+	REDUCE SELECTION([Designs];0)
+Else 
+	QUERY([Designs];[Designs]DesignNum=<>vsDesignNumber)
+	vtDescription:=[Designs]Description
+	<>vlDesignKey:=[Designs]DesignLibraryKey
+End if 
+
+QUERY([Invoices];[Invoices]OrderNumber=[CostSheets]SheetID)
+
+

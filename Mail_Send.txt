@@ -1,0 +1,114 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$list)
+C_TEXT($name)
+C_LONGINT($i)
+C_BOOLEAN($done;$mail)
+C_LONGINT($errorcode)
+C_LONGINT($i;$n;$count)
+C_TIME($starttime)
+C_LONGINT($SMTP_ID)
+$mail:=False
+$done:=False
+
+ARRAY TEXT(asSubCC;0)
+
+  //$1=path $2=address list $3=Subject $4=Body
+
+$path:=$1
+$list:=$2
+
+$i:=1
+Repeat 
+	If (Length($list)=0) | (Position("%%";$list)<1)
+		$done:=True
+	Else 
+		$name:=Substring($list;1;Position("%%";$list)-1)
+		APPEND TO ARRAY(asSubCC;$name)
+		$list:=Substring($list;Position("%%";$list)+2;999)
+	End if 
+	
+Until ($done) | (Shift down)
+
+EMail_GetPreferences 
+
+DELAY PROCESS(Current process;120)
+$starttime:=Current time(*)
+$done:=False
+Repeat 
+	Case of 
+		: (Test path name($path)=1)
+			$done:=True
+			$mail:=True
+		: (Current time(*)-$starttime>?00:10:00?)
+			$done:=True
+			WinPrompt ("There is a problem sending your mail.")
+	End case 
+Until ($done)
+
+If ($mail)
+	$errorcode:=IT_MacTCPInit 
+	EMail_Log (True;$errorcode;"Init")
+	
+	$count:=Size of array(asSubCC)
+	
+	If (<>vfDevelopment)
+		$errorcode:=IT_SetPort (2;587)
+		EMail_Log (True;$errorcode;"Port")
+	Else 
+		  //$errorcode:=IT_SetPort (2;25)
+		  //EMail_Log (True;$errorcode;"Port")
+	End if 
+	
+	$errorcode:=SMTP_New ($SMTP_ID)
+	EMail_Log (True;$errorcode;"New")
+	
+	$errorcode:=SMTP_Host ($SMTP_ID;vtEMHost)
+	EMail_Log (True;$errorcode;"Host")
+	
+	$errorcode:=SMTP_From ($SMTP_ID;<>vtMailFrom)
+	EMail_Log (True;$errorcode;"From")
+	
+	$errorcode:=SMTP_Subject ($SMTP_ID;$3)  //$1 = subject
+	EMail_Log (True;$errorcode;"Subject")
+	
+	$errorcode:=SMTP_To ($SMTP_ID;asSubCC{1};0)
+	EMail_Log (True;$errorcode;asSubCC{1};"To  "+String($i))
+	
+	$n:=1
+	For ($n;1;$count)  //send one to many recipients
+		If ($n>1)
+			$errorcode:=SMTP_Cc ($SMTP_ID;asSubCC{$n};0)
+			EMail_Log (True;$errorcode;"CC  "+String($n))
+		End if 
+	End for 
+	
+	$errorcode:=SMTP_Body ($SMTP_ID;$4)
+	EMail_Log (True;$errorcode;"Body")
+	
+	  //If (Position("Change";$1)<1) & ($1#"Meeting Notification")
+	  //$i:=1
+	  //$pdfFolder:=PDF_FindFolder 
+	  //vtPDFPath:=$pdfFolder+":"+vtPDFName+".pdf"
+	  //Email_Xdelay   `waits for delivery of pdf
+	  //End if 
+	
+	$errorcode:=SMTP_Attachment ($SMTP_ID;$path;1)
+	EMail_Log (True;$errorcode;"Attachement";$path)
+	
+	If (Not(<>vfDevelopment))
+		$errorcode:=SMTP_Auth ($SMTP_ID;vsUser;vsPassword)
+		EMail_Log (True;$errorcode;"Auth")
+	End if 
+	
+	$errorcode:=SMTP_Send ($SMTP_ID)
+	EMail_Log (True;$errorcode;"Send")
+	
+	
+	$errorcode:=SMTP_Clear ($SMTP_ID)
+	EMail_Log (True;$errorcode;"Clear")
+	
+End if 
+<>vlMailer:=0
+If (Test path name($path)=1) & (Current user#"Designer")
+	DELETE DOCUMENT($path)
+End if 

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+hlDCS:=Load list("DCS")
+
+Center Window (500;450;1984;"")
+DIALOG("DCS_Add")
+CLOSE WINDOW

@@ -1,0 +1,13 @@
+  //%attributes = {"publishedSoap":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($namespace;$serverIP)
+C_BLOB($1)
+C_BLOB($0)
+
+$serverIP:="http://"+<>vtWebServicesIP+":"+<>vtWebServicesPort+"/4DSOAP"
+$namespace:=<>vtWebServicesIP+"/namespace/default"
+
+WEB SERVICE SET PARAMETER("vxMover";$1)
+WEB SERVICE AUTHENTICATE("Remote";"r#Mt%%7")
+WEB SERVICE CALL($serverIP;"HMS_Service#"+$2;$2;$namespace)
+WEB SERVICE GET RESULT($0;*)  // Memory clean-up on the final return value.
+

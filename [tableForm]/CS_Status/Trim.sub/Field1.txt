@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in selection([CS_Status])=Selected record number([CS_Status]))
+	[CS_Lines]CurrentStatus:=[CS_Status]ActionStatus
+End if 

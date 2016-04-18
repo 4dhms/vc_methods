@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+
+If (Shift down)
+	$run:=New process("MW_Win";0;"MakeWork")
+End if 

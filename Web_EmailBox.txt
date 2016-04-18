@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<table width=276 height=86 border=0>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<th width=276 height=22 scope=row><div align=center><font color=#663300 size=1 fa"+"ce="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Email Address</FONT></div></th>"
+$HTML:=$HTML+"</tr>"
+$HTML:=$HTML+"<br>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<th height=28 scope=row><div align=center>"
+$HTML:=$HTML+"<input type=text name=vtEmailAddress>"
+$HTML:=$HTML+"</div></th>"
+$HTML:=$HTML+"</tr>"
+$HTML:=$HTML+"<th height=28 scope=row><div align=center>"
+$HTML:=$HTML+" <input type=submit name=Submit value=Email>"
+$HTML:=$HTML+"</div></th>"
+$HTML:=$HTML+"</tr>"
+$HTML:=$HTML+"</Table>"
+
+vtEmailBox:=$HTML

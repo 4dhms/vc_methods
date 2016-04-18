@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+
+If (Current user="Sara Wingate") | (Current user="Designer")
+	$c:=Count in array(tracklist;True)
+	WinChoice ("Are you sure you want to delete these "+String($c)+" garments?")
+	If (ok=1)
+		WinChoice ("Are you really, really, really, really, really really really sure?";"No";"Yes")
+		If (ok=0)
+			$i:=1
+			For ($i;1;Size of array(alTrackID))
+				If (tracklist{$i}=True)
+					QUERY([SampleTrack];[SampleTrack]TrackId=alTrackID{$i})
+					DELETE RECORD([SampleTrack])
+				End if 
+			End for 
+			
+			Sample_TrackInit 
+			ALL RECORDS([SampleTrack])
+			ORDER BY([SampleTrack];[SampleTrack]DateOut;>;[SampleTrack]DateIn;>;[SampleTrack]Store;>)
+			
+			SELECTION TO ARRAY([SampleTrack]SentBy;asEnterer;[SampleTrack]Description;atLDescript;[SampleTrack]Division;asDiv)
+			SELECTION TO ARRAY([SampleTrack]StyleNumber;asStyleNumbers;[SampleTrack]Color;asColor1;[SampleTrack]Store;asCustomers)
+			SELECTION TO ARRAY([SampleTrack]DateOut;adDateOut;[SampleTrack]DateIn;adDateIn;[SampleTrack]Notes;asBDNotes;[SampleTrack]TrackId;alTrackId)
+			
+			LISTBOX SELECT ROW(tracklist;Size of array(asStyleNumbers)+1)
+			
+		End if 
+	End if 
+Else 
+	WinPrompt ("Sara has access to batch delete.")
+End if 
+

@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Appts]ApptWith="")
+	GOTO OBJECT([Appts]ApptWith)
+Else 
+	QUERY([Customers];[Customers]CustomerName=[Appts]ApptWith)
+	If (Records in selection([Customers])>0)
+		
+		RELATE MANY([Customers]CustomerKey)
+		QUERY SELECTION([Contacts];[Contacts]Contact=vsContact)
+		If (Records in selection([Contacts])=0)
+			CREATE RECORD([Contacts])
+			[Contacts]CustomerKey:=[Customers]CustomerKey
+			[Contacts]Contact:=vsContact
+			[Contacts]ContactID:=Sequence number([Contacts])
+			SAVE RECORD([Contacts])
+			
+			CREATE RECORD([Attendees])
+			[Attendees]ApptKey:=[Appts]ApptKey
+			[Attendees]Attendee:=vsContact
+			[Attendees]Customer:=True
+			SAVE RECORD([Attendees])
+			INSERT IN ARRAY(asMeetingCust;1;1)
+			asMeetingCust{1}:=vsContact
+			vsContact:=""
+			SORT ARRAY(asMeetingCust;>)
+		End if 
+	End if 
+End if 

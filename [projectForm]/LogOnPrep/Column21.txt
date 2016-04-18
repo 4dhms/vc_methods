@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+
+If (asColors{asColors}#"")
+	$message:=Replace string(asColors{asColors};" [C] ";Char(13))
+	WinPrompt ($message)
+End if 

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([PCatalog])
+
+  //If (cbSampleRoom=1)
+  //QUERY SELECTION([DesignLines];[DesignLines]SampleRoom=True)
+  //End if 

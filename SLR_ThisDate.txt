@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($Qm;$Qy)
+C_DATE($seasonstart;$yearstart;$monthstart)
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart<=Current date(*))
+QUERY SELECTION([SLRWkLibrary];[SLRWkLibrary]WkEnd>=Current date(*))
+$Qm:=[SLRWkLibrary]WkMonth
+$Qy:=[SLRWkLibrary]WkYear
+
+$yearstart:=Date("2/1/"+String($Qy))
+$monthstart:=Date(String(Month of(Current date(*)))+"/1/"+String(Year of(Current date(*))))
+Case of 
+	: ($Qm>1) & ($Qm<8)
+		$seasonstart:=Date("2/1/"+String($Qy))
+	: ($Qm=1)
+		$seasonstart:=Date("8/1/"+String($Qy-1))
+	Else 
+		$seasonstart:=Date("8/1/"+String($Qy))
+End case 
+
+  //this year
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart<=$yearstart)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkStart;>)
+vdThisyear:=[SLRWkLibrary]WkStart
+
+  //this season
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart>=$seasonstart)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkStart;>)
+vdThisseason:=[SLRWkLibrary]WkStart
+
+  //this month
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart>=$monthstart)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkStart;>)
+vdThismonth:=[SLRWkLibrary]WkStart
+
+UNLOAD RECORD([SLRWkLibrary])
+

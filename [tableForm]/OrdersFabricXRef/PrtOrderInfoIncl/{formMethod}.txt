@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[OrdersFabricXRef]OrderNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=[OrdersFabricXRef]OrdType)
+	QUERY([FabricOrders];[FabricOrders]FabOrderKey=[CP_OrderXRef]FabOrderKey)
+	Rev_FlagFab (True)
+	
+	vtFabDates:=""
+	
+	Case of 
+		: (vfPO)
+			vtFabDates:=""
+		: ([FabricOrders]FinalDelivery#!00-00-00!)
+			vtFabDates:="Final:"+String([FabricOrders]FinalDelivery)
+		: ([FabricOrders]ShippedDate#!00-00-00!)
+			vtFabDates:="Ship:"+String([FabricOrders]ShippedDate)
+		: ([FabricOrders]ReqDeliveryDate#!00-00-00!)
+			vtFabDates:="Est:"+String([FabricOrders]ReqDeliveryDate)
+	End case 
+	
+End if 

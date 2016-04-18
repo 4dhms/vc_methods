@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vtTitle:=<>asSeasonName{<>asSeasonName}+" "+<>asSeasonYear{<>asSeasonYear}+" "+asSortOrder{asSortOrder}
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		vlOrderNumber:=Abs([Costing]OrderNumber)
+		vtNotes:=""
+		If ([CostSheets]Details#"")
+			vtNotes:=vtNotes+[CostSheets]Details+"    "
+		End if 
+		If ([CostSheets]MiscNotes#"")
+			vtNotes:=vtNotes+[CostSheets]MiscNotes+"    "
+		End if 
+		If ([CostSheets]ShipNotes#"")
+			vtNotes:=vtNotes+[CostSheets]ShipNotes+"    "
+		End if 
+		If ([CostSheets]NYMiscNotes#"")
+			vtNotes:=vtNotes+[CostSheets]NYMiscNotes+"    "
+		End if 
+		  //If ([CostSheets]FOBNotes#"")
+		  //vtNotes:=vtNotes+[CostSheets]FOBNotes+"    "
+		  //End if 
+		If ([CostSheets]SpecialNotes#"")
+			vtNotes:=vtNotes+[CostSheets]SpecialNotes+"    "
+		End if 
+		
+		Case of 
+			: (asSortOrder{asSortOrder}#"@Style@") & (asSortOrder{asSortOrder}#"@Design@")
+				OBJECT SET VISIBLE(*;"xDivide";False)
+			: (Size of array(alRecordNumber)>0)
+				OBJECT SET VISIBLE(*;"xDivide";Find in array(alRecordNumber;[CostSheets]SheetID)>0)
+			Else 
+				OBJECT SET VISIBLE(*;"xDivide";False)
+		End case 
+		
+		
+		
+End case 

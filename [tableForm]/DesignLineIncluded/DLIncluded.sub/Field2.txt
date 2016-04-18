@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([DesignLineIncluded]ChangeFiber)
+	[DesignLineIncluded]Fiber:=""
+Else 
+	If ([DesignLineIncluded]Source="") | ([DesignLineIncluded]Source="Sample")
+		[DesignLineIncluded]Fiber:=[Samples]Fabric SG
+	Else 
+		[DesignLineIncluded]Fiber:=[Designs]Fabric
+	End if 
+End if 

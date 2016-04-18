@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[SpecSheetLines]OtherDescription:=asList17{asList17}
+[SpecSheetLines]MisMatch:=""
+SAVE RECORD([SpecSheetLines])
+ACCEPT

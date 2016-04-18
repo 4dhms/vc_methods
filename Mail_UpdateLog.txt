@@ -1,0 +1,54 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($ordernumber)
+C_LONGINT($i)
+
+QUERY([EMailSent];[EMailSent]EMSentDate=adDates{adDates})
+
+Case of 
+	: ($1="fact")
+		If (<>asFactories{<>asFactories}#"All")
+			QUERY SELECTION([EMailSent];[EMailSent]EMSentTo=<>asFactories{<>asFactories})
+		End if 
+		
+	: ($1="sender")
+	Else 
+		ARRAY TEXT(<>asFactories;0)
+		DISTINCT VALUES([EMailSent]EMSentTo;<>asFactories)
+		SORT ARRAY(<>asFactories;>)
+		INSERT IN ARRAY(<>asFactories;1;2)
+		<>asFactories{1}:="Find addressee"
+		<>asFactories{2}:="All"
+		<>asFactories:=1
+		ARRAY TEXT(asUsers;0)
+		DISTINCT VALUES([EMailSent]EMSender;asUsers)
+		INSERT IN ARRAY(asUsers;1;2)
+		asUsers{1}:="By sender"
+		asUsers{2}:="All"
+		asUsers:=1
+End case 
+
+If (asUsers>2)
+	QUERY SELECTION([EMailSent];[EMailSent]EMSender=asUsers{asUsers})
+End if 
+
+ORDER BY([EMailSent];[EMailSent]EMOrderNumber;>)
+
+If (zYes=1)
+	  //clean up duplicates
+	CREATE SET([EMailSent];"Orders")
+	
+	$i:=1
+	FIRST RECORD([EMailSent])
+	For ($i;1;Records in selection([EMailSent]))
+		$orderNumber:=[EMailSent]EMOrderNumber
+		NEXT RECORD([EMailSent])
+		If ($orderNumber=[EMailSent]EMOrderNumber)
+			REMOVE FROM SET([EMailSent];"Orders")
+		End if 
+	End for 
+	
+	USE SET("Orders")
+	CLEAR SET("Orders")
+End if 
+
+ORDER BY([EMailSent];[EMailSent]EMSentDate;>;[EMailSent]EMSentTime;>)

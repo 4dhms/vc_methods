@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([Designs];"All")
+HIGHLIGHT RECORDS("All")
+CLEAR SET("All")

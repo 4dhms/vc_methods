@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+
+If (Size of array(asOrderType)>=$1)
+	vsCPType:=asOrderType{$1}
+	If (Find in array(asSorP;asSolidPrint{asOrderType})>0)
+		asSorP:=Find in array(asSorP;asSolidPrint{asOrderType})
+	Else 
+		asSorP:=1
+	End if 
+	
+	$line:=$1
+	vtFabric:=asFabric{$line}
+	vsFiber:=asFiber{$line}
+	vsTreatment:=asTreatment{$line}
+	vsArt:=atArtNumber{$line}
+	vtSupplier:=asFabSpler{$line}
+	vsPart:=asGarPart{$line}
+	vrUsage:=arUsage{$line}
+	vrActual:=arActual{$line}
+	vfPreview:=True
+	vsFindFlag:=vsCPType+" ("+asSolidPrint{$1}+")"
+	
+	Cost_ShowFab 
+	
+	Center Window (600;175;1;"")
+	DIALOG("FabricCosting")
+	CLOSE WINDOW
+End if 

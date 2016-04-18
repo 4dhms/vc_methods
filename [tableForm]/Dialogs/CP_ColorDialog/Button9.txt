@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user#"Marisol") & (Current user#"Peter G") & (Current user#"Ricky") & (Current user#"Designer") & (<>vlOrderNumber>0) & ([Orders]UPC=1) & ([Orders]PODate#!00-00-00!)
+	WinPrompt ("UPC exists. You can not delete."+Char(13)+Char(13)+"Contact Peter G.")
+Else 
+	WinPrompt ("To change color/print number, click the Change button.")
+End if 

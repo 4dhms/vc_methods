@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Specs])
+CALL PROCESS(<>DesProcID)
+If (Spec_ConfirmType )
+	ACCEPT
+	SET WINDOW RECT(vlLeft;vlTop;vlRight;vlBottom)
+End if 

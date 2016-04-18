@@ -1,0 +1,67 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$count)
+
+Case of 
+	: ($1=1)
+		$i:=1
+		CREATE EMPTY SET([SpecSheetLines];"NewLine")
+		$count:=Records in selection([SpecSheetLines])
+		For ($i;1;Size of array(<>asCopySpec))
+			If ($i>$count)
+				CREATE RECORD([SpecSheetLines])
+				[SpecSheetLines]SF_KeyNumber:=[SpecFactory]SF_KeyNumber
+				[SpecSheetLines]SpecLineKey:=Sequence number([SpecSheetLines])
+			End if 
+			[SpecSheetLines]SortOrder:=$i
+			[SpecSheetLines]OtherDescription:=<>asCopySpec{$i}
+			
+			[SpecSheetLines]PartNumber:=SS_PartNumber 
+			SAVE RECORD([SpecSheetLines])
+			ADD TO SET([SpecSheetLines];"NewLine")
+			If ($i<$count)
+				NEXT RECORD([SpecSheetLines])
+			End if 
+		End for 
+		USE SET("NewLine")
+		CLEAR SET("NewLine")
+		
+	: ($1=2) | ($1=3) | ($1=4)
+		FIRST RECORD([SpecSheetLines])
+		$i:=1
+		For ($i;1;Records in selection([SpecSheetLines]))
+			Case of 
+				: ($i>Size of array(<>asCopySpec))
+					  //done          
+				: ($1=2)
+					[SpecSheetLines]Spec1A:=<>asCopySpec{$i}
+				: ($1=3)
+					[SpecSheetLines]Spec1B:=<>asCopySpec{$i}
+				: ($1=4)
+					[SpecSheetLines]Spec1C:=<>asCopySpec{$i}
+			End case 
+			SAVE RECORD([SpecSheetLines])
+			NEXT RECORD([SpecSheetLines])
+		End for 
+	: ($1=5) | ($1=6) | ($1=7)
+		$i:=1
+		FIRST RECORD([SpecSheetLines])
+		
+		For ($i;1;Records in selection([SpecSheetLines]))
+			QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey)
+			QUERY SELECTION([SpecLineCols];[SpecLineCols]ColumnNumber=alSpecNumber{asRowHeaders})
+			Case of 
+				: ($1=5)
+					[SpecLineCols]SpecA:=<>asCopySpec{$i}
+					[SpecSheetLines]Spec2A:=<>asCopySpec{$i}
+				: ($1=6)
+					[SpecLineCols]SpecB:=<>asCopySpec{$i}
+					[SpecSheetLines]Spec2B:=<>asCopySpec{$i}
+				: ($1=7)
+					[SpecLineCols]SpecC:=<>asCopySpec{$i}
+					[SpecSheetLines]Spec2C:=<>asCopySpec{$i}
+			End case 
+			SAVE RECORD([SpecLineCols])
+			SAVE RECORD([SpecSheetLines])
+			NEXT RECORD([SpecSheetLines])
+		End for 
+End case 

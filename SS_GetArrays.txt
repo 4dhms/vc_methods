@@ -1,0 +1,34 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSizes;0)
+C_LONGINT($i)
+
+QUERY([SpecTemplate];[SpecTemplate]Size=True)
+SELECTION TO ARRAY([SpecTemplate]Template;asSizes)
+SORT ARRAY(asSizes;>)
+INSERT IN ARRAY(asSizes;1;1)
+asSizes{1}:="Size Lists"
+asSizes:=1
+INSERT IN ARRAY(asSizes;Size of array(asSizes)+1;1)
+asSizes{Size of array(asSizes)}:="SAVE SIZE LIST"
+
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+
+CREATE SET([SpecLineSample];"SampleCols")
+
+vlColNo1:=Records in selection([SpecLineSample])+1
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;>)
+
+ARRAY TEXT(asRowHeaders;Records in selection([SpecLineSample]))
+ARRAY LONGINT(alSpecNumber;Records in selection([SpecLineSample]))
+FIRST RECORD([SpecLineSample])
+$i:=1
+For ($i;1;Records in selection([SpecLineSample]))
+	asRowHeaders{$i}:=[SpecLineSample]ColumnHeader
+	alSpecNumber{$i}:=[SpecLineSample]ColumnNumber
+	NEXT RECORD([SpecLineSample])
+End for 
+If (Size of array(asRowHeaders)>0)
+	asRowHeaders:=Size of array(asRowHeaders)
+End if 
+
+

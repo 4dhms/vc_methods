@@ -1,0 +1,162 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_LONGINT($i;$sampleNumber;$n;$self;$c)
+ARRAY TEXT($type;0)
+ARRAY LONGINT($oldref;0)
+ARRAY LONGINT($newref;0)
+
+If (Order_Mandatory )
+	QUERY([Samples];[Samples]HMSOrderNumber=[Orders]OrderNum)
+	Case of 
+		: (Records in selection([Samples])=1)
+			WinChoice ("There is already a sample"+Char(13)+"created from this order.";"Create another";"Ooops")
+			If (ok=1)
+				$continue:=True
+			End if 
+		: (Records in selection([Samples])>0)
+			WinChoice ("There are already"+Char(13)+String(Records in selection([Samples]))+" samples created from this order.";"Create another";"Ooops")
+			If (ok=1)
+				$continue:=True
+			End if 
+		Else 
+			WinChoice ("Are you sure you want to create"+Char(13)+"an Advertising Sample?")
+			If (ok=1)
+				$continue:=True
+			End if 
+	End case 
+	
+	If ($continue)
+		WinChoice ("This action will close the order window.";"Continue";"Stop")
+		If (ok=0)
+			$continue:=False
+		End if 
+	End if 
+	
+	If ($continue)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]FabOrdType;>)
+		SELECTION TO ARRAY([OrdersFabricXRef]OrdType;$type;[OrdersFabricXRef]XrefID;$oldref)
+		ARRAY LONGINT($newref;Size of array($oldref))
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]LineKey;>)
+		ARRAY TEXT(asBDLetter;0)
+		ARRAY TEXT(asBDSelf;0)
+		ARRAY LONGINT($selfKeys;0)
+		
+		
+		FIRST RECORD([CP_OrderXRef])
+		$i:=1
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			If ([CP_OrderXRef]CPType="Self")
+				APPEND TO ARRAY(asBDLetter;[CP_OrderXRef]LineKey)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				APPEND TO ARRAY(asBDSelf;[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName)
+				APPEND TO ARRAY($selfkeys;[CP_OrderXRef]SelfKey)
+			End if 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		
+		Case of 
+			: (Size of array(asBDLetter)=1)
+				APPEND TO ARRAY(asBDPort;asBDLetter{1})
+			: (Size of array(asBDLetter)>1)
+				ARRAY TEXT(asBDPort;0)
+				Center Window (350;250;1;"")
+				DIALOG([Dialogs];"ColorList.i")
+				CLOSE WINDOW
+				SORT ARRAY(asBDPort;>)
+		End case 
+		
+		CREATE RECORD([Samples])
+		[Samples]HMSOrderNumber:=[Orders]OrderNum
+		  //----------------------------
+		  //update SG_FM_EntryOnLoad & SG_DupeOrder
+		[Samples]SampleNumber:=Num(PO_GetNumber ("Sample"))
+		<>vlOrderNumber:=-1*[Samples]SampleNumber
+		  //----------------------------
+		[Samples]CommtsSamGar:="Created from HMS Order "+String([Orders]OrderNum)
+		[Samples]Customer:=[Orders]Customer
+		[Samples]DesignNum:=[Orders]DesignNumber
+		[Samples]DivisionOverride:=[Orders]DivisionOverride
+		[Samples]DueDate:=Current date(*)+14
+		[Samples]Fabric sourceSG:=[Orders]FabricSupplied
+		[Samples]FirstCreator:=Current user
+		[Samples]KWCnS:=[Orders]KWCnS
+		[Samples]Label:=[Orders]Label
+		[Samples]OrderEnterer SG:=Current user
+		[Samples]NewSGSystem:=True
+		[Samples]Sam Type:="Advrtsng Sample"
+		[Samples]SamGarFactry:=[Orders]Factory
+		[Samples]SampleDivision:=[Orders]OrderDivision
+		[Samples]SampleOrderDate:=Current date(*)
+		[Samples]SeasonName:=[Orders]SeasonName
+		[Samples]SeasonYear:=[Orders]SeasonYear
+		[Samples]SGQuantity:=1
+		[Samples]Outstanding:=1
+		[Samples]StyleNum:=[Orders]StyleNumber
+		SAVE RECORD([Samples])
+		SET WINDOW TITLE("Sample Order: "+String([Samples]SampleNumber))
+		$sampleNumber:=-1*[Samples]SampleNumber
+		
+		$i:=1
+		For ($i;1;Size of array($oldref))
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=$oldref{$i})
+			DUPLICATE RECORD([OrdersFabricXRef])
+			[OrdersFabricXRef]OrderNumber:=$sampleNumber
+			[OrdersFabricXRef]XrefID:=10000+Sequence number([OrdersFabricXRef])
+			SAVE RECORD([OrdersFabricXRef])
+			
+			$newref{$i}:=[OrdersFabricXRef]XrefID
+		End for 
+		
+		$i:=1
+		$c:=1
+		For ($i;1;Size of array($selfKeys))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfKeys{$i})
+			CREATE SET([CP_OrderXRef];"Suite")
+			
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+			
+			If (Find in array(asBDPort;[CP_OrderXRef]LineKey)>0)
+				DUPLICATE RECORD([CP_OrderXRef])
+				[CP_OrderXRef]CPOrdID:=Sequence number([CP_OrderXRef])
+				[CP_OrderXRef]OrderNumber:=$sampleNumber
+				[CP_OrderXRef]SelfKey:=[CP_OrderXRef]CPOrdID
+				$self:=[CP_OrderXRef]SelfKey
+				[CP_OrderXRef]LineKey:=Char(64+$c)
+				$c:=$c+1
+				[CP_OrderXRef]XrefID:=$newref{Find in array($type;[CP_OrderXRef]CPType)}
+				[CP_OrderXRef]Quantity:=1
+				SAVE RECORD([CP_OrderXRef])
+				
+				$n:=1
+				For ($n;1;Records in set("Suite")-1)
+					USE SET("Suite")
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo "+String($n);*)
+					QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Zipper")
+					DUPLICATE RECORD([CP_OrderXRef])
+					[CP_OrderXRef]CPOrdID:=Sequence number([CP_OrderXRef])
+					[CP_OrderXRef]SelfKey:=$self
+					[CP_OrderXRef]XrefID:=$newRef{Find in array($type;[CP_OrderXRef]CPType)}
+					SAVE RECORD([CP_OrderXRef])
+				End for 
+			End if 
+		End for 
+		
+		FORM SET INPUT([Samples];"SampleGarment.i")
+		MODIFY RECORD([Samples];*)
+		
+		UNLOAD RECORD([Samples])
+		UNLOAD RECORD([CP_OrderXRef])
+		UNLOAD RECORD([OrdersFabricXRef])
+		REDUCE SELECTION([CP_OrderXRef];0)
+		REDUCE SELECTION([OrdersFabricXRef];0)
+		SAVE RECORD([Orders])
+		USE SET("LastFound")
+		SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+		ACCEPT
+		
+		  //Orders_FM_EnterOnLoad 
+	End if 
+End if 

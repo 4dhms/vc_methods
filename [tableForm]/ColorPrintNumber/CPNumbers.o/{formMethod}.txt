@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		If (Current user="Designer") | (Current user="Nancy")
+			OBJECT SET VISIBLE(bUpdate;True)
+		End if 
+		
+		vsCPNumber:=""
+		vtStudioNumber:=""
+		vsName:=""
+		vsSeason:=""
+		vtOldData:=""
+		CP_GetList 
+		ARRAY TEXT(asFind;7)
+		asFind{1}:="Category"
+		asFind{2}:="Solid"
+		asFind{3}:="Print"
+		asFind{4}:="Embroidery"
+		asFind{5}:="Layout"
+		asFind{6}:="Yard Dye Stripe"
+		asFind{7}:="Novelty"
+		asFind:=1
+		ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPNumberKey;<)
+		
+	: (Form event=On Display Detail)
+		
+		Case of 
+			: ([ColorPrintNumber]CPType=1)
+				vsFlag:="Solid"
+			: ([ColorPrintNumber]CPType=2)
+				vsFlag:="Print"
+			: ([ColorPrintNumber]CPType=3)
+				vsFlag:="Embroider"
+			: ([ColorPrintNumber]CPType=4)
+				vsFlag:="Layout"
+			: ([ColorPrintNumber]CPType=5)
+				vsFlag:="Yarn Dye Stripe"
+			: ([ColorPrintNumber]CPType=6)
+				vsFlag:="Novelty"
+			: ([ColorPrintNumber]CPType=-1)
+				vsFlag:="Zipper"
+			Else 
+				vsFlag:=""
+		End case 
+		If ([ColorPrintNumber]Droplet)
+			OBJECT SET COLOR([ColorPrintNumber]CPNumber;-3+(256*0))
+		Else 
+			OBJECT SET COLOR([ColorPrintNumber]CPNumber;-15+(256*0))
+		End if 
+End case 

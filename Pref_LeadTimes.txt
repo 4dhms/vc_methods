@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+READ WRITE([Preferences])
+
+ALL RECORDS([Preferences])
+FIRST RECORD([Preferences])
+If (Locked([Preferences]))
+	WinPrompt ("The preference file is locked. Please make your changes later.")
+Else 
+	FORM SET INPUT([Preferences];"TicketLeads")
+	Center Window (150;120;1;"")
+	MODIFY RECORD([Preferences];*)
+	CLOSE WINDOW
+End if 
+UNLOAD RECORD([Preferences])

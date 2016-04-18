@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([CS_Lines];[CS_Lines]CS_LineKey=vlCompLineKey)
+QUERY([CS_Status];[CS_Status]CS_LineKey=vlCompLineKey)
+QUERY SELECTION([CS_Status];[CS_Status]HMSOrderNumber=<>vlOrderNumber;*)
+QUERY SELECTION([CS_Status]; | ;[CS_Status]HMSOrderNumber=0)
+
+ORDER BY([CS_Status];[CS_Status]ActionDate;<)
+Center Window (450;250;1;"")
+DIALOG([Dialogs];"CSstatus")
+CLOSE WINDOW

@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+vtFabPO:=""
+
+$continue:=False
+CREATE SET([FabricTrack];"articles")
+FORM SET INPUT([FabricTrack];"FabricTrack.i")
+WinChoice ("Do you want to report by Fabric PO or Article Number?";"PO";"Article";"Cancel")
+If (ok=1)
+	If (bChoice2=1)
+		vtArticleNumber:=Request("Article number:";"";"Yes";"No")
+		If (ok=1)
+			QUERY([FabricOrders];[FabricOrders]ArticleNo=vtArticleNumber)
+		End if 
+	Else 
+		vtFabPO:=Request("Fabric PO Number:";"FB-";"Yes";"No")
+		If (ok=1)
+			QUERY([FabricOrders];[FabricOrders]PONumber=vtFabPO)
+			vtArticleNumber:=[FabricOrders]ArticleNo
+		End if 
+	End if 
+	
+	If (Records in selection([FabricOrders])>0)
+		$continue:=True
+	Else 
+		WinChoice ("There are no Fabric POs for "+vtArticleNumber+"."+Char(13)+Char(13)+"Do you want to continue anyway?")
+		If (ok=1)
+			$continue:=True
+		End if 
+	End if 
+End if 
+
+If ($continue)
+	ADD RECORD([FabricTrack];*)
+	ADD TO SET([FabricTrack];"articles")
+	USE SET("articles")
+	CLEAR SET("articles")
+End if 

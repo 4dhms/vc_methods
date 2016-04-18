@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;vlOldKey)
+
+If (vlOldKey>0)
+	ARRAY LONGINT($keys;0)
+	
+	QUERY([DCS];[DCS]SheetID=vlOldKey)
+	
+	SELECTION TO ARRAY([DCS]ItemKey;$keys)
+	
+	$i:=1
+	For ($i;1;Size of array($keys))
+		QUERY([DCS];[DCS]ItemKey=$keys{$i})
+		DUPLICATE RECORD([DCS])
+		[DCS]ItemKey:=Sequence number([DCS])
+		[DCS]SheetNumber:=[CostSheets]SheetNumber
+		[DCS]CreateDate:=Current date(*)
+		[DCS]SheetID:=[CostSheets]SheetID
+		SAVE RECORD([DCS])
+		If (Size of array(alRecordKey)>0)
+			alRecordKey{Find in array(alRecordKey;$keys{$i})}:=[DCS]ItemKey
+		End if 
+		UNLOAD RECORD([DCS])
+	End for 
+End if 
+[Orders]LastCostSheet:=[CostSheets]SheetName
+SAVE RECORD([Orders])
+QUERY([DCS];[DCS]SheetID=[CostSheets]SheetID)
+ORDER BY([DCS];[DCS]SortOrder;>;[DCS]ItemKey;>)

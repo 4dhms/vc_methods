@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML;$sub;$text)
+
+
+$sub:="<FONT SIZE=2 color=#663333 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">"
+$text:="<FONT SIZE=2 color=#000000 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<table width=850 border=0>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td width=90 align=right>"+$sub+"Units Shipped</font></td>"
+$HTML:=$HTML+"<td width=73>"+$text+String([CostSheets]ActualUnitsShipped)+"</FONT></td>"
+$HTML:=$HTML+"<td width=48 align=right>"+$sub+"Date</FONT></td>"
+$HTML:=$HTML+"<td width=60>"+$text+String([CostSheets]ShippedDate)+"</FONT></td>"
+$HTML:=$HTML+"<td width=48 align=right>"+$sub+"Units Sold</FONT></td>"
+$HTML:=$HTML+"<td width=80>"+$text+String([CostSheets]UnitsSold)+"</FONT></td>"
+$HTML:=$HTML+"<td width=90 align=right>"+$sub+"Received Date</FONT></td>"
+$HTML:=$HTML+"<td width=73>"+$text+String([CostSheets]ActualShipDate)+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Factory</font></td>"
+$HTML:=$HTML+"<td>"+$text+[Costing]Factory+"</FONT></td>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Terms</FONT></td>"
+$HTML:=$HTML+"<td>"+$text+String([Costing]FactoryAPTerms)+"</FONT></td>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Pay Date</FONT></td>"
+$HTML:=$HTML+"<td>"+$text+String([CostSheets]OrderNumber)+"</FONT></td>"
+$HTML:=$HTML+"<td align=right>"+$sub+"</FONT></td>"
+$HTML:=$HTML+"<td>"+$text+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Invoice</font></td>"
+$HTML:=$HTML+"<td>"+$text+[CostSheets]PayInvoice+"</FONT></td>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Invoice Amount</FONT></td>"
+$HTML:=$HTML+"<td>"+$text+String([CostSheets]PayAmt)+"</FONT></td>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Custom Entry No.</FONT></td>"
+$HTML:=$HTML+"<td>"+$text+[CostSheets]CustomsEntryN+"</FONT></td>"
+$HTML:=$HTML+"<td align=right>"+$sub+"Date"+"</FONT></td>"
+$HTML:=$HTML+"<td>"+$text+String([CostSheets]CustomsDate)+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+$HTML:=$HTML+"</Table>"
+
+$0:=$HTML
+

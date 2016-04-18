@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($folderpath;$folder1;$folder2;$folder3;$path;$prefix1;$prefix2)
+C_PICTURE($sketch)
+
+If ([Designs]DesignNum#"") & (Test path name("4D Backup:")=0)
+	$sketch:=[Designs]Sketch
+	CONVERT PICTURE($sketch;".JPG";0.6)
+	
+	$folderpath:="4D Backup:4D Sketches BU:"
+	
+	If (Test path name($folderpath)#0)
+		CREATE FOLDER($folderpath)
+	End if 
+	
+	$prefix1:=Substring([Designs]DesignNum;1;1)
+	$folder1:=$folderpath+$prefix1+"000000:"
+	If (Test path name($folder1)#0)
+		CREATE FOLDER($folder1)
+	End if 
+	
+	If (Length([Designs]DesignNum)>3)
+		$prefix2:=Substring([Designs]DesignNum;2;2)
+		$folder2:=$folder1+$prefix1+$prefix2+"0000:"
+		If (Test path name($folder2)#0)
+			CREATE FOLDER($folder2)
+		End if 
+	Else 
+		$path:=$folder1+[Designs]DesignNum+".jpg"
+	End if 
+	
+	If (Length([Designs]DesignNum)>5)
+		$folder3:=$folder2+$prefix1+$prefix2+Substring([Designs]DesignNum;4;2)+"00:"
+		If (Test path name($folder3)#0)
+			CREATE FOLDER($folder3)
+		End if 
+		$path:=$folder3+[Designs]DesignNum+".jpg"
+	Else 
+		$path:=$folder2+[Designs]DesignNum+".jpg"
+	End if 
+	
+	WRITE PICTURE FILE($path;$sketch)
+End if 
+

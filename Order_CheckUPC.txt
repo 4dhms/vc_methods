@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+QUERY([UPCCodes];[UPCCodes]StyleNumber=[Orders]StyleNumber)
+Case of 
+	: ([Orders]UPC=-1)
+		  //Repair mode
+	: (Records in selection([UPCCodes])>0)
+		[Orders]UPC:=1
+	Else 
+		[Orders]UPC:=0
+End case 
+UNLOAD RECORD([UPCCodes])

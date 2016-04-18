@@ -1,0 +1,111 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$qty;$costcount)
+C_REAL($ldp;$tot)
+C_TEXT($sep)
+C_TEXT($via)
+C_DATE($6mo)
+
+READ ONLY([Orders])
+READ ONLY([Costing])
+READ ONLY([CostSheets])
+
+$6mo:=Current date(*)-180
+$i:=1
+For ($i;1;Size of array(asLDPStat))
+	arPrice{$i}:=0
+	asLDPStat{$i}:=""
+	atFootnote{$i}:=""
+End for 
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+	$qty:=0
+	$tot:=0
+	
+	ARRAY DATE($testdate;0)
+	
+	If (Records in selection([Orders])=0)
+		atFootnote{$i}:="No PO for this style"
+	Else 
+		
+		$n:=1
+		ARRAY LONGINT($orders;0)
+		SELECTION TO ARRAY([Orders]OrderNum;$orders)
+		$costcount:=0
+		
+		For ($n;1;Size of array($orders))
+			QUERY([Orders];[Orders]OrderNum=$orders{$n})
+			QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			
+			CREATE SET([CostSheets];"sheets")
+			QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual@")
+			$costcount:=$costcount+Records in selection([CostSheets])
+			
+			  //CONFIRM("Sheets "+String(Records in selection([CostSheets])))
+			  //If (ok=0)
+			  //TRACE
+			  //End if 
+			
+			If (Records in selection([CostSheets])=0)
+				USE SET("sheets")
+				ORDER BY([CostSheets];[CostSheets]SheetID;<)
+				FIRST RECORD([CostSheets])
+				ONE RECORD SELECT([CostSheets])
+				  //ALERT([CostSheets]SheetName)
+			End if 
+			
+			$s:=1
+			FIRST RECORD([CostSheets])
+			For ($s;1;Records in selection([CostSheets]))
+				Cost_CalcUnitCost 
+				Case of 
+					: ([CostSheets]ShipAir)
+						$via:="air"
+						$ldp:=[CostSheets]UnitCostAirWC
+					: ([CostSheets]ShipSea)
+						$via:="sea"
+						$ldp:=[CostSheets]UnitCostSeaWC
+					Else 
+						$ldp:=[CostSheets]UnitCostSeaWC
+						$via:=[CostSheets]OtherShip
+				End case 
+				
+				$qty:=$qty+[CostSheets]ActualUnitsShipped
+				$tot:=$tot+([CostSheets]ActualUnitsShipped*$ldp)
+				
+				If (atFootnote{$i}#"")
+					$sep:="; "
+				Else 
+					$sep:=""
+				End if 
+				
+				
+				atFootnote{$i}:=atFootnote{$i}+$sep+"PO"+String([Orders]OrderNum)+Char(9)+String([CostSheets]ActualUnitsShipped;"###,###")+" @ "+String($ldp;"###.00")+" shipped via "+$via+" ("+[CostSheets]SheetName+"; "+String([CostSheets]SheetDate)+")"
+				APPEND TO ARRAY($testdate;[CostSheets]SheetDate)
+				NEXT RECORD([CostSheets])
+				
+			End for 
+			
+		End for 
+	End if 
+	arPrice{$i}:=Round($tot/$qty;2)
+	
+	SORT ARRAY($testdate;>)
+	Case of 
+		: (Size of array($testdate)<1)
+			  //error handling
+			asLDPStat{$i}:=""
+		: ($costcount=1) & ($testdate{1}<$6mo)
+			asLDPStat{$i}:="Good 1 < 6mo"
+		: ($costcount=1) & ($testdate{1}>$6mo)
+			asLDPStat{$i}:="Good 1 > 6mo"
+		: ($testdate{1}<$6mo)
+			asLDPStat{$i}:="N/G "+String($costcount)+" < 6mo"
+		Else 
+			asLDPStat{$i}:="Good "+String($costcount)+" > 6mo"
+	End case 
+	
+	
+End for 

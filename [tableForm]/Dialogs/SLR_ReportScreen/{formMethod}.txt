@@ -1,0 +1,109 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSLRcal)
+
+Case of 
+	: (Form event=On Load)
+		vfByStyle:=False
+		ARRAY TEXT(asNames;0)
+		ARRAY TEXT(asSeasonName;0)
+		ARRAY TEXT(asSeasonYear;0)
+		ARRAY TEXT(asStyleNumbers;0)
+		ARRAY TEXT(atStyleNo;0)
+		ARRAY LONGINT(alStyleCount;0)
+		
+		COPY ARRAY(<>asSeasonName;asSeasonName)
+		COPY ARRAY(<>asSeasonYear;asSeasonYear)
+		
+		ALL RECORDS([SLRSearches])
+		SELECTION TO ARRAY([SLRSearches]SearchName;asNames)
+		SORT ARRAY(asNames;>)
+		INSERT IN ARRAY(asNames;1;1)
+		asNames{1}:="Load Search"
+		asNames:=1
+		
+		asSeasonYear:=1
+		asSeasonName:=1
+		vfSort:=False
+		vtTitle:=""
+		zYes:=0
+		zNo:=1
+		ARRAY DATE(adWkEnd;0)
+		vdSubmitDate:=Current date(*)-Day number(Current date(*))
+		SLR_DateInit 
+		OBJECT SET ENABLED(bExcel;False)
+		ARRAY TEXT(asCustomers;0)
+		ARRAY TEXT(asDCCustomer;0)
+		ARRAY TEXT(atPages;2)
+		atPages{1}:="Account"
+		atPages{2}:="Print"
+		  //atPages{3}:="Bottom Line"
+		
+		vfDigest:=False
+		vlRange:=1
+		cbStyle:=1
+		vfStyle:=True
+		qShort:=1
+		qLegal:=0
+		qLetter:=0
+		vfLegal:=True
+		vlSlider:=250
+		
+		ARRAY TEXT(asStyleNumbers;0)
+		ARRAY TEXT(asDCCustomer;0)
+		ARRAY TEXT(asCustomers;0)
+		
+		LIST TO ARRAY("Customers Sales";asDCCustomer)
+		
+		ARRAY TEXT(asDivisions;0)
+		LIST TO ARRAY("Division Code No";asDivisions)
+		ARRAY BOOLEAN(afBatchList;Size of array(asDivisions))
+		asDivisions:=0
+		
+		ARRAY TEXT(asPOdate;0)
+		APPEND TO ARRAY(asPOdate;"Last Week")
+		APPEND TO ARRAY(asPOdate;"Month")
+		APPEND TO ARRAY(asPOdate;"Season")
+		APPEND TO ARRAY(asPOdate;"Year")
+		APPEND TO ARRAY(asPOdate;"Life")
+		asPOdate:=1
+		SLR_SpecialWeek 
+		
+		OBJECT SET ENABLED(bNext;False)
+		OBJECT SET ENABLED(bPrevious;False)
+		SLR_ThisDate 
+		
+		cb1:=1
+		pThree:=1
+		vlCounter:=0
+		vlRouter:=1
+		
+		vdDayOne:=Current date(*)
+		
+		SLR_SpecialWeek 
+		
+	: (Form event=On Unload)
+		CALL PROCESS(<>vlSLRcal)
+		
+		If (Records in set("weeks")>0)
+			CLEAR SET("weeks")
+		End if 
+		If (Records in set("thisMonth")>0)
+			CLEAR SET("thisMonth")
+		End if 
+		If (Records in set("styles")>0)
+			CLEAR SET("styles")
+		End if 
+		  //If (Records in set("range")>0)
+		  //CLEAR SET("range")
+		  //End if 
+		If (Records in set("report")>0)
+			CLEAR SET("report")
+		End if 
+		If (Records in set("division")>0)
+			CLEAR SET("division")
+		End if 
+		ARRAY LONGINT(alTablePop;0;0)
+		ARRAY LONGINT(alTableTot;0;0)
+		ARRAY TEXT(asTableSpec;0;0)
+		ARRAY REAL(alTableTot;0;0)
+End case 

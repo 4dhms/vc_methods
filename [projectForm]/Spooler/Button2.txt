@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+WinChoice ("Are you sure you want to reset the mail spooler?")
+If (ok=1)
+	WinChoice ("WARNING: This will remove all orders from the spooler.";"Stop";"Continue")
+	If (ok=0)
+		QUERY([Spooler];[Spooler]Waiting=True)
+		$i:=1
+		FIRST RECORD([Spooler])
+		For ($i;1;Records in selection([Spooler]))
+			[Spooler]Waiting:=False
+			SAVE RECORD([Spooler])
+			NEXT RECORD([Spooler])
+		End for 
+	End if 
+End if 
+UNLOAD RECORD([Spooler])

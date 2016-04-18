@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($return)
+
+$return:=Get edited text+"@"
+
+QUERY([ReturnStores];[ReturnStores]StoreName=$return)
+ORDER BY([ReturnStores];[ReturnStores]StoreName;>)

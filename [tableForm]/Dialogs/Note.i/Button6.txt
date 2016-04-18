@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (dinsert=1)
+	vfAdd:=False
+Else 
+	vfAdd:=True
+End if 
+ACCEPT

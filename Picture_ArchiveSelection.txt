@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($dn;0)
+
+C_BLOB($varB)
+C_LONGINT($run)
+
+Case of 
+	: (Table name(Current form table)="Designs")
+		SELECTION TO ARRAY([Designs]DesignNum;$dn)
+	: (Table name(Current form table)="Orders")
+		SELECTION TO ARRAY([Orders]DesignNumber;$dn)
+End case 
+
+VARIABLE TO BLOB($dn;$varB)
+
+If (Application type=0)
+	Picture_Archive 
+Else 
+	$run:=Execute on server("Picture_ArchiveBuildSelection";64*1024;"BuildRex";$varB)
+End if 
+

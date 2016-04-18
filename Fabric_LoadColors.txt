@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$ordernumber)
+C_TEXT($truc)
+
+ARRAY TEXT(asCPNumbers;0)
+ARRAY TEXT(asCPColorName;0)
+ARRAY LONGINT(alPOOrder;0)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY LONGINT(alUnits;0)
+ARRAY LONGINT(alColorKey;0)
+ARRAY TEXT($colorprint;0)
+ARRAY TEXT(atDType;0)
+SELECTION TO ARRAY([FabPOLines]ColorPrint;$colorprint;[FabPOLines]FabType;atDType)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+
+$i:=1
+For ($i;1;Size of array(asOrderNumbers))
+	$ordernumber:=Num(asOrderNumbers{$i})
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$ordernumber)
+	QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType=asTypeList{$i})
+	
+	$s:=1
+	FIRST RECORD([OrdersFabricXRef])
+	For ($s;1;Records in selection([OrdersFabricXRef]))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+		FIRST RECORD([CP_OrderXRef])
+		
+		$n:=1
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey;*)
+			QUERY([FabPOLines]; & ;[FabPOLines]ColorPrint=[CP_OrderXRef]CPNumber)
+			
+			If ([CP_OrderXRef]FabOrderKey=0) | (Records in selection([FabPOLines])=0)
+				
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				APPEND TO ARRAY(asCPNumbers;[CP_OrderXRef]CPNumber)
+				APPEND TO ARRAY(asCPColorName;[ColorPrintNumber]CPName)
+				APPEND TO ARRAY(alPOOrder;[CP_OrderXRef]OrderNumber)
+				QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+				APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+				APPEND TO ARRAY(alUnits;[CP_OrderXRef]Quantity)
+				APPEND TO ARRAY(alColorKey;[CP_OrderXRef]CPOrdID)
+			End if 
+			
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+End for 
+
+LISTBOX SELECT ROW(afListBox4;999)
+FORM GOTO PAGE(8)

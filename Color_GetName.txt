@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$1)
+QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+
+
+If (Records in selection([ColorPrintNumber])=0)
+	<>vtColorCode:="NONE"
+Else 
+	<>vtColorCode:=[ColorPrintNumber]CPName
+End if 

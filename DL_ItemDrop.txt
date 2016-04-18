@@ -1,0 +1,125 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_POINTER($designPtr)
+C_BOOLEAN($continue)
+
+Case of 
+	: (Form event=On Double Clicked)
+		QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey;*)
+		QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=[DLPages]PageNumber;*)
+		QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=$1)
+		FORM SET INPUT([DesignLineIncluded];"Design.win")
+		vlWinWd:=600
+		vlWinHt:=250
+		
+		vlWinType:=4
+		vsWinTitle:=""
+		Center Window 
+		MODIFY RECORD([DesignLineIncluded];*)
+		CLOSE WINDOW
+		DL_BuildPage ($1;False)
+		
+		
+		
+	: (Form event=On Begin Drag Over)
+		vlDragPage:=[DLPages]PageNumber
+		vlDragItem:=$1
+	: (Form event=On Drop)
+		
+		$designPtr:=Get pointer("vDesign"+String($1))
+		
+		
+		Case of 
+			: (Current user="Designer") & (Shift down)
+				$continue:=True
+			: ($1=-6)
+				$continue:=True
+			: ($designPtr->#"") & (vlDragItem<13) & ($1<13)
+				WinPrompt ("You can only drop into an empty square. Move current garment to clipboard, then proceed.")
+			: ($1=13) & (vDesign13#"")
+				WinPrompt ("That part of the clipboard is taken.")
+			: ($1=14) & (vDesign14#"")
+				WinPrompt ("That part of the clipboard is taken.")
+			: ($1=15) & (vDesign15#"")
+				WinPrompt ("That part of the clipboard is taken.")
+			: ($1=16) & (vDesign16#"")
+				WinPrompt ("That part of the clipboard is taken.")
+			: ($1=17) & (vDesign17#"")
+				WinPrompt ("That part of the clipboard is taken.")
+			: ($1=18) & (vDesign18#"")
+				WinPrompt ("That part of the clipboard is taken.")
+			: ($designPtr->#"") & (vDesign13#"") & (vDesign14#"") & (vDesign15#"") & (vDesign16#"") & (vDesign17#"") & (vDesign18#"") & (vlDragItem<13)
+				WinPrompt ("Clipboards are full")
+			Else 
+				$continue:=True
+		End case 
+		
+		If ($continue)
+			If ($1>0) | ($1=-6)
+				
+				vlDropItem:=$1
+				vlDropPage:=[DLPages]PageNumber
+				
+				
+				
+				If (vlDropItem<13)
+				Else 
+					  //DL_BuildPage (vlDropItem*-1;False)
+				End if 
+				
+				If (vlDragItem<13)
+					QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+					QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=vlDragPage;*)
+					QUERY SELECTION([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=vlDragItem)
+					If (vlDropItem=-6)
+						[DesignLineIncluded]PageNumber:=-6
+						[DesignLineIncluded]ItemNumber:=-6
+					Else 
+						[DesignLineIncluded]PageNumber:=vlDropPage
+						[DesignLineIncluded]ItemNumber:=vlDropItem
+					End if 
+					SAVE RECORD([DesignLineIncluded])
+					  // DL_BuildPage (vlDragItem*-1;False)
+					  //     
+				Else 
+					QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+					QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=vlDragItem)
+					CREATE SET([DesignLineIncluded];"Drag")
+					
+					QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+					QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=vlDropPage;*)
+					QUERY SELECTION([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=$1)
+					If (vlDropItem=-6)
+						[DesignLineIncluded]PageNumber:=-6
+						[DesignLineIncluded]ItemNumber:=-6
+					Else 
+						[DesignLineIncluded]PageNumber:=vlDragPage
+						[DesignLineIncluded]ItemNumber:=vlDragItem
+					End if 
+					SAVE RECORD([DesignLineIncluded])
+					  //DL_BuildPage (vlDragItem*-1;False)
+					
+					USE SET("Drag")
+					CLEAR SET("Drag")
+					
+					[DesignLineIncluded]PageNumber:=vlDropPage
+					[DesignLineIncluded]ItemNumber:=vlDropItem
+					SAVE RECORD([DesignLineIncluded])
+					  //DL_BuildPage (vlDropItem;False)
+					
+				End if 
+				
+				SAVE RECORD([DesignLineIncluded])
+				
+				  //DL_BuildPage (vlDropItem;False)
+			End if 
+		End if 
+		Case of 
+			: (vlDropItem>0) | (vlDropItem=-6)
+				DL_BuildPage (vlDropItem;False)
+			Else 
+		End case 
+		
+		  //DL_BuildPage (vlDragItem;False)
+		
+End case 
+

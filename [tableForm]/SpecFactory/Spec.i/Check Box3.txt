@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbReorder=1)
+	<>vlCostRouter:=-71
+Else 
+	<>vlCostRouter:=-72
+End if 
+
+CALL PROCESS(<>SalesPrcID)

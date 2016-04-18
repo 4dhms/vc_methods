@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (pOne=1)
+		[SpecFactory]KnitWoven1:="CutSew"
+	: (pTwo=1)
+		[SpecFactory]KnitWoven2:="CutSew"
+	: (pThree=1)
+		[SpecFactory]KnitWoven3:="CutSew"
+	Else 
+		[SpecFactory]KnitWoven1:="CutSew"
+End case 

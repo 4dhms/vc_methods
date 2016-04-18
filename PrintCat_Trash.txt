@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfCopy)
+C_LONGINT($choice)
+C_POINTER($cell)
+C_POINTER($sketch)
+C_TEXT($print)
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+Case of 
+	: ($1=11)
+		$cell:=->[PCatalog]Paste1
+		$sketch:=->vxSketch11
+	: ($1=12)
+		$cell:=->[PCatalog]Paste2
+		$sketch:=->vxSketch12
+	: ($1=13)
+		$cell:=->[PCatalog]Paste3
+		$sketch:=->vxSketch13
+	: ($1=14)
+		$cell:=->[PCatalog]Paste4
+		$sketch:=->vxSketch14
+	: ($1=15)
+		$cell:=->[PCatalog]Paste5
+		$sketch:=->vxSketch15
+	: ($1=16)
+		$cell:=->[PCatalog]Paste6
+		$sketch:=->vxSketch16
+End case 
+vxSketch:=$sketch->
+$print:=$cell->
+
+$choice:=Pop up menu("Move;Delete")
+
+Case of 
+	: ($choice=1)  //copy
+		vsCPNumber:=$cell->
+		vxSketch20:=$sketch->
+		$cell->:=""
+		$sketch->:=$empty
+		QUERY([PCHistory];[PCHistory]PCKey=[PCatalog]PCKey)
+		QUERY SELECTION([PCHistory];[PCHistory]PrintNumber=vsCPNumber)
+		ORDER BY([PCHistory];[PCHistory]Serial;<)
+		vtNote:=""
+		Case of 
+			: ([PCHistory]ApprovedDate#!00-00-00!)
+				vtNote:=[PCHistory]Step+" Approved "+String([PCHistory]ApprovedDate)
+			: ([PCHistory]DueDate#!00-00-00!)
+				vtNote:=[PCHistory]Step+" Due "+String([PCHistory]DueDate)
+			Else 
+				vtNote:=[PCHistory]Step
+		End case 
+		
+		If ([PCHistory]Note#"")
+			vtNote:=vtNote+Char(13)+[PCHistory]Note
+		End if 
+		
+	: ($choice=2)  //delete
+		$sketch->:=$empty
+		$cell->:=""
+		$print:=""
+		SAVE RECORD([PCatalog])
+End case 

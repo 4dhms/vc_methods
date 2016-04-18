@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asStHour;24)
+ARRAY TEXT(asStMin;4)
+ARRAY TEXT(asEndHour;0)
+ARRAY TEXT(asEndMin;0)
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;24)
+	Case of 
+		: ($i=1)
+			asStHour{1}:="6 AM"
+		: ($i<7)
+			asStHour{$i}:=String($i+5)
+		: ($i=7)
+			asStHour{7}:="Noon"
+		: ($i<19)
+			asStHour{$i}:=String($i-7)
+		: ($i=19)
+			asStHour{19}:="Mid"
+		Else 
+			asStHour{$i}:=String($i-19)
+	End case 
+End for 
+
+asStMin{1}:="00"
+asStMin{2}:="15"
+asStMin{3}:="30"
+asStMin{4}:="45"
+
+COPY ARRAY(asStHour;asEndHour)
+COPY ARRAY(asStMin;asEndMin)

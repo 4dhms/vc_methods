@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asStHour=7)
+		vsStAMPM:="Noon"
+	: (asStHour>7) & (asStHour<19)
+		vsStAMPM:="PM"
+	: (asStHour=19)
+		vsStAMPM:="MidN"
+	Else 
+		vsStAMPM:="AM"
+End case 
+
+Case of 
+	: (asEndHour=7)
+		vsEndAMPM:="Noon"
+	: (asEndHour>7) & (asEndHour<19)
+		vsEndAMPM:="PM"
+	: (asEndHour=19)
+		vsEndAMPM:="Mid"
+	Else 
+		vsEndAMPM:="AM"
+End case 

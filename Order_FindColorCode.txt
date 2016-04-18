@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($xref;0)
+C_LONGINT($i;$n)
+
+SAVE RECORD([Orders])
+
+WinFind ("Enter color code:";7)
+
+If (OK=1) & (vsRequestString#"")
+	QUERY([CP_OrderXRef];[CP_OrderXRef]ColorCode=vsRequestString)
+	DISTINCT VALUES([CP_OrderXRef]XrefID;$xref)
+	$i:=1
+	CREATE EMPTY SET([Orders];"Color")
+	CREATE SET([Orders];"Orig")
+	For ($i;1;Size of array($xref))
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=$xref{$i})
+		$n:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($n;1;Records in selection([OrdersFabricXRef]))
+			If (vYesNO=1)
+				USE SET("Orig")
+				QUERY SELECTION([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+			Else 
+				QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+			End if 
+			ADD TO SET([Orders];"Color")
+		End for 
+	End for 
+	USE SET("Color")
+	CLEAR SET("Color")
+	CLEAR SET("Orig")
+End if 
+
+
+p_InputLayHMS 
+p_SetWindowHMS 

@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+FIRST RECORD([DesignLineIncluded])
+$i:=1
+For ($i;1;Records in selection([DesignLineIncluded]))
+	If (Selected record number([DesignLineIncluded])%2=0)
+		[DesignLineIncluded]Background:=False
+	Else 
+		[DesignLineIncluded]Background:=True
+	End if 
+	SAVE RECORD([DesignLineIncluded])
+	NEXT RECORD([DesignLineIncluded])
+End for 

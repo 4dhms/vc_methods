@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (adWeeks>0)
+	vdWeekOne:=adWeeks{adWeeks}
+	[SLRAcct]WeekOne:=vdWeekOne
+	OBJECT SET VISIBLE(vdWeekOne;True)
+	OBJECT SET VISIBLE(bMore;True)
+	vtUnitsTot:=""
+	vtSalesTot:=""
+	vtOnHand:=""
+	vlWkNumber:=1
+	vdDate:=vdWeekOne
+	OBJECT SET ENABLED(bAccept;True)
+End if 

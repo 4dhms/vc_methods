@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atCompNote>0)
+	If (<>atCompNote=1)
+		List_Var ("Comp Note";->vtCSNote)
+		If (ok=1)
+			ARRAY TEXT(<>atCompNote;0)
+			QUERY([Lists];[Lists]UserName=Current user)
+			QUERY SELECTION([Lists];[Lists]ListName="Comp Note")
+			SELECTION TO ARRAY([Lists]ListItem;<>atCompNote)
+			SORT ARRAY(<>atCompNote;>)
+			INSERT IN ARRAY(<>atCompNote;1;1)
+			<>atCompNote{1}:="Add/edit list"
+		End if 
+	Else 
+		vtCSNote:=<>asCompSource{<>asCompSource}
+	End if 
+End if 
+

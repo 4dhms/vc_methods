@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vfMTL:=False
+vPercent:=0
+vNetUnitPrc:=0
+vTotalProf:=0
+vrTotalSales1:=0
+vtOldData:=""
+vtNewData:=""
+vTotalCost:=0
+ARRAY TEXT(<>asCopyGrade;0)
+
+Closed:=False
+SET MENU BAR(2)
+Grade_CatArray 
+Order_LayoutRouter 
+p_SetWindowHMS 
+AccessMode (->[Orders];True)
+TheFile:=->[Orders]
+

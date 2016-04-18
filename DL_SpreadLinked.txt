@@ -1,0 +1,111 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($strip;$season;$year)
+C_LONGINT($used;$unused;$i;$n;$c)
+C_POINTER($type)
+C_POINTER($number)
+C_TEXT($path)
+C_LONGINT($count)
+C_TEXT($message)
+
+Center Window (250;150;1;"")
+DIALOG("Season")
+CLOSE WINDOW
+
+If (ok=1)
+	$season:=<>asSeasonName{<>asSeasonname}
+	$year:=<>asSeasonYear{<>asSeasonYear}
+	
+	ARRAY TEXT($designs;0)
+	
+	QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=[DesignLines]DesignLineKey)
+	
+	$used:=0
+	$unused:=0
+	FIRST RECORD([DesignLinkedPages])
+	For ($n;1;Records in selection([DesignLinkedPages]))
+		$i:=1
+		For ($i;1;12)
+			$type:=Field(116;$i+3)
+			$number:=Field(116;$i+16)
+			
+			If ($type->>0)
+				If ($number->#"")
+					Case of 
+						: ($type->=1)  //design
+							APPEND TO ARRAY($designs;$number->)
+						: ($type->=2)  //style
+							QUERY([Samples];[Samples]SampleNumber=$number->)
+							APPEND TO ARRAY($designs;[Samples]DesignNum)
+						: ($type->=3)  //order
+							QUERY([Orders];[Orders]OrderNum=$number->)
+							APPEND TO ARRAY($designs;[Orders]DesignNumber)
+					End case 
+				End if 
+			End if 
+		End for 
+		NEXT RECORD([DesignLinkedPages])
+	End for 
+	
+	SORT ARRAY($designs;>)
+	ARRAY LONGINT($orders;0)
+	ARRAY TEXT($core;0)
+	
+	$i:=1
+	For ($i;1;Size of array($designs))
+		$strip:=StripToNumber ($designs{$i})
+		QUERY([Orders];[Orders]DesignNumber="@"+$strip+"@";*)
+		QUERY([Orders]; & ;[Orders]Cancelled=False;*)
+		QUERY([Orders]; & ;[Orders]SeasonName=$season;*)
+		QUERY([Orders]; & ;[Orders]SeasonYear=$year)
+		$c:=Find in array($core;$strip)
+		If ($c<1)
+			APPEND TO ARRAY($core;$strip)
+			APPEND TO ARRAY($orders;Records in selection([Orders]))
+		Else 
+			$orders{$c}:=$orders{$c}+Records in selection([Orders])
+			$designs{$i}:="XXX"
+		End if 
+	End for 
+	
+	ARRAY TEXT($po;0)
+	ARRAY TEXT($nopo;0)
+	
+	$i:=1
+	For ($i;1;Size of array($designs))
+		If ($designs{$i}#"XXX")
+			$strip:=StripToNumber ($designs{$i})
+			$count:=$orders{Find in array($core;$strip)}
+			If ($count=0)
+				APPEND TO ARRAY($nopo;$designs{$i})
+				$unused:=$unused+1
+			Else 
+				APPEND TO ARRAY($po;$designs{$i})
+				$used:=$used+1
+			End if 
+		End if 
+	End for 
+	
+	$message:=String($used+$unused)+" unique designs"+Char(13)+"Used: "+String($used)+Char(13)+"Unused: "+String($unused)
+	WinChoice ($message;"Spreadsheet";"No thanks")
+	
+	If (ok=1)
+		$docref:=Create document("";"xls")
+		$path:=Document
+		If (ok=1)
+			$i:=1
+			For ($i;1;Size of array($po))
+				$strip:=StripToNumber ($po{$i})
+				SEND PACKET($docref;$po{$i}+Char(9)+String($orders{Find in array($core;$strip)})+Char(13))
+			End for 
+			$i:=1
+			For ($i;1;Size of array($nopo))
+				SEND PACKET($docref;$nopo{$i}+Char(9)+"0"+Char(13))
+			End for 
+			SEND PACKET($docref;Char(13)+"Used:"+Char(9)+String($used))
+			SEND PACKET($docref;Char(13)+"Usused:"+Char(9)+String($unused))
+			CLOSE DOCUMENT($docref)
+			SHOW ON DISK($path)
+		End if 
+	End if 
+End if 

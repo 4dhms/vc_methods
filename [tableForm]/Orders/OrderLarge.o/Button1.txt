@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($subtot;$i;$ext)
+C_TEXT($path)
+
+
+If (Shift down)
+	WinChoice ("Report factory:";"Sarah Co";"Now Corp";"Azul";"Cancel")
+	If (ok=1)
+		Case of 
+			: (bChoice3=1)
+				QUERY([Orders];[Orders]Factory="Azul@")
+			: (bChoice2=1)
+				QUERY([Orders];[Orders]Factory="Now Corp@")
+			Else 
+				QUERY([Orders];[Orders]Factory="Sarah Co@")
+		End case 
+		QUERY SELECTION([Orders];[Orders]ActualDeliveryDate=!00-00-00!)
+		QUERY SELECTION([Orders];[Orders]Cancelled=False)
+		$docref:=Create document("";"xls")
+		$subtot:=0
+		If (ok=1)
+			$path:=document
+			SEND PACKET($docref;"Factory"+Char(9)+"PO"+Char(9)+"Style Number"+Char(9)+"Price"+Char(9)+"Units"+Char(9)+"Extension"+Char(13))
+			$i:=1
+			ORDER BY([Orders];[Orders]StyleNumber;>)
+			FIRST RECORD([Orders])
+			For ($i;1;Records in selection([Orders]))
+				$ext:=[Orders]Price*[Orders]TotalOrderQuantity
+				SEND PACKET($docref;[Orders]Factory+Char(9)+String([Orders]OrderNum)+Char(9)+[Orders]StyleNumber+Char(9)+String([Orders]Price;"###.00 USD")+Char(9)+String([Orders]TotalOrderQuantity)+Char(9))
+				SEND PACKET($docref;String($ext;"###,###,###.00 USD")+Char(13))
+				$subtot:=$subtot+$ext
+				NEXT RECORD([Orders])
+			End for 
+			SEND PACKET($docref;Char(9)+Char(9)+Char(9)+Char(9)+"Total"+Char(9)+String($subtot;"###,###,###.00 USD")+Char(13))
+			CLOSE DOCUMENT($docref)
+			SHOW ON DISK($path)
+		End if 
+	End if 
+Else 
+	p_ProdStatus 
+End if 

@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+
+QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+
+vtContactKey:=String([StockOrders]BuyerKey)
+vtCustomer:=[Customers]CustomerName
+vsUser:=[Contacts]Contact
+vtEmail:=[Contacts]EmailAddress
+vtCustomerAddress:=[Customers]DefaultAddress
+vtShipTo:=[Customers]ShipTo
+vtTelephone:=[Contacts]PhoneBusiness
+vtTerms:=[Customers]Terms
+vtShipVia:=[Customers]ShipVia
+
+UNLOAD RECORD([Contacts])
+UNLOAD RECORD([Customers])

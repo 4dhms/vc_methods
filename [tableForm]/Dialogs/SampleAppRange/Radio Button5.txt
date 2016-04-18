@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+READ ONLY([Lists])
+QUERY([Lists];[Lists]ListName="FactoriesVietNam")
+QUERY SELECTION([Lists];[Lists]ListItem#"")
+SELECTION TO ARRAY([Lists]ListItem;atSub1)
+SORT ARRAY(atSub1;>)
+  //ARRAY TO LIST(atSub1;"FactoriesVietNam")
+cbGHZ:=0
+cbGSZ:=0
+cbGDom:=0
+cbGVN:=1
+vsSource:=""

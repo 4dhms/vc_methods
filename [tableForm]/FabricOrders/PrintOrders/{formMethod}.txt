@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	
+	If ([OrdersFabricXRef]OrderNumber<0)
+		OBJECT SET VISIBLE(vdShipDateFact;False)
+		OBJECT SET VISIBLE(*;"xShip";False)
+	Else 
+		OBJECT SET VISIBLE(vdShipDateFact;[FabricOrders]NoDates)
+	End if 
+End if 

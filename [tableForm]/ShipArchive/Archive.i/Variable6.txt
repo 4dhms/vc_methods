@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Size of array(asList1)=0) & (Size of array(asList2)=0)
+	WinPrompt ("You must enter at least PO or invoice.")
+Else 
+	Archive_SaveFile 
+	Archive_Save 
+	ORDER BY([ShipArchive];[ShipArchive]ArchiveKey;<)
+End if 

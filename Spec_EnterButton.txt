@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+$continue:=True
+
+Case of 
+	: (Find in array(alPartNumber;3)>0) & ([SpecFactory]Part3="")
+		WinPrompt ("Enter description for Part 3.")
+		$continue:=False
+		GOTO OBJECT([SpecFactory]Part3)
+	: (Find in array(alPartNumber;2)>0) & ([SpecFactory]Part2="")
+		WinPrompt ("Enter description for Part 2.")
+		$continue:=False
+		GOTO OBJECT([SpecFactory]Part2)
+	: (Find in array(alPartNumber;1)>0) & ([SpecFactory]Part1="")
+		WinPrompt ("Enter description for Part 1.")
+		$continue:=False
+		GOTO OBJECT([SpecFactory]Part1)
+End case 
+If (cbKnit=0) & (cbWoven=0) & (cbCutSew=0)
+	WinChoice ("Select fabric type.";"Knit";"Woven";"Cut n Sew")
+	Case of 
+		: (ok=1) & (pOne=1) & (bChoice2=1)
+			[SpecFactory]KnitWoven1:="Woven"
+		: (ok=1) & (pTwo=1) & (bChoice2=1)
+			[SpecFactory]KnitWoven2:="Woven"
+		: (ok=1) & (pThree=1) & (bChoice2=1)
+			[SpecFactory]KnitWoven3:="Woven"
+		: (ok=1) & (pOne=1)
+			[SpecFactory]KnitWoven1:="Knit"
+		: (ok=1) & (pTwo=1)
+			[SpecFactory]KnitWoven2:="Knit"
+		: (ok=1) & (pThree=1)
+			[SpecFactory]KnitWoven3:="Knit"
+		: (ok=0) & (pOne=1)
+			[SpecFactory]KnitWoven1:="CutSew"
+		: (ok=0) & (pTwo=1)
+			[SpecFactory]KnitWoven2:="CutSew"
+		: (ok=0) & (pThree=1)
+			[SpecFactory]KnitWoven3:="CutSew"
+			
+	End case 
+End if 
+
+
+If ($continue)
+	SAVE RECORD([SpecFactory])
+	SS_SaveCol3 
+	SampFit_RecDate 
+End if 

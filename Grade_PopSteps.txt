@@ -1,0 +1,117 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($bit;$long;$header;$Qrange)
+C_POINTER($col)
+
+Grade_SaveSteps 
+vtGradeRange:=<>asGradeCat{<>asGradeCat}
+Case of 
+	: (vtGradeRange="@6-8-10@")
+		$Qrange:="@6-8-10@"
+	Else 
+		$Qrange:=vtGradeRange
+End case 
+
+Case of 
+	: (cbKnit=1)
+		vsCategory:="Knit"
+	: (cbWoven=1)
+		vsCategory:="Woven"
+	: (cbCutSew=1)
+		vsCategory:="CutSew"
+End case 
+$cat:=vsCategory
+
+ARRAY TEXT($headerlist;0)
+ARRAY TEXT(atProcessed;0)
+$c:=0
+
+ARRAY TEXT(asList1;$c)
+ARRAY TEXT(asList2;$c)
+ARRAY TEXT(asList3;$c)
+ARRAY TEXT(asList4;$c)
+ARRAY TEXT(asList5;$c)
+ARRAY TEXT(asList6;$c)
+ARRAY TEXT(asList7;$c)
+ARRAY TEXT(asList8;$c)
+ARRAY TEXT(asList9;$c)
+ARRAY TEXT(asList10;$c)
+
+
+QUERY([Steps];[Steps]Range=$Qrange)
+QUERY SELECTION([Steps];[Steps]Category=$cat)
+If (atGarment>1)
+	QUERY SELECTION([Steps];[Steps]Garment=atGarment{atGarment})
+	
+	ARRAY TEXT(asPOM;0)
+	DISTINCT VALUES([Steps]POM;asPOM)
+	SORT ARRAY(asPOM;>)
+Else 
+	QUERY([ChineseDictionary];[ChineseDictionary]EnglishName#"")
+	SELECTION TO ARRAY([ChineseDictionary]EnglishName;asPOM)
+	SORT ARRAY(asPOM;>)
+	
+End if 
+
+$c:=Size of array(asPOM)
+
+ARRAY TEXT(asList1;$c)
+ARRAY TEXT(asList2;$c)
+ARRAY TEXT(asList3;$c)
+ARRAY TEXT(asList4;$c)
+ARRAY TEXT(asList5;$c)
+ARRAY TEXT(asList6;$c)
+ARRAY TEXT(asList7;$c)
+ARRAY TEXT(asList8;$c)
+ARRAY TEXT(asList9;$c)
+ARRAY TEXT(asList10;$c)
+
+C_TEXT($cat)
+
+$long:=<>asGradeCat{<>asGradeCat}
+
+$i:=1
+For ($i;1;10)
+	If (Length($long)>0)
+		If (Position("-";$long)>0)
+			$bit:=Substring($long;1;Position("-";$long)-1)+"->"
+			$long:=Substring($long;Position("-";$long)+1)
+		Else 
+			$bit:=$long
+			$long:=""
+		End if 
+	Else 
+		$bit:=""
+	End if 
+	APPEND TO ARRAY($headerlist;$bit)
+End for 
+
+$i:=1
+For ($i;1;10)
+	$header:="Header"+String($i+1)
+	OBJECT SET TITLE(*;$header;$headerlist{$i})
+	If ($headerlist{$i}="")
+		OBJECT SET LIST BY NAME(*;$header;"<None>")
+	Else 
+		OBJECT SET LIST BY NAME(*;$header;"Step")
+	End if 
+End for 
+
+
+QUERY([Steps];[Steps]Range=$Qrange)
+QUERY SELECTION([Steps];[Steps]Category=$cat)
+If (atGarment>1)
+	QUERY SELECTION([Steps];[Steps]Garment=atGarment{atGarment})
+End if 
+
+$i:=1
+FIRST RECORD([Steps])
+For ($i;1;Records in selection([Steps]))
+	If ([Steps]POM#"")
+		$col:=Get pointer("asList"+String([Steps]Column))
+		If (Find in array(asPOM;[Steps]POM)>0)
+			$col->{Find in array(asPOM;[Steps]POM)}:=[Steps]Step
+		End if 
+	End if 
+	NEXT RECORD([Steps])
+End for 

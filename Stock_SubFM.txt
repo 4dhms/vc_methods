@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Display Detail)
+		QUERY([Designs];[Designs]DesignNum=[StockOrdersLines]Design)
+		[StockOrdersLines]Ext:=[StockOrdersLines]Price*[StockOrdersLines]Quantity
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[StockOrdersLines]CP_OrdID)
+		
+		QUERY([SpecPix];[SpecPix]OrderNumber=[CP_OrderXRef]OrderNumber)
+		QUERY SELECTION([SpecPix];[SpecPix]LinePlan=True)
+		If (Records in selection([SpecPix])>0)
+			Picture_Get ([CP_OrderXRef]OrderNumber+([SpecPix]SketchNumber*0.1);"B")
+			Pix_Delay 
+			vxSketch:=<>vxSketch
+			UNLOAD RECORD([SpecPix])
+		End if 
+		
+End case 

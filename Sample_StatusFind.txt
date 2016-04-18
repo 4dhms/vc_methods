@@ -1,0 +1,87 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_DATE(vdStart;vdEnd)
+C_TEXT($season;$year)
+C_TEXT($order)
+
+If (asDivisions>1)
+	QUERY([Samples];[Samples]SampleDivision=asDivisions{asDivisions})
+Else 
+	ALL RECORDS([Samples])
+End if 
+If (Size of array(asSearchSeason)>0)
+	$i:=1
+	CREATE SET([Samples];"division")
+	CREATE EMPTY SET([Samples];"season")
+	For ($i;1;Size of array(asSearchSeason))
+		$c:=Position(" 20";asSearchSeason{$i})
+		$season:=Substring(asSearchSeason{$i};1;$c-1)
+		$year:=Substring(asSearchSeason{$i};$c+1;4)
+		USE SET("division")
+		QUERY SELECTION([Samples];[Samples]SeasonName=$season;*)
+		QUERY SELECTION([Samples]; & ;[Samples]SeasonYear=$year)
+		CREATE SET([Samples];"temp")
+		UNION("temp";"season";"season")
+	End for 
+	USE SET("season")
+	CLEAR SET("season")
+	CLEAR SET("temp")
+	CLEAR SET("division")
+End if 
+
+Case of 
+	: (cb2=1) & (cb3=1)
+		QUERY SELECTION([Samples];[Samples]KWCnS="Woven";*)
+		QUERY SELECTION([Samples]; | ;[Samples]KWCnS="CutSew")
+	: (cb3=1)
+		QUERY SELECTION([Samples];[Samples]KWCnS="Woven")
+	: (cb2=1)
+		QUERY SELECTION([Samples];[Samples]KWCnS="CutSew")
+End case 
+Case of 
+	: (cb4=1) & (cb5=1)
+		QUERY SELECTION([Samples];[Samples]Sam Type="Proto Sample";*)
+		QUERY SELECTION([Samples]; | ;[Samples]Sam Type="Sales Sample")
+	: (cb4=1)
+		QUERY SELECTION([Samples];[Samples]Sam Type="Proto Sample")
+	: (cb5=1)
+		QUERY SELECTION([Samples];[Samples]Sam Type="Sales Sample")
+End case 
+If (cb6=1)
+	QUERY SELECTION([Samples];[Samples]Outstanding>0)
+End if 
+QUERY SELECTION([Samples];[Samples]Void=False)
+If (asFactories>1)
+	QUERY SELECTION([Samples];[Samples]SamGarFactry=asFactories{asFactories})
+End if 
+
+If (vdStart#!00-00-00!)
+	QUERY SELECTION([Samples];[Samples]DueDate>=vdStart)
+End if 
+
+If (vdEnd#!00-00-00!)
+	QUERY SELECTION([Samples];[Samples]DueDate<=vdEnd)
+End if 
+
+ORDER BY([Samples];[Samples]SampleNumber;>)
+
+If (cb1=1)  //Pre production
+	$i:=1
+	CREATE SET([Samples];"prod")
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		$order:=String([Samples]SampleNumber)
+		QUERY([Orders];[Orders]SGPO=$order)
+		
+		If (Records in selection([Orders])>0)
+			REMOVE FROM SET([Samples];"prod")
+		End if 
+		NEXT RECORD([Orders])
+	End for 
+	UNLOAD RECORD([Orders])
+	USE SET("prod")
+	CLEAR SET("prod")
+End if 
+ORDER BY([Samples];[Samples]SampleNumber;>)
+
+vlRecCount:=Records in selection([Samples])

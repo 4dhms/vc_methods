@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+
+vsPart1:=asOrderNumbers{asOrderNumbers}
+  //vsPart2:=asCPNumbers{asCPNumbers}
+vsPart3:=asTypeList{asTypeList}
+  //Num(vsPart1)
+
+If (Form event=On Double Clicked)
+	If (Shift down)
+		vtChange:=""
+		vfEdit:=True
+		FabPO_EditOrder 
+	Else 
+		$run:=New process("Order_Preview";0;"Preview";Num(asOrderNumbers{asOrderNumbers}))
+	End if 
+End if 

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([HMSArtNo])
+ADD TO SET([HMSArtNo];"AN")
+USE SET("AN")
+ACCEPT
+UNLOAD RECORD([HMSArtNo])
+UNLOAD RECORD([FabricLibrary])
+UNLOAD RECORD([HMSArtNoRelated])
+
+ORDER BY([HMSArtNo];[HMSArtNo]HANumber;<)

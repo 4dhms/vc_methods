@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfSample)
+C_LONGINT($line;$c;cbSG;cbOrder;vlColorKey)
+vtOrderChanges:=vtOrderChanges+"_Component"
+
+If (vfNew)
+	$line:=0
+Else 
+	$line:=asCompName
+End if 
+vlCSQty:=alCompQty{$line}
+vsCSName:=asCompName{$line}
+vsCSMini:=asCompMini{$line}
+vsCSArt:=asCompArt{$line}
+vsCSSource:=asCompSource{$line}
+vsCSStatus:=asCompStatus{$line}
+vdCSDate:=adCompStatusDate{$line}
+vtCSNote:=atCompNote{$line}
+vlCompLineKey:=alCompLineKey{$line}
+vlColorKey:=alCompDeleted{$line}
+Center Window (350;260;1;"")
+DIALOG([Dialogs];"CompDialog.i")
+CLOSE WINDOW
+
+If (ok=1)
+	If ($line=0)
+		$c:=Size of array(asCompName)+1
+		INSERT IN ARRAY(alCompOrderNumber;$c;1)
+		INSERT IN ARRAY(alCompLineKey;$c;1)
+		INSERT IN ARRAY(alCompQty;$c;1)
+		INSERT IN ARRAY(asCompName;$c;1)
+		INSERT IN ARRAY(asCompMini;$c;1)
+		INSERT IN ARRAY(atCompNote;$c;1)
+		INSERT IN ARRAY(asCompArt;$c;1)
+		INSERT IN ARRAY(asCompSource;$c;1)
+		INSERT IN ARRAY(asCompStatus;$c;1)
+		INSERT IN ARRAY(adCompStatusDate;$c;1)
+		INSERT IN ARRAY(alCompDeleted;$c;1)
+		$line:=$c
+	End if 
+	
+	If (cbSG=1)
+		alCompOrderNumber{$line}:=0
+	Else 
+		alCompOrderNumber{$line}:=<>vlOrderNumber
+	End if 
+	alCompQty{$line}:=vlCSQty
+	asCompName{$line}:=vsCSName
+	asCompMini{$line}:=vsCSMini
+	asCompArt{$line}:=vsCSArt
+	asCompSource{$line}:=vsCSSource
+	asCompStatus{$line}:=vsCSStatus
+	adCompStatusDate{$line}:=vdCSDate
+	atCompNote{$line}:=vtCSNote
+	
+	Case of 
+		: (alCompDeleted{$line}=16765650) | (alCompDeleted{$line}=16777170)
+			  //editing new line
+			
+		: (vfNew) & (vfSample)
+			alCompDeleted{$line}:=16765650
+			
+		: (vfNew)
+			alCompDeleted{$line}:=16777170
+		: (vfSample)
+			alCompDeleted{$line}:=14145535
+		Else 
+			alCompDeleted{$line}:=13500370
+	End case 
+	vtOrderChanges:=vtOrderChanges+"_Components"
+End if 
+vfNew:=False
+vfSample:=False

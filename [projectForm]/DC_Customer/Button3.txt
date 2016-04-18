@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Lists];[Lists]ListName="DC";*)
+QUERY([Lists]; & ;[Lists]ListItem=vtDCCustomer)
+
+
+If (Records in selection([Lists])>0)
+	WinPrompt (vtDCCustomer+" is already in the customer list.")
+Else 
+	CREATE RECORD([Lists])
+	[Lists]ListName:="DC"
+	[Lists]ListItem:=vtDCCustomer
+	[Lists]ListCode:=vtDCCustomer
+	SAVE RECORD([Lists])
+	If (<>vlQuikDC>0)
+		vsCustomer:=vtDCCustomer
+	Else 
+		asCustomers{asCustomers}:=vtDCCustomer
+	End if 
+	
+	CREATE RECORD([Changes])
+	[Changes]FieldName:="DC List"
+	[Changes]NewChange:=vtDCCustomer+" added"
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]Writer:=Current user
+	SAVE RECORD([Changes])
+	DC_List 
+	ACCEPT
+End if 

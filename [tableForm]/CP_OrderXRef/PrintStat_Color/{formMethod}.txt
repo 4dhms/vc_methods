@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+	If ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor#"")
+		Color_GetNameLaunch ([ColorPrintNumber]ThreadColor)
+		vtThreadColor:="Thread: "+[ColorPrintNumber]ThreadColor+" "+vtColor
+	Else 
+		vtThreadColor:=""
+	End if 
+	OBJECT SET VISIBLE([CP_OrderXRef]Quantity;[CP_OrderXRef]CPType="Self")
+End if 

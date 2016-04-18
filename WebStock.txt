@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($html)
+
+CREATE RECORD([WebLog])
+[WebLog]WebUser:=vsWebUser
+[WebLog]LogonDate:=Current date(*)
+[WebLog]LogonateTime:=Current time(*)
+SAVE RECORD([WebLog])
+
+Web_DL_List 

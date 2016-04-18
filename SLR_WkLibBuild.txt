@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($month;$year)
+C_DATE($end)
+C_BOOLEAN($done)
+C_LONGINT($mCounter)
+
+ALL RECORDS([SLRWks])
+
+If (Records in selection([SLRWks])=0) | (Records in selection([SLRWkLibrary])=0)
+	$end:=Date("1/31/2009")
+Else 
+	ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkEnd;<)
+	$end:=[SLRWkLibrary]WkEnd
+End if 
+
+$month:=1
+$year:=Year of($end)
+$mCounter:=13
+
+Repeat 
+	CREATE RECORD([SLRWkLibrary])
+	[SLRWkLibrary]SLRWkKey:=Sequence number([SLRWkLibrary])
+	[SLRWkLibrary]WkMonth:=$month
+	[SLRWkLibrary]WkStart:=$end+1
+	[SLRWkLibrary]WkEnd:=$end+7
+	[SLRWkLibrary]WkYear:=$year
+	SAVE RECORD([SLRWkLibrary])
+	$mCounter:=$mCounter-1
+	
+	If ($mCounter=9) | ($mCounter=4) | ($mCounter=0)
+		If ($month=12)
+			$year:=$year+1
+			$month:=1
+		Else 
+			$month:=$month+1
+		End if 
+	End if 
+	
+	Case of 
+		: (Year of($end)=2020) & ($mCounter=0)
+			$done:=True
+		: (Shift down)
+			$done:=True
+	End case 
+	
+	If ($mCounter=0)
+		$mCounter:=13
+	End if 
+	
+	$end:=$end+7
+	
+Until ($done)
+ALL RECORDS([SLRWkLibrary])
+ALERT("Done")
+

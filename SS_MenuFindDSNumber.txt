@@ -1,0 +1,41 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY LONGINT($orderNumber;0)
+
+WinFind ("Enter Design:")
+If (OK=1)
+	If ($1="Design")
+		QUERY([Orders];[Orders]DesignNumber=vsRequestString)
+		SELECTION TO ARRAY([Orders]OrderNum;$orderNumber)
+		UNLOAD RECORD([Orders])
+		QUERY([Samples];[Samples]DesignNum=vsRequestString)
+	Else 
+		QUERY([Orders];[Orders]StyleNumber=vsRequestString)
+		SELECTION TO ARRAY([Orders]OrderNum;$orderNumber)
+		UNLOAD RECORD([Orders])
+		QUERY([Samples];[Samples]StyleNum=vsRequestString)
+	End if 
+	QUERY SELECTION([Samples];[Samples]Void=False)
+	
+	INSERT IN ARRAY($orderNumber;1;Records in selection([Samples]))
+	$i:=1
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		$orderNumber{$i}:=-1*[Samples]SampleNumber
+		NEXT RECORD([Samples])
+	End for 
+	UNLOAD RECORD([Samples])
+	
+	CREATE EMPTY SET([SpecFactory];"ReturnRecords")
+	$i:=1
+	For ($i;1;Size of array($orderNumber))
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=$orderNumber{$i})
+		ADD TO SET([SpecFactory];"ReturnRecords")
+		NEXT RECORD([SpecFactory])
+	End for 
+	USE SET("ReturnRecords")
+	CLEAR SET("Return Reocrds")
+End if 
+
+

@@ -1,0 +1,137 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($meetingwith)
+C_TEXT($meetingdate)
+C_TIME($dstart;$dend)
+C_TEXT($start;$end)
+C_TEXT($name1;$name2;$name3;$attendee)
+C_TEXT($division)
+C_TEXT($notes)
+C_TEXT($array)
+C_LONGINT($i;$s;$e;$ss;$se)
+
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+$i:=1
+For ($i;1;11)
+	$array:=$array+$name{$i}+"  "+$value{$i}+"  "
+End for 
+
+  //$router:=$value{Find in array($name;"vsFlag")}
+vsWebUser:=$value{Find in array($name;"vsWebUser")}
+vsWebSession:=$value{Find in array($name;"vsWebSession")}
+
+$meetingwith:=$value{Find in array($name;"vtMeetingwith")}
+$meetingDate:=$value{Find in array($name;"vsMeetingDate")}
+$start:=$value{Find in array($name;"vsStart")}
+$end:=$value{Find in array($name;"vsEnd")}
+$dstart:=Time($start)
+$dend:=Time($end)
+$name1:=$value{Find in array($name;"vsName1")}
+$name2:=$value{Find in array($name;"vsName2")}
+$name3:=$value{Find in array($name;"vsName3")}
+$division:=$value{Find in array($name;"vsDivision")}
+If ($division="Division")
+	$division:=""
+End if 
+$notes:=$value{Find in array($name;"vtNotes")}
+
+Case of 
+	: ($meetingwith="Select customer")
+		Web_Error ("Select customer.")
+	: ($meetingdate="Meeting date")
+		Web_Error ("Select meeting date.")
+	: (Date($meetingdate)=!00-00-00!)
+		Web_Error ("Bad meeting date.")
+	: ($dstart=?12:00:00?) & ($dend=?12:00:00?)
+		Web_Error ("Select start/end time.")
+	: ($start>=$end)
+		Web_Error ("End time can not precede start.")
+	: ($name1="Attendee") & ($name2="Attendee") & ($name3="Attendee")
+		Web_Error ("Select attendee.")
+	Else 
+		CREATE RECORD([Appts])
+		[Appts]ApptDate:=Date($meetingdate)
+		[Appts]ApptEnd:=$dend
+		[Appts]ApptKey:=Sequence number([Appts])
+		[Appts]ApptStart:=$dstart
+		[Appts]ApptWith:=$meetingwith
+		[Appts]Notes:=$notes
+		[Appts]Division:=$division
+		If ($name1#"Attendee")
+			[Appts]ApptGroup:=$name1
+		Else 
+			[Appts]ApptGroup:=""
+		End if 
+		If ($name2#"Attendee")
+			[Appts]ApptGroup:=[Appts]ApptGroup+", "+$name2
+		End if 
+		If ($name3#"Attendee")
+			[Appts]ApptGroup:=[Appts]ApptGroup+", "+$name3
+		End if 
+		
+		$ss:=Num(Substring($start;3;2))
+		$se:=Num(Substring($end;3;2))
+		$s:=Num(Substring($start;1;2))
+		$e:=Num(Substring($end;1;2))
+		Case of 
+			: ($s>5)
+				[Appts]StHr:=$s-5
+			: ($s<6)
+				[Appts]StHr:=$s+19
+		End case 
+		Case of 
+			: ($e>5)
+				[Appts]EndHr:=$e-5
+			: ($e<6)
+				[Appts]EndHr:=$e+19
+		End case 
+		Case of 
+			: ($ss=0)
+				[Appts]StMin:=1
+			: ($ss=15)
+				[Appts]StMin:=2
+			: ($ss=30)
+				[Appts]StMin:=3
+			: ($ss=45)
+				[Appts]StMin:=4
+		End case 
+		Case of 
+			: ($se=0)
+				[Appts]EndMin:=1
+			: ($se=15)
+				[Appts]EndMin:=2
+			: ($se=30)
+				[Appts]EndMin:=3
+			: ($se=45)
+				[Appts]EndMin:=4
+		End case 
+		
+		
+		SAVE RECORD([Appts])
+		
+		$i:=1
+		For ($i;1;3)
+			Case of 
+				: ($i=1)
+					$attendee:=$name1
+				: ($i=2)
+					$attendee:=$name2
+				: ($i=3)
+					$attendee:=$name3
+			End case 
+			
+			If ($attendee#"Attendee")
+				CREATE RECORD([Attendees])
+				[Attendees]ApptKey:=[Appts]ApptKey
+				[Attendees]Attendee:=$attendee
+				SAVE RECORD([Attendees])
+				UNLOAD RECORD([Attendees])
+			End if 
+		End for 
+		UNLOAD RECORD([Appts])
+		Web_Index 
+End case 
+

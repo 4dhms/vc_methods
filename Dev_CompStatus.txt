@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([CS_Status];[CS_Status]ActionDate<!2010-01-01!)
+FIRST RECORD([CS_Status])
+ALERT(String(Records in selection([CS_Status])))
+
+CREATE EMPTY SET([CS_Status];"stat")
+
+$i:=1
+For ($i;1;Records in selection([CS_Status]))
+	QUERY([CS_Lines];[CS_Lines]CS_LineKey=[CS_Status]CS_LineKey)
+	If (Records in selection([CS_Lines])=0)
+		ADD TO SET([CS_Status];"stat")
+	End if 
+	NEXT RECORD([CS_Status])
+End for 
+
+USE SET("stat")
+CLEAR SET("stat")
+CONFIRM(String(Records in selection([CS_Status])))
+If (ok=1)
+	DELETE SELECTION([CS_Status])
+End if 
+ALERT("Done")

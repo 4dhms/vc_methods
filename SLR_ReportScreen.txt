@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Count parameters>0)
+	vsStyleNumber:=$1
+End if 
+
+FORM SET INPUT([Dialogs];"SLR_ReportScreen")
+Center Window (1000;725;0;"";"WincBox")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>vlSLReportProc:=0

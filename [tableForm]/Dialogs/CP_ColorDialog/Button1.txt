@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([FabricStatus];[FabricStatus]LibraryKey=vlColorKey)
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber)
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPOrdID;<)
+Center Window (450;250;1;"")
+DIALOG([Dialogs];"FabStatus")
+CLOSE WINDOW

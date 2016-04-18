@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start;$end)
+C_LONGINT($q)
+C_TEXT($divQ)
+
+Case of 
+	: (asStartMonth=17)
+		WinPrompt ("Select Season")
+	: (asSeasonYear=1)
+		WinPrompt ("Select Year")
+	: (pOne=1)
+		Case of 
+			: (asStartMonth{asStartMonth}="Q1")
+				$start:=Date("1/1/"+asSeasonYear{asSeasonYear})
+				$end:=Date("4/1/"+asSeasonYear{asSeasonYear})
+			: (asStartMonth{asStartMonth}="Q2")
+				$start:=Date("4/1/"+asSeasonYear{asSeasonYear})
+				$end:=Date("7/1/"+asSeasonYear{asSeasonYear})
+			: (asStartMonth{asStartMonth}="Q3")
+				$start:=Date("7/1/"+asSeasonYear{asSeasonYear})
+				$end:=Date("10/1/"+asSeasonYear{asSeasonYear})
+			: (asStartMonth{asStartMonth}="Q4")
+				$start:=Date("10/1/"+asSeasonYear{asSeasonYear})
+				$end:=Date("12/1/"+asSeasonYear{asSeasonYear})
+			Else 
+				$start:=Date(String(asStartMonth)+"/1/"+asSeasonYear{asSeasonYear})
+				
+				
+				If (asSeasonYear=12)
+					$end:=Date("1/1/"+String(Num(asSeasonYear{asSeasonYear})+1))
+				Else 
+					$end:=Date(String(asStartMonth+1)+"/1/"+asSeasonYear{asSeasonYear})
+				End if 
+		End case 
+		
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPCreationDate>=$start;*)
+		QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPCreationDate<$end)
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPType=2)
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber="@-1")
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]SeasonName=asStartMonth{asStartMonth};*)
+		QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonYear=asSeasonYear{asSeasonYear})
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPType=2)
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber="@-1")
+End case 
+
+$q:=1
+For ($q;1;Size of array(asDivisions))
+	$divQ:=Substring(asDivisions{$q};1;3)+"@"
+	
+	Case of 
+		: ($q=1)
+			QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Division=$divQ;*)
+			QUERY SELECTION([ColorPrintNumber]; | ;[ColorPrintNumber]Division="05@";*)
+		: ($q=Size of array(asDivisions))
+			QUERY SELECTION([ColorPrintNumber]; | ;[ColorPrintNumber]Division=$divQ)
+		Else 
+			QUERY SELECTION([ColorPrintNumber]; | ;[ColorPrintNumber]Division=$divQ;*)
+	End case 
+End for 
+
+

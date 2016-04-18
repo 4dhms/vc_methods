@@ -1,0 +1,37 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global to search for order in sample garments
+C_LONGINT($orderno)
+
+SAVE RECORD([Samples])
+CREATE SET([Samples];"StyPreSet")
+If (Records in selection([Samples])=0)
+	ALL RECORDS([Samples])
+Else 
+End if 
+WinFind ("Enter Order Number:")
+$orderno:=Num(vsRequestString)
+
+If (OK=0)
+	CLOSE WINDOW
+	FORM SET INPUT([Samples];"SampleGarment.i")
+	USE SET("StyPreSet")
+	p_SetWndwSamGar 
+	CLEAR SET("StyPreSet")
+Else 
+	If (vAddTo=1)
+		QUERY([Samples];[Samples]SampleNumber=$orderno)
+		CREATE SET([Samples];"StySGSet")
+		UNION("StyPreSet";"StySGSet";"NwSGSet")
+		CLOSE WINDOW
+		CLEAR SET("StySGSet")
+		CLEAR SET("StyPreSet")
+		USE SET("NwSGSet")
+		p_SetWndwSamGar 
+		CLEAR SET("NwSGSet")
+	Else 
+		QUERY([Samples];[Samples]SampleNumber=$orderno)
+		CLEAR SET("StyPreSet")
+		CLOSE WINDOW
+		p_SetWndwSamGar 
+	End if 
+End if 

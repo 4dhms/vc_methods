@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	If (asSpareParts>0)
+		INSERT IN ARRAY(asPart;Size of array(asPart)+1;1)
+		asPart{Size of array(asPart)}:=asSpareParts{asSpareParts}
+		DELETE FROM ARRAY(asSpareParts;asSpareParts;1)
+	End if 
+End if 

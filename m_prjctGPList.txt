@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlGPProc)
+ARRAY TEXT($users;0)
+APPEND TO ARRAY($users;"Designer")
+APPEND TO ARRAY($users;"Spenser")
+APPEND TO ARRAY($users;"Nubby")
+APPEND TO ARRAY($users;"Lou")
+APPEND TO ARRAY($users;"August")
+APPEND TO ARRAY($users;"Zoe")
+
+
+Case of 
+	: (Find in array($users;Current user)<1)
+		WinPrompt ("See Spenser for access.")
+	: (<>vlGPProc>0)
+		SHOW PROCESS(<>vlGPProc)
+		BRING TO FRONT(<>vlGPProc)
+	: (<>vlGPProc=0)
+		<>vlGPProc:=New process("p_PrjctGPlist";0;"GP Report")
+	Else 
+		SHOW PROCESS(<>vlGPProc)
+		BRING TO FRONT(<>vlGPProc)
+End case 

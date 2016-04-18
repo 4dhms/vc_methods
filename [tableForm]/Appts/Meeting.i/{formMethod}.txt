@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asCustomers;0)
+Case of 
+	: (Form event=On Load)
+		Cal_LoadAppt 
+		Customer_Setup 
+		ARRAY TO LIST(asCustomers;"Store List")
+		If (Size of array(asMeeting)>0)
+			If (asMeeting{1}="Conference Room")
+				asTeam:=Find in array(asTeam;"Design")
+			End if 
+		End if 
+		If ([Appts]ApptWith="")
+			GOTO OBJECT([Appts]ApptWith)
+		End if 
+End case 

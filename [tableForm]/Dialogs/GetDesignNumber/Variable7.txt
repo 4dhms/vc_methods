@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($variation)
+
+Case of 
+	: (vsList1Name="")
+		WinPrompt ("Enter Variation")
+	: (vsList2Name="")
+		WinPrompt ("Enter Suffix")
+	: (cb1+cb2+cb3+cb4=0)
+		WinPrompt ("Check category choice")
+	Else 
+		Case of 
+			: (cb1=1)
+				$variation:="Sleeves"
+				APPEND TO ARRAY(asList1;vsList1Name)
+				APPEND TO ARRAY(asList2;vsList2Name)
+				asList1:=Size of array(asList1)
+				
+			: (cb2=1)
+				$variation:="Yarn & Fabric"
+				APPEND TO ARRAY(asList3;vsList1Name)
+				APPEND TO ARRAY(asList4;vsList2Name)
+				asList3:=Size of array(asList3)
+				
+			: (cb3=1)
+				$variation:="Stitches"
+				APPEND TO ARRAY(asList5;vsList1Name)
+				APPEND TO ARRAY(asList6;vsList2Name)
+				asList5:=Size of array(asList5)
+				
+			: (cb4=1)
+				$variation:="Misc"
+				APPEND TO ARRAY(asList7;vsList1Name)
+				APPEND TO ARRAY(asList8;vsList2Name)
+				asList7:=Size of array(asList7)
+		End case 
+		vsSuffix:=vsList2Name
+		
+		CREATE RECORD([Lists])
+		[Lists]ListName:=$variation
+		[Lists]ListItem:=vsList1Name
+		[Lists]ArticleNumber:=vsList2Name
+		SAVE RECORD([Lists])
+		
+		FORM GOTO PAGE(2)
+End case 
+UNLOAD RECORD([Lists])

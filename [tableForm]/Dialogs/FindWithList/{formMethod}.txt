@@ -1,0 +1,117 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vsRequestString:=""
+		cbAdd:=0
+		OBJECT SET VISIBLE(cbAdd;True)
+		
+		Case of 
+			: (vlRouter=25)
+				OBJECT SET LIST BY NAME(vsRequestString;"Factories")
+				OBJECT SET TITLE(bValidate;"Save")
+				FORM GOTO PAGE(9)
+			: (vlRouter=23)
+				OBJECT SET LIST BY NAME(vsRequestString;"Garments")
+				OBJECT SET TITLE(bValidate;"Save")
+				FORM GOTO PAGE(9)
+			: (vlRouter=24)
+				asSizeName:=1
+				OBJECT SET TITLE(bValidate;"Save")
+				FORM GOTO PAGE(10)
+			: (vlRouter=1)
+				OBJECT SET LIST BY NAME(vsRequestString;"Colors")
+				OBJECT SET TITLE(bValidate;"Continue")
+				FORM GOTO PAGE(3)
+			: (vlRouter=2)
+				OBJECT SET LIST BY NAME(vsRequestString;"Prints")
+				OBJECT SET TITLE(bValidate;"Continue")
+				FORM GOTO PAGE(3)
+			: (vlRouter=3)
+				OBJECT SET LIST BY NAME(vsRequestString;"Division Code No")
+				OBJECT SET TITLE(bValidate;"Find")
+			: (vlRouter=4)
+				OBJECT SET LIST BY NAME(vsRequestString;"Fabric")
+				OBJECT SET TITLE(bValidate;"Find")
+				OBJECT SET VISIBLE(cbAdd;True)
+			: (vlRouter=6)
+				OBJECT SET LIST BY NAME(vsRequestString;"Group")
+				OBJECT SET TITLE(bValidate;"Find")
+				OBJECT SET VISIBLE(cbAdd;True)
+			: (vlRouter=7)
+				OBJECT SET LIST BY NAME(vsRequestString;"Season")
+				OBJECT SET TITLE(bValidate;"Find")
+				OBJECT SET VISIBLE(cbAdd;False)
+				<>asSeasonName:=1
+				<>asSeasonYear:=1
+				FORM GOTO PAGE(11)
+				
+			: (vlRouter=11)  //Add Solid Color
+				OBJECT SET LIST BY NAME(vsRequestString;"<None>")
+				OBJECT SET TITLE(bValidate;"OK")
+				FORM GOTO PAGE(2)
+			: (vlRouter=12)  //Add Print Color
+				OBJECT SET LIST BY NAME(vsRequestString;"<None>")
+				OBJECT SET TITLE(bValidate;"OK")
+				FORM GOTO PAGE(2)
+			: (vlRouter=13)  //Add Print Color
+				OBJECT SET LIST BY NAME(vsRequestString;"<None>")
+				OBJECT SET TITLE(bValidate;"Find")
+				OBJECT SET VISIBLE(cbAdd;True)
+				OBJECT SET TITLE(cbAdd;"Find Editor")
+				FORM GOTO PAGE(1)
+			: (vlRouter=14)  //EMail Status List      
+				OBJECT SET LIST BY NAME(vsRequestString;"<None>")
+				OBJECT SET TITLE(bValidate;"Ok")
+				vsFindFlag:="Double click to remove"
+				If (vtVendor#"")
+					ALERT("HERE")
+					
+					asVendors:=Find in array(asVendors;vtVendor)
+					Vendors_GetAddresses 
+					vtVendor:=""
+				End if 
+				FORM GOTO PAGE(4)
+			: (vlRouter=15)  //Subset of status by Solid or Print
+				OBJECT SET LIST BY NAME(vsRequestString;"SolidPrint")
+				OBJECT SET TITLE(bValidate;"Show")
+				OBJECT SET VISIBLE(cbAdd;False)
+			: (vlRouter=16)  //EMail PO
+				OBJECT SET TITLE(bValidate;"Ok")
+				FORM GOTO PAGE(5)
+				vsFindSubhead:="TO:"
+				vsFindFlag:="Double click to remove"
+			: (vlRouter=17)  //Button status
+				OBJECT SET LIST BY NAME(vsRequestString;"Source")
+				OBJECT SET TITLE(bValidate;"Show")
+				OBJECT SET VISIBLE(cbAdd;False)
+			: (vlRouter=18)  //Unshipped Factory Prints
+				OBJECT SET LIST BY NAME(vsRequestString;"Suppliers")
+				OBJECT SET TITLE(bValidate;"Enter")
+				OBJECT SET VISIBLE(cbAdd;False)
+			: (vlRouter=19)  //Unshipped Factory Prints
+				OBJECT SET LIST BY NAME(vsRequestString;"Suppliers")
+				OBJECT SET TITLE(bValidate;"Enter")
+				OBJECT SET VISIBLE(cbAdd;False)
+			: (vlRouter=20)  //Unshipped Factory Prints
+				FORM GOTO PAGE(7)
+			: (vlRouter=21)  //Fabric Library  
+				vsArticle:=""
+				FORM GOTO PAGE(8)
+			: (vlRouter=22)  //Find Factory
+				OBJECT SET LIST BY NAME(vtItemName;"Factory")
+				OBJECT SET VISIBLE(vsEmpty;vtItemName#"")
+				OBJECT SET TITLE(bValidate;"OK")
+				FORM GOTO PAGE(2)
+		End case 
+		If (vlRouter=2)
+			OBJECT SET VISIBLE(cbPrint;True)
+			OBJECT SET VISIBLE(cbTrim;True)
+			OBJECT SET VISIBLE(cbStrip;True)
+		End if 
+		Case of 
+			: (FORM Get current page=2)
+				GOTO OBJECT(vtItemName)
+			Else 
+				GOTO OBJECT(vsRequestString)
+		End case 
+End case 

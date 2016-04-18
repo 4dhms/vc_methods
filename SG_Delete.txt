@@ -1,0 +1,21 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE SET([Samples];"Keep")
+Case of 
+	: (Records in set("UserSet")>1)
+		WinPrompt ("You may only delete sample orders one at a time.")
+	: (Records in set("UserSet")=1)
+		USE SET("UserSet")
+		WinChoice ("This action will void and hide"+Char(13)+"Sample Order "+String([Samples]SampleNumber)+"?";"Do it";"Cancel")
+		If (ok=1)
+			<>vlOrderNumber:=-1*[Samples]SampleNumber
+			REMOVE FROM SET([Samples];"Keep")
+			[Samples]Void:=True
+			SAVE RECORD([Samples])
+			vlTableNum:=3
+			Rev_LogEvent ("Sample removed")
+		End if 
+	Else 
+		WinPrompt ("No order selected.")
+End case 
+USE SET("Keep")
+CLEAR SET("Keep")

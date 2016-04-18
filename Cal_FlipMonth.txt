@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($month;$year)
+vfNewMonth:=True
+REDUCE SELECTION([Appts];0)
+Case of 
+	: (vlMonth=1) & ($1<0)
+		$month:=12
+		$year:=vlYear-1
+	: (vlMonth=12) & ($1>0)
+		$month:=1
+		$year:=vlYear+1
+	Else 
+		$month:=vlMonth+$1
+		$year:=vlYear
+End case 
+vdCalToday:=Date("!"+String($month)+"/1/"+String($year))
+
+Cal_BuildThumb 
+SET WINDOW TITLE(Current user+"    "+vsFlag)

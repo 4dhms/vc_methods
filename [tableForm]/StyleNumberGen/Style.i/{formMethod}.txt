@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbEdit)
+
+If (Form event=On Load)
+	OBJECT SET VISIBLE(cbEdit;User in group(Current user;"ColorCodes"))
+	If (vfContinue)
+		vtStyleNo:=""
+		vDesignNum:=""
+		vsWriter:=""
+		vdDate:=!00-00-00!
+		vsCustomer:=""
+		FORM GOTO PAGE(2)
+		  //End caseUNLOAD RECORD([StyleNumberGen])
+	Else 
+		QUERY([Orders];[Orders]StyleNumber=[StyleNumberGen]StyleNumber)
+	End if 
+End if 

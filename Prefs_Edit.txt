@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Preferences];"Prefs.i")
+READ WRITE([Preferences])
+ALL RECORDS([Preferences])
+vlWinWd:=300
+vlWinHt:=400
+vlWinType:=1
+vsWinTitle:=""
+
+
+Center Window 
+SET WINDOW TITLE("Preferences")
+MODIFY RECORD([Preferences];*)
+CLOSE WINDOW
+SET WINDOW TITLE("")
+READ ONLY([Preferences])
+UNLOAD RECORD([Preferences])
+<>PrefsProc:=0

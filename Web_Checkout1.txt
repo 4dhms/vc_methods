@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsWebUser;vsWebSession;vtContactKey;vtCustomer;vsUser;vtEmail)
+C_TEXT(vtCustomerAddress;vtShipTo;vtTelephone;$customer)
+C_BOOLEAN(vfSameAdd)
+C_LONGINT($i)
+C_BOOLEAN($checkout;$new)
+
+  //Web_StockVar 
+
+QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+
+Web_StockOrderOpen 
+Web_StockVarLookUp 
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+ORDER BY([StockOrdersLines];[StockOrdersLines]SOKey;<)
+WEB SEND FILE("stockorder.html")

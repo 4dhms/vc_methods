@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //SD_SizeArray (0)
+SD_FindDesign 
+SD_FontColor 
+OBJECT SET ENABLED(bOk;True)

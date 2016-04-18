@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+PRINT SETTINGS
+vfPDF:=False
+vfExpand:=True
+Fabric_PrintUsageBulk 
+PAGE BREAK
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([Orders])
+ACCEPT
+UNLOAD RECORD([FabricOrders])

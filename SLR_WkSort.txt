@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($wk)
+
+FIRST RECORD([SLRReporter])
+$i:=1
+For ($i;1;Records in selection([SLRReporter]))
+	$wk:=Substring([SLRReporter]StyleNumber;Position(" ";[SLRReporter]StyleNumber);99)
+	$wk:=Substring($wk;1;Position("wk";$wk))
+	[SLRReporter]SortOrder:=Num($wk)
+	SAVE RECORD([SLRReporter])
+	NEXT RECORD([SLRReporter])
+End for 

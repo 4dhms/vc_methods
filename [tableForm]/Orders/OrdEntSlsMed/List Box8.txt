@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Double Clicked) & (Shift down)
+		vtOrderChanges:=vtOrderChanges+"_Color"
+		
+		WinChoice ("Are you sure you want to delete this"+Char(13)+asTypeList{asTypeList}+"?";"No";"Yes")
+		If (ok=1)
+		Else 
+			alShadeFab{asTypeList}:=16711690
+		End if 
+		
+	: (Form event=On Double Clicked) & (asTypeList>0)
+		vtOrderChanges:=vtOrderChanges+"_Color"
+		  //Case of 
+		  //: (Size of array(asCC)#Size of array(asTypeList))
+		  //error control
+		  //: (asTypeList{asTypeList}="Self")
+		  //asCC{asTypeList}:=""
+		  //Else 
+		  //asCC{asTypeList-Num(asTypeList{asTypeList})}:=""
+		  //End case 
+		
+		CP_Edit 
+		
+		If (ok=1)
+			[Orders]TotalOrderQuantity:=Orders_ArrayQuantity 
+		End if 
+		LISTBOX SELECT ROW(colorList;Size of array(asTypeList)+1)
+		
+		
+End case 

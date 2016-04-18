@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atFiberList=1)
+	List_Var ("Fiber";->vsFiber)
+Else 
+	vsFiber:=<>atFiberList{<>atFiberList}
+End if 

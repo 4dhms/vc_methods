@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	If (cbStockPrint=0)
+		WinPrompt ("Do you want to reset all printing?")
+		If (ok=1)
+			QUERY([StockOrders];[StockOrders]Print=True)
+			APPLY TO SELECTION([StockOrders];[StockOrders]Print:=False)
+			UNLOAD RECORD([StockOrders])
+			ALL RECORDS([DesignLines])
+			ORDER BY([DesignLines];[DesignLines]DesignLineKey;<)
+		End if 
+	End if 
+End if 
+

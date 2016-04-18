@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($imagenumbers;0)
+
+WinChoice ("Are you sure you want to remove this picture?")
+If (ok=1)
+	
+	QUERY([SpecPix];[SpecPix]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	SELECTION TO ARRAY([SpecPix]ImageNumber;$imagenumbers)
+	SORT ARRAY($imagenumbers;>)
+	
+	QUERY SELECTION([SpecPix];[SpecPix]ImageNumber=$imagenumbers{vlPixPos+($1)})
+	DELETE RECORD([SpecPix])
+	DELETE FROM ARRAY(aSketch;vlPixPos+$1;1)
+	DELETE FROM ARRAY(atNote;vlPixPos+$1;1)
+	
+	vlPixCount:=vlPixCount-1
+	
+	Spec_GetPix 
+End if 

@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($knitWoven)
+ARRAY TEXT(asSizeName;10)
+
+CREATE EMPTY SET([SpecLibGrade];"Grade")
+
+If (cbKnit=1)
+	$knitWoven:="Knit"
+Else 
+	$knitWoven:="Woven"
+End if 
+
+QUERY([SpecLibrary];[SpecLibrary]PartKey=asPOMType-1)
+If (cbKnit=1)
+	QUERY SELECTION([SpecLibrary];[SpecLibrary]Knit=True)
+Else 
+	QUERY SELECTION([SpecLibrary];[SpecLibrary]Woven=True)
+End if 
+
+QUERY([SpecGradeCats];[SpecGradeCats]ACatName=<>asGradeCat{<>asGradeCat})
+QUERY([POMList];[POMList]PartDescrip=asPOMType{asPOMType})
+QUERY([SpecSampleSize];[SpecSampleSize]POMKey=[POMList]POMKey;*)
+QUERY([SpecSampleSize]; & ;[SpecSampleSize]GradeCatKey=[SpecGradeCats]GradeCatKey;*)
+QUERY([SpecSampleSize]; & ;[SpecSampleSize]KnitWoven=$knitWoven)
+
+If (Records in selection([SpecSampleSize])=0)
+	WinFindList ("Select sample size.";24)
+	If (ok=1)
+		vlColSlider:=asSizeName-1
+		CREATE RECORD([SpecSampleSize])
+		[SpecSampleSize]GradeCatKey:=[SpecGradeCats]GradeCatKey
+		[SpecSampleSize]KnitWoven:=$knitWoven
+		[SpecSampleSize]POMKey:=[POMList]POMKey
+		[SpecSampleSize]SampleCol:=vlColSlider
+		SAVE RECORD([SpecSampleSize])
+	End if 
+Else 
+	vlColSlider:=[SpecSampleSize]SampleCol
+End if 
+ORDER BY([SpecLibrary];[SpecLibrary]DescriptionA;>)
+$i:=1
+FIRST RECORD([SpecLibrary])
+For ($i;1;Records in selection([SpecLibrary]))
+	QUERY([SpecLibGrade];[SpecLibGrade]Col1=[SpecLibrary]SpecLibKey;*)
+	QUERY([SpecLibGrade]; & ;[SpecLibGrade]SpecLibKey=$knitWoven;*)
+	QUERY([SpecLibGrade]; & ;[SpecLibGrade]GradeCatLine=[SpecGradeCats]GradeCatKey)
+	
+	If (Records in selection([SpecLibGrade])=0)
+		CREATE RECORD([SpecLibGrade])
+		[SpecLibGrade]GradeCatLine:=[SpecGradeCats]GradeCatKey
+		  //[SpecLibGrade]SpecLibKey:=$knitWoven
+		[SpecLibGrade]SortOrder:=$i
+		[SpecLibGrade]TempKey:=vlColSlider
+		[SpecLibGrade]Col1:=[SpecLibrary]SpecLibKey
+		SAVE RECORD([SpecLibGrade])
+	End if 
+	ADD TO SET([SpecLibGrade];"Grade")
+	NEXT RECORD([SpecLibrary])
+End for 
+USE SET("Grade")
+CLEAR SET("Grade")
+<>asGradeCat:=1
+ORDER BY([SpecLibGrade];[SpecLibGrade]SortOrder;>)

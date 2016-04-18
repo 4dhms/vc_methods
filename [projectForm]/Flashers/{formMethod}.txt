@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlClick)
+C_LONGINT(vlEnd)
+
+Case of 
+	: (Form event=On Load)
+		vlEnd:=3
+		vlClick:=0
+		SET TIMER(2)
+	: (Form event=On Timer)
+		Case of 
+			: (vlClick=1)
+				OBJECT SET VISIBLE(*;"c2";True)
+				vlClick:=1+vlClick
+			: (vlClick>vlEnd)
+				OBJECT SET VISIBLE(*;"c2";False)
+		End case 
+End case 
+
+

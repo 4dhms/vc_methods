@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+INSERT IN ARRAY(asList1;1;1)
+asList1{1}:=asCustomers{asCustomers}
+SORT ARRAY(asList1;>)

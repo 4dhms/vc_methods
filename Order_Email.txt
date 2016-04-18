@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Orders_CalcQty 
+vtVendor:=[Orders]Factory
+
+Case of 
+	: ([Orders]DesignNumber="")
+		WinPrompt ("Enter Design Number")
+	Else 
+		Email_Confirm ("PO";"Purchase Order")
+		UNLOAD RECORD([Spooler])
+End case 

@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+BEEP
+BEEP
+BEEP
+CONFIRM("This replaces the Actl Rcv Dates in current selection with today's date.")
+If (OK=1)
+	APPLY TO SELECTION([Samples];[Samples]SampleReceived:=Current date)
+End if 

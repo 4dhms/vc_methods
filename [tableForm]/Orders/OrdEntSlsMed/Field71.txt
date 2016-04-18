@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($m)
+
+If (Form event=On Data Change)
+	$m:=Month of([Orders]CancelDate)
+	If ($m=12)
+		[Orders]CancelMonth:=Date("12/31/"+String(Year of([Orders]CancelDate)))
+	Else 
+		[Orders]CancelMonth:=Date(String(Month of([Orders]CancelDate)+1)+"/1/"+String(Year of([Orders]CancelDate)))-1
+	End if 
+End if 
+

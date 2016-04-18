@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY POINTER($ar_Ptr;5)
+C_LONGINT($i)
+ARRAY TEXT(asSortOrder;0)
+
+$i:=1
+For ($i;1;5)
+	$ar_Ptr{$i}:=Get pointer("vsSort"+String($i))
+End for 
+
+$i:=1
+For ($i;1;5)
+	If ($ar_Ptr{$i}->#"") & ($ar_Ptr{$i}->#"Add Sort")
+		INSERT IN ARRAY(asSortOrder;Size of array(asSortOrder)+1;1)
+		asSortOrder{Size of array(asSortOrder)}:=$ar_Ptr{$i}->
+	End if 
+End for 

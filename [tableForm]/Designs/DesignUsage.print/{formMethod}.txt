@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($stripper)
+C_LONGINT($style)
+
+Case of 
+	: (Form event=On Header)
+		vtTitle:="Design Usage ("+asDivisions{asDivisions}+", "+<>asSeasonName{<>asSeasonName}+" "+<>asSeasonYear{<>asSeasonYear}+")  "+String(Records in selection([Designs]))+" designs"
+		If (cbOther=1)
+			vtTitle:=vtTitle+" including shared"
+		End if 
+		
+		vsPrintingHeader:=String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		$stripper:=String(Num([Designs]DesignNum))
+		If ([Designs]DesignNum=$stripper)
+			$style:=1
+		Else 
+			$style:=6
+		End if 
+		OBJECT SET FONT STYLE([Designs]DesignNum;$style)
+		OBJECT SET FONT STYLE([Designs]Description;$style)
+		OBJECT SET FONT STYLE(vlCount;$style)
+		OBJECT SET FONT STYLE(vlUnits;$style)
+		
+		QUERY([Orders];[Orders]DesignNumber=$stripper+"@")
+		vlCount:=Records in selection([Orders])
+		vlUnits:=Util_Sel_Sum (->[Orders];->[Orders]TotalOrderQuantity)
+		
+		QUERY([Samples];[Samples]DesignNum=$stripper+"@")
+		vlSampleCount:=Records in selection([Samples])
+		vlColSub1:=arNetNetSales{Find in array(asSSDesignNumber;[Designs]DesignNum)}
+		vlColSub2:=arNetNetProfit{Find in array(asSSDesignNumber;[Designs]DesignNum)}
+	: (Form event=On Unload)
+		UNLOAD RECORD([Orders])
+		UNLOAD RECORD([Samples])
+End case 
+

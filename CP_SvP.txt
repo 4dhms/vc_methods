@@ -1,0 +1,71 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search for fabric content in hms
+C_LONGINT($i)
+C_TEXT($searchString)
+C_BOOLEAN($unshipped;$group)
+
+SAVE RECORD([Orders])
+
+If (Records in selection([Orders])=0)
+	ALL RECORDS([Orders])
+End if 
+
+WinChoice ("Do you want to find color/print usage within a group?"+Char(13)+"Or find a single color/print?";"Group";"Single")
+
+If (ok=1)
+	WinFindList ("Find by Solid or Print:";15)
+	$group:=True
+Else 
+	$group:=False
+	WinFind ("Find by Solid or Print:";10)
+End if 
+
+If (OK=1)
+	If ($group)
+		Case of 
+			: (vsRequestString="Color") | (vsRequestString="Print")
+				$searchString:=vsRequestString
+			: (vsRequestString="Unshipped Print")
+				$searchString:="Print"
+				$unshipped:=True
+		End case 
+		$i:=1
+		If ($unshipped)
+			QUERY SELECTION([Orders];[Orders]ActualDeliveryDate=!00-00-00!;*)
+			QUERY SELECTION([Orders]; & ;[Orders]Cancelled=False)
+		End if 
+		CREATE SET([Orders];"ColorSet")
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+		QUERY([OrdersFabricXRef]; & ;[OrdersFabricXRef]SolidPrint=$searchString)
+		FIRST RECORD([Orders])
+		CREATE SET([OrdersFabricXRef];"Source")
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			USE SET("Source")
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			If (Records in selection([OrdersFabricXRef])=0)
+				REMOVE FROM SET([OrdersFabricXRef];"Source")
+			End if 
+			NEXT RECORD([Orders])
+		End for 
+		USE SET("ColorSet")
+		CLEAR SET("ColorSet")
+		CLEAR SET("Source")
+	Else 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=vsRequestString)
+		$i:=1
+		CREATE EMPTY SET([Orders];"ColorSet")
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			RELATE ONE([CP_OrderXRef])
+			QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+			ADD TO SET([Orders];"ColorSet")
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		USE SET("ColorSet")
+		CLEAR SET("ColorSet")
+	End if 
+End if 
+
+
+
+p_InputLayHMS 
+p_SetWindowHMS 

@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Digest];[Digest]OrderNumber=<>vlOrderNumber;*)
+QUERY([Digest]; & ;[Digest]Quantity=False)
+Dev_Trayce 
+
+Case of 
+	: (Records in selection([Digest])>1)
+		APPLY TO SELECTION([Digest];[Digest]OrderNumber:=0)
+		FIRST RECORD([Digest])
+		[Digest]OrderNumber:=[Orders]OrderNum
+		[Digest]ChangeDate:=Current date(*)
+		[Digest]ChangeMessage:=""
+		[Digest]Processed:=False
+	: (Records in selection([Digest])=1)
+		[Digest]ChangeDate:=Current date(*)
+		If (([Digest]ChangeDate#Current date(*)))
+			[Digest]ChangeMessage:=""
+		End if 
+		[Digest]Processed:=False
+	: (Records in selection([Digest])=0)
+		QUERY([Digest];[Digest]Processed=True)
+		If (Records in selection([Digest])=0)
+			CREATE RECORD([Digest])
+		Else 
+			FIRST RECORD([Digest])
+		End if 
+		[Digest]Processed:=False
+		[Digest]OrderNumber:=[Orders]OrderNum
+		[Digest]ChangeDate:=Current date(*)
+		[Digest]ChangeMessage:=""
+End case 
+
+[Digest]DesignNumber:=[Orders]DesignNumber
+[Digest]StyleNumber:=[Orders]StyleNumber
+[Digest]CncelDate:=[Orders]CancelDate
+[Digest]ChangeMessage:=vtContent
+[Digest]PODate:=[Orders]PODate
+[Digest]Quantity:=False
+[Digest]Changer:=Current user
+SAVE RECORD([Digest])
+UNLOAD RECORD([Digest])
+

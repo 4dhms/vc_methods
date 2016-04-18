@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($plat;$sys)
+C_TEXT($os)
+
+PLATFORM PROPERTIES($plat;$sys)
+
+If ($plat=3)
+	$os:="Windows"
+Else 
+	If (Int($sys/256)=16)
+		$os:="10."+String(($sys/16)%16)+"."+String($sys%16)*Num(($sys%10#0))
+	End if 
+End if 
+
+CREATE RECORD([Changes])
+[Changes]OrderNumber:=-9999
+[Changes]Writer:=Current user
+[Changes]NewChange:=String(Screen width)+" x "+String(Screen height)
+[Changes]RevDate:=Current date(*)
+[Changes]OldData:=$os
+SAVE RECORD([Changes])
+

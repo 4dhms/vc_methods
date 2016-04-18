@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($search)
+C_BOOLEAN($continue)
+C_LONGINT($i)
+C_TEXT($divisionkey)
+
+$search:=Request("Name this search:")
+
+If (ok=1) & ($search#"")
+	QUERY([SLRSearches];[SLRSearches]SearchName=$search)
+	If (Records in selection([SLRSearches])=1)
+		WinPrompt ("There is a search named "+Char(34)+$search+Char(34)+", do you want to overwrite it?")
+		If (ok=1)
+			$continue:=True
+		Else 
+			$continue:=False
+		End if 
+	Else 
+		CREATE RECORD([SLRSearches])
+		$continue:=True
+	End if 
+	
+	$divisionkey:=""
+	
+	$i:=1
+	For ($i;1;Size of array(afBatchList))
+		If (afBatchList{$i}=True)
+			$divisionkey:=$divisionkey+"1"
+		Else 
+			$divisionkey:=$divisionkey+"0"
+		End if 
+	End for 
+	
+	[SLRSearches]SearchName:=$search
+	[SLRSearches]Divisions:=$divisionkey
+	VARIABLE TO BLOB(asCustomers;[SLRSearches]Customers)
+	VARIABLE TO BLOB(asStyleNumbers;[SLRSearches]StyleNumbers)
+	[SLRSearches]Range:=asPODate{asPODate}
+	[SLRSearches]Title:=vtTitle
+	[SLRSearches]SeasonName:=asSeasonName{asSeasonName}
+	[SLRSearches]SeasonYear:=asSeasonYear{asSeasonYear}
+	If (zYes=1)
+		[SLRSearches]ColorStyle:="Color"
+	Else 
+		[SLRSearches]ColorStyle:="Style"
+	End if 
+	SAVE RECORD([SLRSearches])
+	If (Find in array(asNames;$search)<1)
+		asNames{1}:=""
+		APPEND TO ARRAY(asNames;$search)
+		SORT ARRAY(asNames;>)
+		asNames{1}:="Load Search"
+	End if 
+End if 

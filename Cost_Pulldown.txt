@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfDCS)
+
+QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+
+Case of 
+	: (asSheetNames{asSheetNames}="New Sheet")
+		vsFlag:=""
+		Case of 
+			: (Records in selection([Costing])=0)
+				Cost_CreateCosting 
+			: (Records in selection([Costing])=1)
+				vlNewSheetNumber:=[Costing]SheetNumber
+		End case 
+		
+		If (ok=1)
+			Cost_AddNewSheet 
+		End if 
+	: (asSheetNames{asSheetNames}="Favorite")
+		Sheet_SaveFave 
+		
+	: (asSheetNames{asSheetNames}="Spreadsheet")
+		CS_Spreadsheet 
+		If (<>vlOrderNumber>0)
+			FORM GOTO PAGE(11)
+		Else 
+			FORM GOTO PAGE(7)
+		End if 
+	Else 
+		CS_FindSheet (asSheetNames{asSheetNames})
+End case 
+
+If ([CostSheets]Method="") & (<>vfDCS)
+	[CostSheets]Method:=atMethod{atMethod}
+End if 

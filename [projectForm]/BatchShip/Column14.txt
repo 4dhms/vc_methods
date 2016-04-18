@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($list)
+If (Form event=On Clicked)
+	$list:="Sea;Air"
+	
+	$choice:=Pop up menu($list)
+	If ($choice=1)
+		atMNote{atMNote}:="Sea"
+	Else 
+		atMNote{atMNote}:="Air"
+	End if 
+End if 
+

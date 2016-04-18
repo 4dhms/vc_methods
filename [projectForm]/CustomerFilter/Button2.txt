@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(asXCustomer))
+	If (asXCustomer{$i}#"")
+		APPEND TO ARRAY(asCustomers;asXCustomer{$i})
+	End if 
+End for 
+ARRAY TEXT(asXCustomer;0)
+SORT ARRAY(asCustomers;>)

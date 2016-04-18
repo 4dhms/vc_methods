@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($color)
+C_LONGINT($length;$i)
+C_BOOLEAN($done)
+C_TEXT($suff)
+
+$length:=$2
+If (Position("-";$1)>0) & ($1#"@-1")
+	$suff:=Substring($1;Position("-";$1)+1;2)
+End if 
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$1)
+$color:=[ColorPrintNumber]CPName
+$color:=Replace string($color;"DTM";"")
+$color:=Replace string($color;" ";"")
+$color:=Replace string($color;"-";"")
+$color:=Replace string($color;"*";"")
+$color:=Replace string($color;".";"")
+$color:=Replace string($color;Char(34);"";*)
+$color:=Replace string($color;"/";"")
+$color:=Replace string($color;" ";"")
+$color:=Replace string($color;"#";"")
+$color:=Replace string($color;"$";"")
+$color:=Replace string($color;"&";"")
+$color:=Replace string($color;"'";"")
+$color:=Replace string($color;"_";"")
+$color:=Replace string($color;"(";"")
+$color:=Replace string($color;")";"")
+$color:=Replace string($color;"+";"")
+$color:=Replace string($color;"=";"")
+
+If (Length($color)>$length) | (Length($color)>$2) | ($2<7)
+	$color:=Replace string($color;"Bright";"BRT")
+	$color:=Replace string($color;"Gold";"GLD")
+	$color:=Replace string($color;"Silver";"SLVR")
+	$color:=Replace string($color;"Black";"BLK")
+	$color:=Replace string($color;"White";"WHT")
+	$color:=Replace string($color;"Orange";"OR")
+	$color:=Replace string($color;"Yellow";"YLLW")
+End if 
+
+$i:=2
+$done:=False
+
+Repeat 
+	Case of 
+			  //: (Shift down)
+			  //$done:=True
+		: (Length($color)<$i)
+			$done:=True
+		: (Length($color)<=$length)
+			$done:=True
+		: ($color[[$i]]="a") | ($color[[$i]]="e") | ($color[[$i]]="i") | ($color[[$i]]="o") | ($color[[$i]]="u")
+			$color:=Delete string($color;$i;1)
+		Else 
+			$i:=$i+1
+	End case 
+Until ($done)
+
+Case of 
+	: (Length($suff)=2)
+		$color:=Substring($color;1;8)+$suff
+	: (Length($suff)=1)
+		$color:=Substring($color;1;9)+$suff
+End case 
+
+$0:=Uppercase(Substring($color;1;$length))

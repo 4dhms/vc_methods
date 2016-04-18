@@ -1,0 +1,21 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($baseDN)
+If (<>vlOrderNumber>0)
+	$baseDN:=StripToNumber ([Orders]DesignNumber)
+Else 
+	$baseDN:=StripToNumber ([Samples]DesignNum)
+End if 
+
+QUERY([Costing];[Costing]DesignNumber=$baseDN+"@")
+
+QUERY SELECTION([Costing];[Costing]OrderNumber#<>vlOrderNumber)
+ORDER BY([Costing];[Costing]DesignNumber;>)
+
+If (Records in selection([Costing])>0)
+	Cost_HList 
+Else 
+	C_LONGINT(hlSheets)
+	If (hlSheets>0)
+		CLEAR LIST(hlSheets)
+	End if 
+End if 

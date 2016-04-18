@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($sfx)
+
+$sfx:=asList8{asList7}
+
+If (asList7>1)
+	Case of 
+		: ($sfx="X")
+			Case of 
+				: (Position("W";vsSuffix)>0) & (Position("CB";vsSuffix)>0)
+					vsSuffix:=Replace string(vsSuffix;"W";"")
+					vsSuffix:=Replace string(vsSuffix;"CB";"")
+					$sfx:="XCBW"
+				: (Position("W";vsSuffix)>0)
+					vsSuffix:=Replace string(vsSuffix;"W";"")
+					$sfx:="XW"
+				: (Position("CB";vsSuffix)>0)
+					vsSuffix:=Replace string(vsSuffix;"CB";"")
+					$sfx:="CBW"
+			End case 
+		: ($sfx="CB")
+			Case of 
+				: (Position("W";vsSuffix)>0) & (Position("X";vsSuffix)>0) & (Position("XB";vsSuffix)<1)
+					vsSuffix:=Replace string(vsSuffix;"W";"")
+					vsSuffix:=Replace string(vsSuffix;"X";"")
+					$sfx:="XCBW"
+				: (Position("W";vsSuffix)>0)
+					vsSuffix:=Replace string(vsSuffix;"W";"")
+					$sfx:="CBW"
+				: (Position("X";vsSuffix)>0) & (Position("XB";vsSuffix)<1)
+					vsSuffix:=Replace string(vsSuffix;"X";"")
+					$sfx:="XCB"
+			End case 
+		: ($sfx="W")
+			Case of 
+				: (Position("X";vsSuffix)>0) & (Position("CB";vsSuffix)>0) & (Position("XB";vsSuffix)<1)
+					vsSuffix:=Replace string(vsSuffix;"X";"")
+					vsSuffix:=Replace string(vsSuffix;"CB";"")
+					$sfx:="XCBW"
+				: (Position("X";vsSuffix)>0) & (Position("XB";vsSuffix)<1)
+					vsSuffix:=Replace string(vsSuffix;"X";"")
+					$sfx:="XW"
+				: (Position("CB";vsSuffix)>0)
+					vsSuffix:=Replace string(vsSuffix;"CB";"")
+					$sfx:="XW"
+			End case 
+	End case 
+	vsSuffix:=vsSuffix+$sfx
+End if 
+asList7:=1

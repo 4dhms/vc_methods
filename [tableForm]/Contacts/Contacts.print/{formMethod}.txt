@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($address)
+Case of 
+	: (Form event=On Header)
+		vsCustomer:=asCustomers{asCustomers}
+		vsPrintingHeader:="Printed on "+String(Current date(*))+"   Page "+String(Printing page)
+	: (Form event=On Printing Break)
+		vsCustomer:=[Customers]CustomerName
+	: (Form event=On Printing Detail)
+		If ([Contacts]Title="")
+			vtFullName:=[Contacts]Contact
+		Else 
+			vtFullName:=[Contacts]Contact+", "+[Contacts]Title
+		End if 
+		$address:=Replace string([Contacts]MailingAddress;Char(13);", ";*)
+		$address:=Replace string($address;Char(10);", ";*)
+		If (Substring($address;Length($address)-1;2)=", ")
+			$address:=Substring($address;1;Length($address)-1)
+		End if 
+		
+		If ($address#"")
+			vtFullName:=vtFullName+"  --  "+$address
+		End if 
+		If ([Contacts]EmailAddress#"") | ([Contacts]PhoneBusiness#"") | ([Contacts]PhoneHome#"") | ([Contacts]PhoneCell#"")
+			vtFullName:=vtFullName+Char(13)
+		End if 
+		
+		If ([Contacts]EmailAddress#"")
+			vtFullName:=vtFullName+[Contacts]EmailAddress
+		End if 
+		If ([Contacts]PhoneBusiness#"")
+			vtFullName:=vtFullName+"  Phone: "+[Contacts]PhoneBusiness
+		End if 
+		If ([Contacts]PhoneHome#"")
+			vtFullName:=vtFullName+"  Home: "+[Contacts]PhoneHome
+		End if 
+		If ([Contacts]PhoneCell#"")
+			vtFullName:=vtFullName+"  Cell: "+[Contacts]PhoneCell
+		End if 
+		If ([Contacts]Notes#"")
+			vtFullName:=vtFullName+Char(13)+[Contacts]Notes
+		End if 
+		vtFullName:=Replace string(vtFullName;Char(13)+Char(13);Char(13);*)
+		If (Substring(vtFullName;1;1)=" ")
+			vtFullName:=Substring(vtFullName;2;999)
+		End if 
+		
+End case 

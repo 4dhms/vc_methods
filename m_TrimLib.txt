@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlTrimLib)
+
+Case of 
+	: (<>vlTrimLib=0)
+		<>vlTrimLib:=New process("p_FabLib";0;"FabLibEntry";"Trim")
+	Else 
+		SHOW PROCESS(<>vlTrimLib)
+		BRING TO FRONT(<>vlTrimLib)
+End case 

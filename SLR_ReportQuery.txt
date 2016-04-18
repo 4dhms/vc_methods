@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlOrderNumber)
+
+CREATE EMPTY SET([SLRReporter];"report")
+
+SLR_ReportEngine 
+
+UNLOAD RECORD([Orders])
+

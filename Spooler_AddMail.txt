@@ -1,0 +1,155 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($spool)
+C_LONGINT($i;$dc)
+C_LONGINT($dlOutput)
+
+$dlOutput:=0
+$spool:=True
+
+Email_BuildAddressScreen 
+If ($1="CS")
+	ARRAY TEXT(asSubCC;0)
+End if 
+
+If ($1="PO") & ([Orders]PODate=!00-00-00!)
+	[Orders]PODate:=Current date(*)
+End if 
+
+vfProdStatus:=False
+
+Case of 
+	: ($1="Status")
+		vfProdStatus:=True
+		Order_StatusSetup 
+		If (ok=1)
+			Order_StatusReturn (True)
+		Else 
+			$spool:=False
+		End if 
+End case 
+
+If ($spool)
+	  //If ($1="PO") | ($1="POs")
+	  //vfToSpenser:=True
+	  //Else 
+	vfToSpenser:=False
+	  //End if 
+	Win_EmailList 
+	
+	If (ok=1)
+		If (Size of array(asSubCC)>0) | ($1="CS") & (ok=1)
+			If ($1="DL")
+				WinChoice ("Which do you want to print?";"Record";"Design")
+				If (ok=1)
+					$dlOutput:=1
+				Else 
+					$dlOutput:=2
+				End if 
+			End if 
+			
+			QUERY([Spooler];[Spooler]Waiting=False;*)
+			QUERY([Spooler]; & ;[Spooler]SpoolLog=False)
+			QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+			
+			If (Records in selection([Spooler])<1) | (Locked([Spooler]))
+				CREATE RECORD([Spooler])
+			Else 
+				Spooler_ClearSprocket 
+			End if 
+			
+			Case of 
+				: ($1="DP@")
+					[Spooler]RecordNumber:=[DLPages]DLItemKey
+					
+				: ($1="CS")
+					[Spooler]RecordNumber:=Record number([CostSheets])
+			End case 
+			[Spooler]SpoolKey:=Sequence number([Spooler])
+			<>vlMailKey:=[Spooler]SpoolKey
+			[Spooler]Waiting:=True
+			[Spooler]Attempts:=0
+			[Spooler]ReturnAddress:=<>vtMailFrom
+			[Spooler]SpoolRouter:=1
+			[Spooler]OutputChoice:=$dlOutput
+			[Spooler]Status:=1
+			[Spooler]User:=Current user
+			[Spooler]MachineName:=Current machine owner
+			VARIABLE TO BLOB(asSubCC;[Spooler]AddressListBlob)
+			$i:=1
+			ARRAY LONGINT($records;Records in selection(vptablePtr->))
+			
+			If ($1="DPY") | ($1="DPN")
+				ARRAY TEXT($pages;0)
+				For ($i;1;Size of array(alHistKey))
+					If (afPrint{$i}=True)
+						APPEND TO ARRAY($pages;String(alHistKey{$i}))
+					End if 
+				End for 
+				VARIABLE TO BLOB($pages;[Spooler]SortArray)
+			Else 
+				FIRST RECORD(vptablePtr->)
+				  //records shipment on PO
+				For ($i;1;Size of array($records))
+					$records{$i}:=Record number(vptablePtr->)
+					If ($1="PO@")
+						If (Locked([Orders]))
+							WinPrompt ("The record for order "+String([Orders]OrderNum)+" is locked, the Revision History will not be updated.")
+						End if 
+						Spooler_AddRobert 
+						
+						If ([Orders]RevisionNumber=0)
+							[Orders]RevHistory:="Original order "+Substring(String(Current time(*));1;5)+"  "+String(Current date(*))+" by "+Current user+Char(13)+[Orders]RevHistory
+						Else 
+							[Orders]RevHistory:="Revision "+String([Orders]RevisionNumber)+"  "+Substring(String(Current time(*));1;5)+"  "+String(Current date(*))+" by "+Current user+Char(13)+[Orders]RevHistory
+						End if 
+						If ([Orders]PODate=!00-00-00!)
+							[Orders]PODate:=Current date(*)
+						End if 
+						
+						SAVE RECORD([Orders])
+						NEXT RECORD([Orders])
+					Else 
+						NEXT RECORD(vptablePtr->)
+					End if 
+				End for 
+				VARIABLE TO BLOB($records;[Spooler]OrderArrayBlob)
+			End if 
+			
+			Case of 
+				: (vfProdStatus)
+					VARIABLE TO BLOB(asSortOrder;[Spooler]SortArray)
+				: ($1="DPY") | ($1="DPN")
+					[Spooler]SpoolMessage:=vtEmailSubject+"$%&"+vtBodyText
+			End case 
+			
+			Case of 
+				: ($1="TC@")
+					If ($1="TC")
+						[Spooler]Genre:="TC"
+						[Spooler]OutputChoice:=0
+					Else 
+						$dc:=Num(Substring($1;3;10))
+						[Spooler]Genre:="TC"
+						[Spooler]OutputChoice:=$dc
+					End if 
+					
+				: (Size of array($records)>1) & ($1="Po")
+					[Spooler]Genre:=$1+"s"
+				Else 
+					[Spooler]Genre:=$1
+			End case 
+			If ($1="Status")  //| ($1="Spec")
+				[Spooler]StatusGuide:=vtProdStatGuide
+				If (vtTitle="")
+					[Spooler]Title:="Status Report"
+				Else 
+					[Spooler]Title:=vtTitle
+				End if 
+			End if 
+			
+			SAVE RECORD([Spooler])
+			UNLOAD RECORD([Spooler])
+			
+		End if 
+	End if 
+End if 

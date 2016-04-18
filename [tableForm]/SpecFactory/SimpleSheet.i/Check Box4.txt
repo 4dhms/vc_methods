@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to change the factory?")
+If (ok=1)
+	OBJECT SET ENTERABLE([SpecFactory]Factory;True)
+	GOTO OBJECT([SpecFactory]Factory)
+End if 
+cbFactory:=1

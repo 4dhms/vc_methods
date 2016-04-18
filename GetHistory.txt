@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+QUERY([Changes];[Changes]OrderNumber=<>vlOrderNumber)
+If (Current user="Claudia Chang") | (Current user="Elaine Yang") | (Current user="TC Li") | (Current user="Designer") | (Current user="Joseph") | (Current user="Lin Li")
+Else 
+	QUERY SELECTION([Changes];[Changes]FieldName#"@FOB@")
+End if 
+ORDER BY([Changes];[Changes]RevDate;<;[Changes]RevTime;<)
+$c:=Records in selection([Changes])
+
+ARRAY TEXT(atHistField;$c)
+ARRAY TEXT(atHistOld;$c)
+ARRAY TEXT(atHistNew;$c)
+ARRAY TEXT(atHistChanger;$c)
+ARRAY DATE(adHistDate;$c)
+ARRAY TEXT(asHistTime;$c)
+ARRAY LONGINT(alHistKey;$c)
+
+$i:=1
+FIRST RECORD([Changes])
+For ($i;1;Size of array(atHistField))
+	atHistField{$i}:=[Changes]FieldName
+	atHistOld{$i}:=[Changes]OldData
+	atHistNew{$i}:=[Changes]NewChange
+	atHistChanger{$i}:=[Changes]Writer
+	adHistDate{$i}:=[Changes]RevDate
+	asHistTime{$i}:=String([Changes]RevTime;"##:##")
+	alHistKey{$i}:=[Changes]ChangeKey
+	NEXT RECORD([Changes])
+End for 

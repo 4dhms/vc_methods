@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($countText)
+C_BOOLEAN($header)
+$countText:=" ("+String(Selected record number([Orders]))+" of "+String(Records in selection([Orders]))+")"
+
+Case of 
+	: (Selected record number([CS_Lines])>=Records in selection([CS_Lines])) & (Selected record number([CS_Status])>=Records in selection([CS_Status])) & (Records in selection([CS_Issues])<1)
+		vGroupName:=""
+		If (vfPO)
+			Order_PrintLoadHeader (False)
+		Else 
+			Order_PrintLoadHeader (False)
+		End if 
+		vlPage:=0
+		vlRecCount:=vlReccount+1
+	: (Selected record number([CS_Status])>=Records in selection([CS_Status])) & (Records in selection([CS_Issues])>1)
+		vGroupName:="ISSUES CONTINUED"
+		vsPrintingFooter:="MORE"
+		$header:=True
+	Else 
+		vGroupName:="COMPONENTS CONTINUED"
+		vsPrintingFooter:="MORE"
+		$header:=True
+End case 
+
+If ($header)
+	If (vfPO)
+		vtHeader:="HMS Purchase Order No. "+String(Abs(<>vlOrderNumber))+" (continued)"
+	Else 
+		vtHeader:="HMS Order Information "+String(Abs(<>vlOrderNumber))+" (continued)"
+	End if 
+End if 

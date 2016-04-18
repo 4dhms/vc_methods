@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtOldData:=""
+vtNewData:=""
+
+Case of 
+	: (asPOv{asPOv}="Original order")
+		If (Not([Samples]Revised))
+			  //do nothing
+		Else 
+			[Samples]RevisionKey:=<>vlOrderNumber
+			Revise_SG_FlagFields (True)
+		End if 
+	: (asPOv{asPOv}="UN-cancelled")
+		<>vlRevisionNumber:=[Samples]RevisionNumber+1
+		WinChoice ("Do you want to UNCANCEL this order?")
+		If (ok=1)
+			[Samples]Void:=False
+			SAVE RECORD([Samples])
+			ACCEPT
+			Rev_LogEvent ("UN-cancelled")
+		End if 
+	: (asPOv{asPOv}="Cancelled")
+		<>vlRevisionNumber:=[Samples]RevisionNumber+1
+		WinChoice ("Are you sure you want to CANCEL this order?")
+		If (ok=1)
+			[Samples]Void:=True
+			SAVE RECORD([Samples])
+			Rev_LogEvent ("Cancelled")
+			ACCEPT
+		End if 
+	: (asPOv{asPOv}="Edit")
+		<>vlRevisionNumber:=[Samples]RevisionNumber
+		<>Enter:=True
+		Revise_FlagFields (True)
+		
+	: (asPOv{asPOv}="New Revision")
+		<>vlRevisionNumber:=[Samples]RevisionNumber+1
+		Rev_LogEvent ("New Revision")
+		WinChoice ("Are you sure you want to REVISE this order?")
+		If (ok=1)
+			<>Enter:=True
+			[Samples]ReviseDate:="Revised "+String(Current date(*))
+			[Samples]Revised:=True
+			[Samples]RevisionNumber:=[Samples]RevisionNumber+1
+			[Samples]RevisionKey:=-1*([Samples]SampleNumber+(0.01*[Samples]RevisionNumber))
+			SAVE RECORD([Samples])
+			
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+			APPLY TO SELECTION([OrdersFabricXRef];[OrdersFabricXRef]RevStatus:=0)
+			RELATE MANY([CP_OrderXRef]XrefID)
+			APPLY TO SELECTION([CP_OrderXRef];[CP_OrderXRef]TempSelfKey:=0)
+			
+			QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlOrderNumber)
+			RELATE MANY SELECTION([CS_Lines]CS_ID)
+			QUERY SELECTION([CS_Lines];[CS_Lines]FlagStatus#0)
+			APPLY TO SELECTION([CS_Lines];[CS_Lines]FlagStatus:=0)
+			UNLOAD RECORD([CS_Lines])
+			
+			
+			ARRAY TEXT(asPOv;1)
+			asPOv{1}:="Revision "+String([Samples]RevisionNumber)
+			asPOv:=1
+			
+			  //negative number if a component sheet ID
+			[Orders]Cancelled:=False
+			Revise_FlagFields (<>Enter)
+			  //Revise_Array 
+		End if 
+		  // Rev_LogEvent ("Changed")
+	Else 
+		<>Enter:=False
+		[Orders]RevisionKey:=[Orders]OrderNum+(0.01*(asPOv-1))
+		Revise_FlagFields (False)
+End case 

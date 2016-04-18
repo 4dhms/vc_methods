@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+QUERY([SpecSheetLines];[SpecSheetLines]SpecLineKey=[Sizes]SpecLineKey)
+Case of 
+	: ($1=1)
+		[Sizes]Size1:=[SpecSheetLines]Spec1A
+	: ($1=2)
+		[Sizes]Size2:=[SpecSheetLines]Spec1A
+	: ($1=3)
+		[Sizes]Size3:=[SpecSheetLines]Spec1A
+	: ($1=4)
+		[Sizes]Size4:=[SpecSheetLines]Spec1A
+	: ($1=5)
+		[Sizes]Size5:=[SpecSheetLines]Spec1A
+	: ($1=6)
+		[Sizes]Size6:=[SpecSheetLines]Spec1A
+	: ($1=7)
+		[Sizes]Size7:=[SpecSheetLines]Spec1A
+	: ($1=8)
+		[Sizes]Size8:=[SpecSheetLines]Spec1A
+	: ($1=9)
+		[Sizes]Size9:=[SpecSheetLines]Spec1A
+	: ($1=10)
+		[Sizes]Size10:=[SpecSheetLines]Spec1A
+	: ($1=11)
+		[Sizes]Size11:=[SpecSheetLines]Spec1A
+	: ($1=12)
+		[Sizes]Size12:=[SpecSheetLines]Spec1A
+End case 
+[Sizes]SampleCol:=vlColSlider

@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($po;$i)
+
+$po:=Num(Request("Enter HMS PO Number:"))
+
+If (ok=1)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$po)
+	If (Records in selection([OrdersFabricXRef])>0)
+		QUERY([FabricOrders];[FabricOrders]FabOrderKey=[OrdersFabricXRef]FabricOrderKey)
+		CREATE SET([FabricOrders];"FOs")
+	Else 
+		CREATE EMPTY SET([FabricOrders];"FOs")
+	End if 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$po)
+	ARRAY LONGINT($polist;0)
+	DISTINCT VALUES([CP_OrderXRef]FabOrderKey;$polist)
+	  //ALERT(String(Size of array*$polist))
+	
+	$i:=1
+	For ($i;1;Size of array($polist))
+		QUERY([FabricOrders];[FabricOrders]FabOrderKey=$polist{$i})
+		ADD TO SET([FabricOrders];"FOs")
+	End for 
+	USE SET("FOs")
+	CLEAR SET("FOs")
+	
+End if 
+

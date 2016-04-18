@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($next;$first)
+ARRAY TEXT($years;0)
+
+$c:=Year of(Current date(*))+2
+$next:=String($c)
+$first:=String(Year of(Current date(*))-3)
+
+LIST TO ARRAY("Year";$years)
+If (Find in array($years;$next)<1) | (Find in array($years;$first)<1)
+	ARRAY TEXT($years;0)
+	APPEND TO ARRAY($years;"")
+	$i:=1
+	$c:=$c+1
+	For ($i;1;6)
+		APPEND TO ARRAY($years;String($c-$i))
+	End for 
+End if 
+
+ARRAY TO LIST($years;"Year")

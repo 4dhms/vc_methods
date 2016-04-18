@@ -1,0 +1,177 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$p)
+C_TIME(vhDocref)
+C_DATE($range)
+C_TEXT($t;$colorprint;$rem;$key)
+C_TEXT($type;$path)
+
+$range:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+
+$t:=Char(9)
+vhDocref:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	
+	SEND PACKET(vhDocref;"NS"+Char(9)+"New Style"+Char(9)+"DV"+Char(9)+"Change Divison"+Char(13))
+	SEND PACKET(vhDocref;"CS"+Char(9)+"Change Style"+Char(9)+"NC"+Char(9)+"New Color"+Char(13))
+	SEND PACKET(vhDocref;"SR"+Char(9)+"Size Range"+Char(9)+"CC"+Char(9)+"Change Color"+Char(13))
+	SEND PACKET(vhDocref;"SC"+Char(9)+"Season Change"+Char(9)+"PC"+Char(9)+"Price Change"+Char(13))
+	SEND PACKET(vhDocref;Char(13)+Char(13))
+	
+	SEND PACKET(vhDocref;"Style"+$t+"Division"+$t+"Season"+$t+"Group"+$t+"Size Range"+$t+"Price"+$t+"Change"+$t+"Self"+$t+"Combo 1"+$t+"Combo 2"+$t+"Combo 3"+$t+"Combo 4"+$t+"Combo 5"+$t+"Combot 6"+Char(13))
+	
+	If (ok=1)
+		$i:=1
+		For ($i;1;Size of array(asStyleNumbers))
+			  //If (asStyleNumbers{$i}="CU81131")
+			SEND PACKET(vhDocref;asStyleNumbers{$i}+$t+String(adActionDate{$i})+$t+asDivisions{$i}+$t+asSeasonName{$i}+$t+asGroups{$i}+$t+asXSizeRange{$i}+$t+String(arSalePrice{$i};"##0.00")+$t)
+			
+			$p:=1
+			ARRAY TEXT($code;0)
+			$rem:=Replace string(atChange{$i};"  ";" ")
+			If ($rem[[Length($rem)]]=" ")
+				$rem:=Substring($rem;1;Length($rem)-1)
+			End if 
+			
+			Repeat 
+				If (Position(" ";$rem)<1)
+					$key:=$rem
+					$rem:=""
+				Else 
+					$key:=Substring($rem;1;Position(" ";$rem)-1)
+					$rem:=Substring($rem;Position(" ";$rem)+1;100)
+				End if 
+				vsChange1:=asStyleNumbers{$i}
+				vsChange2:=$key
+				  //If ($key="CC")
+				  //LogOn_ColorChange 
+				  //SEND PACKET(vhDocref;Char(13))
+				  //Else 
+				LogOn_GrabChange 
+				APPEND TO ARRAY($code;vsChange3)
+				  //End if 
+			Until (Length($rem)<1) | (Shift down)
+			
+			
+			$p:=1
+			For ($p;1;Size of array($code))
+				If ($p>1)
+					SEND PACKET(vhDocref;$t+$t+$t+$t+$t+$t)  //+$code{$p}+$t)
+				Else 
+					  //strips out doublet
+					Case of 
+						: ($code{$p}="CC")
+						Else 
+							SEND PACKET(vhDocref;$code{$p})
+					End case 
+					If ($code{$p}="NS") | ($code{$p}="NC")
+						SEND PACKET(vhDocref;$t)
+					End if 
+				End if 
+				
+				Case of 
+					: ($code{$p}="NS")
+						QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+						$n:=1
+						FIRST RECORD([Orders])
+						For ($n;1;Records in selection([Orders]))
+							  //Error checking
+							QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+							ARRAY LONGINT($ordercheck;0)
+							DISTINCT VALUES([OrdersFabricXRef]XrefID;$ordercheck)
+							
+							QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+							$s:=1
+							FIRST RECORD([CP_OrderXRef])
+							CREATE EMPTY SET([CP_OrderXRef];"colors")
+							For ($s;1;Records in selection([CP_OrderXRef]))
+								If (Find in array($ordercheck;[CP_OrderXRef]XrefID)>0)
+									ADD TO SET([CP_OrderXRef];"colors")
+								End if 
+								NEXT RECORD([CP_OrderXRef])
+							End for 
+							NEXT RECORD([Orders])
+						End for 
+						
+						USE SET("colors")
+						
+						ARRAY LONGINT($self;0)
+						DISTINCT VALUES([CP_OrderXRef]SelfKey;$self)
+						
+						$s:=1
+						For ($s;1;Size of array($self))
+							USE SET("colors")
+							QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self{$s})
+							ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPOrdID;>)
+							If ($s>1)
+								SEND PACKET(vhDocref;Char(13)+$t+$t+$t+$t+$t+$t+$t)
+							End if 
+							$n:=1
+							FIRST RECORD([CP_OrderXRef])
+							For ($n;1;Records in selection([CP_OrderXRef]))
+								QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+								SEND PACKET(vhDocref;[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName+$t)
+								NEXT RECORD([CP_OrderXRef])
+							End for 
+						End for 
+						
+					: ($key="CC")
+						LogOn_ColorChange 
+						SEND PACKET(vhDocref;Char(13))
+						
+					: ($code{$p}="NC")
+						QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+						ARRAY LONGINT($orders;0)
+						SELECTION TO ARRAY([Orders]OrderNum;$orders)
+						
+						CREATE EMPTY SET([Changes];"ccs")
+						$n:=1
+						For ($n;1;Size of array($orders))
+							QUERY([Changes];[Changes]OrderNumber=$orders{$n})
+							QUERY SELECTION([Changes];[Changes]RevDate>=$range)
+							
+							QUERY SELECTION([Changes];[Changes]NewChange="Added")
+							QUERY SELECTION([Changes];[Changes]FieldName="@color (@")
+							$s:=1
+							ARRAY TEXT(asPrintNumber;0)
+							ORDER BY([Changes];[Changes]RevDate;>;[Changes]RevTime;>)
+							SELECTION TO ARRAY([Changes]FieldName;asPrintNumber)
+							SORT ARRAY(asPrintNumber;<)
+							FIRST RECORD([Changes])
+							
+							If (Find in array(asPrintNumber;"@combo@")>0)
+								LogOn_NC_Combo 
+							Else 
+								For ($s;1;Records in selection([Changes]))
+									$type:=Substring([Changes]FieldName;1;Position("(";[Changes]FieldName))
+									$colorprint:=Replace string([Changes]FieldName;$type;"")
+									$colorprint:=Replace string($colorprint;")";"")
+									QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$colorprint)
+									If ($s>1)
+										SEND PACKET(vhDocref;$t+$t+$t+$t+$t+$t+$t)
+									End if 
+									SEND PACKET(vhDocref;$colorprint+" "+[ColorPrintNumber]CPName)
+									If ($s<Records in selection([Changes]))
+										SEND PACKET(vhDocref;Char(13))
+									End if 
+									
+									NEXT RECORD([Changes])
+								End for 
+							End if 
+							
+							  //NEXT RECORD([Changes])
+						End for 
+						USE SET("ccs")
+						CLEAR SET("ccs")
+						
+				End case 
+				SEND PACKET(vhDocref;Char(13))
+			End for 
+			SEND PACKET(vhDocref;Char(13))
+			  //End if 
+		End for 
+		CLOSE DOCUMENT(vhDocref)
+	End if 
+	
+	SHOW ON DISK($path)
+End if 

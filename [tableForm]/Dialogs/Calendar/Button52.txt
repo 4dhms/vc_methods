@@ -1,0 +1,72 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$last)
+
+ARRAY TEXT($test;0)
+ARRAY TEXT($list;0)
+ARRAY TEXT(asCustomers;0)
+LIST TO ARRAY("Customers";$list)
+
+QUERY([Customers];[Customers]CustomerName="@ ";*)
+QUERY([Customers]; | ;[Customers]CustomerName="@ ";*)
+QUERY([Customers]; | ;[Customers]CustomerName="@  @")
+
+If (Records in selection([Customers])>0)
+	WinChoice ("Strip leading, trailing or double spaces off "+String(Records in selection([Customers]))+" customer names?")
+	If (ok=1)
+		
+		$i:=1
+		FIRST RECORD([Customers])
+		For ($i;1;Records in selection([Customers]))
+			If ([Customers]CustomerName="@  @")
+				[Customers]CustomerName:=Replace string([Customers]CustomerName;"  ";" ")
+				SAVE RECORD([Customers])
+			End if 
+			
+			$last:=Length([Customers]CustomerName)
+			If ([Customers]CustomerName[[$last]]=" ")
+				[Customers]CustomerName:=Substring([Customers]CustomerName;1;$last-1)
+				SAVE RECORD([Customers])
+			End if 
+			
+			If ([Customers]CustomerName[[1]]=" ")
+				[Customers]CustomerName:=Substring([Customers]CustomerName;2;999)
+				SAVE RECORD([Customers])
+			End if 
+			NEXT RECORD([Customers])
+		End for 
+	End if 
+End if 
+
+QUERY([Customers];[Customers]CustomerName#"")
+CREATE SET([Customers];"broke")
+
+  //QUERY([Orders];[Orders]CancelDate>Current date(*))
+ALL RECORDS([Orders])
+
+DISTINCT VALUES([Orders]Customer;$test)
+SORT ARRAY($test;>)
+
+$i:=1
+For ($i;1;Size of array($test))
+	QUERY([Customers];[Customers]CustomerName=$test{$i})
+	If (Records in selection([Customers])>0)
+		REMOVE FROM SET([Customers];"broke")
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array($list))
+	QUERY([Customers];[Customers]CustomerName=$list{$i})
+	If (Records in selection([Customers])>0)
+		REMOVE FROM SET([Customers];"broke")
+	End if 
+End for 
+
+
+USE SET("broke")
+CLEAR SET("broke")
+
+SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+SORT ARRAY(asCustomers;>)
+
+WinPrompt ("There are "+String(Size of array(asCustomers))+" questionable customer names.")

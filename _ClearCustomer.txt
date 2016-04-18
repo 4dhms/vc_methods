@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([OrdersBreakdowns];[OrdersBreakdowns]Customer="0")
+CONFIRM(String(Records in selection([OrdersBreakdowns])))
+If (ok=1)
+	APPLY TO SELECTION([OrdersBreakdowns];[OrdersBreakdowns]Customer:="")
+End if 
+ALERT("Done")

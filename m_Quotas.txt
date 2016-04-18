@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vlQuotaProc:=0
+C_LONGINT(<>vlQuotaProc)
+  //
+Case of 
+	: (<>vlQuotaProc>0)
+		SHOW PROCESS(<>vlQuotaProc)
+		BRING TO FRONT(<>vlQuotaProc)
+	: (<>vlQuotaProc=0)
+		<>vlQuotaProc:=New process("Cost_Quota";0;"Quotas";3)
+	Else 
+		SHOW PROCESS(<>vlQuotaProc)
+		BRING TO FRONT(<>vlQuotaProc)
+End case 

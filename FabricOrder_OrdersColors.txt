@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vlOrderNumber=0)
+		QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+		vOrd:="PO"+String([CP_OrderXRef]OrderNumber)
+		vlSubtotal:=[CP_OrderXRef]Quantity
+		vStyle:=[Orders]StyleNumber
+		vDesign:=[Orders]DesignNumber
+		vtVendor:=[Orders]Factory
+		vdShipDateFact:=[Orders]ShipDateFactory
+		  //ALERT(String([CP_OrderXRef]OrderNumber)+"  "+String(Records in selection([Orders])))
+		OBJECT SET VISIBLE(vdShipDateFact;[FabricOrders]NoDates)
+	: (vlOrderNumber<0)
+		QUERY([Samples];[Samples]SampleNumber=vlOrderNumber)
+		vOrd:="SG"+String(Abs(vlOrderNumber))
+		vlSubtotal:=[Samples]SGQuantity
+		vStyle:=[Samples]StyleNum
+		vDesign:=[Samples]DesignNum
+		vtVendor:=[Samples]SamGarFactry
+		OBJECT SET VISIBLE(vdShipDateFact;False)
+		OBJECT SET VISIBLE(*;"xShip";False)
+	Else 
+		QUERY([Orders];[Orders]OrderNum=vlOrderNumber)
+		
+		vOrd:="PO"+String(Abs(vlOrderNumber))
+		vlSubtotal:=[Orders]TotalOrderQuantity
+		vStyle:=[Orders]StyleNumber
+		vDesign:=[Orders]DesignNumber
+		vtVendor:=[Orders]Factory
+		vdShipDateFact:=[Orders]ShipDateFactory
+		OBJECT SET VISIBLE(vdShipDateFact;[FabricOrders]NoDates)
+End case 
+Print form([FabricOrders];"PrintOrders")

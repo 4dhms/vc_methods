@@ -1,0 +1,116 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfDetail)
+C_TEXT(vsCustomer;vsFactory;$path)
+
+C_LONGINT(cbInvoice)
+
+Case of 
+	: (vdStart=!00-00-00!) | (vdEnd=!00-00-00!)
+		WinPrompt ("Enter date range.")
+	Else 
+		QUERY([Orders];[Orders]Cancelled=False;*)
+		QUERY([Orders]; & ;[Orders]CancelDate>=vdStart;*)
+		QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+		
+		If (vsCustomer#"")
+			QUERY SELECTION([Orders];[Orders]Customer=vsCustomer)
+		End if 
+		
+		If (vsFactory#"")
+			QUERY SELECTION([Orders];[Orders]Factory=vsFactory)
+		End if 
+		
+		If (vdShipDateFact#!00-00-00!)
+			QUERY SELECTION([Orders];[Orders]ShipDateFactory<=vdShipDateFact)
+		End if 
+		If (b1=1)
+			QUERY SELECTION([Orders];[Orders]RetailPrice#0)
+			QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+		End if 
+		
+		If (cbTicketUnsent=1)
+			QUERY SELECTION([Orders];[Orders]Customer="Marmax@";*)
+			  //QUERY SELECTION([Orders]; | ;[Orders]Customer="Macy's East";*)
+			  //QUERY SELECTION([Orders]; | ;[Orders]Customer="Dillard@";*)
+			QUERY SELECTION([Orders]; & ;[Orders]DCInfo=False)
+			QUERY SELECTION([Orders];[Orders]PriceTicket=True)
+		End if 
+		
+		If (cbStrip=1)
+			QUERY SELECTION([Orders];[Orders]Customer="Marmax@";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Macy's East";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Dillard@";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Petite Sophis@";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Lane Bryant@";*)
+			QUERY SELECTION([Orders]; & ;[Orders]DCInfo=False)
+		End if 
+		
+		If (cbInvoice=1)
+			QUERY SELECTION([Orders];[Orders]Customer="TK Max@";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Winner";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Aafes@";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Manteaux@";*)
+			QUERY SELECTION([Orders]; & ;[Orders]WHInvoice=False)
+		End if 
+		
+		If (cbNoTicket=1)
+			QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+		End if 
+		  //QUERY SELECTION([Orders];[Orders]Cancelled=False)
+		
+		PreCarton_DueCalc 
+		
+		If (Records in selection([Orders])=0)
+			WinPrompt ("There are no orders with those criteria.")
+		Else 
+			Case of 
+				: (vsCustomer=vsFactory)
+					WinChoice ("How do you want to sort the report?";"By Customer";"By Factory")
+					If (ok=1)
+						ORDER BY([Orders];[Orders]Customer;>;[Orders]Factory;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+						ACCUMULATE([Orders]Customer)
+					Else 
+						ORDER BY([Orders];[Orders]Factory;>;[Orders]Customer;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+						ACCUMULATE([Orders]Factory)
+					End if 
+				: (vsCustomer#"") & (vsFactory#"")
+					WinChoice ("How do you want to sort the report?";"By Customer";"By Factory")
+					If (ok=1)
+						ORDER BY([Orders];[Orders]Customer;>;[Orders]Factory;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+						ACCUMULATE([Orders]Customer)
+					Else 
+						ORDER BY([Orders];[Orders]Factory;>;[Orders]Customer;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+						ACCUMULATE([Orders]Factory)
+					End if 
+				: (vsCustomer#"")
+					ORDER BY([Orders];[Orders]Customer;>;[Orders]Factory;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+					ACCUMULATE([Orders]Customer)
+				Else 
+					ORDER BY([Orders];[Orders]Factory;>;[Orders]Customer;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+					ACCUMULATE([Orders]Factory)
+					
+			End case 
+			Case of 
+				: (bPrint=1)
+					BREAK LEVEL(1)
+					PAGE SETUP([Orders];"Report_TicketA")
+					If (vdShipDateFact=!00-00-00!) & (Not(vfDetail))
+						<>vfFactory:=False
+						FORM SET OUTPUT([Orders];"Report_TicketA")
+					Else 
+						<>vfFactory:=True
+						FORM SET OUTPUT([Orders];"Report_TicketB")
+					End if 
+					Print_Selection (->[Orders])
+				: (bPreview=1)
+					FORM SET OUTPUT([Orders];"OrderLarge.o")
+					FORM SET INPUT([Orders];"OrdEntSlsMed")
+					Order_PrepSalesEntry 
+					  //SET WINDOW RECT((Screen width/2)-390;(Screen height/2)-290;(Screen width/2)+390;(Screen height/2)+290)
+					
+					MODIFY SELECTION([Orders];*)
+				Else 
+					Report_PriceTicketExcel 
+			End case 
+		End if 
+End case 

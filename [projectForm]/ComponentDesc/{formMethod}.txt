@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	OBJECT SET VISIBLE([CS_Lines]Count;[CS_Lines]Count>0)
+End if 

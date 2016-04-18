@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (Current user="Designer")
+	QUERY([Orders];[Orders]YardsReq>0;*)
+	QUERY([Orders]; | ;[Orders]YardsCombo>0;*)
+	QUERY([Orders]; & ;[Orders]Cancelled=False)
+	
+	SET WINDOW TITLE(String(Records in selection([Orders])))
+	
+	FIRST RECORD([Orders])
+	$i:=1
+	
+	For ($i;1;Records in selection([Orders]))
+		If ([Orders]YardsReq>0)
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+			[OrdersFabricXRef]Usage:=[Orders]YardsReq
+			SAVE RECORD([OrdersFabricXRef])
+		End if 
+		
+		If ([Orders]YardsCombo>0)
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 1")
+			[OrdersFabricXRef]Usage:=[Orders]YardsCombo
+			SAVE RECORD([Orders])
+		End if 
+		
+		NEXT RECORD([Orders])
+	End for 
+	
+End if 
+
+

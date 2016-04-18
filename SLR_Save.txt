@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCustomer)
+C_TEXT(vsStyleNumber)
+C_DATE(vdWeekOne)
+
+
+[SLRAcct]SLRAcct:=vsCustomer
+[SLRAcct]SLRStyleNumber:=vsStyleNumber
+[SLRAcct]Division:=vsDivision
+
+If ([SLRAcct]WeekOne=!00-00-00!) | (vdWeekOne<[SLRAcct]WeekOne)
+	[SLRAcct]WeekOne:=vdWeekOne
+End if 
+
+SAVE RECORD([SLRAcct])
+
+If ([SLRAcct]Reorder>0)
+	[SLRColor]Reorder:=[SLRAcct]Reorder
+	SAVE RECORD([SLRColor])
+End if 

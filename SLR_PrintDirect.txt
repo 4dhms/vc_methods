@@ -1,0 +1,76 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pixelcount)
+
+If (qShort=1)
+	vfDigest:=True
+Else 
+	vfDigest:=False
+End if 
+
+If (vfDigest)
+	SET PRINT OPTION(Orientation option;1)
+Else 
+	SET PRINT OPTION(Orientation option;2)
+End if 
+PRINT SETTINGS
+vlPage:=1
+
+If (ok=1)
+	$pixelcount:=0
+	
+	$i:=1
+	FIRST RECORD([SLRReporter])
+	
+	For ($i;1;Records in selection([SLRReporter]))
+		
+		If ($pixelcount<50)
+			If (vlPage>1)
+				PAGE BREAK(>)
+			End if 
+			SLR_HeaderPrint 
+			vlPage:=vlPage+1
+			If (vfDigest)
+				$pixelcount:=720
+			Else 
+				$pixelcount:=550
+			End if 
+		End if 
+		
+		  //SLR_PrintPopulate (0)
+		  //SLR_PrintPopulate (5)
+		  //SLR_PrintPopulate (10)
+		  //USE SET("line")
+		  //QUERY SELECTION([SLRReporter];[SLRReporter]Wk2=◊adDates{1})
+		Case of 
+			: (qLetter=1)  //4 Weeks
+				vfPrinting:=True
+				Print form([SLRReporter];"4Wks")
+				$pixelcount:=$pixelcount-66
+			: (zYes=1)
+				Print form([SLRReporter];"AcctColor.digest")
+				$pixelcount:=$pixelcount-44
+			: (zNo=1)
+				vfPrinting:=True
+				Print form([SLRReporter];"Acct.digest")
+				$pixelcount:=$pixelcount-40
+		End case 
+		  //Case of 
+		  //: ([SLRReporter]AUR1+[SLRReporter]OHU1+[SLRReporter]Total1+[SLRReporter]Units1=0)
+		  //  `don't print
+		  //
+		  //: (vfDigest) & (Current form page=1)
+		  //: (vfLegal) & (vlRouter=1)
+		  //Print form([SLRReporter];"Acct.legal")
+		  //$pixelcount:=$pixelcount-106
+		  //: (Not(vfLegal)) & (vlRouter=1)
+		  //Print form([SLRReporter];"Acct.letter")
+		  //$pixelcount:=$pixelcount-106
+		  //: (Not(vfLegal)) & (vlRouter=2)
+		  //End case 
+		NEXT RECORD([SLRReporter])
+	End for 
+End if 
+PAGE BREAK
+CLEAR SET("thissession")
+vfPrinting:=False
+

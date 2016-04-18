@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Sort for Proto or Sales Sample?";"Proto";"Sales")
+
+If (ok=1)
+	Sample_Sort (-5)
+Else 
+	Sample_Sort (5)
+End if 

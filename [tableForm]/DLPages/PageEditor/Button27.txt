@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($update)
+$update:=False
+
+  //tests change
+
+$i:=1
+For ($i;1;Size of array(alHistKey))
+	If (alHistKey{$i}#$i) | (afDelete{$i}=True)
+		$update:=True
+	End if 
+End for 
+
+If (Not($update))
+	WinPrompt ("The page order has not been changed. There is nothing to update.")
+Else 
+	
+	DL_Update 
+	
+	QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+	ORDER BY([DLPages];[DLPages]NewPageNumber;>)
+	
+	$i:=1
+	FIRST RECORD([DLPages])
+	For ($i;1;Records in selection([DLPages]))
+		[DLPages]PageNumber:=$i
+		SAVE RECORD([DLPages])
+		NEXT RECORD([DLPages])
+	End for 
+	FIRST RECORD([DLPages])
+	
+	DL_BuildPageArray 
+	DL_BuildPage (1;True)
+	
+	LISTBOX SELECT ROW(afDLPages;1)
+End if 
+

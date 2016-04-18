@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($create)
+C_LONGINT($choice)
+C_TEXT($art)
+
+If (Form event=On Data Change)
+	Case of 
+		: ([Orders]Label="cupio")
+			$create:=True
+		: ([Orders]Label="cupio blush")
+			$create:=True
+		: ([Orders]Label="SPENSE")
+			$create:=True
+		: ([Orders]Label="Spense")
+			$create:=True
+		: ([Orders]Label="spenser jeremy")
+			$create:=True
+		: ([Orders]Label="CG cable & gauge")
+			$create:=True
+		: ([Orders]Label="cable & gauge")
+			$create:=True
+		: ([Orders]Label="CG sport")
+			$create:=True
+		: ([Orders]Label="Cable & gauge heatseal")
+			$create:=True
+		: ([Orders]Label="Melissa Paige")
+			$create:=True
+		: ([Orders]Label="Pointelle")
+			$create:=True
+		Else 
+			$create:=False
+	End case 
+	
+	If ($create)
+		Label_BuildScreen 
+		<>CloseBox:=True
+		Center Window (350;662;4;"Point and Click")
+		DIALOG("LabelArtNos")
+		CLOSE WINDOW
+	End if 
+End if 
+

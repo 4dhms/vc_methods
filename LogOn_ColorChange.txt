@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($t)
+C_BOOLEAN($first)
+ARRAY LONGINT($orders;0)
+$t:=Char(9)
+
+QUERY([Orders];[Orders]StyleNumber=vsChange1)
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+UNLOAD RECORD([Orders])
+
+$i:=1
+For ($i;1;Size of array($orders))
+	$first:=True
+	USE SET("changed")
+	QUERY SELECTION([Changes];[Changes]OrderNumber=$orders{$i};*)
+	QUERY SELECTION([Changes]; & ;[Changes]FieldName="@color/print number@")
+	
+	$n:=1
+	FIRST RECORD([Changes])
+	For ($n;1;Records in selection([Changes]))
+		Case of 
+			: ([Changes]FieldName="Self@")
+				vsChange3:="CC Self"+" from "+[Changes]OldData+" to "+[Changes]NewChange
+			: ([Changes]FieldName="Combo@")
+				vsChange3:="CC "+Substring([Changes]FieldName;1;7)+" from "+[Changes]OldData+" to "+[Changes]NewChange
+		End case 
+		
+		Case of 
+			: ($first)
+				SEND PACKET(vhDocref;vsChange3+Char(13))
+				$first:=False
+			Else 
+				SEND PACKET(vhDocref;$t+$t+$t+$t+$t+$t+vsChange3+Char(13))
+		End case 
+		
+		NEXT RECORD([Changes])
+	End for 
+End for 

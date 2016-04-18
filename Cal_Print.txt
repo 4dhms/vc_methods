@@ -1,0 +1,55 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+CREATE SET([Appts];"Appts")
+C_DATE($weekStart;$weekEnd)
+C_LONGINT($i)
+
+WinChoice ("Print datebook"+Char(13)+"for "+asUsers{asUsers}+"?";String(vdCalToday);"Week";"Fortnight";"Cancel")
+If (ok#1)
+Else 
+	$weekStart:=vdCalToday-(Day number(vdCalToday)-1)
+	If (bChoice2=1) | (bChoice3=1)
+		If (bChoice2=1)
+			$weekEnd:=$weekStart+7
+		Else 
+			$weekEnd:=$weekStart+14
+		End if 
+		
+		QUERY([Appts];[Appts]ApptDate>=$weekStart;*)
+		QUERY([Appts]; & ;[Appts]ApptDate<$weekEnd)
+	End if 
+	
+	If (asUsers{asUsers}#"All")
+		WinChoice ("Do you want to print only appointments for "+asUsers{asUsers}+" or do you want to print all?";"All";asUsers{asUsers})
+		If (ok=1)
+			asUsers:=Find in array(asUsers;"All")
+		End if 
+		CREATE SET([Appts];"PrintSet")
+		FIRST RECORD([Appts])
+		$i:=1
+		For ($i;1;Records in selection([Appts]))
+			QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey;*)
+			QUERY([Attendees]; & ;[Attendees]Attendee=asUsers{asUsers})
+			QUERY SELECTION([Attendees];[Attendees]Customer=False)
+			If (Records in selection([Attendees])<1)
+				REMOVE FROM SET([Appts];"PrintSet")
+			End if 
+			NEXT RECORD([Appts])
+		End for 
+		USE SET("PrintSet")
+		CLEAR SET("PrintSet")
+		vtDateFlag:=String($weekstart+1)+" - "+String($weekEnd-2)
+	Else 
+		vtDateFlag:=String(vdCalToday)
+	End if 
+	
+	vdPaperwork:=!00-00-00!
+	FORM SET OUTPUT([Appts];"PrintDateBook")
+	PAGE SETUP([Appts];"PrintDateBook")
+	ORDER BY([Appts];[Appts]ApptDate;>;[Appts]ApptStart;>;[Appts]ApptEnd;>)
+	ACCUMULATE([Appts]ApptDate)
+	BREAK LEVEL(1;1)
+	Print_Selection (->[Appts])
+	
+	USE SET("Appts")
+	CLEAR SET("Appts")
+End if 

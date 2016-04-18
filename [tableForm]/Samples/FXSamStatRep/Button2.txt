@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //p_HMS2OrdEnt goes back to order entry
+ACCEPT
+FORM SET OUTPUT([Samples];"LargeList.o")
+FORM SET INPUT([Samples];"SampleGarment.i")
+ORDER BY([Samples];[Samples]SampleNumber;<)
+MODIFY SELECTION([Samples];*)

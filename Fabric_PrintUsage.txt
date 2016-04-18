@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pixelcount;$page)
+  //FabPO_PrintPrep 
+
+SET PRINT OPTION(Orientation option;1)
+$page:=1
+vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String($page)
+If (vfPDF)
+	If (Records in selection([FabricOrders])>1)
+		vtPDFPath:=PDF_FindFolder +<>pathBreak+"usage.pdf"
+	Else 
+		vtPDFPath:=PDF_FindFolder +<>pathBreak+[FabricOrders]PONumber+"_usage.pdf"
+	End if 
+	SET PRINT OPTION(Destination option;3;vtPDFPath)
+End if 
+
+Print form([FabricOrders];"PrintUsageInfo")
+Print form("Usage_Info")
+$pixelcount:=650
+
+$i:=1
+For ($i;1;Size of array(asColors))
+	If ($pixelcount<106) & (asStyleNumbers{$i}#"Ordered:") & (asStyleNumbers{$i}#"Shipped:") & (asStyleNumbers{$i}#"Not Received:") & (asStyleNumbers{$i}#"Over/Under:") & (asStyleNumbers{$i}#"")
+		$page:=$page+1
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String($page)
+		PAGE BREAK(>)
+		Print form([FabricOrders];"PrintUsageInfo")
+		Print form("Usage_Info")
+		$pixelcount:=650
+	End if 
+	
+	vsPart1:=asColors{$i}
+	vsPart2:=String(alPOOrder{$i};"######")
+	vsPart3:=asStyleNumbers{$i}
+	vsPart4:=String(alUnits{$i};"###,###")
+	vsPart5:=atSub1{$i}
+	vsPart6:=String(alSubTot1{$i};"###,###")
+	vsPart8:=atSub2{$i}
+	vsPart9:=String(alSubTot2{$i};"###,###")
+	QUERY([Orders];[Orders]OrderNum=alPOOrder{$i})
+	vsPart7:=String([Orders]PODate)
+	Print form("Print_InventoryLine")
+	$pixelcount:=$pixelcount-16
+End for 

@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbQ)
+C_BOOLEAN($show)
+
+If (cbQ=0)
+	$show:=False
+Else 
+	$show:=$1
+End if 
+
+OBJECT SET VISIBLE(vsPart1;$show)
+OBJECT SET VISIBLE(vsPart2;$show)
+OBJECT SET VISIBLE(vsPart3;$show)
+OBJECT SET VISIBLE(vsPart4;$show)
+OBJECT SET VISIBLE(vlOrdersQa11;$show)
+OBJECT SET VISIBLE(vlOrdersQa12;$show)
+OBJECT SET VISIBLE(vlOrdersQb11;$show)
+OBJECT SET VISIBLE(vlOrdersQb12;$show)
+OBJECT SET VISIBLE(vlUnitsQa11;$show)
+OBJECT SET VISIBLE(vlUnitsQa12;$show)
+OBJECT SET VISIBLE(vlUnitsQb11;$show)
+OBJECT SET VISIBLE(vlUnitsQb12;$show)
+OBJECT SET VISIBLE(vlDollarsQa11;$show)
+OBJECT SET VISIBLE(vlDollarsQa12;$show)
+OBJECT SET VISIBLE(vlDollarsQb11;$show)
+OBJECT SET VISIBLE(vlDollarsQb12;$show)
+
+OBJECT SET VISIBLE(vlOrdersQa1;$show)
+OBJECT SET VISIBLE(vlOrdersQa2;$show)
+OBJECT SET VISIBLE(vlOrdersQb1;$show)
+OBJECT SET VISIBLE(vlOrdersQb2;$show)
+OBJECT SET VISIBLE(vlUnitsQa1;$show)
+OBJECT SET VISIBLE(vlUnitsQa2;$show)
+OBJECT SET VISIBLE(vlUnitsQb1;$show)
+OBJECT SET VISIBLE(vlUnitsQb2;$show)
+OBJECT SET VISIBLE(vlDollarsQa1;$show)
+OBJECT SET VISIBLE(vlDollarsQa2;$show)
+OBJECT SET VISIBLE(vlDollarsQb1;$show)
+OBJECT SET VISIBLE(vlDollarsQb2;$show)

@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($nov)
+C_TEXT($key)
+
+$key:=[DesignLinkedPages]Novelty
+If ($key="")
+	$key:="000000000000"
+	[DesignLinkedPages]Novelty:=$key
+End if 
+
+$i:=1
+For ($i;1;12)
+	$nov:=Get pointer("cb"+String($i))
+	If ($key[[$i]]="1")
+		$nov->:=1
+	Else 
+		$nov->:=0
+	End if 
+End for 
+

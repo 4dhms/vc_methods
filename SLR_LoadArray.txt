@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($print)
+
+Case of 
+	: (asPOdate{asPOdate}="Last Week")
+		vlRange:=1
+	: (asPOdate{asPOdate}="Month")
+		vlRange:=2
+	: (asPOdate{asPOdate}="Season")
+		vlRange:=3
+	: (asPOdate{asPOdate}="Year")
+		vlRange:=4
+	: (asPOdate{asPOdate}="Life")
+		vlRange:=5
+End case 
+
+Case of 
+	: (vfByStyle) & (zNo=1)  //by style
+		  //QUERY SELECTION([SLRReporter];[SLRReporter]Header<-1)
+		  // ALL RECORDS([SLRReporter])
+		
+	: (vfByStyle)
+		QUERY SELECTION([SLRReporter];[SLRReporter]Header#-1)
+		
+	: (zYes=1) & (nav1+nav2=0) & (c1+c2+c3=0)
+		  //by color only
+		
+	: (zPrint=1)  //print ranking
+		QUERY SELECTION([SLRReporter];[SLRReporter]Header>=0;*)
+		QUERY SELECTION([SLRReporter]; & ;[SLRReporter]LineItem="@-@")
+		$i:=1
+		FIRST RECORD([SLRReporter])
+		CREATE SET([SLRReporter];"print")
+		For ($i;1;Records in selection([SLRReporter]))
+			$c:=Position("/";[SLRReporter]LineItem)-1
+			$print:=[SLRReporter]LineItem
+			If ($c>-0)
+				$print:=Substring($print;1;$c)
+			End if 
+			
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$print)
+			If ([ColorPrintNumber]CPType#2)
+				REMOVE FROM SET([SLRReporter];"print")
+			End if 
+			NEXT RECORD([SLRReporter])
+		End for 
+		USE SET("print")
+		CLEAR SET("print")
+		
+		
+	: (zNo=1)  //by style
+		QUERY SELECTION([SLRReporter];[SLRReporter]Header<-1;*)
+		QUERY SELECTION([SLRReporter]; | ;[SLRReporter]Header=2.5)
+		
+End case 
+
+If (vfByStyle)
+	QUERY SELECTION([SLRReporter];[SLRReporter]PrimeSort>0)
+	If (Shift down)
+	Else 
+		QUERY SELECTION([SLRReporter];[SLRReporter]Header<-1)
+	End if 
+	ORDER BY([SLRReporter];[SLRReporter]PrimeSort;>;[SLRReporter]ColorSort;>)
+End if 

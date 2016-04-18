@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alOrders;0)
+
+QUERY([WebArrays];[WebArrays]SessionKey=vsWebSession)
+
+BLOB TO VARIABLE([WebArrays]Array;alOrders)
+UNLOAD RECORD([WebArrays])

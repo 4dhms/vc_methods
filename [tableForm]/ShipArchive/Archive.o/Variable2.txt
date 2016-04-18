@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsPart1:=""
+vsPart3:=""
+vdStart:=!00-00-00!
+vdEnd:=!00-00-00!

@@ -1,0 +1,141 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$pxl)
+C_TEXT(vtQFactory)
+
+
+QUERY([FabricOrders];[FabricOrders]FabPODate>!2014-05-30!)
+QUERY SELECTION([FabricOrders];[FabricOrders]POType=0)
+QUERY SELECTION([FabricOrders];[FabricOrders]Closed=False)
+QUERY SELECTION([FabricOrders];[FabricOrders]Void=False)
+
+
+SET WINDOW TITLE(String(Records in selection([FabricOrders]))+" Open Orders")
+
+WinChoice ("Do you want to print a report?";"Summary";"Show All";"No")
+If (ok=1)
+	If (bChoice2=1)
+		vfMini:=False
+	Else 
+		vfMini:=True
+	End if 
+	vlPage:=1
+	$pxl:=0
+	
+	ARRAY TEXT(asList20;0)
+	DISTINCT VALUES([FabricOrders]VendorName;asList20)
+	SORT ARRAY(asList20;>)
+	INSERT IN ARRAY(asList20;1;1)
+	asList20{1}:="Vendor"
+	asList20:=1
+	
+	WinCentOnCenter (250;375;1)
+	DIALOG("OpenFabricSort")
+	CLOSE WINDOW
+	
+	If (ok=1)
+		If (asList20>1)
+			QUERY([FabricOrders];[FabricOrders]FabPODate>!2014-05-30!)
+			QUERY SELECTION([FabricOrders];[FabricOrders]POType=0)
+			QUERY SELECTION([FabricOrders];[FabricOrders]Closed=False)
+			QUERY SELECTION([FabricOrders];[FabricOrders]Void=False)
+			QUERY SELECTION([FabricOrders];[FabricOrders]VendorName=asList20{asList20})
+		End if 
+		
+		Case of 
+			: (Size of array(asSortOrder)=1)
+				Case of 
+					: (asSortOrder{1}="PO Number")
+						ORDER BY([FabricOrders];[FabricOrders]PONumber;>)
+					: (asSortOrder{1}="Article Number")
+						ORDER BY([FabricOrders];[FabricOrders]ArticleNo;>)
+					: (asSortOrder{1}="Supplier")
+						ORDER BY([FabricOrders];[FabricOrders]VendorName;>)
+				End case 
+			: (Size of array(asSortOrder)=2)
+				Case of 
+					: (asSortOrder{1}="PO Number") & (asSortOrder{2}="Article Number")
+						ORDER BY([FabricOrders];[FabricOrders]PONumber;>;[FabricOrders]ArticleNo;>)
+					: (asSortOrder{1}="PO Number") & (asSortOrder{2}="Supplier")
+						ORDER BY([FabricOrders];[FabricOrders]PONumber;>;[FabricOrders]VendorName;>)
+					: (asSortOrder{1}="Article Number") & (asSortOrder{2}="PO Number")
+						ORDER BY([FabricOrders];[FabricOrders]ArticleNo;>;[FabricOrders]PONumber;>)
+					: (asSortOrder{1}="Article Number") & (asSortOrder{2}="Supplier")
+						ORDER BY([FabricOrders];[FabricOrders]ArticleNo;>;[FabricOrders]VendorName;>)
+					: (asSortOrder{1}="Supplier") & (asSortOrder{2}="PO Number")
+						ORDER BY([FabricOrders];[FabricOrders]VendorName;>;[FabricOrders]PONumber;>)
+					: (asSortOrder{1}="Supplier") & (asSortOrder{2}="Article Number")
+						ORDER BY([FabricOrders];[FabricOrders]VendorName;>;[FabricOrders]ArticleNo;>)
+				End case 
+			: (Size of array(asSortOrder)=3)
+				Case of 
+					: (asSortOrder{1}="PO Number") & (asSortOrder{2}="Article Number")
+						ORDER BY([FabricOrders];[FabricOrders]PONumber;>;[FabricOrders]ArticleNo;>;[FabricOrders]VendorName;>)
+					: (asSortOrder{1}="PO Number") & (asSortOrder{2}="Supplier")
+						ORDER BY([FabricOrders];[FabricOrders]PONumber;>;[FabricOrders]VendorName;>;[FabricOrders]ArticleNo;>)
+					: (asSortOrder{1}="Article Number") & (asSortOrder{2}="PO Number")
+						ORDER BY([FabricOrders];[FabricOrders]ArticleNo;>;[FabricOrders]PONumber;>;[FabricOrders]VendorName;>)
+					: (asSortOrder{1}="Article Number") & (asSortOrder{2}="Supplier")
+						ORDER BY([FabricOrders];[FabricOrders]ArticleNo;>;[FabricOrders]VendorName;>;[FabricOrders]PONumber;>)
+					: (asSortOrder{1}="Supplier") & (asSortOrder{2}="PO Number")
+						ORDER BY([FabricOrders];[FabricOrders]VendorName;>;[FabricOrders]PONumber;>;[FabricOrders]ArticleNo;>)
+					: (asSortOrder{1}="Supplier") & (asSortOrder{2}="Article Number")
+						ORDER BY([FabricOrders];[FabricOrders]VendorName;>;[FabricOrders]ArticleNo;>;[FabricOrders]PONumber;>)
+				End case 
+		End case 
+		
+		PRINT SETTINGS
+		If (ok=1)
+			$i:=1
+			FIRST RECORD([FabricOrders])
+			For ($i;1;Records in selection([FabricOrders]))
+				If ($pxl<24)
+					If (vlPage>1)
+						PAGE BREAK(>)
+					End if 
+					vsPrintingHeader:="Page "+String(vlPage)
+					vlPage:=vlPage+1
+					Print form("OpenFabricHead")
+					$pxl:=670
+				End if 
+				
+				vsPart1:=[FabricOrders]PONumber
+				vsPart2:=String([FabricOrders]FabPODate)
+				vsPart3:=[FabricOrders]ArticleNo
+				vsPart4:=[FabricOrders]VendorName
+				If (vfMini)
+					vsPart5:=""
+					vsPart6:=""
+					vsPart7:=""
+					Print form("OpenFabricLine")
+					$pxl:=$pxl-15
+				Else 
+					QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+					QUERY SELECTION([FabPOLines];[FabPOLines]ColorPrint#"")
+					$n:=1
+					FIRST RECORD([FabPOLines])
+					For ($n;1;Records in selection([FabPOLines]))
+						QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[FabPOLines]ColorPrint)
+						vsPart5:=[FabPOLines]ColorPrint
+						vsPart6:=[ColorPrintNumber]CPName
+						If ([FabPOLines]LabDip)
+							vsPart7:=String([FabPOLines]LabDipDate)
+						Else 
+							vsPart7:=""
+						End if 
+						If ($n>1)
+							vsPart1:=""
+							vsPart2:=""
+							vsPart3:=""
+							vsPart4:=""
+						End if 
+						Print form("OpenFabricLine")
+						$pxl:=$pxl-15
+						
+						NEXT RECORD([FabPOLines])
+					End for 
+				End if 
+				NEXT RECORD([FabricOrders])
+			End for 
+		End if 
+	End if 
+End if 

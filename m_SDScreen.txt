@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSDproc)
+
+Case of 
+	: (<>vlSDproc=0)
+		<>vlSDproc:=New process("p_SDScreen";0;"SDuty")
+		vfActual:=False
+	Else 
+		SHOW PROCESS(<>vlSDproc)
+		BRING TO FRONT(<>vlSDproc)
+End case 

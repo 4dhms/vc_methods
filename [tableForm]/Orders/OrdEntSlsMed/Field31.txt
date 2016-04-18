@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If ([Orders]ShipDateFactory<Current date(*))
+		WinPrompt (String([Orders]ShipDateFactory)+" is in the past, look to the future.")
+		
+		[Orders]ShipDateFactory:=!00-00-00!
+	End if 
+End if 

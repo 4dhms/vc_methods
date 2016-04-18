@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($Process)
+C_TEXT($User)
+C_TEXT($Session)
+C_TEXT($ProcessName)
+
+
+If (Locked([Samples]))
+	LOCKED BY([Samples];$Process;$User;$Session;$ProcessName)
+	WinPrompt ("User: "+$user+Char(13)+"Session: "+$session+Char(13)+"Process #: "+String($process)+"  "+$processname)
+End if 
+
+

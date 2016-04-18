@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($key)
+C_LONGINT($i;$c)
+C_TEXT($old;$new;$field)
+C_BOOLEAN($log)
+
+$key:=String([FabPOLines]LineID)
+
+$i:=1
+For ($i;1;Size of array(atOldBreakdown))
+	If (atOldBreakdown{$i}{1}=$key)
+		$c:=$i
+	End if 
+End for 
+
+$i:=1
+For ($i;1;6)
+	$log:=False
+	Case of 
+		: ($i=2)
+			$new:=[FabPOLines]ColorPrint
+			$old:=atOldBreakdown{$c}{2}
+			$field:="Color"
+		: ($i=3)
+			$new:=String([FabPOLines]Quantity)
+			$old:=atOldBreakdown{$c}{3}
+			$field:=atOldBreakdown{$c}{2}+" Quantity"
+		: ($i=4)
+			$new:=[FabPOLines]POUnit
+			$old:=atOldBreakdown{$c}{4}
+			$field:=atOldBreakdown{$c}{2}+" Unit"
+		: ($i=5)
+			$new:=[FabPOLines]POWidth
+			$old:=atOldBreakdown{$c}{5}
+			$field:=atOldBreakdown{$c}{2}+" Width"
+		: ($i=6)
+			$new:=String([FabPOLines]UnitPrice)
+			$old:=atOldBreakdown{$c}{6}
+			$field:=atOldBreakdown{$c}{2}+" Price"
+		: ($i=7)
+			$new:=String([FabPOLines]TransPO)
+			$old:=atOldBreakdown{$c}{7}
+			$field:=atOldBreakdown{$c}{2}+" Dip date"
+	End case 
+	
+	If ($old#$new)
+		CREATE RECORD([Changes])
+		[Changes]RevisionNumber:=[FabricOrders]ReviseNumber
+		[Changes]OrderNumber:=-1
+		[Changes]RevDate:=Current date(*)
+		[Changes]RevTime:=Current time(*)
+		[Changes]Writer:=Current user
+		[Changes]ChangeKey:=Sequence number([Changes])
+		[Changes]FabOrder:=[FabricOrders]PONumber
+		[Changes]FieldName:=$field
+		[Changes]OldData:=$old
+		[Changes]NewChange:=$new
+		SAVE RECORD([Changes])
+		UNLOAD RECORD([Changes])
+	End if 
+End for 

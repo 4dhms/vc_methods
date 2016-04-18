@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>vlOrderNumber>0)
+	If ([Orders]KWCnS="")
+		WinChoice ("Missing fabric type:";"Knit";"Woven";"Cut & Sew";"Cancel")
+		
+		If (ok=1)
+			Case of 
+				: (bChoice2=1)
+					[Orders]KWCnS:="Woven"
+					cbWoven:=1
+				: (bChoice3=1)
+					[Orders]KWCnS:="CutSew"
+					cbWoven:=1
+				Else 
+					[Orders]KWCnS:="Knit"
+					cbKnit:=1
+			End case 
+		End if 
+	End if 
+Else 
+	
+	If ([Samples]KWCnS="")
+		WinChoice ("Missing fabric type:";"Knit";"Woven";"Cut & Sew";"Cancel")
+		If (ok=1)
+			Case of 
+				: (bChoice2=1)
+					[Samples]KWCnS:="Woven"
+					cbWoven:=1
+				: (bChoice3=1)
+					[Samples]KWCnS:="CutSew"
+					cbCutSew:=1
+				Else 
+					[Samples]KWCnS:="Knit"
+					cbKnit:=1
+			End case 
+		End if 
+	End if 
+End if 
+

@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]ProdComments#"")
+	[Orders]ProdComments:=[Orders]ProdComments+Char(13)+Char(13)
+	[Orders]ProdComments:=Replace string([Orders]ProdComments;Char(13)+Char(13)+Char(13);Char(13)+Char(13);*)
+End if 

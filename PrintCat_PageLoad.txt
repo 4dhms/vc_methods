@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+vxSketch11:=$empty
+vxSketch12:=$empty
+vxSketch13:=$empty
+vxSketch14:=$empty
+vxSketch15:=$empty
+vxSketch16:=$empty
+
+If (Find in array(alSortList;[PCPage]PageNumber)<1)
+	APPEND TO ARRAY(alSortList;[PCPage]PageNumber)
+	SORT ARRAY(alSortList;>)
+End if 
+
+alSortList:=Find in array(alSortList;[PCPage]PageNumber)
+
+ARRAY TEXT(atSteps;0)
+APPEND TO ARRAY(atSteps;"Add Step")
+APPEND TO ARRAY(atSteps;"S/O")
+APPEND TO ARRAY(atSteps;"S/Y")
+APPEND TO ARRAY(atSteps;"SS")
+atSteps:=1
+If (Is new record([PCPage]))
+	[PCPage]PageNumber:=vlPage
+	[PCPage]PCKey:=[PCatalog]PCKey
+End if 
+
+PrintCat_GetPix (1;[PCPage]Print1)
+PrintCat_GetPix (2;[PCPage]Print2)
+PrintCat_GetPix (3;[PCPage]Print3)
+PrintCat_GetPix (4;[PCPage]Print4)
+PrintCat_GetPix (5;[PCPage]Print5)
+PrintCat_GetPix (6;[PCPage]Print6)
+PrintCat_GetPix (7;[PCPage]Print7)
+PrintCat_GetPix (8;[PCPage]Print8)
+PrintCat_GetPix (9;[PCPage]Print9)
+PrintCat_GetPix (10;[PCPage]Print10)
+
+PrintCat_GetPix (11;[PCatalog]Paste1)
+PrintCat_GetPix (12;[PCatalog]Paste2)
+PrintCat_GetPix (13;[PCatalog]Paste3)
+PrintCat_GetPix (14;[PCatalog]Paste4)
+PrintCat_GetPix (15;[PCatalog]Paste5)
+PrintCat_GetPix (16;[PCatalog]Paste6)

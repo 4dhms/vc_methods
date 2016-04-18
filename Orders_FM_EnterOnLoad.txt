@@ -1,0 +1,347 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCurrentTab;$test;$break1;$break2)
+C_BOOLEAN($dc;<>vfSupersheet;vfCheckCredit)
+C_LONGINT($i)
+
+Dev_TrackLock (->[Orders])
+UNLOAD RECORD([Costing])
+UNLOAD RECORD([CostSheets])
+UNLOAD RECORD([SpecFactory])
+
+Rev_MakeArray (2)
+
+If ([Orders]BDHeaderKey>0)
+	QUERY([BreakDownLibrary];[BreakDownLibrary]BDKey=[Orders]BDHeaderKey)
+	$break1:=Replace string([Orders]BrkdnCutRatio;" ";"")
+	$break2:=Replace string([BreakDownLibrary]BDName;" ";"")
+	If ($break1=$break2)
+		OBJECT SET COLOR([Orders]BrkdnCutRatio;-(15+(256*0)))
+		OBJECT SET FONT STYLE([Orders]BrkdnCutRatio;0)
+	Else 
+		OBJECT SET FONT STYLE([Orders]BrkdnCutRatio;1)
+		OBJECT SET COLOR([Orders]BrkdnCutRatio;-(15+(256*3)))
+	End if 
+	UNLOAD RECORD([BreakDownLibrary])
+Else 
+	OBJECT SET COLOR([Orders]BrkdnCutRatio;-(15+(256*0)))
+	OBJECT SET FONT STYLE([Orders]BrkdnCutRatio;0)
+End if 
+
+vlBDGrandTot:=0
+<>vlCodeCheck:=0
+If ([Orders]Customer="") | (Is new record([Orders]))
+	vfCheckCredit:=True
+End if 
+
+WH_Tab 
+
+If (Record number([Orders])=-1)
+	WinPrompt ("Record failed to load. Please email phil@persinger.com and describe what you were"+" doing when it failed.")
+	CANCEL
+Else 
+	OBJECT SET VISIBLE(vrTestPrice;False)
+	
+	  //Guide_NewOrderScreen 
+	vfFabImport:=False
+	  //Customer_InfoProc 
+	  //QUERY([Customers];[Customers]CustomerName=[Orders]Customer)
+	  //$test:=[Customers]Label+[Customers]HangTag+[Customers]Packing+[Customers]CartonMU+[Customers]Folding
+	  //$test:=$test+[Customers]RN+[Customers]OverShort+[Customers]FitSize+[Customers]PPSize+[Customers]PPCount+[Customers]TOPSize
+	  //$test:=$test+[Customers]TOPCount+[Customers]ColorTrimOK+[Customers]Testing+[Customers]ShipTo+[Customers]NotesInternal
+	  //If (Records in selection([Customers])=0) | ($test="")
+	  //OBJECT SET VISIBLE(*;"xInfo";False)
+	  //Else 
+	  //OBJECT SET VISIBLE(*;"xInfo";True)
+	  //End if 
+	  //UNLOAD RECORD([Customers])
+	
+	OBJECT SET ENABLED(bCancelOrder;True)
+	OBJECT SET VISIBLE(bDC;User in group(Current user;"DC"))
+	Orders_FM_Prep 
+	Fab_BuildOrderArray ([Orders]OrderNum)
+	  //Order_GetCategory (True)
+	
+	Order_ExtLoad 
+	  //Compliance_FileList 
+	OBJECT SET VISIBLE(*;"xExists";[Orders]BDHeaderKey>0)
+	If ([Orders]Customer="@Marmax@") & ([Orders]Customer#"@Stock@")
+		OBJECT SET VISIBLE([Orders]PC;True)
+	Else 
+		OBJECT SET VISIBLE([Orders]PC;False)
+	End if 
+	OBJECT SET VISIBLE(*;"xVoid";[Orders]Cancelled)
+	OBJECT SET VISIBLE([Orders]CnF;([Orders]ShipLDP=True) | ([CostSheets]ShipLDP=True))
+	
+	
+	OBJECT SET VISIBLE([Designs]DivisionCodeN;Not([Orders]DivisionOverride))
+	OBJECT SET VISIBLE([Orders]OrderDivision;([Orders]DivisionOverride))
+	OBJECT SET VISIBLE(*;"xConflict";[Orders]SizeRangeConflict)
+	OBJECT SET VISIBLE(*;"xConflict1";[Orders]SizeRangeConflict)
+	Order_Yellow 
+	
+	Case of 
+		: ([Orders]Customer="Marmax@") | ([Orders]Customer="Macy's East") | ([Orders]Customer="Dillard@") | ([Orders]Customer="Lane Bryant@") | ([Orders]Customer="Petite Sophis@")
+			OBJECT SET VISIBLE([Orders]DCInfo;True)
+			OBJECT SET VISIBLE([Orders]DCSent;True)
+		: ([Orders]Customer="TJX UK@") | ([Orders]Customer="Strong") | ([Orders]Customer="Illig")  //| ([Orders]Customer="TK Maxx@")
+			OBJECT SET VISIBLE([Orders]DCInfo;True)
+			OBJECT SET VISIBLE([Orders]DCSent;True)
+		: ([Orders]Customer="Mark's Warehouse@") | ([Orders]Customer="Simons") | ([Orders]Customer="Ricki's") | ([Orders]Customer="Trade Secret")
+			OBJECT SET VISIBLE([Orders]DCInfo;True)
+			OBJECT SET VISIBLE([Orders]DCSent;True)
+		: ([Orders]Customer="J.C. Retail@") | ([Orders]Customer="JC Retail@") | ([Orders]Customer="TSC@")
+			OBJECT SET VISIBLE([Orders]DCInfo;True)
+			OBJECT SET VISIBLE([Orders]DCSent;True)
+		Else 
+			OBJECT SET VISIBLE([Orders]DCInfo;False)
+			OBJECT SET VISIBLE([Orders]DCSent;False)
+	End case 
+	OBJECT SET VISIBLE(bBatch;True)
+	
+	  //Warehouse Invoice box
+	Case of 
+		: ([Orders]Customer="TK Max@") | ([Orders]Customer="Winner@") | ([Orders]Customer="Aafe@") | ([Orders]Customer="Manteaux@") | ([Orders]Customer="TSC@") | ([Orders]Customer="Liverpool@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		: ([Orders]Customer="Costco") | ([Orders]Customer="TJX UK@") | ([Orders]Customer="Strong") | ([Orders]Customer="Cleo") | ([Orders]Customer="Illig") | ([Orders]Customer="Wados@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		: ([Orders]Customer="Simons") | ([Orders]Customer="JC Retail") | ([Orders]Customer="Ricki's") | ([Orders]Customer="Trade Secret") | ([Orders]Customer="TJXE@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		: ([Orders]Customer="Alfred Sung@") | ([Orders]Customer="Mark's Warehouse@") | ([Orders]Customer="Costco Mexico@") | ([Orders]Customer="CM@") | ([Orders]Customer="J.C. Retail") | ([Orders]Customer="le chateau@") | ([Orders]Customer="@shopping channel@") | ([Orders]Customer="bj@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		: ([Orders]Customer="Costco Canada@") | ([Orders]Customer="Suzy") | ([Orders]Customer="Costco UK@") | ([Orders]Customer="Costco Japan@") | ([Orders]Customer="Costco Taiwan@") | ([Orders]Customer="Serena Fashion@") | ([Orders]Customer="Costco Korea@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		: ([Orders]Customer="LVMH@") | ([Orders]Customer="Pricesmart@") | ([Orders]Customer="Costco Australia@") | ([Orders]Customer="Chico's@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		: ([Orders]Customer="Catco@")
+			OBJECT SET VISIBLE([Orders]WHInvoice;True)
+		Else 
+			OBJECT SET VISIBLE([Orders]WHInvoice;False)
+	End case 
+	OBJECT SET VISIBLE([Orders]WHInvoiceNos;[Orders]WHInvoice)
+	If ([Orders]WHInvoiceNos="0")
+		[Orders]WHInvoiceNos:=""
+	End if 
+	
+	If (Is new record([Orders]))
+		  //SET VISIBLE([Orders]OrderNum;False)
+		  //SET VISIBLE(*;"xOrderFlag";True)
+		[Orders]OrderNum:=Num(PO_GetNumber ("Order"))
+		[Orders]Order_Enterer:=Current user
+		[Orders]POOpen:=True
+		vfNewRecord:=True
+		[Orders]CostSheet:=True
+		[Orders]PartReq:=True
+		Defaults_Custom 
+	Else 
+		  //SET VISIBLE([Orders]OrderNum;True)
+		  //SET VISIBLE(*;"xOrderFlag";False)
+		vfNewRecord:=False
+	End if 
+	<>vlOrderNumber:=[Orders]OrderNum
+	
+	vfUpdateShipping:=False
+	vtHistory:=""
+	vlFieldNum:=0
+	vfNewCostSheet:=False
+	SET WINDOW TITLE("HMS Order: "+String([Orders]OrderNum))
+	Order_AirSeaToggle 
+	Order_SeasonToggle 
+	asQuikFind:=1
+	vsRestore:="Revert"
+	vsRecInSelection:=String(Selected record number([Orders]))+"/"+String(Records in selection([Orders]))
+	vfRepair:=False
+	QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+	
+	<>PageLoaded:=True
+	
+	If ([Orders]DesignNumber="")
+		OBJECT SET ENABLED(bComponent;True)
+	Else 
+		<>vlDesignKey:=[Designs]DesignLibraryKey
+		OBJECT SET ENABLED(bComponent;True)
+	End if 
+	Order_Router 
+	
+	If (<>vsDesignNumber="")
+		REDUCE SELECTION([Designs];0)
+	Else 
+		QUERY([Designs];[Designs]DesignNum=<>vsDesignNumber)
+		If ([Orders]KWCnS#[Designs]KWCnS)
+			[Orders]KWCnS:=[Designs]KWCnS
+		End if 
+		
+		Picture_RestoreOnTheFly 
+		Order_KWCSToggle 
+		
+		vtDescription:=[Designs]Description
+		<>vlDesignKey:=[Designs]DesignLibraryKey
+		
+		If ([Orders]SpecialGarment#[Designs]SpecialGarment)
+			[Orders]SpecialGarment:=[Designs]SpecialGarment
+		End if 
+		
+		If ([Orders]ActlDutyRate#[Designs]DutyAmt) & ([Orders]LastCostSheet#"Actual@")
+			  //[Orders]ActlDutyRate:=[Designs]DutyAmt
+		End if 
+		
+	End if 
+	
+	SG_PO 
+	SampFit_RecDate 
+	vsRecInSelection:=String(Selected record number([Orders]))+" / "+String(Records in selection([Orders]))
+	
+	Order_NavButtons 
+	  //End if 
+	
+	  //PATCH FOR OLD COST SHEET TEMP NOTES
+	If ([Orders]CostNotes="0")
+		[Orders]CostNotes:=""
+	End if 
+	QUERY([Invoices];[Invoices]OrderNumber=[CostSheets]SheetID)
+	QUERY SELECTION([Invoices];[Invoices]OrderNumber>0)
+	
+	If (Is new record([Orders]))
+		Order_Defaults 
+		REDUCE SELECTION([OrdersFabricXRef];0)
+		REDUCE SELECTION([CP_OrderXRef];0)
+	Else 
+	End if 
+	
+	Case of 
+		: ([Orders]ShipMethod="Flat pack")
+			pFlat:=1
+			pGOH:=0
+			pTBA:=0
+		: ([Orders]ShipMethod="GOH")
+			pFlat:=0
+			pGOH:=1
+			pTBA:=0
+		: ([Orders]ShipMethod="TBA")
+			pFlat:=0
+			pGOH:=0
+			pTBA:=1
+		Else 
+			pFlat:=0
+			pGOH:=0
+			pTBA:=0
+	End case 
+	
+	
+	Order_RequiredFlag 
+	If ([Orders]LastCostSheet="") & ([Orders]Price Terms="8/10")
+		[Orders]NetDiscount:=8
+	End if 
+	
+	QUERY([DC];[DC]OrderNumber=[Orders]OrderNum)
+	If (Records in selection([DC])>0) & (User in group(Current user;"DC"))
+		$dc:=True
+	Else 
+		$dc:=False
+	End if 
+	
+	OBJECT SET VISIBLE(*;"xExists1";$dc)
+	Order_GetFabric 
+	
+	Order_GetComponents (<>vlOrderNumber)
+	
+	Case of 
+		: (vsCurrentTab="")
+			
+		: (vsCurrentTab="Cost@") & (Find in array(atPages;vsCurrentTab)<1)
+			vsCurrentTab:="Cost"
+	End case 
+	
+	Case of 
+		: (Is new record([Orders]))
+			atPages:=1
+			FORM GOTO PAGE(1)
+			GOTO OBJECT([Orders]StyleNumber)
+		: (vsCurrentTab="")
+			atPages:=1
+		Else 
+			atPages:=Find in array(atPages;vsCurrentTab)
+			Case of 
+				: (atPages{atPages}="Components")
+					
+				: (atPages{atPages}="History")
+					GetHistory 
+			End case 
+			  //FORM GOTO PAGE(atPages)
+			GOTO OBJECT(vsEmpty)
+	End case 
+	vtOrderChanges:=""
+	<>vsCustomer:=[Orders]Customer
+	  //Orders_ComboFM 
+	ARRAY TEXT(atOldData;0)
+	ARRAY TEXT(atNewData;0)
+	ARRAY TEXT(atDataName;0)
+	
+	If (vsCurrentTab="")
+		Tabber_Setup 
+		FORM GOTO PAGE(1)
+	Else 
+		Order_Tabber 
+	End if 
+	
+	
+	If (Application type>0)
+		Pix_Load 
+	End if 
+	If ([Orders]OrderDivision="05-@") & ([Designs]LabelPict)
+		OBJECT SET VISIBLE([Orders]DontPrintLabel;True)
+		OBJECT SET VISIBLE(bView;True)
+	Else 
+		OBJECT SET VISIBLE([Orders]DontPrintLabel;False)
+		OBJECT SET VISIBLE(bView;False)
+	End if 
+	Order_CheckUPC 
+	
+	Cost_Enterable 
+	Orders_FactoryGroup 
+	  //LockTrack 
+	Order_OpenSpec 
+	Order_ShortageFlag 
+	
+	  //Fabric/Trim Order PO Flag
+	ARRAY LONGINT($po;0)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey>0)
+	DISTINCT VALUES([CP_OrderXRef]FabOrderKey;$po)
+	
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+	
+	ARRAY LONGINT($poA;0)
+	DISTINCT VALUES([OrdersFabricXRef]FabricOrderKey;$poA)
+	
+	$i:=1
+	For ($i;1;Size of array($poA))
+		If (Find in array($po;$poA{$i})<1) & ($poA{$i}>0)
+			APPEND TO ARRAY($po;$poA{$i})
+		End if 
+	End for 
+	
+	$i:=1
+	vtPONote:=""
+	For ($i;1;Size of array($po))
+		QUERY([FabricOrders];[FabricOrders]FabOrderKey=$po{$i})
+		If ($i>1)
+			vtPONote:=vtPONote+", "
+		End if 
+		vtPONote:=vtPONote+[FabricOrders]PONumber
+		If ([FabricOrders]ReqDeliveryDate#!00-00-00!)
+			vtPONote:=vtPONote+" Est: "+String([FabricOrders]ReqDeliveryDate)
+		End if 
+		If ([FabricOrders]ShippedDate#!00-00-00!)
+			vtPONote:=vtPONote+" Ship: "+String([FabricOrders]ShippedDate)
+		End if 
+		If ([FabricOrders]FinalDelivery#!00-00-00!)
+			vtPONote:=vtPONote+" Final: "+String([FabricOrders]FinalDelivery)
+		End if 
+		
+		
+	End for 
+	UNLOAD RECORD([FabricOrders])
+End if 
+
+UNLOAD RECORD([CP_OrderXRef])
+

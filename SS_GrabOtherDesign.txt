@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($searchString)
+C_TEXT($designNumber)
+
+$designNumber:=Request("Enter Design Number:")
+
+If (ok=1)
+	$searchString:=String(Num($designNumber))+"@"
+	If (Substring($designNumber;1;1)="0")
+		$searchString:="0"+$searchString
+	End if 
+	  //
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY([SpecFactory];[SpecFactory]DesignNumber=$searchString)
+	
+	QUERY SELECTION([SpecFactory];[SpecFactory]SF_KeyNumber>0;*)
+	QUERY SELECTION([SpecFactory]; & ;[SpecFactory]OrderNumber<999999)
+	ORDER BY([SpecFactory];[SpecFactory]SF_KeyNumber;>)
+	
+	vDesign1:=$designNumber
+	SS_DesignSetup 
+	vfNewFactory:=True
+	vlAddPartStatus:=2
+	FORM GOTO PAGE(2)
+End if 

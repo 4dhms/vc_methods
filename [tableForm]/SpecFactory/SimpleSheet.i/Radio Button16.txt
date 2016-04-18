@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (ssApproved=1)
+	[SpecFactory]ApprovedForProd:=True
+	[SpecFactory]ApproveDate:=Current date(*)
+End if 
+
+SS_Show 

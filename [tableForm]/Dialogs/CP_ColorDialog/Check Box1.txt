@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbMultiStyles=1)
+	OBJECT SET VISIBLE(cbMultiStyles;False)
+	OBJECT SET VISIBLE(*;"xStyle";True)
+	OBJECT SET VISIBLE(bGet;True)
+	OBJECT SET VISIBLE(*;"xStyle1";True)
+	OBJECT SET VISIBLE(vtMultiStyleNumber;True)
+	vtMultiStyleNumber:=[Samples]StyleNum
+	[Samples]MultipleStyles:=True
+	[Samples]StyleNum:="Multiple"
+Else 
+	OBJECT SET VISIBLE(bGet;False)
+	OBJECT SET VISIBLE(cbMultiStyles;True)
+	OBJECT SET VISIBLE(*;"xStyle";False)
+	OBJECT SET VISIBLE(*;"xStyle1";False)
+	OBJECT SET VISIBLE(vtMultiStyleNumber;False)
+	OBJECT SET ENTERABLE([Samples]MultipleStyles;False)
+	[Samples]MultipleStyles:=False
+	
+End if 

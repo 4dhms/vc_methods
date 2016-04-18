@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlDCShow)
+
+If (Form event=On Load)
+	If (vlDCShow=-1)
+		vlDCCount:=0
+		FORM GOTO PAGE(2)
+	Else 
+		If (vlDCShow=1) | (vlDCShow=11)
+			HIGHLIGHT TEXT(vtDCpo;4;4)
+		End if 
+		If (vlDCShow=10) | (vlDCShow=11)
+			OBJECT SET VISIBLE(vtDCdept;True)
+			OBJECT SET VISIBLE(*;"xPO1";True)
+		End if 
+		If (Length(vtDCpo)>3)
+			GOTO OBJECT(vlDCcount)
+		End if 
+	End if 
+End if 

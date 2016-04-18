@@ -1,0 +1,54 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$size)
+
+$c:=Records in selection([SpecFactory])
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(asSGOrder;0)
+ARRAY DATE(adDates;0)
+ARRAY TEXT(asCol4;0)
+ARRAY BOOLEAN(afSpecial;0)
+ARRAY TEXT(asXFactory;0)
+ARRAY LONGINT(alRecordKey;0)
+
+
+FIRST RECORD([SpecFactory])
+
+$i:=1
+For ($i;1;Records in selection([SpecFactory]))
+	If ([SpecFactory]OrderNumber#<>vlOrderNumber) & ([SpecFactory]OrderNumber#0)
+		$size:=Size of array(asSGOrder)+1
+		INSERT IN ARRAY(asDesignNumbers;$size;1)
+		INSERT IN ARRAY(asSGOrder;$size;1)
+		INSERT IN ARRAY(adDates;$size;1)
+		INSERT IN ARRAY(asCol4;$size;1)
+		INSERT IN ARRAY(asXFactory;$size;1)
+		INSERT IN ARRAY(afSpecial;$size;1)
+		INSERT IN ARRAY(alRecordKey;$size;1)
+		asDesignNumbers{$size}:=[SpecFactory]DesignNumber
+		
+		If ([SpecFactory]OrderNumber>0)
+			QUERY([Orders];[Orders]OrderNum=[SpecFactory]OrderNumber)
+			asSGOrder{$size}:=String([SpecFactory]OrderNumber)
+			asXFactory{$size}:=[Orders]Factory
+		Else 
+			QUERY([Samples];[Samples]SampleNumber=Abs([SpecFactory]OrderNumber))
+			asSGOrder{$size}:="SG"+String([SpecFactory]OrderNumber)
+			asXFactory{$size}:=[Samples]SamGarFactry
+		End if 
+		alRecordKey{$size}:=[SpecFactory]SF_KeyNumber
+		adDates{$size}:=[SpecFactory]CreationDate
+		If ([Orders]MasterSpec)
+			afSpecial{$size}:=True
+		Else 
+			afSpecial{$size}:=False
+		End if 
+		
+		If ([SpecFactory]ApprovedForProd)
+			asCol4{$size}:="X"
+		Else 
+			asCol4{$size}:=""
+		End if 
+	End if 
+	NEXT RECORD([SpecFactory])
+End for 
+

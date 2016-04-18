@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alFieldNumber;0)
+C_REAL($revKey)
+$revKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+QUERY([Changes];[Changes]RevisionKey=$revKey)
+QUERY SELECTION([Changes];[Changes]TableNum=2)
+SELECTION TO ARRAY([Changes]FieldNum;alFieldNumber)

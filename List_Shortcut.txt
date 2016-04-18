@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($init)
+
+$init:=$1+"@"
+
+Case of 
+	: (FORM Get current page=1)
+		If (Find in array(atAllListContents;$init)>0)
+			atAllListContents:=Find in array(atAllListContents;$init)
+		End if 
+	Else 
+		If (Find in array(atAllListArt;$init)>0)
+			LISTBOX SELECT ROW(FiberListAll;Find in array(atAllListArt;$init);0)
+			OBJECT SET SCROLL POSITION(FiberListAll;Find in array(atAllListArt;$init))
+		End if 
+End case 

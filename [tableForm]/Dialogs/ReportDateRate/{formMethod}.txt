@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE(vdNY1;vdNY2)
+If (Form event=On Load)
+	If (vfShortQuery)
+		vfShortQuery:=False
+		FORM GOTO PAGE(2)
+	End if 
+	<>vsFactory:=""
+	If (vdNY1#!00-00-00!)
+		[Dialogs]StartDate:=vdNY1
+	End if 
+	If (vdNY2#!00-00-00!)
+		[Dialogs]EndDate:=vdNY2
+	End if 
+	
+	cbDivision:=1
+	vlRouter:=1
+End if 

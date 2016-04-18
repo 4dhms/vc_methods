@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+ARRAY TEXT(asOrderNumbers;Size of array(atArtNumber))
+For ($i;1;Size of array(atArtNumber))
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=atArtNumber{$i})
+	asOrderNumbers{$i}:=String(Records in selection([OrdersFabricXRef]))
+End for 

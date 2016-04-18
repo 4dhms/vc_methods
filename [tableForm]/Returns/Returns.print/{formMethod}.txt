@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Footer)
+	OBJECT SET VISIBLE(*;"xText1";[RMA]ShipBack)
+	If ([RMA]ShipBack)
+		OBJECT SET VISIBLE(*;"xText";[RMA]Credit)
+		OBJECT SET VISIBLE(*;"xText2";Not([RMA]Credit))
+	End if 
+	
+	If (Not([RMA]ShipBack))
+		OBJECT SET VISIBLE(*;"xText";False)
+		OBJECT SET VISIBLE(*;"xText2";False)
+		If ([RMA]Credit)
+			vsFlag:="YOU DO NOT NEED TO RETURN ANYTHING"+Char(13)+"TO RECEIVE A CREDIT"
+		Else 
+			vsFlag:="YOU DO NOT NEED TO RETURN ANYTHING"+Char(13)+"TO RECEIVE A REPLACEMENT"
+		End if 
+	Else 
+		vsFlag:=""
+	End if 
+End if 

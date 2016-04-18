@@ -1,0 +1,153 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($dayOneCurrent;$dayOneLast;$dayOneNext)
+  //C_POINTER($orders;$units;$amount;$month)
+C_LONGINT($i;$c;$n;$s;$netSales)
+C_TEXT($division)
+C_TEXT($day)
+
+READ ONLY([Orders])
+
+SR_QueryArrays 
+
+If (asSeasonA=1)
+	$day:="1"
+Else 
+	$day:="7"
+End if 
+
+$dayOneCurrent:=Date($day+"/1/"+String(alYearA{alYearA}))
+$dayOneLast:=Date($day+"/1/"+String(alYearA{alYearA}-1))
+$dayOneNext:=Date($day+"/1/"+String(alYearA{alYearA}+1))
+
+QUERY([Orders];[Orders]CancelDate>=$dayOneLast;*)
+QUERY([Orders]; & ;[Orders]CancelDate<$dayOneNext)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"cancelled")
+QUERY SELECTION([Orders];[Orders]OrderDivision#"")
+
+Case of 
+	: (Current user="Guest")
+		  //do nothing
+	: (User in group(Current user;"DressesOnly"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="02@")
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="09@")
+	: (Current user="Prakash") | (Current user="Lorna")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="05@")
+	: (Current user="Mark")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="02-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="01@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04@")
+		  //QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="08@")
+End case 
+
+$division:=Replace string(asDivisions{asDivisions};"_";" ")
+If (asDivisions{asDivisions}#"All@")
+	QUERY SELECTION([Orders];[Orders]OrderDivision=$division)
+End if 
+
+CREATE SET([Orders];"Master")
+
+$i:=1
+$n:=1
+$c:=1
+$s:=1
+
+ARRAY DATE($canceldate;0)
+ARRAY TEXT($sizecat;0)
+ARRAY LONGINT($units;0)
+ARRAY REAL($price;0)
+ARRAY REAL($discount;0)
+
+SELECTION TO ARRAY([Orders]CancelDate;$canceldate;[Orders]SizeCategory;$sizecat;[Orders]TotalOrderQuantity;$units;[Orders]Price;$price;[Orders]NetDiscount;$discount)
+
+USE SET("Master")
+
+$i:=1
+
+For ($i;1;Size of array($units))
+	If ($c%5=0)
+		<>vlCounter:=Int(($c/Size of array($units))*100)
+		CALL PROCESS(<>SendingWin)
+	End if 
+	$c:=Month of($canceldate{$i})
+	
+	Case of 
+		: (cbBreakout=0) & ($day="1")
+			If ($c>6)
+				$c:=$c+1
+			End if 
+			
+		: (cbBreakout=0) & ($day="7") & ($c<7)
+			$c:=$c+7
+		: (cbBreakout=0) & ($day="7") & ($c>6)
+			$c:=$c-6
+			
+			
+		: ($day="1") & ($c=1)
+			  //leave as is
+		: ($day="1") & ($c>1) & ($c<7)
+			$c:=($c*4)-3
+		: ($day="1") & ($c>6)
+			$c:=(($c+1)*4)-3
+			
+		: ($day="7") & ($c<7)
+			$c:=$c+6
+		: ($day="7") & ($c>6)
+			$c:=$c-6
+	End case 
+	
+	$netSales:=Round($units{$i}*($price{$i}*((100-$discount{$i})/100));0)
+	
+	If ($canceldate{$i}<$dayOneCurrent)
+		Case of 
+			: (cbBreakout=0)
+				  //skip these
+			: ($sizecat{$i}="Petite")
+				alSRorderB{$c+1}:=alSRorderB{$c+1}+1
+				alSRunitB{$c+1}:=alSRunitB{$c+1}+$units{$i}
+				alSRdollarB{$c+1}:=alSRdollarB{$c+1}+$netSales
+			: ($sizecat{$i}="Missy")
+				alSRorderB{$c+2}:=alSRorderB{$c+2}+1
+				alSRunitB{$c+2}:=alSRunitB{$c+2}+$units{$i}
+				alSRdollarB{$c+2}:=alSRdollarB{$c+2}+$netSales
+			: ($sizecat{$i}="Large")
+				alSRorderB{$c+3}:=alSRorderB{$c+3}+1
+				alSRunitB{$c+3}:=alSRunitB{$c+3}+$units{$i}
+				alSRdollarB{$c+3}:=alSRdollarB{$c+3}+$netSales
+		End case 
+		alSRorderB{$c}:=alSRorderB{$c}+1  //total month
+		alSRunitB{$c}:=alSRunitB{$c}+$units{$i}
+		alSRdollarB{$c}:=alSRdollarB{$c}+$netSales
+	Else 
+		Case of 
+			: (cbBreakout=0)
+				  //skip these
+			: ($sizecat{$i}="Petite")
+				alSRorderA{$c+1}:=alSRorderA{$c+1}+1
+				alSRunitA{$c+1}:=alSRunitA{$c+1}+$units{$i}
+				alSRdollarA{$c+1}:=alSRdollarA{$c+1}+$netSales
+			: ($sizecat{$i}="Missy")
+				alSRorderA{$c+2}:=alSRorderA{$c+2}+1
+				alSRunitA{$c+2}:=alSRunitA{$c+2}+$units{$i}
+				alSRdollarA{$c+2}:=alSRdollarA{$c+2}+$netSales
+			: ($sizecat{$i}="Large")
+				alSRorderA{$c+3}:=alSRorderA{$c+3}+1
+				alSRunitA{$c+3}:=alSRunitA{$c+3}+$units{$i}
+				alSRdollarA{$c+3}:=alSRdollarA{$c+3}+$netSales
+		End case 
+		alSRorderA{$c}:=alSRorderA{$c}+1  //total month
+		alSRunitA{$c}:=alSRunitA{$c}+$units{$i}
+		alSRdollarA{$c}:=alSRdollarA{$c}+$netSales
+	End if 
+	
+End for 
+
+
+SR_BuildTotals 
+
+
+
+

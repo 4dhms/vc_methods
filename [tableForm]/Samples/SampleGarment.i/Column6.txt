@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	adStatusDate{asColorStatus}:=Current date(*)
+	vtOrderChanges:=vtOrderChanges+"_Color"
+	CREATE RECORD([FabricStatus])
+	[FabricStatus]LibraryKey:=alColorKey{asColorStatus}
+	[FabricStatus]StatusDate:=adStatusDate{asColorStatus}
+	[FabricStatus]Status:=asColorStatus{asColorStatus}
+	[FabricStatus]Approver:=Current user
+	[FabricStatus]StatusKey:=Sequence number([FabricStatus])
+	SAVE RECORD([FabricStatus])
+End if 

@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alItemNumber;0)
+C_LONGINT($i)
+
+SELECTION TO ARRAY([SpecSheetLines]SpecLineKey;alItemNumber)
+ARRAY TEXT(asList1;Size of array(alItemNumber))
+$i:=1
+FIRST RECORD([SpecSheetLines])
+For ($i;1;Size of array(alItemNumber))
+	If ([SpecSheetLines]OtherDescription="")
+		QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+		asList1{$i}:=[SpecLibrary]SpecEnglish
+	Else 
+		asList1{$i}:=[SpecSheetLines]OtherDescription
+	End if 
+	NEXT RECORD([SpecSheetLines])
+End for 
+
+
+Center Window (300;550;1;"")
+DIALOG([Dialogs];"ReorderSpecs")
+CLOSE WINDOW

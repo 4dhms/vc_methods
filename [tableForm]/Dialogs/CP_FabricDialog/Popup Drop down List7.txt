@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atYarnSize=1)
+	List_Var ("Yarn Size";->vtYarnSize)
+Else 
+	vtYarnSize:=<>atYarnSize{<>atYarnSize}
+End if 

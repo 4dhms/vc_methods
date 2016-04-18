@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList11;0)
+ARRAY TEXT(asList12;0)
+ARRAY TEXT(asList13;0)
+ARRAY TEXT(asList14;0)

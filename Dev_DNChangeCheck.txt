@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TIME($docref)
+C_BOOLEAN($note)
+C_TEXT($test;$first)
+Dev_ChangeArray 
+
+C_TIME($docref)
+$docref:=Create document("";"xls")
+SEND PACKET($docref;"Sample Order from"+Char(9)+"to"+Char(9)+"Design Library from"+Char(9)+"to"+Char(9)+"Style Number Book from"+Char(9)+"to"+Char(13))
+
+$i:=1
+For ($i;1;Size of array(asDesignNumbers))
+	$note:=False
+	$test:="310"+Substring(asDesignNumbers{$i};4;20)
+	$first:=$test
+	QUERY([Samples];[Samples]DesignNum=$test)
+	If (Records in selection([Samples])>1)
+		$test:="370"+Substring(asDesignNumbers{$i};4;20)
+		$note:=True
+		QUERY([Samples];[Samples]DesignNum=$test)
+		If (Records in selection([Samples])>1)
+			ALERT($test)
+			TRACE
+		End if 
+	End if 
+	QUERY([Samples];[Samples]DesignNum=asDesignNumbers{$i})
+	$n:=1
+	For ($n;1;Records in selection([Samples]))
+		SEND PACKET($docref;[Samples]DesignNum+Char(9)+$test+Char(9))
+		[Samples]DesignNum:=$test
+		SAVE RECORD([Samples])
+		QUERY([Designs];[Designs]DesignNum=asDesignNumbers{$i})
+		SEND PACKET($docref;[Designs]DesignNum+Char(9)+$test+Char(9))
+		[Designs]DesignNum:=$test
+		SAVE RECORD([Designs])
+		QUERY([StyleNumberGen];[StyleNumberGen]DesignNumber=asDesignNumbers{$i})
+		If ($note)
+			SEND PACKET($docref;[Samples]DesignNum+Char(9)+$test+Char(9)+"Conflict with existing D/N: "+$first+Char(13))
+		Else 
+			SEND PACKET($docref;[Samples]DesignNum+Char(9)+$test+Char(13))
+		End if 
+		[StyleNumberGen]DesignNumber:=$test
+		SAVE RECORD([StyleNumberGen])
+	End for 
+	
+End for 
+
+
+ALERT("Done")
+
+

@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asFabric;0)
+ARRAY TEXT(asFiber;0)
+ARRAY TEXT(asTreatment;0)
+ARRAY LONGINT(alOrders;0)
+
+If (Is new record([ColorPrintNumber]))
+	vtFootNote:=""
+Else 
+	CP_IsolateCustomer 
+End if 

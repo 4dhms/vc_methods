@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$line)
+C_POINTER($arrayPtr;$headptr)
+C_BOOLEAN(vfIncomplete)
+
+If (vfIncomplete)
+	$line:=Order_DCIncomplete 
+	WinPrompt ("Missing price for "+asCustomers{$line})
+Else 
+	$i:=1
+	For ($i;1;Size of array(alDCRef))
+		$arrayPtr:=Get pointer("asColor"+String($i))
+		
+		QUERY([DC];[DC]CPOrdID=alDCRef{$i})
+		CREATE SET([DC];"Line")
+		$n:=1
+		For ($n;1;Size of array(alDCLine))
+			If ($n>1) & ($n+1<Size of array(alDCLine))
+				USE SET("Line")
+				QUERY SELECTION([DC];[DC]DCLine=alDCLine{$n})
+				
+				If (Records in selection([DC])=0)
+					CREATE RECORD([DC])
+				Else 
+					If (Num($arrayPtr->{$n})#[DC]Count)
+						vtNewData:=$arrayPtr->{$n}
+						$headptr:=Get pointer("Header"+String($i+22))
+						vtOldData:=OBJECT Get title($headptr->)+" ("+asCustomers{$n}+") "+String([DC]Count)
+						Rev_LogChange ("DC";"Qty";[Orders]OrderNum)
+					End if 
+					
+					If ([DC]CancelDate#adCancel{$n}) & ($i=1)
+						vtNewData:=String(adCancel{$n})
+						vtOldData:=String([DC]CancelDate)
+						Rev_LogChange ("DC"+asCustomers{$n};"Cancel "+asCustomers{$n};[Orders]OrderNum)
+					End if 
+					
+					If ([DC]Customer#asCustomers{$n}) & ($i=1)
+						vtNewData:=asCustomers{$n}
+						vtOldData:=[DC]Customer
+						Rev_LogChange ("DC";"DC Customer";[Orders]OrderNum)
+					End if 
+					
+					If (Num([DC]Price)#arPrice{$n}) & ($i=1)
+						vtNewData:=String(arPrice{$n})
+						vtOldData:=String([DC]Price)
+						Rev_LogChange ("DC";"Price "+asCustomers{$n};[Orders]OrderNum)
+					End if 
+				End if 
+				
+				If (Num($arrayPtr->{$n})#[DC]Count) | ([DC]InWarehouse#afIn{$n}) | ([DC]CancelDate#adCancel{$n}) | (Num($arrayPtr->{$n})#[DC]Count) | ([DC]CPOrdID#alDCRef{$i}) | ([DC]DCLine#alDCline{$n}) | ([DC]Customer#asCustomers{$n}) | ([DC]Price#arPrice{$n}) | ([DC]Note#atNote{$n})
+					QUERY([Lists];[Lists]ListName="DC";*)
+					QUERY([Lists]; & ;[Lists]ListItem=asCustomers{$n})
+					[DC]Customer:=asCustomers{$n}
+					[DC]ReportCustomer:=[Lists]ListCode
+					[DC]CancelDate:=adCancel{$n}
+					[DC]Count:=Num($arrayPtr->{$n})
+					[DC]CPOrdID:=alDCRef{$i}
+					[DC]DCLine:=alDCline{$n}
+					[DC]OrderNumber:=[Orders]OrderNum
+					[DC]Price:=arPrice{$n}
+					[DC]Note:=atNote{$n}
+					[DC]CreateDate:=adCreateDate{$n}
+					[DC]InWarehouse:=afIn{$n}
+					SAVE RECORD([DC])
+				End if 
+			End if 
+		End for 
+	End for 
+End if 
+

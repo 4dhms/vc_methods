@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_LONGINT($i;$n;$c)
+C_BOOLEAN($kill)
+
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"colors")
+
+For ($i;1;Size of array(asOrderNumbers))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=Num(asOrderNumbers{$i}))
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=asTypeList{$i})
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		ADD TO SET([CP_OrderXRef];"colors")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+End for 
+
+USE SET("colors")
+
+ARRAY LONGINT($order;0)
+ARRAY TEXT($color;0)
+ARRAY TEXT($type;0)
+
+SELECTION TO ARRAY([CP_OrderXRef]OrderNumber;$order;[CP_OrderXRef]CPNumber;$color;[CP_OrderXRef]CPType;$type)
+
+$i:=1
+CREATE EMPTY SET([FabPOLines];"del")
+
+FIRST RECORD([FabPOLines])
+For ($i;1;Records in selection([FabPOLines]))
+	  //ALERT(string($i))
+	
+	$n:=1
+	$kill:=True
+	For ($n;1;Size of array($order))
+		  //ALERT(String($order{$n})+"  "+String(Find in array(asOrderNumbers;"PO"+String($order{$n})))+"  "+$color{$n}+"|  "+[FabPOLines]ColorPrint+"|  "+$type{$n}+"| "+[FabPOLines]FabType)
+		  //If ($i<3)
+		  //If ($color{$n}=[FabPOLines]ColorPrint)
+		  //ALERT($color{$n}+" Yes")
+		  //Else 
+		  //ALERT($color{$n}+" no")
+		  //End if 
+		  //If ($type{$n}=[FabPOLines]FabType)
+		  //ALERT($type{$n}+" Yes")
+		  //Else 
+		  //ALERT($type{$n}+" no")
+		  //End if 
+		  //End if 
+		
+		If (Find in array(asOrderNumbers;"PO"+String($order{$n}))>0) & ($color{$n}=[FabPOLines]ColorPrint) & ($type{$n}=[FabPOLines]FabType)
+			$kill:=False
+		End if 
+	End for 
+	If ($kill)
+		ADD TO SET([FabPOLines];"del")
+	End if 
+	NEXT RECORD([FabPOLines])
+End for 
+
+USE SET("del")
+$c:=Records in selection([FabPOLines])
+
+If ($c=1)
+	$message:="There is one unrelated line."+Char(13)+"Do you want to remove it?"
+Else 
+	$message:="There are "+String($c)+" unrelated lines."+Char(13)+"Do you want to remove them?"
+End if 
+
+WinChoice ($message)
+If (ok=1)
+	DELETE SELECTION([FabPOLines])
+End if 

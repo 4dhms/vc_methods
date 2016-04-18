@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($route)
+C_LONGINT($po;$run)
+
+WinChoice ("Pick locked record:";"PO";"Cancel")
+
+If (ok=1)
+	$route:="PO"
+	$po:=Num(Request("Enter PO Number:"))
+	If (ok=1)
+		QUERY([Orders];[Orders]OrderNum=$po)
+		Case of 
+			: (Records in selection([Orders])=0)
+				ALERT("PO "+String($po)+" is no longer locked")
+				$route:=""
+			: (Not(Locked([Orders])))
+				ALERT("PO "+String($po)+" is no longer locked")
+				UNLOAD RECORD([Orders])
+				$route:=""
+		End case 
+	End if 
+	
+	
+	Case of 
+		: ($route="PO")
+			$run:=Execute on server("Locked_CheckPO";64*1024;"LockedPO";$po;Current machine owner)
+	End case 
+End if 

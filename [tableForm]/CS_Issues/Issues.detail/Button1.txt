@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([CS_Issues])
+QUERY([CS_Issues];[CS_Issues]CS_ID=[ComponentSheets]CS_ID)
+ORDER BY([CS_Issues];[CS_Issues]Resolved;>;[CS_Issues]CS_IssueKey;>)
+ACCEPT

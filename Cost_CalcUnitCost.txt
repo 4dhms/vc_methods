@@ -1,0 +1,46 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($unitAir;$unitSea;$totalAir;$totalSea;$unitSeaRaw;$totalSeaRaw;$unitAirRaw;$totalAirRaw)
+C_BOOLEAN(vfTestQuantity)
+C_LONGINT(vlTestQuantity)
+C_REAL(vActlTotPrf;vPercent)
+
+$unitAir:=Round([CostSheets]FOB+[CostSheets]FOB2+[CostSheets]FreightAIR+[CostSheets]NYMisc+[CostSheets]BrokerageChg+[CostSheets]Quota+[CostSheets]Quota2;2)
+$unitSea:=Round([CostSheets]FOB+[CostSheets]FOB2+[CostSheets]FreightBOAT+[CostSheets]NYMisc+[CostSheets]BrokerageChg+[CostSheets]Quota+[CostSheets]Quota2;2)
+
+
+  //duty and cushion
+$unitAirRaw:=$unitAir+[CostSheets]Cushion+[CostSheets]DutyAmount
+$unitSeaRaw:=$unitSea+[CostSheets]Cushion+[CostSheets]DutyAmount
+
+$unitAir:=$unitAir+[CostSheets]DutyAmount
+$unitSea:=$unitSea+[CostSheets]DutyAmount
+
+$totalAir:=Round($unitAir*[CostSheets]Quantity;2)
+$totalSea:=Round($unitSea*[CostSheets]Quantity;2)
+$totalAirRaw:=Round($unitAirRaw*[CostSheets]Quantity;2)
+$totalSeaRaw:=Round($unitSeaRaw*[CostSheets]Quantity;2)
+
+[CostSheets]UnitCostAir:=$unitAirRaw
+[CostSheets]TotalCostAir:=$totalAir
+[CostSheets]UnitCostSea:=$unitSeaRaw
+[CostSheets]TotalCostSea:=$totalSea
+[CostSheets]UnitCostAirWC:=$unitAir
+[CostSheets]UnitCostSeaWC:=$unitSea
+
+SAVE RECORD([CostSheets])
+
+vrUnit1:=$unitSea
+vrUnit2:=$unitAir
+vrTotal1:=$totalSea
+vrTotal2:=$totalAir
+vrLDPAir:=$unitAir
+vrLDPBoat:=$unitSea
+
+vrUnit1a:=$unitSeaRaw
+vrUnit2a:=$unitAirRaw
+vrTotal1a:=$totalSeaRaw
+vrTotal2a:=$totalAirRaw
+vrLDP1a:=$unitSeaRaw
+vrLDP2a:=$unitAirRaw
+
+

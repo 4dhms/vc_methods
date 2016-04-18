@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([DesignLines];"Lines")
+USE SET("Userset")
+If (Records in set("UserSet")=1)
+	WinChoice ("Are you sure you want to delete this design line plan?")
+	If (ok=1)
+		REMOVE FROM SET([DesignLines];"Lines")
+		DELETE RECORD([DesignLines])
+	End if 
+Else 
+	WinPrompt ("Select single design line to delete.")
+End if 
+
+USE SET("Lines")
+CLEAR SET("Lines")

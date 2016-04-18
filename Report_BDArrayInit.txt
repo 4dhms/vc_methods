@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alBDStyle;0)
+
+ARRAY TEXT(asBDDivisions;$1)
+ARRAY TEXT(asBDFactories;$1)
+ARRAY LONGINT(alBDQuantity;$1)
+ARRAY REAL(arBDNetSales;$1)
+ARRAY REAL(arBDNetProfit;$1)
+ARRAY REAL(arBDSpecialDiscount;$1)
+ARRAY REAL(arBDNetNetSales;$1)
+ARRAY REAL(arBDNetNetProfit;$1)
+ARRAY REAL(arBDAvgNetMarkup;$1)
+ARRAY REAL(arBDAvgNetNetMarkup;$1)
+ARRAY LONGINT(alBDGrossSales;$1)
+ARRAY LONGINT(alBDDiscAmt;$1)
+ARRAY LONGINT(alBDCost;$1)
+ARRAY LONGINT(alBDStyle;$1)
+

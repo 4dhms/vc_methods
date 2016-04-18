@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($color;$background;$fontstyle;)
+
+If (Form event=On Printing Detail)
+	QUERY([Designs];[Designs]DesignNum=[SLRReporter]DesignNumber)
+	SLR_AcctStyleFM 
+	
+	Case of 
+		: ([SLRReporter]Header=3) & (Not(vfByStyle))
+			OBJECT SET COLOR(*;"xBG";-(15+(256*15)))
+			$color:=0
+			$background:=15
+			$fontstyle:=1
+		: ([SLRReporter]Header=2) & (Not(vfByStyle))
+			OBJECT SET COLOR(*;"xBG";-(12+(256*12)))
+			$color:=15
+			$background:=12
+			$fontstyle:=1
+		: ([SLRReporter]Header=-3) & (Not(vfByStyle))
+			OBJECT SET COLOR(*;"xBG";-(Grey+(256*Grey)))
+			$color:=15
+			$background:=Grey
+			$fontstyle:=1
+		Else 
+			OBJECT SET COLOR(*;"xBG";-(0+(256*0)))
+			$color:=15
+			$background:=0
+			$fontstyle:=1
+	End case 
+	
+	OBJECT SET VISIBLE(*;"xSubtot";[SLRReporter]Header=-2)
+	OBJECT SET VISIBLE(*;"xBG";[SLRReporter]Header>0)
+	OBJECT SET VISIBLE([SLRReporter]LineItem;[SLRReporter]Header>=-1)
+	OBJECT SET VISIBLE([SLRReporter]StyleNumber;[SLRReporter]Header>=-2)
+	
+	OBJECT SET COLOR(vsStyleNumber;-($color+(256*$background)))
+End if 

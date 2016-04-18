@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE RECORD([Lists])
+[Lists]ArticleNumber:=atAllListArt{atAllListContents}
+[Lists]ListItem:=atAllListContents{atAllListContents}
+[Lists]ListName:=vsList1Name
+[Lists]UserName:=Current user
+
+Case of 
+	: (Position("Cable & Gauge";vsList3Name)>0)
+		[Lists]Division:="Cable & Gauge"
+	: (Position("Cupio";vsList3Name)>0)
+		[Lists]Division:="Cable & Gauge"
+End case 
+Case of 
+	: (cbKnit=1)
+		[Lists]KWCS:="Knit"
+	: (cbWoven=1)
+		[Lists]KWCS:="Woven"
+	: (cbCutSew=1)
+		[Lists]KWCS:="CutSew"
+End case 
+SAVE RECORD([Lists])
+
+
+If (<>vlOrderNumber>0)
+	[Lists]KWCS:=[Orders]KWCnS
+Else 
+	[Lists]KWCS:=[Samples]KWCnS
+End if 
+SAVE RECORD([Lists])
+INSERT IN ARRAY(atListContents;1;1)
+atListContents{1}:=atAllListContents{atAllListContents}
+atListArt{1}:=atAllListArt{atAllListArt}
+LISTBOX DELETE ROWS(FiberListAll;atAllListContents)

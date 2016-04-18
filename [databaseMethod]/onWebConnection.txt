@@ -1,0 +1,243 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($1;$2;$3;$4;$5;$6)
+C_TEXT(vtURL;$Browser;$BrowserIP;$ServerIP;$name;$password)
+C_LONGINT($table;$orderNumber;$stockNumber;$cpkey)
+C_TEXT($toFind;$link;$page;$count;$key;$catalog)
+C_TEXT($stripper)
+C_TEXT($designNum)
+
+If ($1[[1]]="/")
+	vtURL:=$1
+Else 
+	vtURL:="/"+$1
+End if 
+
+$Browser:=$2
+$BrowserIP:=$3
+$ServerIP:=$4
+$name:=$5
+$password:=$6
+
+vsUniqueWebID:=String(Tickcount)
+
+User_FullList 
+
+Web_GetUserSession (vtURL)
+
+$toFind:=Substring(vtURL;Position("?";vtURL)+1;999)  // /4DCGI/Rec03_"+String(Record number([Produits]);"00000")
+$key:=Substring(vtURL;Position("]";vtURL)+1;999)
+$key:=Substring($key;1;Position("?";$key)-1)
+$link:=Substring($toFind;1;99)
+$link:=Substring($link;1;Position("[";$link)-1)
+
+vsWebSession:=Substring(vtURL;Position("[";vtURL)+1;999)
+vsWebSession:=Substring(vtURL;Position("&";vtURL)+1;999)
+vsWebSession:=Substring(vsWebSession;1;Position("]";vsWebSession)-1)
+
+Case of 
+	: ($tofind="printline@")
+		Web_AddCell (vtURL)
+		QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+		[StockOrders]Print:=False
+		SAVE RECORD([StockOrders])
+		UNLOAD RECORD([StockOrders])
+		WebStock 
+		
+	: ($tofind="addcell@")
+		Web_AddCell (vtURL)
+		
+	: ($tofind="change@")
+		$key:=Substring($tofind;Position("=";$tofind)+1;100)
+		Web_StockChange ($key)
+		
+	: ($tofind="remove@")
+		$key:=Substring($tofind;Position("=";$tofind)+1;100)
+		Web_StockRemove ($key)
+		
+	: ($tofind="contact@")
+		$key:=Substring($tofind;Position("=";$tofind)+1;100)
+		Web_ContactLogin ($key)
+		
+	: ($tofind="checkout@")
+		Web_Checkout1 
+		
+	: ($tofind="stocklist@")
+		$catalog:=Substring($toFind;10;40)
+		vtBuyer:=Substring($toFind;Position("+";$toFind)+1;40)
+		
+		If (vtBuyer="None")
+			Web_StockNewSession ($catalog)
+		Else 
+			Web_StockCatalog ($catalog)  //+vsWebSession)
+		End if 
+		
+	: ($tofind="stock@")
+		vtBuyer:=Substring(vtURL;Position("+";vtURL)+1;40)
+		vtBuyer:=Substring(vtBuyer;1;Position("?";vtBuyer)-1)
+		
+		$stockNumber:=Num(Substring($toFind;7;5))
+		  //vtBack:=Substring(vtURL;1;Position("]";vtURL))
+		  //vtBack:=vtBack+"?stocklist="+$key
+		Web_StockPO ($stockNumber;Replace string($key;"&&";""))
+		
+		  //: ($tofind="newgcoc@")
+		  //Web_GCOCNew 
+		  //: ($tofind="pullgcoc@")
+		  //$orderNumber:=Num(Substring($toFind;9;5))
+		  //Web_PullGCOC ($orderNumber)
+	: ($tofind="returns@")
+		Web_Returns 
+	: ($tofind="susansreport@")
+		Web_SusansReport 
+	: ($tofind="addcalendar@")
+		<>vfFactory:=False
+		Web_CalendarAdd 
+	: ($tofind="findcalendar@")
+		<>vfFactory:=False
+		Web_BuildRange 
+	: ($tofind="findorder@")
+		<>vfFactory:=False
+		Web_BuildQueryScreen ("Order")
+	: ($tofind="findsample@")
+		Web_BuildQueryScreen ("Sample")
+	: ($toFind="ordercost=@")  //find a record
+		$table:=Num(Substring($toFind;4;2))
+		If ($toFind="ordercost=1@")
+			$orderNumber:=Num(Substring($toFind;11;6))
+		Else 
+			$orderNumber:=Num(Substring($toFind;11;5))
+		End if 
+		Web_GetArray 
+		vRecNum:=String(Find in array(alOrders;$orderNumber))+" of "+String(Size of array(alOrders))
+		Web_OrderCost ($orderNumber)
+	: ($toFind="spreadsheet=@")  //find a record
+		$table:=Num(Substring($toFind;4;2))
+		$orderNumber:=Num(Substring($toFind;13;5))
+		Web_Spreadsheet ($ordernumber)
+	: ($toFind="sample=@")  //find a record
+		$table:=Num(Substring($toFind;4;2))
+		$orderNumber:=Num(Substring($toFind;8;6))
+		Web_GetArray 
+		vRecNum:=String(Find in array(alOrders;$orderNumber))+" of "+String(Size of array(alOrders))
+		Web_cgiFromSamples ($orderNumber)
+		
+	: ($toFind="samplecost=@")  //find a record
+		$table:=Num(Substring($toFind;4;2))
+		$orderNumber:=Num(Substring($toFind;12;5))
+		Web_GetArray 
+		vRecNum:=String(Find in array(alOrders;$orderNumber))+" of "+String(Size of array(alOrders))
+		Web_SampleCost ($orderNumber)
+	: ($toFind="order=@")  //find a record
+		If ($toFind="order=1@")
+			$orderNumber:=Num(Substring($toFind;7;6))
+		Else 
+			$orderNumber:=Num(Substring($toFind;7;5))
+		End if 
+		
+		$table:=Num(Substring($toFind;4;2))
+		Web_GetArray 
+		vRecNum:=String(Find in array(alOrders;$orderNumber))+" of "+String(Size of array(alOrders))
+		Web_cgiFromOrders ($orderNumber)
+		
+	: ($toFind="emailorder=@")
+		vlOrderNumber:=Num(Substring($toFind;Position("=";$toFind)+1;6))
+		Web_EmailOrder 
+		
+	: ($toFind="next@")
+		vsFlag:=Replace string($toFind;"next";"")
+		vsFlag:=Substring(vsFlag;1;Position("=";vsFlag)-1)
+		Web_GetArray 
+		$orderNumber:=Num(Substring($toFind;Position("=";$toFind)+1;5))
+		$orderNumber:=alOrders{Find in array(alOrders;$orderNumber)+1}
+		vRecNum:=String(Find in array(alOrders;$orderNumber))+" of "+String(Size of array(alOrders))
+		
+		Case of 
+			: (vsFlag="order")
+				Web_cgiFromOrders ($orderNumber)
+			: (vsFlag="ordercost")
+				Web_OrderCost ($orderNumber)
+			: (vsFlag="sample")
+				Web_cgiFromSamples ($orderNumber)
+			: (vsFlag="samplecost")
+				Web_SampleCost ($orderNumber)
+		End case 
+		
+	: ($toFind="previous@")
+		vsFlag:=Replace string($toFind;"previous";"")
+		vsFlag:=Substring(vsFlag;1;Position("=";vsFlag)-1)
+		
+		Web_GetArray 
+		$orderNumber:=Num(Substring($toFind;Position("=";$toFind)+1;5))
+		
+		$orderNumber:=alOrders{Find in array(alOrders;$orderNumber)-1}
+		
+		vRecNum:=String(Find in array(alOrders;$orderNumber))+" of "+String(Size of array(alOrders))
+		
+		Case of 
+			: (vsFlag="order")
+				Web_cgiFromOrders ($orderNumber)
+			: (vsFlag="ordercost")
+				Web_OrderCost ($orderNumber)
+			: (vsFlag="sample")
+				Web_cgiFromSamples ($orderNumber)
+			: (vsFlag="samplecost")
+				Web_SampleCost ($orderNumber)
+		End case 
+		
+	: ($toFind="menu@")
+		Web_Index 
+		
+	: (vtURL="/4DCGI/Validate@")
+		WebSubmit_ValidateUser 
+		
+		  //: (vtURL="/4DACTION/Web_SaveGCOC@")
+		  //Web_SaveGCOC 
+		
+	: (vtURL="/4DCGI/@")
+		Case of 
+			: (vtURL="/4DCGI/login@")
+				ALERT("????"+vtURL)
+			: (vtURL="/4DCGI/HMSLIST@")  //displays the thumbnail
+				$designNum:=Substring(vtURL;Length("/4DCGI/HMSLIST_")+1;Length(vtURL))
+				Web_GetGIF ($designNum)
+				
+			: (vtURL="/4DCGI/CHOICE@")  //displays the hms logo
+				$cpkey:=Num(Substring(vtURL;Length("/4DCGI/CHOICE_")+1;Length(vtURL)))
+				Web_GetSketchPhoto ($cpkey)
+				
+			: (vtURL="/4DCGI/LOGO@")  //displays the hms logo
+				Web_GetLogo 
+			: (vtURL="/4DCGI/DESIGN@")  //displays the thumbnail
+				$designNum:=Substring(vtURL;Length("/4DCGI/DESIGN_")+1;Length(vtURL))
+				Web_GetPicture ($designNum)
+			: (vtURL="/4DCGI/PHOTO@")  //displays the thumbnail
+				$designNum:=Substring(vtURL;Length("/4DCGI/PHOTO_")+1;Length(vtURL))
+				Web_GetPhoto ($designNum)
+			: ($link="DesignLib")
+				Web_Error ("Design Library is not yet on line")
+			: ($link="SpecSheets")
+				Web_Error ("Spec Sheets is not yet on line")
+			: ($link="SpeedForms")
+				Web_Error ("Speed Forms are not yet on line")
+			: ($link="FabricOrders")
+				Web_Error ("Fabric Orders are not yet on line")
+			: ($link="FabricLib")
+				Web_Error ("Fabric Library is not yet on line")
+			: ($link="Approval")
+				Web_Error ("Approval are not yet on line")
+			: ($toFind="List0@")
+				LOAD VARIABLES(Current user;vtOrders)
+				$stripper:=Substring($toFind;Position("_";$toFind)+1;9999)
+				$page:=Substring($stripper;1;Position("_";$stripper)-1)
+				$count:=Substring($stripper;Position("_";$stripper)+1;9999)
+				vsPageTurner:=Web_PageTurner ($page;$count)
+				
+				Case of 
+					: ($toFind="List01@")
+						Web_StatusNav (1)
+					: ($toFind="List02@")
+						Web_StatusNav (2)
+				End case 
+		End case 
+End case 
+

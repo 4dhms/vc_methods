@@ -1,0 +1,67 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ($1="RMA")
+		  //vpsupplierPtr:=->[CostSheets]SheetName
+		vptablePtr:=->[RMA]
+		vpnumberPtr:=->[RMA]RMAkey
+	: ($1="CS")
+		vpsupplierPtr:=->[CostSheets]SheetName
+		vptablePtr:=->[CostSheets]
+		vpnumberPtr:=->[CostSheets]SheetID
+	: ($1="Spec")
+		vpsupplierPtr:=->[SpecFactory]Factory
+		vptablePtr:=->[SpecFactory]
+		vpnumberPtr:=->[SpecFactory]OrderNumber
+	: ($1="PO") | ($1="POs") | ($1="Status") | ($1="VS") | ($1="Fitting") | ($1="Retail") | ($1="TC")
+		vtVendor:=[Orders]Factory
+		vpsupplierPtr:=->[Orders]Factory
+		vptablePtr:=->[Orders]
+		vpnumberPtr:=->[Orders]OrderNum
+	: ($1="UN")  //Sample Garment
+		  //  vtVendor:=[Sample Garments]Sam Gar Factry
+		  //   vpsupplierPtr:=->
+		vptablePtr:=->[CP_OrderXRef]
+		vpnumberPtr:=->[Samples]SampleNumber
+	: ($1="SG")  //Sample Garment
+		vtVendor:=[Samples]SamGarFactry
+		vpsupplierPtr:=->[Samples]SamGarFactry
+		vptablePtr:=->[Samples]
+		vpnumberPtr:=->[Samples]SampleNumber
+	: ($1="SF")  //Sample Garment
+		vtVendor:=[SampleFabrics]Fabric Source
+		vpsupplierPtr:=->[SampleFabrics]Fabric Source
+		vptablePtr:=->[SampleFabrics]
+		vpnumberPtr:=->[SampleFabrics]SampleFab PO Nu
+	: ($1="Spec")  //Sample Garment
+		Array_Vendors 
+		WinFindList (Char(13)+"Select supplier:")
+		If (ok=1)
+			vtVendor:=asVendors{asVendors}
+		End if 
+		vptablePtr:=->[Specs]
+		vpnumberPtr:=->[Specs]Design Num
+	: ($1="FO")
+		vtVendor:=[FabricOrders]VendorName
+		vpsupplierPtr:=->[FabricOrders]VendorName
+		vptablePtr:=->[FabricOrders]
+		vpNumberPtr:=->[FabricOrders]PONumber
+		
+	: ($1="SP")  //Speed Post
+		vpsupplierPtr:=->[Speedpost Form]To Factory
+		vptablePtr:=->[Speedpost Form]
+		vpNumberPtr:=->[Speedpost Form]Package number
+		vtVendor:=""
+		
+	: ($1="DL")
+		vtVendor:=[Designs]Patt Srce
+		vptablePtr:=->[Designs]
+		vpNumberPtr:=->[Designs]DesignNum
+	: ($1="DPY") | ($1="DPN")
+		vptablePtr:=->[DLPages]
+		vpNumberPtr:=->[DesignLines]DesignLineKey
+	Else 
+		vpsupplierPtr:=->[Orders]Factory
+		vptablePtr:=->[Orders]
+		vpnumberPtr:=->[Orders]OrderNum
+End case 
+CREATE SET(vptablePtr->;"List")

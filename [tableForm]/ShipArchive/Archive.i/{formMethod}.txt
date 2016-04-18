@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (Form event=On Load)
+	vsPart1:=""
+	vsPart2:=""
+	ARRAY TEXT(asList1;0)
+	ARRAY LONGINT(alOrders;0)
+	ARRAY TEXT(asSheetNames;0)
+	
+	QUERY([ShipInvoices];[ShipInvoices]ArchiveKey=[ShipArchive]ArchiveKey)
+	
+	If (Is new record([ShipArchive]))
+		[ShipArchive]ArchiveDate:=Current date(*)
+		[ShipArchive]Archivist:=Current user
+		[ShipArchive]ArchiveKey:=Sequence number([ShipArchive])
+	Else 
+		SELECTION TO ARRAY([ShipInvoices]InvNumber;asList1;[ShipInvoices]PO;alOrders;[ShipInvoices]SheetName;asSheetNames)
+		
+	End if 
+	If ([ShipArchive]FilePath="")
+		OBJECT SET ENABLED(bGet;False)
+		OBJECT SET ENABLED(bSave;True)
+	Else 
+		OBJECT SET ENABLED(bGet;True)
+		OBJECT SET ENABLED(bSave;False)
+	End if 
+End if 

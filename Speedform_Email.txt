@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([Speedpost Form]Package number="")
+		WinPrompt ("Form is not ready to ship.")
+	Else 
+		Email_Confirm ("SP";"Speed Post")
+End case 
+

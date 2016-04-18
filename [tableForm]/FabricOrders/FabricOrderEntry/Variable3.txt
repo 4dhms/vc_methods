@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CONFIRM("This tool will strip off lines you don't want to report."+Char(13)+Char(13)+"Click Keep if you want to keep it in the list.";"Continue";"Stop")
+If (ok=1)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+	ORDER BY([CP_OrderXRef];[CP_OrderXRef]OrderNumber;>;[CP_OrderXRef]XrefID;>)
+	
+	FIRST RECORD([FabricOrders])
+	$i:=1
+	For ($i;1;Records in selection([CP_OrderXRef]))
+		WinChoice ("PO "+String([CP_OrderXRef]OrderNumber)+" "+[CP_OrderXRef]CPType;"Keep";"Remove")
+		If (ok=0)
+			[CP_OrderXRef]FabOrderKey:=0
+			SAVE RECORD([CP_OrderXRef])
+		End if 
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+End if 

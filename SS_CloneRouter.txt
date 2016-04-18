@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //vlCloneRouter
+  //1=Specsheet only
+  //2=Both
+  //3=Grade only
+
+If (asSGOrder{asSGOrder}="Old Style")
+	vlCloneRouter:=-1
+Else 
+	WinChoice ("What do you want to copy?";"Specsheet Only";"Plus Grading")
+	If (ok=1)
+		vlCloneRouter:=1
+	Else 
+		vlCloneRouter:=2
+	End if 
+	
+	If (vlCloneRouter=3)
+		OBJECT SET ENABLED(bNew;False)
+	Else 
+		OBJECT SET ENABLED(bNew;True)
+	End if 
+End if 

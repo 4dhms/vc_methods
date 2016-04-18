@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If ([SpecLibrary]SpecLibKey=0)
+		[SpecLibrary]SpecLibKey:=Sequence number([SpecLibrary])
+		SAVE RECORD([SpecLibrary])
+	End if 
+End if 

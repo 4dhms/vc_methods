@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asUsers{asUsers}="All") | (asUsers=0)
+	WinChoice ("Is this appointment for "+Current user+"?")
+	If (ok=1)
+		asUsers:=Find in array(asUsers;Current user)
+		FORM SET INPUT([Appts];"Meeting.i")
+		If (Screen height>580)
+			ADD RECORD([Appts];*)
+		Else 
+			ADD RECORD([Appts])
+		End if 
+	Else 
+		asUsers:=0
+		ALERT("Select someone else.")
+	End if 
+Else 
+	FORM SET INPUT([Appts];"Meeting.i")
+	If (Screen height>580)
+		ADD RECORD([Appts];*)
+	Else 
+		ADD RECORD([Appts])
+	End if 
+End if 
+
+Cal_FindSched 
+Cal_WindowTitle 
+ORDER BY([Appts];[Appts]ApptStart;>;[Appts]ApptEnd;>)

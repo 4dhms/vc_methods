@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Drop)
+		INSERT IN ARRAY(asList1;1;1)
+		asList1{1}:=asCustomers{asCustomers}
+		SORT ARRAY(asList1;>)
+	: (Form event=On Double Clicked)
+		DELETE FROM ARRAY(asList1;asList1;1)
+End case 

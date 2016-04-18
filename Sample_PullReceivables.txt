@@ -1,0 +1,139 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$order;$c)
+C_TEXT($color1;$color2;$sgpo;$season;$year)
+C_LONGINT($background)
+ARRAY LONGINT($livecount;0)
+
+Sample_ReceivingInit (0)
+$background:=16777215
+
+Case of 
+	: (asDivisions<2)
+		WinPrompt ("Select Division")
+	: (<>asSeasonName<2)
+		WinPrompt ("Select Season")
+	: (<>asSeasonYear<2)
+		WinPrompt ("Select Year")
+	Else 
+		If (asDivisions>1)
+			QUERY([Samples];[Samples]SampleDivision=asDivisions{asDivisions};*)
+		Else 
+			ALL RECORDS([Samples])
+		End if 
+		CREATE SET([Samples];"division")
+		
+		If (Size of array(asSearchSeason)>0)
+			$i:=1
+			CREATE EMPTY SET([Samples];"season")
+			For ($i;1;Size of array(asSearchSeason))
+				$c:=Position(" 20";asSearchSeason{$i})
+				$season:=Substring(asSearchSeason{$i};1;$c-1)
+				$year:=Substring(asSearchSeason{$i};$c+1;4)
+				USE SET("division")
+				QUERY SELECTION([Samples];[Samples]SeasonName=$season;*)
+				QUERY SELECTION([Samples]; & ;[Samples]SeasonYear=$year)
+				CREATE SET([Samples];"temp")
+				UNION("temp";"season";"season")
+			End for 
+			USE SET("season")
+			CLEAR SET("season")
+			CLEAR SET("temp")
+			CLEAR SET("division")
+		End if 
+		Case of 
+			: (cb4=1) & (cb5=1)
+				QUERY SELECTION([Samples];[Samples]Sam Type="Proto Sample";*)
+				QUERY SELECTION([Samples]; | ;[Samples]Sam Type="Sales Sample")
+			: (cb4=1)
+				QUERY SELECTION([Samples];[Samples]Sam Type="Proto Sample")
+			: (cb5=1)
+				QUERY SELECTION([Samples];[Samples]Sam Type="Sales Sample")
+		End case 
+		
+		QUERY SELECTION([Samples];[Samples]Void=False)
+		If (asFactories>1)
+			QUERY SELECTION([Samples];[Samples]SamGarFactry=asFactories{asFactories})
+		End if 
+		
+		ORDER BY([Samples];[Samples]StyleNum;>)
+		
+		$i:=1
+		FIRST RECORD([Samples])
+		For ($i;1;Records in selection([Samples]))
+			$order:=-1*[Samples]SampleNumber
+			$sgpo:=String([Samples]SampleNumber)
+			
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+			
+			ARRAY LONGINT($selfkeys;0)
+			DISTINCT VALUES([CP_OrderXRef]CPOrdID;$selfkeys)
+			$n:=1
+			For ($n;1;Size of array($selfkeys))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkeys{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 1")
+				
+				If (Records in selection([CP_OrderXRef])=0)
+					$color2:=""
+				Else 
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+					$color2:=[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName
+				End if 
+				
+				QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkeys{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				$color1:=[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName
+				
+				QUERY([Orders];[Orders]SGPO=$sgpo)
+				QUERY SELECTION([Orders];[Orders]SGPO#"")
+				
+				Case of 
+					: (Records in selection([Orders])>0) & (cb1=1)
+						  //In production
+					: (cb2=1) & ([Samples]DesignNum#"57@")
+						  //Cut & Sew
+					: ([Samples]Sam Type="Proto Sample") & ([CP_OrderXRef]CPStatus="Rcvd Proto")
+						  //Leave off
+					: ([CP_OrderXRef]CPStatus="Recd") | ([CP_OrderXRef]CPStatus="Recd Sample") & ([Samples]Sam Type="Sales Sample")
+						  //Leave off
+					Else 
+						If (Find in array($livecount;[Samples]SampleNumber)<1)
+							APPEND TO ARRAY($livecount;[Samples]SampleNumber)
+						End if 
+						
+						APPEND TO ARRAY(alPOrder;[Samples]SampleNumber)
+						APPEND TO ARRAY(asStyleNumbers;[Samples]StyleNum)
+						APPEND TO ARRAY(asDesignNumbers;[Samples]DesignNum)
+						APPEND TO ARRAY(asXFactory;[Samples]SamGarFactry)
+						APPEND TO ARRAY(asColor1;$color1)
+						APPEND TO ARRAY(asColor2;$color2)
+						Case of 
+							: ([Samples]Sam Type="Proto@")
+								APPEND TO ARRAY(asSampleTypes;"Proto")
+							: ([Samples]Sam Type="Sales@")
+								APPEND TO ARRAY(asSampleTypes;"Sales")
+							Else 
+								APPEND TO ARRAY(asSampleTypes;"")
+						End case 
+						
+						APPEND TO ARRAY(afReceived;False)
+						
+						APPEND TO ARRAY(adStatusDate;!00-00-00!)
+						APPEND TO ARRAY(alXrefkeys;[CP_OrderXRef]SelfKey)
+						APPEND TO ARRAY(alBDColor;$background)
+				End case 
+			End for 
+			If ($background=16777215)
+				$background:=14149350
+			Else 
+				$background:=16777215
+			End if 
+			NEXT RECORD([Samples])
+		End for 
+		
+End case 
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([Orders])
+vlRecCount:=Size of array($livecount)

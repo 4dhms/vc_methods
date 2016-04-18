@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($color)
+
+$color:=$1
+If (Length($color)>$4)
+	$color:=Replace string($color;$2;$3)
+End if 
+$0:=$color

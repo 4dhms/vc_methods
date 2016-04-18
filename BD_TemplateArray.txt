@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asTemplates;0)
+
+ALL RECORDS([BDTemplates])
+SELECTION TO ARRAY([BDTemplates]Template;asTemplates)
+SORT ARRAY(asTemplates;>)
+
+INSERT IN ARRAY(asTemplates;1;2)
+asTemplates{1}:="Templates"
+asTemplates{2}:="Add Template"
+
+asTemplates:=1

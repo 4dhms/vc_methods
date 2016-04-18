@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+
+  //If (Find in array(asCostLines;$1)>0)
+$show:=True
+If (Position("Self";$1)>0) | (Position("Combo";$1)>0)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+	Case of 
+		: (Position("Self";$1)>0)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+			vtFabric1:=[OrdersFabricXRef]FabricName
+			vStyle1:=[OrdersFabricXRef]FiberContent
+			vtStitch1:=[OrdersFabricXRef]FabricName+" ("+[OrdersFabricXRef]FiberContent+")"
+		: (Position("Combo 1";$1)>0)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 1")
+			vtFabric2:=[OrdersFabricXRef]FabricName
+			vStyle2:=[OrdersFabricXRef]FiberContent
+			vtStitch2:=[OrdersFabricXRef]FabricName+" ("+[OrdersFabricXRef]FiberContent+")"
+		: (Position("Combo 2";$1)>0)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 2")
+			vtFabric3:=[OrdersFabricXRef]FabricName
+			vStyle3:=[OrdersFabricXRef]FiberContent
+			vtStitch4:=[OrdersFabricXRef]FabricName+" ("+[OrdersFabricXRef]FiberContent+")"
+		: (Position("Combo 3";$1)>0)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 3")
+			vtFabric4:=[OrdersFabricXRef]FabricName
+			vStyle4:=[OrdersFabricXRef]FiberContent
+			vtStitch4:=[OrdersFabricXRef]FabricName+" ("+[OrdersFabricXRef]FiberContent+")"
+	End case 
+End if 
+
+  //Else 
+  //$show:=False
+  //End if 
+
+OBJECT SET VISIBLE(*;$2;$show)
+OBJECT SET VISIBLE($3->;$show)
+OBJECT SET VISIBLE($4->;$show)
+OBJECT SET VISIBLE($5->;$show)

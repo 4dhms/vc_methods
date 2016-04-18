@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CREATE EMPTY SET([Orders];"uni")
+
+ARRAY TEXT($designs;0)
+
+FIRST RECORD([Orders])
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	If (Find in array($designs;[Orders]DesignNumber)<1)
+		ADD TO SET([Orders];"uni")
+		APPEND TO ARRAY($designs;[Orders]DesignNumber)
+	End if 
+	NEXT RECORD([Orders])
+End for 
+
+USE SET("uni")
+CLEAR SET("uni")
+ORDER BY([Orders];[Orders]DesignNumber)

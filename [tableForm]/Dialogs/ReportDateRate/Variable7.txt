@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vlReportQuant:=0
+vrRptNetSales:=0
+vrRptNetProfit:=0
+vrRptNetNetSales:=0
+vrRptNetNetProfit:=0
+vrRptSpecDisc:=0
+vrRptAvgNetMarkup:=0
+vrRptAvgNetNetMarkup:=0
+vlReportQuantBD:=0
+vrRptNetSalesBD:=0
+vrRptNetProfitBD:=0
+vrRptNetNetSalesBD:=0
+vrRptNetNetProfitBD:=0
+vrRptSpecDiscBD:=0
+vrRptAvgNetMarkupBD:=0
+vrRptAvgNetNetMarkupBD:=0
+ACCEPT

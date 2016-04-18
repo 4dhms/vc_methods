@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($option)
+C_LONGINT($i)
+ARRAY TEXT($factories;0)
+LIST TO ARRAY("Factory";$factories)
+SORT ARRAY($factories;>)
+INSERT IN ARRAY($factories;1;1)
+$factories{1}:="Factory List"
+
+If (1=2)
+	$option:="<OPTION>Factory List")
+	For ($i;1;Size of array(<>asQuery))
+		$option:=$option+"<OPTION>$factories{$i})"
+	End for 
+	$0:=Char(1)+$option
+End if 
+
+
+C_LONGINT($i)
+C_TEXT($option)
+
+$option:="<OPTION>"
+For ($i;1;Size of array($factories))
+	If ($i=1)
+		$option:=$option+"<OPTION SELECTED>"
+	Else 
+		$option:=$option+"<OPTION>"
+	End if 
+	$option:=$option+$factories{$i}
+End for 
+$0:=Char(1)+$option
+
+

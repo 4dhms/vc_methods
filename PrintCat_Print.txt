@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$printpage)
+
+QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+ORDER BY([PCPage];[PCPage]PageNumber;>)
+WinChoice ("Do you want to print all pages"+Char(13)+"or just one?";"All";"One Page")
+If (ok=1)
+	$printpage:=0
+Else 
+	$printpage:=Num(Request("What page do you want to print?"))
+	If (ok=0)
+		$printpage:=-1
+	End if 
+End if 
+
+If ($printpage>-1)
+	
+	FIRST RECORD([PCPage])
+	SET PRINT OPTION(Orientation option;2)
+	PRINT SETTINGS
+	
+	If (ok=1)
+		
+		$i:=1
+		For ($i;1;Records in selection([PCPage]))
+			vsPrintingHeader:=String($i)+" of "+String(Records in selection([PCPage]))
+			
+			  //prints one or all
+			If ($printpage=$i) | ($printpage=0)
+				If ([PCPage]PageTitle#"")
+					vtTitle:=[PCPage]PageTitle
+				Else 
+					vtTitle:=[PCatalog]PCName
+				End if 
+				
+				PrintCat_GetPix (1;[PCPage]Print1)
+				PrintCat_GetPix (2;[PCPage]Print2)
+				PrintCat_GetPix (3;[PCPage]Print3)
+				PrintCat_GetPix (4;[PCPage]Print4)
+				PrintCat_GetPix (5;[PCPage]Print5)
+				PrintCat_GetPix (6;[PCPage]Print6)
+				PrintCat_GetPix (7;[PCPage]Print7)
+				PrintCat_GetPix (8;[PCPage]Print8)
+				PrintCat_GetPix (9;[PCPage]Print9)
+				PrintCat_GetPix (10;[PCPage]Print10)
+				
+				Print form([PCPage];"Prints.p")
+				If ($i<Records in selection([PCPage])) & ($printpage=0)
+					PAGE BREAK(>)
+				Else 
+					PAGE BREAK
+				End if 
+			End if 
+			NEXT RECORD([PCPage])
+		End for 
+	End if 
+End if 

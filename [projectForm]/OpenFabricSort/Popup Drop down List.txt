@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked)
+		<>asVendorTypes{1}:="Show All"
+		Case of 
+			: (<>asVendorTypes{<>asVendorTypes}="Show All")
+				ALL RECORDS([FabricOrders])
+			: (<>asVendorTypes{<>asVendorTypes}="Fabric")
+				QUERY([FabricOrders];[FabricOrders]POType=0)
+			: (<>asVendorTypes{<>asVendorTypes}="Button")
+				QUERY([FabricOrders];[FabricOrders]POType=1)
+			: (<>asVendorTypes{<>asVendorTypes}="Trim")
+				QUERY([FabricOrders];[FabricOrders]POType=2)
+		End case 
+		  //ORDER BY([Vendors];[Vendors]VendorName;<)
+		p_VendorArray_Build 
+		ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)
+		FabricPullDown 
+		vsSubhead:=Uppercase(<>asVendorTypes{<>asVendorTypes}+" Orders")
+		SET WINDOW TITLE(<>asVendorTypes{<>asVendorTypes}+" Orders")
+End case 

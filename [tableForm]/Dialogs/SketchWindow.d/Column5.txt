@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vsArticle#"")
+		vsNewGarmentPart:=vsArticle
+		OBJECT SET ENABLED(bOk;True)
+	: (asSpareParts>0)
+		vsNewGarmentPart:=asSpareParts{asSpareParts}
+		OBJECT SET ENABLED(bOk;True)
+End case 
+
+If (vsNewGarmentPart#"") & (Form event=On Double Clicked)
+	ACCEPT
+End if 

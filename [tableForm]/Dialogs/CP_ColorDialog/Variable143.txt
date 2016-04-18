@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	vdCPStatusDate:=Current date
+	CP_StatusChange 
+	If (vsCPStatus="R@D Proto")
+		[Samples]SampleReceived:=vdCPStatusDate
+	End if 
+End if 

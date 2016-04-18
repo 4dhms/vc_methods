@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($sizeptr)
+C_LONGINT($subKey)
+CREATE SET([Sizes];"Grid")
+
+If (<>asGradeCat>1)
+	$subKey:=[SpecFactory]SF_KeyNumber*-1
+	QUERY([Sizes];[Sizes]SF_KeyNumber=$subKey)
+	
+	QUERY([SpecGradeCats];[SpecGradeCats]ACatName=<>asGradeCat{<>asGradeCat})
+	vsSize1:=[SpecGradeCats]ACol1
+	vsSize2:=[SpecGradeCats]ACol2
+	vsSize3:=[SpecGradeCats]ACol3
+	vsSize4:=[SpecGradeCats]ACol4
+	vsSize5:=[SpecGradeCats]ACol5
+	vsSize6:=[SpecGradeCats]ACol6
+	vsSize7:=[SpecGradeCats]ACol7
+	vsSize8:=[SpecGradeCats]ACol8
+	vsSize9:=[SpecGradeCats]ACol9
+	vsSize10:=[SpecGradeCats]ACol10
+	vsSize11:=[SpecGradeCats]ACol11
+	vsSize12:=[SpecGradeCats]ACol12
+	
+	If (Records in selection([Sizes])=0)
+		CREATE RECORD([Sizes])
+		[Sizes]SpecLineKey:=[SpecSheetLines]SpecLineKey
+		[Sizes]SF_KeyNumber:=$subKey
+		SAVE RECORD([Sizes])
+		ADD TO SET([Sizes];"Grid")
+	Else 
+		
+		[Sizes]Size1:=vsSize1
+		[Sizes]Size2:=vsSize2
+		[Sizes]Size3:=vsSize3
+		[Sizes]Size4:=vsSize4
+		[Sizes]Size5:=vsSize5
+		[Sizes]Size6:=vsSize6
+		[Sizes]Size7:=vsSize7
+		[Sizes]Size8:=vsSize8
+		[Sizes]Size9:=vsSize9
+		[Sizes]Size10:=vsSize10
+		[Sizes]Size11:=vsSize11
+		[Sizes]Size12:=vsSize12
+		SAVE RECORD([Sizes])
+		
+	End if 
+	USE SET("Grid")
+	CLEAR SET("Grid")
+	
+	Grade_FindSampleCol 
+	$sizeptr:=Get pointer("vsSize"+String(vlColSlider))
+	[SpecFactory]SampleCol:=vlColSlider
+	SS_MovePointer (vlColSlider)
+	SS_ClearArray 
+	Grade_FindSteps 
+End if 
+
+

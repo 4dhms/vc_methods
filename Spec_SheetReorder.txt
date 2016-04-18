@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+CREATE SET([SpecSheetLines];"SheetLines")
+$i:=1
+For ($i;1;Size of array(asList1))
+	USE SET("SheetLines")
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SpecLineKey=alItemNumber{$i})
+	[SpecSheetLines]SortOrder:=$i
+	SAVE RECORD([SpecSheetLines])
+	QUERY([Sizes];[Sizes]SpecLineKey=[SpecSheetLines]SpecLineKey;*)
+	QUERY([Sizes]; & ;[Sizes]SF_KeyNumber>0)
+	
+	[Sizes]SortOrder:=$i
+	SAVE RECORD([Sizes])
+End for 
+
+USE SET("SheetLines")
+CLEAR SET("SheetLines")
+ORDER BY([SpecSheetLines];[SpecSheetLines]SortOrder;>)
+ACCEPT

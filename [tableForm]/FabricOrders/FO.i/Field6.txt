@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($pref)
+
+If (Form event=On Data Change)
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[FabricOrders]ArticleNo)
+	$pref:=Substring([FabricOrders]PONumber;1;2)
+	If ($pref="FB")
+		QUERY SELECTION([FabricLibrary];[FabricLibrary]Type=0)
+	Else 
+		QUERY SELECTION([FabricLibrary];[FabricLibrary]Type=2)
+	End if 
+	If (Records in selection([FabricLibrary])=0)
+		WinPrompt ("Article number "+[FabricOrders]ArticleNo+" does not exist in the Fabric Library.")
+		[FabricOrders]ArticleNo:=""
+	End if 
+End if 

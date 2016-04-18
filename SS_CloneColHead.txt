@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCopyFrom)
+C_LONGINT($i)
+
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=$1)
+Util_RecordNumberArray (Table(->[SpecLineSample]))
+
+$i:=1
+For ($i;1;Size of array(alRecordNumber))
+	GOTO RECORD([SpecLineSample];alRecordNumber{$i})
+	DUPLICATE RECORD([SpecLineSample])
+	[SpecLineSample]SF_KeyNumber:=$2
+	[SpecLineSample]From:="From "+vsCopyFrom
+	
+	SAVE RECORD([SpecLineSample])
+End for 

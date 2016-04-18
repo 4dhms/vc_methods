@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		If (Selected record number([FabricOrders])=1) | (Records in selection([FabricOrders])=1)
+			OBJECT SET ENABLED(bFrstHMS;False)
+			OBJECT SET ENABLED(bPrvHMS;False)
+		Else 
+			OBJECT SET ENABLED(bFrstHMS;True)
+			OBJECT SET ENABLED(bPrvHMS;True)
+		End if 
+		FabPO_FM_Entry 
+	: (Form event=On Unload)
+End case 

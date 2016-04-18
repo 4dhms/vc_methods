@@ -1,0 +1,96 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$libKey;$sort;$subKey)
+C_TEXT($descrip)
+
+$i:=1
+QUERY([Sizes];[Sizes]SF_KeyNumber=$1)
+CREATE SET([Sizes];"OldSizes")
+  //
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=$1)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+CREATE SET([SpecSheetLines];"OldLines")
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=$2)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+CREATE SET([SpecSheetLines];"NewLines")
+
+$i:=1
+
+
+For ($i;1;Size of array(alNewSpecLineKeys))
+	QUERY([SpecSheetLines];[SpecSheetLines]SpecLineKey=alNewSpecLineKeys{$i})
+	$descrip:=[SpecSheetLines]OtherDescription
+	$libKey:=[SpecSheetLines]SpecLibKey
+	USE SET("OldLines")
+	Case of 
+		: ($descrip#"")
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]OtherDescription=$descrip)
+		: ($libKey>0)
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SpecLibKey=$libKey)
+	End case 
+	If (Records in selection([SpecSheetLines])>0)
+		QUERY([Sizes];[Sizes]SpecLineKey=[SpecSheetLines]SpecLineKey)
+		QUERY SELECTION([Sizes];[Sizes]SF_KeyNumber>0)
+		If (Records in selection([Sizes])>0)
+			$sort:=[Sizes]SortOrder
+			ARRAY TEXT($sizes;13)
+			$sizes{1}:=[Sizes]Size1
+			$sizes{2}:=[Sizes]Size2
+			$sizes{3}:=[Sizes]Size3
+			$sizes{4}:=[Sizes]Size4
+			$sizes{5}:=[Sizes]Size5
+			$sizes{6}:=[Sizes]Size6
+			$sizes{7}:=[Sizes]Size7
+			$sizes{8}:=[Sizes]Size8
+			$sizes{9}:=[Sizes]Size9
+			$sizes{10}:=[Sizes]Size10
+			$sizes{11}:=[Sizes]Size11
+			$sizes{12}:=[Sizes]Size12
+			$sizes{13}:=[Sizes]Tolerance
+			
+			QUERY([Sizes];[Sizes]SpecLineKey=alNewSpecLineKeys{$i})
+			
+			Case of 
+				: (Records in selection([Sizes])=0)
+					CREATE RECORD([Sizes])
+					[Sizes]SF_KeyNumber:=$2
+					[Sizes]SpecLineKey:=alNewSpecLineKeys{$i}
+				: (Records in selection([Sizes])>1)
+					DELETE SELECTION([Sizes])
+					CREATE RECORD([Sizes])
+					[Sizes]SF_KeyNumber:=$2
+					[Sizes]SpecLineKey:=alNewSpecLineKeys{$i}
+					SAVE RECORD([Sizes])
+			End case 
+			[Sizes]SortOrder:=$sort
+			[Sizes]Size1:=$sizes{1}
+			[Sizes]Size2:=$sizes{2}
+			[Sizes]Size3:=$sizes{3}
+			[Sizes]Size4:=$sizes{4}
+			[Sizes]Size5:=$sizes{5}
+			[Sizes]Size6:=$sizes{6}
+			[Sizes]Size7:=$sizes{7}
+			[Sizes]Size8:=$sizes{8}
+			[Sizes]Size9:=$sizes{9}
+			[Sizes]Size10:=$sizes{10}
+			[Sizes]Size11:=$sizes{11}
+			[Sizes]Size12:=$sizes{12}
+			[Sizes]Tolerance:=$sizes{13}
+			SAVE RECORD([Sizes])
+		End if 
+	End if 
+End for 
+
+$subKey:=-1*$2
+QUERY([Sizes];[Sizes]SF_KeyNumber=$subKey)
+If (Records in selection([Sizes])=0)
+	$subKey:=-1*$1
+	QUERY([Sizes];[Sizes]SF_KeyNumber=$subKey)
+	DUPLICATE RECORD([Sizes])
+	[Sizes]SF_KeyNumber:=-1*$2
+	SAVE RECORD([Sizes])
+End if 
+
+QUERY([SpecFactory];[SpecFactory]SF_KeyNumber=$2)
+SS_Sizing 
+FORM GOTO PAGE(3)

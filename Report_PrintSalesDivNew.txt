@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vfNew:=True
+If (vlRouter=1)
+	FORM SET OUTPUT([ReportGenerator];"DivisionSales")
+	ORDER BY([ReportGenerator]Divison;>;[ReportGenerator]Factory;>)
+	BREAK LEVEL(1)
+	ACCUMULATE([ReportGenerator]Quantity;[ReportGenerator]NetSales;[ReportGenerator]NetProfit;[ReportGenerator]SpecialDiscount;[ReportGenerator]NetNetSales;[ReportGenerator]NetNetProfit;[ReportGenerator]AvgNetMarkup;[ReportGenerator]AvgNetNetMarkup)
+Else 
+	FORM SET OUTPUT([ReportGenerator];"FactorySales")
+End if 
+PAGE SETUP([ReportGenerator];"DivisionSales")
+Print_Selection (->[ReportGenerator])

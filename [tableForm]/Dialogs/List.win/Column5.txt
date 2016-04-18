@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE RECORD([Lists])
+[Lists]ListItem:=atAllListContents{atAllListContents}
+[Lists]ListName:=vsList1Name
+[Lists]UserName:=Current user
+Case of 
+	: (cbKnit=1)
+		[Lists]KWCS:="Knit"
+	: (cbWoven=1)
+		[Lists]KWCS:="Woven"
+	: (cbCutSew=1)
+		[Lists]KWCS:="CutSew"
+End case 
+SAVE RECORD([Lists])
+INSERT IN ARRAY(atListContents;1;1)
+atListContents{1}:=atAllListContents{atAllListContents}
+DELETE FROM ARRAY(atAllListContents;atAllListContents;1)
+
+Case of 
+	: ([Lists]ListName="Fabric")
+		<>atFabricList{1}:=[Lists]ListItem
+		SORT ARRAY(<>atFabricList;>)
+		INSERT IN ARRAY(<>atFabricList;1;1)
+		<>atFabricList{1}:="Add to list"
+		
+	: ([Lists]ListName="Fiber")
+		<>atFiberList{1}:=[Lists]ListItem
+		SORT ARRAY(<>atFiberList;>)
+		INSERT IN ARRAY(<>atFiberList;1;1)
+		<>atFiberList{1}:="Add to list"
+		
+	: ([Lists]ListName="Treatment")
+		<>atTreatmentList{1}:=[Lists]ListItem
+		SORT ARRAY(<>atTreatmentList;>)
+		INSERT IN ARRAY(<>atTreatmentList;1;1)
+		<>atTreatmentList{1}:="Add to list"
+		
+	: ([Lists]ListName="Supplier")
+		<>atSupplierList{1}:=[Lists]ListItem
+		SORT ARRAY(<>atSupplierList;>)
+		INSERT IN ARRAY(<>atSupplierList;1;1)
+		<>atSupplierList{1}:="Add to list"
+		
+	: ([Lists]ListName="Part")
+		<>atPartList{1}:=[Lists]ListItem
+		SORT ARRAY(<>atPartList;>)
+		INSERT IN ARRAY(<>atPartList;1;1)
+		<>atPartList{1}:="Add to list"
+		
+End case 
+

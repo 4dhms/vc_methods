@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in set("SalesReport")>0)
+	CLEAR SET("SalesReport")
+End if 
+ACCEPT
+ALL RECORDS([Orders])

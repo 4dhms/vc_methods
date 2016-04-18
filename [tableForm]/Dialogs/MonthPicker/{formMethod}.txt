@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	ARRAY TEXT(<>asStartMonth;14)
+	<>asStartMonth{1}:="January"
+	<>asStartMonth{2}:="February"
+	<>asStartMonth{3}:="March"
+	<>asStartMonth{4}:="April"
+	<>asStartMonth{5}:="May"
+	<>asStartMonth{6}:="June"
+	<>asStartMonth{7}:="July"
+	<>asStartMonth{8}:="August"
+	<>asStartMonth{9}:="September"
+	<>asStartMonth{10}:="October"
+	<>asStartMonth{11}:="November"
+	<>asStartMonth{12}:="December"
+	<>asStartMonth{13}:="All"
+	<>asStartMonth{14}:="Cancel"
+	<>asStartMonth:=0
+	ARRAY TEXT(<>asStartYear;3)
+	<>asStartYear{1}:=String(Year of(Current date(*))-1)
+	<>asStartYear{2}:=String(Year of(Current date(*)))
+	<>asStartYear{3}:=String(Year of(Current date(*))+1)
+	<>asStartYear:=2
+End if 

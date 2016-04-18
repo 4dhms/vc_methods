@@ -1,0 +1,31 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Appts];[Appts]ApptDate=vdCalToday)
+If (asDivisions>1)
+	QUERY SELECTION([Appts];[Appts]Division=asDivisions{asDivisions})
+End if 
+
+CREATE SET([Appts];"Glean")
+
+If (asUsers{asUsers}#"All")
+	$i:=1
+	FIRST RECORD([Appts])
+	For ($i;1;Records in selection([Appts]))
+		QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey;*)
+		QUERY([Attendees]; & ;[Attendees]Attendee=asUsers{asUsers})
+		QUERY SELECTION([Attendees];[Attendees]Customer=False)
+		
+		If (Records in selection([Attendees])<1)
+			REMOVE FROM SET([Appts];"Glean")
+		End if 
+		NEXT RECORD([Appts])
+	End for 
+	
+	USE SET("Glean")
+	CLEAR SET("Glean")
+End if 
+
+ORDER BY([Appts];[Appts]ApptStart;>;[Appts]ApptEnd;>)
+
+Cal_WindowTitle 

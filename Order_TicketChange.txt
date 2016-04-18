@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($oldfactory;$oldcustomer)
+
+If ([Orders]PriceTicket)
+	[Orders]PriceTicket:=False
+	[Orders]Price_Tckt_Sent:=""
+End if 
+
+$oldfactory:=Old([Orders]Factory)
+$oldcustomer:=Old([Orders]Customer)
+
+If ($oldfactory#[Orders]Factory) & ($oldfactory#"") & (<>vlRevisionNumber>0)
+	QUERY([Digest];[Digest]Processed=True)
+	If (Records in selection([Digest])=0) | (Locked([Digest]))
+		CREATE RECORD([Digest])
+	Else 
+		FIRST RECORD([Digest])
+	End if 
+	
+	[Digest]Processed:=False
+	[Digest]ChangeDate:=Current date(*)
+	[Digest]ChangeMessage:="Factory changed from "+$oldfactory+" to "+[Orders]Factory
+	[Digest]Changer:="factory change"
+	[Digest]DesignNumber:=[Orders]DesignNumber
+	[Digest]StyleNumber:=[Orders]StyleNumber
+	[Digest]Factory:=[Orders]Customer
+	[Digest]OrderNumber:=[Orders]OrderNum
+	SAVE RECORD([Digest])
+End if 
+
+If ($oldcustomer#[Orders]Customer)
+	QUERY([Digest];[Digest]Processed=True)
+	If (Records in selection([Digest])=0) | (Locked([Digest]))
+		CREATE RECORD([Digest])
+	Else 
+		FIRST RECORD([Digest])
+	End if 
+	[Digest]Processed:=False
+	[Digest]ChangeDate:=Current date(*)
+	[Digest]ChangeMessage:="Customer changed from "+$oldcustomer+" to "+[Orders]Customer
+	[Digest]Changer:="customer change"
+	[Digest]DesignNumber:=[Orders]DesignNumber
+	[Digest]StyleNumber:=[Orders]StyleNumber
+	[Digest]Factory:=[Orders]Customer
+	[Digest]OrderNumber:=[Orders]OrderNum
+	SAVE RECORD([Digest])
+End if 
+
+  //End if 
+UNLOAD RECORD([Digest])
+

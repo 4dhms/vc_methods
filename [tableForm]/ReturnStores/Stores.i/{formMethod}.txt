@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		If (Is new record([ReturnStores]))
+			[ReturnStores]StoreID:=Sequence number([ReturnStores])
+			REDUCE SELECTION([RMA];0)
+		Else 
+			QUERY([RMA];[RMA]StoreID=[ReturnStores]StoreID)
+			ORDER BY([RMA];[RMA]RMAkey;<)
+		End if 
+End case 
+

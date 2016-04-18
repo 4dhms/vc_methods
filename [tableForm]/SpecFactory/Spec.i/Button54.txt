@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([SpecFactory]OrderNumber=0)
+	WinPrompt ("Garments without a sample or production order can not be graded.")
+Else 
+	SS_GradeButton 
+End if 

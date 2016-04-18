@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$sample)
+
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"CS")
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	$sample:=Abs([CP_OrderXRef]OrderNumber)
+	If ([CP_OrderXRef]OrderNumber>0)
+		QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+		If (Records in selection([Orders])=0)
+			ADD TO SET([CP_OrderXRef];"CS")
+		End if 
+	Else 
+		QUERY([Samples];[Samples]SampleNumber=$sample)
+		If (Records in selection([Samples])=0)
+			ADD TO SET([CP_OrderXRef];"CS")
+		End if 
+	End if 
+	
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+USE SET("CS")
+CLEAR SET("CS")
+
+ALERT("Done")

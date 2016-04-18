@@ -1,0 +1,149 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($dynamic)
+C_DATE($srchDate)
+C_TIME($docRef)
+C_TEXT($path)
+C_LONGINT($i;$dynamicLT)
+C_TEXT($datestamp)
+UNLOAD RECORD([Preferences])
+
+  //QUERY([Orders];[Orders]Customer="Winners";*)
+  //QUERY([Orders]; | ;[Orders]Customer="TK Maxx@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="Boston Proper@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="CATO@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="Gordmans@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="Manteaux Manteaux@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="ricki@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="Simons@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="TK Maxx@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="Dress Barn@";*)
+  //QUERY([Orders]; | ;[Orders]Customer="TJX UK")
+
+$srchDate:=Current date(*)
+QUERY([Orders];[Orders]CancelDate>=$srchDate)
+QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"")
+
+PreCarton_DueCalc 
+
+ORDER BY([Orders];[Orders]NeedBy;>;[Orders]Customer;>;[Orders]OrderNum;>)
+
+If (Application type=5) | (Current user="Spooler")
+	$datestamp:=Replace string(String($srchDate);"/";"_")
+	$path:=PDF_FindFolder +":Missing_"+$datestamp+".xls"
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	$docRef:=Create document("";"xls")
+	$path:=Document
+End if 
+
+SEND PACKET($docRef;"PO"+Char(9))
+SEND PACKET($docRef;"Style"+Char(9))
+SEND PACKET($docRef;"Division"+Char(9))
+SEND PACKET($docRef;"Customer PO"+Char(9))
+SEND PACKET($docRef;"Factory"+Char(9))
+SEND PACKET($docRef;"Customer"+Char(9))
+SEND PACKET($docRef;"Coordimator"+Char(9))
+SEND PACKET($docRef;"X Factory"+Char(9))
+SEND PACKET($docRef;"Cancel Date"+Char(9))
+SEND PACKET($docRef;"Quantity"+Char(9))
+SEND PACKET($docRef;"DC & Pre-Carton Info"+Char(9))
+SEND PACKET($docRef;"Price Ticket"+Char(9))
+SEND PACKET($docRef;"Need By"+Char(13))
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+	SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+	If ([Orders]DivisionOverride)
+		SEND PACKET($docRef;[Orders]OrderDivision+Char(9))
+	Else 
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		SEND PACKET($docRef;[Designs]DivisionCodeN+Char(9))
+	End if 
+	SEND PACKET($docRef;[Orders]CustPONumber+Char(9))
+	SEND PACKET($docRef;[Orders]Factory+Char(9))
+	SEND PACKET($docRef;[Orders]Customer+Char(9))
+	SEND PACKET($docRef;[Orders]Coordinator+Char(9))
+	SEND PACKET($docRef;String([Orders]ShipDateFactory)+Char(9))
+	SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+	SEND PACKET($docRef;String([Orders]TotalOrderQuantity;"###,###,##0")+Char(9))
+	Case of 
+		: (Not([Orders]PC)) & ([Orders]DCInfo)
+			SEND PACKET($docRef;"Missing PC"+Char(9))
+		: (Not([Orders]DCInfo)) & ([Orders]PC)
+			SEND PACKET($docRef;"Missing DC"+Char(9))
+		: (Not([Orders]DCInfo)) & (Not([Orders]PC))
+			SEND PACKET($docRef;"Missing Both"+Char(9))
+		Else 
+			SEND PACKET($docRef;""+Char(9))
+	End case 
+	
+	If (Not([Orders]PriceTicket))
+		SEND PACKET($docRef;"Missing Price Ticket"+Char(9))
+		Case of 
+			: ([Orders]Factory="@Now Cor@") | ([Orders]Factory="@Sara@Co@")
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+			: ([Orders]Factory="@Weaver App@")
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+				
+			: ([Orders]Factory="Glory@") | ([Orders]Factory="@CMW@")
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+			: ([Orders]Factory="@Rudiger@") | ([Orders]Factory="@Wangmian@") | ([Orders]Factory="@Fungyun@") | ([Orders]Factory="Yunting@")
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+			: ([Orders]Factory="@Azul Clothing@") | ([Orders]Factory="@Alan Menchel@") | ([Orders]Factory="@Granco@") | ([Orders]Factory="@XYD@")
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+			: ([Orders]Factory="JW@") | ([Orders]Factory="AO@")
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+			Else 
+				SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+		End case 
+	Else 
+		SEND PACKET($docRef;Char(9)+" "+Char(13))
+	End if 
+	NEXT RECORD([Orders])
+End for 
+CLOSE DOCUMENT($docRef)
+If (Application type=5) | (Current user="Spooler")
+	ARRAY TEXT(asSubCC;0)
+	APPEND TO ARRAY(asSubCC;"tcli@nubby.com")
+	APPEND TO ARRAY(asSubCC;"claudia@nubby.com")
+	APPEND TO ARRAY(asSubCC;"davids@nubby.com")
+	APPEND TO ARRAY(asSubCC;"spenser@nubby.com")
+	APPEND TO ARRAY(asSubCC;"marisol@nubby.com")
+	APPEND TO ARRAY(asSubCC;"joseph@nubby.com")
+	APPEND TO ARRAY(asSubCC;"chris@nubby.com")
+	APPEND TO ARRAY(asSubCC;"linli@nubby.com")
+	
+	APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+	APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+	
+	APPEND TO ARRAY(asSubCC;"bing@nubby.com")
+	APPEND TO ARRAY(asSubCC;"amanda.gonzalez@nubby.com")
+	APPEND TO ARRAY(asSubCC;"nestor@nubby.com")
+	APPEND TO ARRAY(asSubCC;"darlinys.fernandez@nubby.com")
+	APPEND TO ARRAY(asSubCC;"nicole@nubby.com")
+	APPEND TO ARRAY(asSubCC;"thomas@nubby.com")
+	APPEND TO ARRAY(asSubCC;"aaron.bell@nubby.com")
+	APPEND TO ARRAY(asSubCC;"morgan@nubby.com")
+	APPEND TO ARRAY(asSubCC;"lina@nubby.com")
+	APPEND TO ARRAY(asSubCC;"jody.remache@nubby.com")
+	APPEND TO ARRAY(asSubCC;"jessica@nubby.com")
+	APPEND TO ARRAY(asSubCC;"melaniem@nubby.com")
+	APPEND TO ARRAY(asSubCC;"aldo@nubby.com")
+	APPEND TO ARRAY(asSubCC;"sales@nubby.com")
+	
+	APPEND TO ARRAY(asSubCC;"ken.tsui@nubby.com")
+	APPEND TO ARRAY(asSubCC;"elaine.yang@nubby.com")
+	
+	Mail_SimpleSend ("List";$path;"Missing Ticket Report ("+String($srchdate)+")";"Attached is the new missing ticket report."+Char(13)+Char(13))
+Else 
+	SHOW ON DISK($path)
+End if 
+
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([Orders])
+

@@ -1,0 +1,94 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;vlOldKey)
+C_POINTER($fieldptr)
+
+If (Records in set("ThisSheet")<1)
+	CREATE SET([CostSheets];"ThisSheet")
+End if 
+
+If (vfImport)
+	vfImport:=False
+	ADD TO SET([CostSheets];"ThisSheet")
+	USE SET("ThisSheet")
+	
+	CLEAR SET("ThisSheet")
+	ARRAY LONGINT(alSheetKeys;0)
+	ARRAY TEXT(asSheetNames;0)
+	ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames;[CostSheets]SheetID;alSheetKeys)
+	LOAD RECORD([CostSheets])
+	asSheetNames:=Find in array(asSheetNames;[CostSheets]SheetName)
+Else 
+	If (Records in selection([CostSheets])<1)
+		vlOldKey:=0
+		CREATE RECORD([CostSheets])
+		If (Current user="Designer")
+			[CostSheets]Cushion:=0
+		Else 
+			[CostSheets]Cushion:=0.3
+		End if 
+		[CostSheets]SheetNumber:=vlNewSheetNumber
+		[CostSheets]Figurer:=0
+		[CostSheets]DCS:=<>vfDCS
+	Else 
+		[CostSheets]SheetNumber:=vlNewSheetNumber
+		
+		If (vfImport)
+		Else 
+			vlOldKey:=[CostSheets]SheetID
+			DUPLICATE RECORD([CostSheets])
+			CREATE SET([CostSheets];"ActiveSheet")
+			[CostSheets]SheetNumber:=vlNewSheetNumber
+			[CostSheets]FreightOldAir:=0
+			[CostSheets]FreightOldBoat:=0
+			
+			If (vfImport)
+				[CostSheets]Figurer:=0
+			End if 
+		End if 
+	End if 
+	ADD TO SET([CostSheets];"ThisSheet")
+	Cost_AddNewFields 
+	
+	
+	INSERT IN ARRAY(asSheetNames;1;1)
+	asSheetNames{1}:=[CostSheets]SheetName
+	asSheetNames:=Find in array(asSheetNames;[CostSheets]SheetName)
+	
+	If ([CostSheets]DCS)
+		DCS_AddNew 
+		ADD TO SET([CostSheets];"ThisSheet")
+	Else 
+		Cost_EntryCalculate 
+		If (Records in set("ThisSheet")>0)
+			ADD TO SET([CostSheets];"ThisSheet")
+		End if 
+		
+		  //USE SET("ThisSheet")
+		  //CLEAR SET("ThisSheet")
+		ORDER BY([CostSheets];[CostSheets]SheetID;<)
+		
+		If ([Costing]OrderNumber#<>vlOrderNumber)
+			QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+		End if 
+		[Costing]OpenSheetID:=vlOpenSheetID
+		[Costing]OpenColNumber:=Records in selection([CostSheets])+1
+		SAVE RECORD([Costing])
+	End if 
+	
+	If (<>vlOrderNumber>0)
+		[Orders]LastCostSheet:=[CostSheets]SheetName
+		SAVE RECORD([Orders])
+	Else 
+		[Samples]LastCostSheet:=[CostSheets]SheetName
+		SAVE RECORD([Samples])
+	End if 
+	
+	$i:=1
+	For ($i;1;Get last field number(53))
+		If (Is field number valid(53;$i))
+			$fieldptr:=Field(53;$i)
+			OBJECT SET ENTERABLE($fieldptr->;True)
+		End if 
+	End for 
+End if 

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	Case of 
+		: ([FabricOrders]POType=0)
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[FabPOLines]ColorPrint)
+			If (Records in selection([ColorPrintNumber])=0)
+				vsFabColor:=[FabPOLines]ColorPrint+" "+[FabPOLines]ColorName
+			Else 
+				vsFabColor:=[FabPOLines]ColorPrint+" "+[ColorPrintNumber]CPName
+			End if 
+			
+		: ([FabricOrders]POType=1)
+			vsCol:=[FabPOLines]Ligne
+			vsFabColor:=[FabPOLines]ColorPrint
+		Else 
+			vsCol:=[FabPOLines]POWidth
+			vsFabColor:=[FabPOLines]ColorPrint
+			
+	End case 
+	If ([FabPOLines]Changed)
+		FabPO_ColorCode (3)
+	Else 
+		FabPO_ColorCode (0)
+	End if 
+End if 

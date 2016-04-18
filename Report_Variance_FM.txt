@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(bPreview;<>vlNewOrdSum>0)
+		Report_LoadArrays 
+	: (Form event=On Display Detail)
+		QUERY([Invoices];[Invoices]OrderNumber=[Orders]OrderNum)
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		vlNetSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+		
+		vlInvQty:=Sum([Invoices]InvoiceQuantity)
+		vlDiff:=[Orders]TotalOrderQuantity-vlInvQty
+		If (vlDiff=0)
+			vlDiffPC:=0
+		Else 
+			vlDiffPC:=100-Round((vlDiff/[Orders]TotalOrderQuantity)*100;0)
+		End if 
+		vlDiffPC:=Round((vlDiff/[Orders]TotalOrderQuantity)*100;0)
+		vrRptNetSales:=Sum([Invoices]InvoiceAmount)
+		vlDiffSales:=Round(vlNetSales-vrRptNetSales;2)
+		If (vlDiffSales=0)
+			vlDiffSalesPC:=0
+		Else 
+			vlDiffSalesPC:=100-Round((vlDiffSales/vlNetSales)*100;0)
+		End if 
+		
+	: (Form event=On Unload)
+		<>vfFactory:=False
+		If (Records in set("Orders")>0)
+			CLEAR SET("Orders")
+		End if 
+End case 

@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		GET WINDOW RECT(vlLeft;vlTop;vlRight;vlBottom)
+		ARRAY TEXT(asMmtType;8)
+		asMmtType{1}:="Measurement Term"
+		asMmtType{2}:="Sweaters/Knits"
+		asMmtType{3}:="Dresses/Coats"
+		asMmtType{4}:="Bottoms"
+		asMmtType{5}:="Blouses"
+		asMmtType{6}:="Jackets"
+		asMmtType{7}:="Outfits"
+		asMmtType{8}:="Panties"
+		asMmtType:=1
+		
+		C_LONGINT($height)
+		If (Screen height-70>730)
+			$height:=730
+		Else 
+			$height:=Screen height-70
+		End if 
+		
+		  //Win_Resize (615;$height)
+		
+		
+		Case of 
+			: ([Specs]Design Num="") & (Record number([Specs])<1) & (vsDesignNumber#"")
+				[Specs]Design Num:=vsDesignNumber
+			: ([Specs]Design Num="") & (Record number([Specs])<1)
+				[Specs]Design Num:=[Designs]DesignNum
+		End case 
+	: (Form event=On Close Box)
+		SET WINDOW RECT(vlLeft;vlTop;vlRight;vlBottom)
+		
+End case 

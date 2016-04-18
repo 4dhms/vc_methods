@@ -1,0 +1,94 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asFabric;0)
+ARRAY TEXT(asFiber;0)
+ARRAY TEXT(asTreatment;0)
+ARRAY TEXT(<>asFactories;0)
+ARRAY LONGINT(alUnits;0)
+ARRAY TEXT(asOrderNumbers;0)
+C_BOOLEAN($stop)
+C_LONGINT($i;$production)
+
+READ ONLY([OrdersFabricXRef])
+READ ONLY([CP_OrderXRef])
+READ ONLY([Orders])
+READ ONLY([Samples])
+
+  //If (Size of array(atFabrication)=0)
+  //$fablist:=True
+  //End if 
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+
+CREATE EMPTY SET([OrdersFabricXRef];"Fabrics")
+If (Records in selection([CP_OrderXRef])>200)
+	WinPrompt ("There are "+String(Records in selection([CP_OrderXRef]))+" uses of that color. List will be shortened.")
+	ORDER BY([CP_OrderXRef];[CP_OrderXRef]OrderNumber;<)
+	REDUCE SELECTION([CP_OrderXRef];100)
+End if 
+
+vlTotalUnits:=0
+$production:=0
+$i:=1
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]OrderNumber;>)
+
+ARRAY LONGINT($selfkey;0)
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	If (Find in array($selfkey;[CP_OrderXRef]SelfKey)<1)
+		APPEND TO ARRAY($selfkey;[CP_OrderXRef]SelfKey)
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+For ($i;1;Size of array($selfkey))
+	$stop:=False
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$selfkey{$i})
+	If ([CP_OrderXRef]OrderNumber>0)
+		QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+		If ([Orders]Cancelled)
+			$stop:=True
+		End if 
+	Else 
+		QUERY([Samples];[Samples]SampleNumber=Abs([CP_OrderXRef]OrderNumber))
+		If ([Samples]Void)
+			$stop:=True
+		End if 
+	End if 
+	
+	If ($stop)
+		  //cancelled
+	Else 
+		If ([CP_OrderXRef]OrderNumber<0)
+			APPEND TO ARRAY(asOrderNumbers;"SG"+String(Abs([CP_OrderXRef]OrderNumber)))
+		Else 
+			APPEND TO ARRAY(asOrderNumbers;String([CP_OrderXRef]OrderNumber))
+			$production:=$production+1
+			vlTotalUnits:=vlTotalUnits+[CP_OrderXRef]Quantity
+		End if 
+		APPEND TO ARRAY(alUnits;[CP_OrderXRef]Quantity)
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkey{$i})
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+		APPEND TO ARRAY(asFabric;[OrdersFabricXRef]FabricName)
+		APPEND TO ARRAY(asFiber;[OrdersFabricXRef]FiberContent)
+	End if 
+End for 
+  //If ($fablist)
+  //SORT ARRAY(atFabrication;>)
+  //INSERT IN ARRAY(atFabrication;1;1)
+  //atFabrication{1}:="Fabrication"
+  //atFabrication:=1
+  //
+  //SORT ARRAY(asDivisions;>)
+  //INSERT IN ARRAY(asDivisions;1;1)
+  //asDivisions{1}:="Division"
+  //asDivisions:=1
+  //End if 
+
+If (vlTotalUnits=0)
+	vtFootNote:="This color was not used on an order."
+Else 
+	vtFootNote:="Total units using this color on production orders is "+String(vlTotalUnits;"###,###,##0")+" for an average of "+String(Round(vlTotalUnits/$production;1);"###,###,##0.0")+" units per order."
+End if 

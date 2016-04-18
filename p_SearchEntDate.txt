@@ -1,0 +1,35 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_DATE($querydate)
+
+  //global to search for order number in hms
+SAVE RECORD([Orders])
+CREATE SET([Orders];"DesPreSet")
+If (Records in selection([Orders])=0)
+	ALL RECORDS([Orders])
+Else 
+End if 
+WinFind ("Enter Order Date:")
+If (OK=0)
+	USE SET("DesPreSet")
+	p_SetWindowHMS 
+	CLEAR SET("DesPreSet")
+Else 
+	$queryDate:=Date(vsRequestString)
+	If (vAddTo=1)
+		QUERY([Orders];[Orders]OrderEntryDate=$queryDate)
+		CREATE SET([Orders];"DesignSGSet")
+		UNION("DesPreSet";"DesignSGSet";"NewSGSet")
+		CLOSE WINDOW
+		CLEAR SET("DesSGSet")
+		CLEAR SET("DesPreSet")
+		USE SET("NewSGSet")
+		p_SetWindowHMS 
+		CLEAR SET("NewSGSet")
+	Else 
+		QUERY([Orders];[Orders]OrderEntryDate=$queryDate)
+		CLEAR SET("DesPreSet")
+		CLOSE WINDOW
+		p_SetWindowHMS 
+	End if 
+End if 
+p_InputLayHMS 

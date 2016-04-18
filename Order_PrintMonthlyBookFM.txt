@@ -1,0 +1,116 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL(vNetUnitPrc)
+C_REAL(vrTotalSales1)
+C_LONGINT($monthNo)  //
+C_LONGINT(vProdStQty)
+C_REAL(vTotSales)
+C_BOOLEAN(vfDivision)
+
+
+  //
+Case of 
+	: (Form event=On Header)
+		OBJECT SET VISIBLE([Orders]Customer;(Not(<>vfFactory) & (Not(vfDivision))))
+		OBJECT SET VISIBLE([Orders]Factory;(<>vfFactory & (Not(vfDivision))))
+		OBJECT SET VISIBLE([Orders]OrderDivision;vfDivision)
+		vsPrintingHeader:="Printed: "+String(Current date(*))+"   Page: "+String(Printing page)
+	: (Form event=On Printing Detail)
+		<>vlOrderNumber:=[Orders]OrderNum
+		
+		If (<>vfFactory)
+			If (vsFactory#[Orders]Factory)
+				vlShipAmt:=0
+				vlShipQtySub:=0
+				vlShipAmtSub:=0
+				vlShipQtyTot:=0
+				vlShipAmtTot:=0
+				vlInvQtySub:=0
+				vlInvAmtSub:=0
+				vTotSales:=0
+				vlSubtotal:=0
+			End if 
+			If (vsMonthSorter#[Orders]MonthSorter)
+				vlShipQtySub:=0
+				vlShipAmtSub:=0
+				vlInvQtySub:=0
+				vlInvAmtSub:=0
+				vTotSales:=0
+			End if 
+		Else 
+			If (vsCustomer#[Orders]Customer)
+				vlSubtotal:=0
+				
+				vlShipAmt:=0
+				vlShipQtySub:=0
+				vlShipAmtSub:=0
+				vlShipQtyTot:=0
+				vlShipAmtTot:=0
+				vlInvQtySub:=0
+				vlInvAmtSub:=0
+				vTotSales:=0
+			End if 
+			If (vsMonthSorter#[Orders]MonthSorter)
+				vlShipQtySub:=0
+				vlShipAmtSub:=0
+				vlInvQtySub:=0
+				vlInvAmtSub:=0
+				vTotSales:=0
+			End if 
+		End if 
+		
+		vlNetSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+		vNetUnitPrc:=Round([Orders]Price*((100-[Orders]NetDiscount)/100);2)
+		vTotSales:=vTotSales+vlNetSales
+		vlSubtotal:=vlSubTotal+vlNetSales
+		vlGrossAmt:=vlGrossAmt+vlNetSales
+		Report_MB_PullInv 
+		vsFactory:=[Orders]Factory
+		vsCustomer:=[Orders]Customer
+		vsMonthSorter:=[Orders]MonthSorter
+		
+		  //
+	: (Form event=On Printing Break)
+		Report_PullAvgPrice 
+		OBJECT SET VISIBLE([Orders]Customer;(Not(<>vfFactory) & (Not(vfDivision))))
+		OBJECT SET VISIBLE([Orders]Factory;(<>vfFactory & (Not(vfDivision))))
+		OBJECT SET VISIBLE([Orders]OrderDivision;vfDivision)
+		vProdStQty:=Subtotal([Orders]TotalOrderQuantity)
+		$monthNo:=Num(Substring([Orders]MonthSorter;6;2))
+		
+		Case of 
+			: (vfDivision)
+				vtDateFlag:=[Orders]OrderDivision
+			: ($monthNo=1)
+				vtDateFlag:="January"
+			: ($monthNo=2)
+				vtDateFlag:="February"
+			: ($monthNo=3)
+				vtDateFlag:="March"
+			: ($monthNo=4)
+				vtDateFlag:="April"
+			: ($monthNo=5)
+				vtDateFlag:="May"
+			: ($monthNo=6)
+				vtDateFlag:="June"
+			: ($monthNo=7)
+				vtDateFlag:="July"
+			: ($monthNo=8)
+				vtDateFlag:="August"
+			: ($monthNo=9)
+				vtDateFlag:="September"
+			: ($monthNo=10)
+				vtDateFlag:="October"
+			: ($monthNo=11)
+				vtDateFlag:="November"
+			: ($monthNo=12)
+				vtDateFlag:="December"
+			Else 
+				vtDateFlag:=""
+		End case 
+		If (vtDateFlag#"")
+			vtDateFlag:=vtDateFlag+" / "+Substring([Orders]MonthSorter;1;4)
+		End if 
+End case 
+
+
+

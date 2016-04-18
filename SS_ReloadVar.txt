@@ -1,0 +1,4 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+<>vlOrderNumber:=[SpecFactory]OrderNumber
+<>vsStyleNumber:=vStyle
+<>vsDesignNumber:=vDesign

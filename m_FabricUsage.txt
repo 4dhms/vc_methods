@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlFabricUsageProc)
+
+Case of 
+	: (<>vlFabricUsageProc>0)
+		SHOW PROCESS(<>vlFabricUsageProc)
+		BRING TO FRONT(<>vlFabricUsageProc)
+	: (<>vlFabricUsageProc=0)
+		<>vlFabricUsageProc:=New process("Fabric_UsageProc";0;"Inventory";"")
+	Else 
+		SHOW PROCESS(<>vlFabricUsageProc)
+		BRING TO FRONT(<>vlFabricUsageProc)
+End case 

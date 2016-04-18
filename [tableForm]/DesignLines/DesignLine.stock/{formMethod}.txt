@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$year)
+
+Case of 
+	: (Form event=On Load)
+		If (Is new record([DesignLines]))
+			[DesignLines]DLCreationDate:=Current date(*)
+			[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+			[DesignLines]DLCreator:=Current user
+			[DesignLines]Stock:=True
+			[DesignLines]TextSize:=9
+			[DesignLines]TextFont:="Helvetica"
+			[DesignLines]Pubdate:=Current date(*)
+			
+			ARRAY TEXT(asSeasonName;0)
+			ARRAY BOOLEAN(afReceived;0)
+			$year:=Year of(Current date(*))-1
+			$i:=1
+			For ($i;1;3)
+				APPEND TO ARRAY(asSeasonName;"Fall "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Holiday "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Resort "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Spring "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Spring II "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Summer "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Transition "+String($year))
+				APPEND TO ARRAY(asSeasonName;"Downtime "+String($year))
+				$year:=$year+1
+			End for 
+			ARRAY BOOLEAN(afReceived;Size of array(asSeasonName))
+			OBJECT SET SCROLL POSITION(afListBox1;15)
+			
+			
+			CP_BuildDivArray (-1)
+			DELETE FROM ARRAY(asDivisions;1;1)
+			ARRAY BOOLEAN(afInventory;0)
+			ARRAY BOOLEAN(afInventory;Size of array(asDivisions))
+			FORM GOTO PAGE(2)
+			
+		Else 
+			Picture_BatchRestore 
+			DL_UpdateStock 
+			DL_AddDivArray 
+		End if 
+		vsFlag:=String(Records in selection([DesignLineIncluded]))
+	: (Form event=On Unload)
+		UNLOAD RECORD([DesignLineIncluded])
+		UNLOAD RECORD([DesignLines])
+		
+End case 

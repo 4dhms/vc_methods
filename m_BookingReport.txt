@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlReportProc)
+C_LONGINT($i;$weightedtot)
+
+ARRAY TEXT($users;0)
+APPEND TO ARRAY($users;"Designer")
+APPEND TO ARRAY($users;"Spenser")
+APPEND TO ARRAY($users;"Nubby")
+APPEND TO ARRAY($users;"Lou")
+APPEND TO ARRAY($users;"August")
+APPEND TO ARRAY($users;"Zoe")
+APPEND TO ARRAY($users;"Dusha")
+APPEND TO ARRAY($users;"Lai Mun")
+APPEND TO ARRAY($users;"Lorna")
+
+
+Case of 
+	: (Find in array($users;Current user)<1)
+		WinPrompt ("See Spenser for access.")
+	: (Shift down)
+		Array_BuildDates 
+		$i:=1
+		vlTotQty:=0
+		vlTotNetSales:=0
+		$weightedtot:=0
+		FIRST RECORD([Orders])
+		
+		For ($i;1;Records in selection([Orders]))
+			vlTotQty:=vlTotQty+[Orders]TotalOrderQuantity
+			vlTotNetSales:=vlTotNetsales+Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+			NEXT RECORD([Orders])
+		End for 
+		vrAvgPriceTot:=Round(vlTotNetSales/vlTotQty;2)
+		
+		SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+		FORM SET OUTPUT([Orders];"MnthlyBkRep Out")
+		MODIFY SELECTION([Orders];*)
+		CLOSE WINDOW
+		
+	: (<>vlReportProc>0)
+		SHOW PROCESS(<>vlReportProc)
+		BRING TO FRONT(<>vlReportProc)
+	: (<>vlReportProc=0)
+		ARRAY LONGINT(<>alSection;0)
+		If (Table name(Current form table)="Orders")
+			LONGINT ARRAY FROM SELECTION([Orders];<>alSelection)
+		End if 
+		<>vlReportProc:=New process("p_MthBookRep";0;"Summary")
+		
+	Else 
+		SHOW PROCESS(<>vlReportProc)
+		HIDE PROCESS(<>vlReportProc)
+		BRING TO FRONT(<>vlReportProc)
+End case 

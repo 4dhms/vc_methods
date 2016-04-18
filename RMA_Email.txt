@@ -1,0 +1,80 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($record;1)
+C_BOOLEAN($continue)
+C_TEXT($message)
+
+$continue:=False
+
+If (<>vtMailFrom="")
+	Email_CheckUserAddress 
+	If (<>vtMailFrom="")
+		WinPrompt ("There is something wrong with your return email address. Please restart 4D.")
+	Else 
+		$continue:=True
+	End if 
+Else 
+	$continue:=True
+End if 
+
+Case of 
+	: ([RMA]Credit) & ([RMA]ShipBack)
+		$message:="Return required for credit."
+	: (Not([RMA]Credit)) & ([RMA]ShipBack)
+		$message:="Return required for replacement."
+	: ([RMA]Credit) & (Not([RMA]ShipBack))
+		$message:="Return not required for credit."
+	: (Not([RMA]Credit)) & (Not([RMA]ShipBack))
+		$message:="Return not required for replacement"
+End case 
+
+$message:="Attached is Return Authorization Number "+String([RMA]RMAkey)+". "+$message
+
+If ($continue)
+	
+	$record{1}:=Record number([RMA])
+	
+	Case of 
+		: ([ReturnStores]StoreEmail="")
+			ARRAY TEXT(asSubCC;1)
+			asSubCC{1}:="susanc@nubby.com"
+		: ($1)
+			ARRAY TEXT(asSubCC;2)
+			asSubCC{1}:=[ReturnStores]StoreEmail
+			asSubCC{2}:="susanc@nubby.com"
+		Else 
+			ARRAY TEXT(asSubCC;1)
+			asSubCC{1}:="susanc@nubby.com"
+	End case 
+	  //APPEND TO ARRAY(asSubCC{3};"spenser@nubby.com")
+	
+	
+	vfToSpenser:=False
+	
+	QUERY([Spooler];[Spooler]Waiting=False;*)
+	QUERY([Spooler]; & ;[Spooler]SpoolLog=False)
+	QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+	
+	If (Records in selection([Spooler])<1) | (Locked([Spooler]))
+		CREATE RECORD([Spooler])
+	Else 
+		Spooler_ClearSprocket 
+	End if 
+	[Spooler]RecordNumber:=[RMA]RMAkey
+	[Spooler]SpoolKey:=Sequence number([Spooler])
+	<>vlMailKey:=[Spooler]SpoolKey
+	[Spooler]Waiting:=True
+	[Spooler]Attempts:=0
+	[Spooler]ReturnAddress:=<>vtMailFrom
+	[Spooler]SpoolRouter:=1
+	[Spooler]OutputChoice:=0
+	[Spooler]Status:=1
+	[Spooler]SpoolMessage:=$message
+	[Spooler]User:=Current user
+	[Spooler]MachineName:=Current machine owner
+	VARIABLE TO BLOB(asSubCC;[Spooler]AddressListBlob)
+	VARIABLE TO BLOB($record;[Spooler]OrderArrayBlob)
+	[Spooler]Genre:="RMA"
+	SAVE RECORD([Spooler])
+	UNLOAD RECORD([Spooler])
+End if 
+

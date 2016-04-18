@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE([Designs]DivisionCodeN;Not([Samples]DivisionOverride))
+OBJECT SET VISIBLE([Samples]SampleDivision;([Samples]DivisionOverride))
+
+  //vtOldData:=[Samples]SampleDivision
+If ([Samples]DivisionOverride)
+	GOTO OBJECT([Samples]SampleDivision)
+Else 
+	[Samples]SampleDivision:=[Designs]DivisionCodeN
+End if 
+  //Rev_LogEvent ("Division Router";vtOldData;[Samples]SampleDivision)
+
+

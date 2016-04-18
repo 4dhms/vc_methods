@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbMini=1)
+	cbComments:=0
+	cbComponents:=0
+	cbHistory:=0
+	cbStatus:=0
+	cbIssues:=0
+	cbAll:=0
+	cbUnresolved:=0
+End if 

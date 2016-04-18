@@ -1,0 +1,92 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($tableptr;$fieldptr;$arrayptr)
+C_LONGINT($i;$high;$tableno;$type)
+C_TEXT($value;$tablename;$fieldname)
+
+Case of 
+	: ($1=2) & ([Orders]RevisionNumber=0)
+		  //
+	Else 
+		$tableno:=$1
+		$tableptr:=Table($tableno)
+		$tablename:=Table name($tableptr)
+		$high:=Get last field number($tableptr)
+		
+		$i:=1
+		For ($i;1;$high)
+			If (Is field number valid($tableno;$i))
+				$fieldptr:=Field($tableno;$i)
+				$fieldname:=Field name($fieldptr)
+				Case of 
+					: ($fieldname="NYFabNot")
+						  //
+					: ($fieldname="NotPrinted")
+						  //
+					: ($fieldname="Revised")
+						  //
+					: ($fieldname="RevisionKey")
+						  //
+					: ($fieldname="RevisionNumber") & ($tableno=2)
+						  //
+					: ($fieldname="POOpen")
+						  //
+					: ($fieldname="FlagChange")
+						  //
+					Else 
+						GET FIELD PROPERTIES($tableno;$i;$type)
+						Case of 
+							: ($type=0) | ($type=2)
+								$value:=$fieldptr->
+							: ($type=30)
+								  //BLOB
+							: ($type=3)
+								  //Picture
+							: ($type=6)
+								If ($fieldptr->)
+									$value:="True"
+								Else 
+									$value:="False"
+								End if 
+							: ($type=4)
+								$value:=String($fieldptr->)
+							: ($type=8) | ($type=25) | ($type=9) | ($type=1)
+								$value:=String($fieldptr->)
+							: ($type=11)
+								$value:=String($fieldptr->)
+						End case 
+						If ($value#atOldFieldValues{$i})
+							CREATE RECORD([Changes])
+							Case of 
+								: ($tablename="Orders")
+									[Changes]RevisionNumber:=[Orders]RevisionNumber
+									[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber*0.01)
+									[Changes]OrderNumber:=[Orders]OrderNum
+									[Changes]TableNum:=2
+								: ($tablename="Samples")
+									[Changes]RevisionNumber:=[Samples]RevisionNumber
+									[Changes]RevisionKey:=([Samples]SampleNumber+([Samples]RevisionNumber*0.01))*-1
+									[Changes]OrderNumber:=-1*[Samples]SampleNumber
+									[Changes]TableNum:=3
+							End case 
+							[Changes]RevDate:=Current date(*)
+							[Changes]RevTime:=Current time(*)
+							[Changes]Writer:=Current user
+							[Changes]ChangeKey:=Sequence number([Changes])
+							[Changes]Tag:="Changed"
+							[Changes]FieldNum:=$i
+							[Changes]Tag:="Changed"
+							[Changes]FieldName:=Rev_NameOrdField ($fieldName)
+							[Changes]OldData:=atOldFieldValues{$i}
+							[Changes]NewChange:=$value
+							
+							  //If (asPOv{asPOv}="Cancelled")
+							  //[Changes]OldData:="Quantity: "+String([Orders]TotalOrderQuantity)
+							  //End if 
+							
+							SAVE RECORD([Changes])
+							UNLOAD RECORD([Changes])
+						End if 
+				End case 
+			End if 
+		End for 
+End case 

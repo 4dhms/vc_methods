@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($fixedKey)
+
+Case of 
+	: (Form event=On Getting Focus)
+	: (Form event=On Data Change)
+		Sample_RequiredFlag 
+		
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		SG_UpdateKWCS 
+		$fixedKey:=[Samples]SampleNumber*-1
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=$fixedKey)
+		If (Records in selection([SpecFactory])>0) & ([SpecFactory]DesignNumber#[Samples]DesignNum)
+			[SpecFactory]DesignNumber:=[Samples]DesignNum
+			SAVE RECORD([SpecFactory])
+		End if 
+		UNLOAD RECORD([SpecFactory])
+		
+		QUERY([CS_Lines];[CS_Lines]OrderNumber=$fixedKey)
+		QUERY SELECTION([CS_Lines];[CS_Lines]CS_ID=0;*)
+		QUERY SELECTION([CS_Lines]; & ;[CS_Lines]SpecSheet=True)
+		FIRST RECORD([CS_Lines])
+		If (Records in selection([CS_Lines])>0) & ([CS_Lines]DesignNumber#[Samples]DesignNum)
+			APPLY TO SELECTION([CS_Lines];[CS_Lines]DesignNumber:=[Samples]DesignNum)
+		End if 
+		UNLOAD RECORD([CS_Lines])
+		
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=<>vlOrderNumber)
+		[SpecFactory]DesignNumber:=[Orders]DesignNumber
+		SAVE RECORD([SpecFactory])
+		
+		SG_CupioFix 
+End case 

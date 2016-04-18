@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (Find in array(asXStyleNumbers;vsStyleNumber)<1) & (vsStyleNumber#"")
+		APPEND TO ARRAY(asXStyleNumbers;vsStyleNumber)
+		GOTO OBJECT(vsStyleNumber)
+		vsStyleNumber:=""
+	End if 
+End if 

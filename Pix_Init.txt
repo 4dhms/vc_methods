@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($empty)
+
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+vxSketch1:=$empty
+vxSketch2:=$empty
+vxSketch3:=$empty
+vxSketch4:=$empty
+vtField1:=""
+vtField2:=""
+vtField3:=""
+vtField4:=""
+vtField11:=""
+vtField12:=""
+vtField13:=""
+vtField14:=""

@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]StyleNumber=$1;*)
+QUERY([Orders]; & ;[Orders]OrderNum#<>vlOrderNumber)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+If (Records in selection([Orders])=0)
+	<>vtBDTest:="NG"
+Else 
+	ORDER BY([Orders];[Orders]OrderNum;<)
+	<>vtBDTest:=[Orders]BrkdnCutRatio
+End if 

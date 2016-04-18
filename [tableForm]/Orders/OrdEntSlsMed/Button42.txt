@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($artno)
+
+$artno:=Replace string(vsHeader;"SPEC CHANGE: Article # ";"")
+$c:=Find in array(atArtNumber;$artno)
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+USE SET("fabrics")
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=$artno)
+QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=$artno)
+
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	
+	If ([OrdersFabricXRef]FabricName#[FabricLibrary]FabricName)
+		vtOldData:=[OrdersFabricXRef]FabricName
+		vtNewData:=[FabricLibrary]FabricName
+		Rev_LogEvent ("Art # Update")
+	End if 
+	
+	If ([OrdersFabricXRef]FiberContent#[FabricLibrary]FiberContent)
+		vtOldData:=[OrdersFabricXRef]FiberContent
+		vtNewData:=[FabricLibrary]FiberContent
+		Rev_LogEvent ("Art # Update")
+	End if 
+	
+	[OrdersFabricXRef]FabricName:=[FabricLibrary]FabricName
+	[OrdersFabricXRef]FiberContent:=[FabricLibrary]FiberContent
+	
+	SAVE RECORD([OrdersFabricXRef])
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+
+$c:=1
+For ($c;1;Size of array(atArtNumber))
+	If (atArtNumber{$c}=$artNo)
+		asFabric{$c}:=[FabricLibrary]FabricName
+		asFiber{$c}:=[FabricLibrary]FiberContent
+	End if 
+End for 
+
+UNLOAD RECORD([FabricLibrary])
+ArtNo_Update 
+

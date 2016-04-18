@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Do you want to add a design number?")
+If (ok=1)
+	
+	OBJECT SET VISIBLE([DesignLineIncluded]DesignNumber;True)
+	[DesignLineIncluded]DesignNumber:=""
+	FORM GOTO PAGE(2)
+End if 

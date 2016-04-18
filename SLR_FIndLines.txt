@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([SLRColor];[SLRColor]SLRAcctKey=[SLRAcct]SLRAcctKey)
+QUERY SELECTION([SLRColor];[SLRColor]SLRColor=asColors{asColors})
+
+QUERY([SLRWks];[SLRWks]SLRColorKey=[SLRColor]SLRColorKey)
+QUERY SELECTION([SLRWks];[SLRWks]SLRColorKey>0)
+
+ORDER BY([SLRWks];[SLRWks]SLRWkEnd;<)

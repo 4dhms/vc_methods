@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Before Keystroke)
+		If (Size of array(asColHeader)=0)
+			WinPrompt ("Select a size ratio")
+		End if 
+		
+	: (Form event=On Data Change)
+		adBDRevDate{alBDStores}:=Current date(*)
+		Order_BDTotals 
+End case 

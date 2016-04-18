@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (Shift down)
+	Order_BatchRevision 
+Else 
+	If (Current user="Designer") & (Macintosh command down)
+		CONFIRM("Archive these "+String(Records in selection([Orders]))+" sketches?")
+		If (ok=1)
+			Picture_ArchiveSelection 
+		End if 
+	Else 
+		WinChoice ("Select Batch:";"Revisions";"Color Status";"Cancel")
+		If (ok=1)
+			If (bChoice2=1)
+				Order_BatchApproval 
+			Else 
+				Order_BatchComment 
+			End if 
+		End if 
+	End if 
+End if 

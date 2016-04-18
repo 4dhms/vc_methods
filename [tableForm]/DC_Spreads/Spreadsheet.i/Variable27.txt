@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_LONGINT($packtot)
+
+Case of 
+	: (FORM Get current page=1)
+		If (Find in array(asBDLetter;"@Total@")>0)
+		Else 
+			
+			$packtot:=Util_Array_Sum (->alBDPackTot)
+		End if 
+		
+		Case of 
+			: (vlBDGrandTot=0) | (vlBDGrandTot=[Orders]TotalOrderQuantity)
+			: (vlBDGrandTot>[Orders]TotalOrderQuantity)
+				$message:="Quarder quantity is "+String([Orders]TotalOrderQuantity;"###,##0")+"."+Char(13)+"You have breakdowns for "+String(vlBDGrandTot;"###,##0")+". "
+				$message:=$message+Char(13)+Char(13)+"You are over by "+String(vlBDGrandTot-[Orders]TotalOrderQuantity;"###,##0")+"."
+				WinPrompt ($message)
+			: (vlBDGrandTot<[Orders]TotalOrderQuantity)
+				$message:="Order quantity is "+String([Orders]TotalOrderQuantity;"###,##0")+"."+Char(13)+"You have breakdowns for "+String(vlBDGrandTot;"###,##0")+". "
+				$message:=$message+Char(13)+Char(13)+"You are short by "+String([Orders]TotalOrderQuantity-vlBDGrandTot;"###,##0")+"."
+				WinPrompt ($message)
+		End case 
+		Order_SaveBD 
+		ACCEPT
+	: (FORM Get current page=2)
+		Order_DC_Save 
+		ACCEPT
+	: (FORM Get current page=4)
+		DC_SpreadSave 
+		LISTBOX SELECT ROW(Breakdown;0)
+		
+End case 

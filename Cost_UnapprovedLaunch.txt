@@ -1,0 +1,112 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_DATE($start;$end)
+C_LONGINT($i)
+C_BOOLEAN($add;$exit)
+
+<>CloseBox:=True
+
+Center Window (150;300;1;"")
+DIALOG([Dialogs];"MonthPicker")
+CLOSE WINDOW
+
+If (<>asStartMonth=14) | (<>asStartMonth=0)
+	$exit:=True
+Else 
+	If ($1=1)
+		CREATE EMPTY SET([Orders];"unconfirmed")
+		CREATE EMPTY SET([Orders];"confirmed")
+		CREATE EMPTY SET([Orders];"noFOB")
+	Else 
+		CREATE EMPTY SET([Orders];"unconfirmed")
+		CREATE EMPTY SET([Orders];"confirmed")
+		CREATE EMPTY SET([Orders];"noFOB")
+	End if 
+	
+	
+	If (<>asStartMonth=13)
+		If ($1=1)
+			If (Records in selection([Orders])>5000)
+				WinPrompt ("Please reduce subset to something under 5,000 orders.")
+				$exit:=True
+			Else 
+				$i:=1
+				FIRST RECORD([Orders])
+				For ($i;1;Records in selection([Orders]))
+					QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+					QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+					QUERY SELECTION([CostSheets];[CostSheets]SheetName#"weighted")
+					ORDER BY([CostSheets];[CostSheets]SheetID;<)
+					Cost_UnconFOBAll 
+					NEXT RECORD([Orders])
+				End for 
+			End if 
+		Else 
+			Cost_UnapprovedQuota 
+		End if 
+	Else 
+		$start:=Date("!"+String(<>asStartMonth)+"/1/"+<>asStartYear{<>asStartYear}+"!")
+		If (<>asStartMonth=12)
+			$end:=Date("!1/1/"+String(Num(<>asStartYear{<>asStartYear})+1)+"!")
+		Else 
+			$end:=Date("!"+String(<>asStartMonth+1)+"/1/"+<>asStartYear{<>asStartYear}+"!")
+		End if 
+		
+		
+		QUERY([Orders];[Orders]CancelDate>=$start;*)
+		QUERY([Orders]; & ;[Orders]CancelDate<$end;*)
+		QUERY([Orders]; & ;[Orders]Cancelled=False)
+		
+		$i:=1
+		FIRST RECORD([Orders])
+		For ($i;1;Records in selection([Orders]))
+			QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			QUERY SELECTION([Costing];[CostSheets]SheetName#"weighted")
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			If ([CostSheets]SheetName="Weighted")
+				NEXT RECORD([CostSheets])
+			End if 
+			
+			If ($1=1)
+				Cost_UnconFOBAll 
+			Else 
+				Case of 
+					: ([CostSheets]Quota>0) & ([CostSheets]Quota1Confirm=False)
+						$add:=True
+					: ([CostSheets]Quota2>0) & ([CostSheets]Quota2Confirm=False)
+						$add:=True
+					Else 
+						$add:=False
+				End case 
+			End if 
+			If ($add)
+				ADD TO SET([Orders];"unconfirmed")
+			End if 
+			NEXT RECORD([Orders])
+		End for 
+	End if 
+End if 
+If (Not($exit))
+	If ($1=1)
+		WinChoice ("What are you looking for?";"Unconfirmed";"Confirmed";"No FOB")
+		If (ok=1)
+			If (bChoice2=1)
+				USE SET("Confirmed")
+			Else 
+				USE SET("Unconfirmed")
+			End if 
+		Else 
+			USE SET("NoFOB")
+		End if 
+		CLEAR SET("NoFOB")
+		CLEAR SET("Unconfirmed")
+		CLEAR SET("Confirmed")
+	Else 
+		USE SET("unconfirmed")
+		CLEAR SET("unconfirmed")
+	End if 
+End if 
+
+p_SetWindowHMS 
+
+

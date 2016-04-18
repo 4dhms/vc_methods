@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+SET PRINT OPTION(Orientation option;2)
+PRINT SETTINGS
+If (ok=1)
+	vsPart11:=asSeasonName{asSeasonName}+" "+asSeasonYear{asSeasonYear}
+	vsPart1:="01"+Char(13)+"Blouses"
+	vsPart2:="02"+Char(13)+"Dresses"
+	vsPart3:=Char(13)+"03-Cupio"
+	vsPart6:=Char(13)+"06-C&G"
+	vsPart7:=Char(13)+"07-Ts"
+	vsPart8:="08"+Char(13)+"C&G Sport"
+	vsPart9:="09"+Char(13)+"Spense Knit"
+	vsPart12:="12"+Char(13)+"Melissa Paige"
+	vsPart5:="All"+Char(13)+"Divisions"
+	Print form("PrintUsage_Print")
+	Print form([Orders];"PrintOrder_3pt")
+	Print form("Rule")
+	Print form([Orders];"PrintOrder_3pt")
+	
+	$i:=1
+	For ($i;1;Size of array(asList11))
+		vsPart11:=asList11{$i}
+		vsPart1:=String(arMCol1{$i};"###,###")
+		vsPart2:=String(arMCol2{$i};"###,###")
+		vsPart3:=String(arMCol3{$i};"###,###")
+		vsPart6:=String(arMCol6{$i};"###,###")
+		vsPart7:=String(arMCol7{$i};"###,###")
+		vsPart8:=String(arMCol8{$i};"###,###")
+		vsPart9:=String(arMCol9{$i};"###,###")
+		vsPart12:=String(arMCol12{$i};"###,###")
+		vsPart5:=String(arMCol5{$i};"###,###")
+		Print form("PrintUsage_Print")
+		Print form("Rule")
+		Print form([Orders];"PrintOrder_3pt")
+	End for 
+	
+	PAGE BREAK
+End if 

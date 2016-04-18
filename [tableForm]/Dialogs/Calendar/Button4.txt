@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+ARRAY LONGINT($next;0)
+SELECTION TO ARRAY([Changes]OrderNumber;$next)
+SORT ARRAY($next;<)
+If (Size of array($next)>0)
+	$c:=$next{1}+1
+Else 
+	$c:=1
+End if 
+
+CREATE RECORD([Changes])
+[Changes]RevDate:=Current date(*)
+[Changes]RevTime:=Current time(*)
+[Changes]Writer:=Current user
+[Changes]ChangeKey:=Sequence number([Changes])
+[Changes]FieldName:="todo"
+[Changes]OrderNumber:=$c
+SAVE RECORD([Changes])
+
+QUERY([Changes];[Changes]FieldName="todo")
+ORDER BY([Changes];[Changes]OrderNumber;<)

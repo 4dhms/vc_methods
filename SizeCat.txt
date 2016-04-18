@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>vlOrderNumber>0)
+	If ([Orders]SizeCategory="")
+		WinChoice ("Missing size category:";"Petite";"Missy";"Large";"Cancel")
+		If (ok=1)
+			Case of 
+				: (bChoice2=1)
+					[Orders]SizeCategory:="Missy"
+					rMissy:=1
+				: (bChoice3=1)
+					[Orders]SizeCategory:="Large"
+					rLarge:=1
+				Else 
+					[Orders]SizeCategory:="Petite"
+					rPetite:=1
+			End case 
+		End if 
+	End if 
+Else 
+	If ([Samples]SizeCatagory="")
+		WinChoice ("Missing size category:";"Petite";"Missy";"Large";"Cancel")
+		If (ok=1)
+			Case of 
+				: (bChoice2=1)
+					[Samples]SizeCatagory:="Missy"
+					rMissy:=1
+				: (bChoice3=1)
+					[Samples]SizeCatagory:="Large"
+					rLarge:=1
+				Else 
+					[Samples]SizeCatagory:="Petite"
+					rPetite:=1
+			End case 
+		End if 
+	End if 
+End if 
+

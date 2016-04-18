@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	Case of 
+		: (cbGHZ=1)
+			QUERY([Lists];[Lists]ListName="FactoriesHZ")
+		: (cbGSZ=1)
+			QUERY([Lists];[Lists]ListName="FactoriesSZ")
+	End case 
+	READ WRITE([Lists])
+	QUERY SELECTION([Lists];[Lists]ListItem=atSub1{atSub1})
+	If (Records in selection([Lists])=1)
+		WinChoice ("Are you sure you want to remove "+atSub1{atSub1}+"?")
+		If (ok=1)
+			DELETE RECORD([Lists])
+			DELETE FROM ARRAY(atSub1;atSub1)
+			atSub1:=0
+		End if 
+	End if 
+End if 

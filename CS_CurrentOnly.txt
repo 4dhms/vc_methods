@@ -1,0 +1,23 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$lineKey)
+$lineKey:=-1
+
+$i:=1
+
+ORDER BY([CS_Status];[CS_Status]CS_Sort;>;[CS_Lines]ComponentName;>;[CS_Status]CS_StatusKey;>)
+
+CREATE SET([CS_Status];"Track")
+
+LAST RECORD([CS_Status])
+
+For ($i;1;Records in selection([CS_Status]))
+	If ([CS_Status]CS_LineKey=$lineKey)
+		REMOVE FROM SET([CS_Status];"Track")
+	Else 
+		$lineKey:=[CS_Status]CS_LineKey
+	End if 
+	PREVIOUS RECORD([CS_Status])
+End for 
+
+USE SET("Track")
+CLEAR SET("Track")

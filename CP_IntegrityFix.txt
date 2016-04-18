@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($test;$high)
+
+$n:=1
+$i:=1
+$high:=asOrderType{Size of array(asOrderType)}
+
+Repeat 
+	$test:="Combo "+String($n)
+	Case of 
+		: ($i=1)
+			  //
+		: (asTypeList{$i}="Self") & (asTypeList{$i-1}="Self") & (Find in array(asTypeList;"Combo 1")>0)
+			CP_AddArrayLine ($i)
+			asTypeList{$i}:="Combo 1"
+			alCPXref{$i}:=alXrefKeys{Find in array(asOrderType;$test)}
+			alSelfKey{$i}:=alSelfKey{$i-1}
+			
+		: (asTypeList{$i}="Self") & (asTypeList{$i-1}#$high)
+			CP_AddArrayLine ($i)
+			asTypeList{$i}:=$test
+			alCPXref{$i}:=alXrefKeys{Find in array(asOrderType;$test)}
+			alSelfKey{$i}:=alSelfKey{$i-1}
+			
+		: (asTypeList{$i}="Self")
+			$n:=1
+		: (asTypeList{$i}="Zipper")
+			  //
+		Else 
+			If (asTypeList{$i}#$test)
+				CP_AddArrayLine ($i)
+				asTypeList{$i}:=$test
+				alCPXref{$i}:=alXrefKeys{Find in array(asOrderType;$test)}
+				alSelfKey{$i}:=alSelfKey{$i-1}
+			End if 
+			$n:=$n+1
+	End case 
+	$i:=$i+1
+Until ($i>Size of array(asTypeList))
+
+If (asTypeList{Size of array(asTypeList)}#$high) & (Find in array(asTypeList;"Combo@")>0)
+	CP_AddArrayLine (Size of array(asTypeList)+1)
+	asTypeList{$i}:=$high
+	alCPXref{$i}:=alXrefKeys{Find in array(asOrderType;$high)}
+	alSelfKey{$i}:=alSelfKey{Size of array(alSelfKey)}
+End if 
+
+OBJECT SET VISIBLE(bFix;False)

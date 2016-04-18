@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($docs;0)
+C_TEXT($path)
+C_TEXT($thisFile)
+C_LONGINT($w;$h)
+C_REAL($scale;$scale1;$scale2)
+
+C_LONGINT($i)
+
+$path:=Select folder("Process folder:")
+
+If (ok=1)
+	DOCUMENT LIST($path;$docs)
+	$i:=1
+	For ($i;1;Size of array($docs))
+		If ($docs{$i}="T@")
+			$thisFile:=$path+$docs{$i}
+			
+			READ PICTURE FILE($thisFile;vxSketch)
+			
+			PICTURE PROPERTIES(vxSketch;$w;$h)
+			
+			$scale1:=Round(460/$w;2)
+			$scale2:=Round(480/$h;2)
+			
+			If ($scale1<$scale2)
+				$scale:=$scale1
+			Else 
+				$scale:=$scale2
+			End if 
+			
+			TRANSFORM PICTURE(vxSketch;Scale;$scale;$scale)
+			
+			WRITE PICTURE FILE($thisFile;vxSketch;"JPEG")
+			
+		End if 
+	End for 
+End if 
+ALERT("Done")

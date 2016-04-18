@@ -1,0 +1,113 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfSupersheet)
+C_REAL($netPrice;$netnetPrice;$LDP)
+C_REAL($netSales;$netNetSales;$netSalesWC;$netNetSalesWC)
+C_REAL($net;$netNet;$netWC;$netNetWC)
+C_TEXT($via)
+
+$LDP:=vrFOB
+$via:=asList11{Size of array(asList11)}
+vsHead3:=[CostSheets]Method
+If (<>vlOrderNumber>0)
+	vrPrice:=[Orders]Price
+Else 
+	vrPrice:=[Samples]Price
+End if 
+
+If ($via="Boat") | ($via="Air")
+Else 
+	$via:=""
+End if 
+
+If ([CostSheets]Figurer=0)
+	$netPrice:=[Orders]Price
+Else 
+	$netPrice:=Round([Orders]Price*((100-[CostSheets]Figurer)/100);2)
+End if 
+
+  //Net Net Unit Price
+$netnetprice:=Round($netPrice*((100-[CostSheets]SpecialDiscount)/100);2)
+[CostSheets]NetUnitPrice:=$netPrice
+[CostSheets]NetNetUnitPrice:=$netNetPrice
+SAVE RECORD([CostSheets])
+
+$netsales:=$netPrice*[Orders]TotalOrderQuantity
+$netnetsales:=$netNetPrice*[Orders]TotalOrderQuantity
+
+[CostSheets]NetNetTotalSales:=$netnetsales
+[CostSheets]NetTotalSales:=$netsales
+  //[CostSheets]DutyAmount:=$amt
+  //[CostSheets]DutyAmountActual:=$amtactual
+[CostSheets]NetUnitPrice:=$netprice
+[CostSheets]NetNetUnitPrice:=$netnetprice
+
+SAVE RECORD([CostSheets])
+
+
+vrLDPBoat:=$LDP
+vrLDP1a:=$LDP+[CostSheets]Cushion
+vrTotal1:=vrLDPBoat*[Orders]TotalOrderQuantity
+vrTotal1a:=vrLDP1a*[Orders]TotalOrderQuantity
+
+  //vrLDPBoat:=[CostSheets]NetTotalSales-([CostSheets]Quantity*$LDP)
+  //vrLDP1a:=[CostSheets]NetTotalSales-([CostSheets]Quantity*($LDP+[CostSheets]Cushion))
+
+$netSales:=[CostSheets]NetTotalSales-([CostSheets]Quantity*vrLDPBoat)
+$netSalesWC:=[CostSheets]NetTotalSales-([CostSheets]Quantity*vrLDP1a)
+$netNetSales:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*vrLDPBoat)
+$netNetSalesWC:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*vrLDP1a)
+
+  //$net:=Round((([CostSheets]NetUnitPrice-vrLDPBoat)/[CostSheets]NetUnitPrice)*100;2)
+  //$netnetprice:=Round($netPrice*((100-[CostSheets]SpecialDiscount)/100);2)
+
+Case of 
+	: ($via="Boat")
+		[CostSheets]NetTotalProfitSea:=$netSales
+		[CostSheets]NetNetTotalProfitSea:=$netNetSales
+	: ($via="Air")
+		[CostSheets]NetTotalProfitAir:=$netSales
+		[CostSheets]NetNetTotalProfitAir:=$netNetSales
+End case 
+SAVE RECORD([CostSheets])
+
+vrNetProfit1:=$netSales
+vrNetNetProfit1:=$netNetSales
+
+vrNetProfit1a:=$netSalesWC
+vrNetNetProfit1a:=$netNetSalesWC
+
+$net:=Round((([CostSheets]NetUnitPrice-vrLDPBoat)/[CostSheets]NetUnitPrice)*100;2)
+$netWC:=Round((([CostSheets]NetUnitPrice-vrLDP1a)/[CostSheets]NetUnitPrice)*100;2)
+$netNet:=Round((([CostSheets]NetNetUnitPrice-vrLDPBoat)/[CostSheets]NetNetUnitPrice)*100;2)
+$netNetWC:=Round((([CostSheets]NetNetUnitPrice-vrLDP1a)/[CostSheets]NetNetUnitPrice)*100;2)
+
+vrNetPercent1:=$net
+vrNetPercent1a:=$netWC
+vrNetNetPercent1:=$netNet
+vrNetNetPercent1a:=$netNetWC
+
+  //If (Not(User in group(Current user;"Supercostsheets"))) | (Not(<>vfSupersheet)) & (Not(User in group(Current user;"SuperDuperCostSheets")))
+  //vrLDPBoat:=vrLDP1a
+  //vrTotal1:=vrTotal1a
+  //vrNetProfit1:=vrNetProfit1a
+  //vrNetNetProfit1:=vrNetNetProfit1a
+  //vrNetPercent1:=vrNetPercent1a
+  //vrNetNetPercent1:=vrNetNetPercent1a
+  //End if 
+  //
+
+OBJECT SET VISIBLE(vrTotal1a;<>vfSupersheet)
+OBJECT SET VISIBLE(vrNetProfit1a;<>vfSupersheet)
+OBJECT SET VISIBLE(vrNetNetProfit1a;<>vfSupersheet)
+OBJECT SET VISIBLE(vrNetPercent1a;<>vfSupersheet)
+OBJECT SET VISIBLE(vrNetNetPercent1a;<>vfSupersheet)
+OBJECT SET VISIBLE(vrLDP1a;<>vfSupersheet)
+OBJECT SET VISIBLE(vrUnit1a;<>vfSupersheet)
+OBJECT SET VISIBLE([CostSheets]Cushion;<>vfSupersheet)
+OBJECT SET VISIBLE(*;"xCushion1";<>vfSupersheet)
+
+  //If (atMethod{atMethod}="FOB")
+If (Find in array(asList11;"Duty@")>0) | (Find in array(asList11;"Air@")>0) | (Find in array(asList11;"Boat@")>0)
+	atMethod:=Find in array(atMethod;"LDP")
+	vsHead3:="LDP"
+End if 

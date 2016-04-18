@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asRowHeaders;0)
+ARRAY LONGINT(alSpecNumber;0)
+ARRAY TEXT(asSpareParts;0)
+ARRAY LONGINT(alSpareKeys;0)
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(asSGOrder;0)
+ARRAY DATE(adDates;0)
+ARRAY TEXT(asPart;0)
+
+SS_GetArrays 
+SS_Gather 
+SS_Init 
+
+OBJECT SET ENABLED(bNewCol;True)
+
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="Combo@")
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]FabOrdType;>)
+
+If (FORM Get current page=1)
+	OBJECT SET TITLE(bNextPage;"Sizes")
+Else 
+	OBJECT SET TITLE(bNextPage;"Samples")
+End if 
+
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;>)
+ORDER BY([SpecSheetLines];[SpecSheetLines]SortOrder;>)
+
+vlColNo1:=Size of array(asRowHeaders)+1

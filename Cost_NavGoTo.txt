@@ -1,0 +1,60 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (<>vlOrderNumber<0)
+	<>vlPrice:=[Samples]Price
+	<>vsTerms:=""
+	<>vsDesignNumber:=[Samples]DesignNum
+	<>vsStyleNumber:=[Samples]StyleNum
+	<>vlQuantity:=[Samples]SGQuantity
+	<>vsFactory:=[Samples]SamGarFactry
+	If (<>vlQuantity=0)
+		<>vlQuantity:=1
+	End if 
+	<>vsCustomer:=[Samples]Customer
+	<>vlOrderNumber:=[Samples]SampleNumber*-1
+	QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlOrderNumber)
+	QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+	<>vlCSId:=[ComponentSheets]CS_ID
+	UNLOAD RECORD([ComponentSheets])
+Else 
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	<>vfAir:=[CostSheets]ShipAir
+	<>vfSea:=[CostSheets]ShipSea
+	<>vlPrice:=[Orders]Price
+	<>vsTerms:=[Orders]Price Terms
+	<>vsDesignNumber:=[Orders]DesignNumber
+	<>vsStyleNumber:=[Orders]StyleNumber
+	<>vlQuantity:=[Orders]TotalOrderQuantity
+	<>vsCustomer:=[Orders]Customer
+	<>vsFactory:=[Orders]Factory
+	
+	REDUCE SELECTION([ComponentSheets];0)
+	
+	SG_PO 
+	CS_GetSheet 
+	If (Records in selection([ComponentSheets])>0)
+		<>vlCSId:=[ComponentSheets]CS_ID
+	Else 
+		<>vlCSId:=0
+	End if 
+	UNLOAD RECORD([ComponentSheets])
+End if 
+
+If (<>PrcQteID>0)
+Else 
+	QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+End if 
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+ARRAY LONGINT(alSheetKeys;0)
+
+ARRAY TEXT(asSheetNames;0)
+CREATE SET([CostSheets];"ThisSheet")
+ORDER BY([CostSheets];[CostSheets]SheetID;<)
+If (Records in selection([CostSheets])>0)
+	vfNewCostSheet:=True
+	SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames;[CostSheets]SheetID;alSheetKeys)
+Else 
+	vfNewCostsheet:=False
+	If (Table name(Current form table)="CostSheets")
+		CANCEL
+	End if 
+End if 

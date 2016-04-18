@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+
+<>vsFactory:=[Samples]SamGarFactry
+<>vsCustomer:=[Samples]Customer
+<>vsLabel:=[Samples]Label
+<>vsSource:=[Designs]Patt Srce
+<>vlSGPO:=0
+<>vsKnitWoven:=""
+<>vdXFactory:=[Samples]XFactoryReq
+<>vsDesignNumber:=[Samples]DesignNum
+<>vsStyleNumber:=[Samples]StyleNum
+<>vtCustomerStyle:=""
+<>ComponentSheet:=False
+m_SpecsA 

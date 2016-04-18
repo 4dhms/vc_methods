@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($size)
+
+If ($1=-1)
+	$size:=0
+Else 
+	$size:=$1
+	ARRAY TEXT(asDivisions;$size)
+End if 
+
+ARRAY TEXT(asBDDivisions;$size)
+ARRAY LONGINT(alQuantity;$size)
+ARRAY REAL(arNetSales;$size)
+ARRAY REAL(arNetProfit;$size)
+ARRAY REAL(arSpecialDiscount;$size)
+ARRAY REAL(arNetNetSales;$size)
+ARRAY REAL(arNetNetProfit;$size)
+ARRAY REAL(arAvgNetMarkup;$size)
+ARRAY REAL(arAvgNetNetMarkup;$size)
+ARRAY LONGINT(alGrossSales;$size)
+ARRAY LONGINT(alDiscAmt;$size)
+ARRAY LONGINT(alCost;$size)

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+$n:=Abs($1)
+
+If ($1>=0)
+	ARRAY TEXT(asDesignNumbers;$n)
+End if 
+
+ARRAY TEXT(atCost1;$n)
+ARRAY TEXT(atCost2;$n)
+ARRAY TEXT(atCost3;$n)
+ARRAY TEXT(atCost4;$n)
+ARRAY TEXT(atCost5;$n)
+ARRAY TEXT(atCost6;$n)
+ARRAY TEXT(atCost7;$n)
+ARRAY TEXT(asFactories;$n)
+ARRAY TEXT(asStyleNumbers;$n)
+ARRAY LONGINT(alSDID;$n)
+ARRAY BOOLEAN(afApproved;$n)
+ARRAY BOOLEAN(afProcess;$n)
+ARRAY TEXT(asOrderNumbers;$n)
+ARRAY LONGINT(alSDcolor;$n)

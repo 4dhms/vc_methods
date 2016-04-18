@@ -1,0 +1,66 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(bAdd;True)
+OBJECT SET VISIBLE(*;"xComplete";False)
+
+QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+QUERY SELECTION([CostSheets];[CostSheets]DCS=<>vfDCS)
+
+ORDER BY([CostSheets];[CostSheets]SheetID;<)
+
+vlNewSheetNumber:=[Costing]SheetNumber
+Case of 
+	: (asSheetNames{1}="No costsheet")
+		Sheet_BuildDLGrabber 
+		QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+		vfImport:=True
+	: (Size of array(asSheetNames)=1) | (Records in selection([CostSheets])=1)  //bridge to old and new systems
+		If (asSheetNames{1}="Old Sheet")
+			Sheet_BuildDLGrabber 
+			vfImport:=True
+		Else 
+			Cost_RouterArray (vlNewSheetNumber;<>vlOrderNumber)
+		End if 
+	Else 
+		Cost_RouterArray (vlNewSheetNumber;<>vlOrderNumber)
+End case 
+
+Namer_Window 
+
+If (vfCancel)
+	asSheetNames:=1
+Else 
+	If (Find in array(asSheetNames;"No Costsheet")>0)
+		DELETE FROM ARRAY(asSheetNames;Find in array(asSheetNames;"No Costsheet");1)
+	End if 
+	If (<>vlOrderNumber<0)
+		<>vlQuantity:=[Samples]SGQuantity
+		<>vlPrice:=[Samples]Price
+		<>vsTerms:=""
+	Else 
+		<>vlQuantity:=[Orders]TotalOrderQuantity
+		<>vlPrice:=[Orders]Price
+		<>vsTerms:=[Orders]Price Terms
+	End if 
+	
+	Cost_AddNewExecute 
+	
+	
+	If (Find in array(asSheetNames;"New Sheet")<1)
+		APPEND TO ARRAY(asSheetNames;"-")
+		APPEND TO ARRAY(asSheetNames;"New Sheet")
+		APPEND TO ARRAY(asSheetNames;"Favorite")
+		  //If (User in group(Current user;"SuperCostsheets"))
+		  //APPEND TO ARRAY(asSheetNames;"Email")
+		  //APPEND TO ARRAY(asSheetNames;"Spreadsheet")
+		  //End if 
+	End if 
+	
+	OBJECT SET ENTERABLE([CostSheets]FOBConfirmed;Position("confirm";[CostSheets]SheetName)>0)
+	OBJECT SET ENTERABLE([CostSheets]FOB2Confirmed;Position("confirm";[CostSheets]SheetName)>0)
+	OBJECT SET VISIBLE([CostSheets]FreightAIR;([CostSheets]ShipAir) | ([CostSheets]FreightAIR>0))
+	OBJECT SET VISIBLE([CostSheets]FreightBOAT;([CostSheets]ShipSea) | ([CostSheets]FreightBOAT>0))
+	OBJECT SET VISIBLE(*;"xAir1";[CostSheets]ShipAir)
+	OBJECT SET VISIBLE(*;"xBoat1";[CostSheets]ShipSea)
+	Cost_EntryShowA 
+End if 

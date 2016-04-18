@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($new)
+Case of 
+	: (Form event=On Load)
+		SET MENU BAR(6)
+		Speedform_Trigger 
+		  //triggers build number
+		If ([Speedpost Form]Package number="")
+			<>asFactories:=0
+			$new:=True
+		Else 
+			$new:=False
+		End if 
+		OBJECT SET VISIBLE(<>asFactories;$new)
+		OBJECT SET VISIBLE(*;"NewText";$new)
+		OBJECT SET ENTERABLE([Speedpost Form]To Factory;$new)
+	: (Form event=On Data Change)
+		Speedform_Trigger 
+End case 

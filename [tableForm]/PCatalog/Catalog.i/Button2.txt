@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+SAVE RECORD([PCatalog])
+If (<>asSeasonName=1) | (<>asSeasonYear=1)
+	WinPrompt ("Select a season.")
+End if 
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]SeasonName=<>asSeasonName{<>asSeasonName};*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+
+CREATE SET([ColorPrintNumber];"print")
+If ([PCatalog]Division#"")
+	$i:=1
+	FIRST RECORD([ColorPrintNumber])
+	For ($i;1;Records in selection([ColorPrintNumber]))
+		USE SET("print")
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Division=[PCatalog]Division)
+		
+		QUERY([CP_Customers];[CP_Customers]CPNumber=[ColorPrintNumber]CPNumber)
+		QUERY SELECTION([CP_Customers];[CP_Customers]Division=[ColorPrintNumber]Division)
+		
+		If (Records in selection([ColorPrintNumber])=0) & (Records in selection([CP_Customers])=0)
+			REMOVE FROM SET([ColorPrintNumber];"print")
+		End if 
+		NEXT RECORD([ColorPrintNumber])
+	End for 
+	USE SET("print")
+End if 
+
+If ([CP_Customers]Customer#"") & (1=2)
+	
+	$i:=1
+	FIRST RECORD([ColorPrintNumber])
+	For ($i;1;Records in selection([ColorPrintNumber]))
+		USE SET("print")
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Customer=[PCatalog]Division)
+		
+		QUERY([CP_Customers];[CP_Customers]CPNumber=[ColorPrintNumber]CPNumber)
+		QUERY SELECTION([CP_Customers];[CP_Customers]Customer=[ColorPrintNumber]Customer)
+		
+		If (Records in selection([ColorPrintNumber])=0) & (Records in selection([CP_Customers])=0)
+			REMOVE FROM SET([ColorPrintNumber];"print")
+		End if 
+		NEXT RECORD([ColorPrintNumber])
+	End for 
+	USE SET("print")
+End if 
+
+PrintCat_Pop 

@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_POINTER(vpFieldPtr)
+C_POINTER(vpArrayPtr)
+C_POINTER(vpFindTable)
+C_POINTER(TheFile)
+C_POINTER(vpSupplierPtr)
+C_POINTER(vpNumberPtr)
+C_POINTER(vpcpPtr)
+C_POINTER(vpTotals1Ptr;vpTotals2Ptr)
+C_POINTER(vpStylePtr)
+C_POINTER(vpUnitsPtr)
+C_POINTER(vpcolorPtr)
+C_POINTER(vphmsPOPtr)
+C_POINTER(vpconsum1Ptr;vpconsum2Ptr)
+C_POINTER(vpColorKeyPtr)
+
+
+

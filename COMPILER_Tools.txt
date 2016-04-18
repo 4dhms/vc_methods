@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtEMHost;vtEMPOText)
+C_TEXT(vsChoice1)
+C_TEXT(vsChoice2)
+C_TEXT(vsChoice3)
+C_TEXT(vsChoice4)
+C_TEXT(vsChoice5)
+  //processes
+C_LONGINT(vlPageRouter)

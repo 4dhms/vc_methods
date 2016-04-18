@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($test)
+C_TEXT(vsDesignNumber;vsOrderNumber;vsStyleNumber)
+ARRAY TEXT($designs;0)
+
+Case of 
+	: (vdStart=!00-00-00!) & (vdEnd=!00-00-00!)
+		WinPrompt ("Enter find criterion.")
+	Else 
+		Case of 
+			: (vsDesignNumber#"")
+				QUERY([Orders];[Orders]DesignNumber=vsDesignNumber+"@")
+			: (vsStyleNumber#"")
+				QUERY([Orders];[Orders]StyleNumber=vsStyleNumber)
+			: (vsOrderNumber#"")
+				QUERY([Orders];[Orders]OrderNum=vsOrderNumber)
+			Else 
+				QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+				QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+				Case of 
+					: (pOne=1)
+						QUERY SELECTION([Orders];[Orders]SDProcessed=True)
+					: (pTwo=1)
+						QUERY SELECTION([Orders];[Orders]SDProcessed=False)
+				End case 
+				QUERY SELECTION([Orders];[Orders]Cancelled=False;*)
+				QUERY SELECTION([Orders]; & ;[Orders]ShipFOB=False;*)
+				QUERY SELECTION([Orders]; & ;[Orders]Factory#"";*)
+				QUERY SELECTION([Orders]; & ;[Orders]ShipLDP=False)
+				
+		End case 
+End case 
+
+DISTINCT VALUES([Orders]DesignNumber;$designs)
+
+$i:=1
+For ($i;1;Size of array($designs))
+	$test:=StripToNumber ($designs{$i})
+	If (Find in array(asDesignNumbers;$test+"@")<1)
+		APPEND TO ARRAY(asDesignNumbers;$test)
+	End if 
+End for 
+
+SORT ARRAY(asDesignNumbers;>)
+
+SD_SizeArray (Size of array(asDesignNumbers)*-1)
+
+UNLOAD RECORD([Orders])
+
+  //SD_ColorCoded 

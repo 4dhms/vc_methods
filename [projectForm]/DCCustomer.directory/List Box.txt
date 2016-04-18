@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	If (asXCustomer>0)
+		ARRAY TEXT(asCustomerBuild;0)
+		
+		QUERY([DC];[DC]ReportCustomer=asXCustomer{asXCustomer})
+		DISTINCT VALUES([DC]Customer;asCustomerBuild)
+		
+		If (Find in array(asCustomerBuild;asXCustomer{asXCustomer})>0)
+			DELETE FROM ARRAY(asCustomerBuild;Find in array(asCustomerBuild;asXCustomer{asXCustomer}))
+		End if 
+		
+		SORT ARRAY(asCustomerBuild;>)
+		If (Size of array(asCustomerBuild)>0)
+			OBJECT SET VISIBLE(afListBox2;True)
+			OBJECT SET VISIBLE(*;"xClick";True)
+		Else 
+			OBJECT SET VISIBLE(afListBox2;False)
+			OBJECT SET VISIBLE(*;"xClick";False)
+		End if 
+	End if 
+End if 
+
+
+  //QUERY([DC];[DC]Customer=$customer)
+  //QUERY SELECTION([DC];[DC]ReportCustomer=asXCustomer{asXCustomer})

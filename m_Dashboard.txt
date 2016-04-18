@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Dashboard
+Case of 
+	: (Current user="Spooler")
+		  //
+		
+	: (<>DashbID=0)
+		<>DashbID:=New process("p_Dashboard";0;"Dashboard")
+	Else 
+		SHOW PROCESS(<>DashbID)
+		BRING TO FRONT(<>DashbID)
+End case 

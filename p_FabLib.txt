@@ -1,0 +1,95 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atArtNumber;0)
+  //p_FabLib global procedure
+
+  //builds vendor list
+p_VendorArray_Build 
+
+Closed:=False
+SET MENU BAR(1)
+
+If ($1="HMS Article Library")
+	vfHMSart:=True
+	ALL RECORDS([HMSArtNo])
+	vtTitle1:="HMS Article Numbers"
+	vtTitle2:="Fabric"
+	vtTitle3:="Fiber Content"
+	vfTrim:=False
+	vlWinWd:=600
+	vlWinHt:=600
+	vlWinType:=8
+	vsWinTitle:=""
+	<>CloseBox:=True
+	FORM SET OUTPUT([HMSArtNo];"HMSArticle.o")
+	FORM SET INPUT([HMSArtNo];"HMSArticle.i")
+	ORDER BY([HMSArtNo];[HMSArtNo]HANkey;>)
+	CREATE SET([HMSArtNo];"AN")
+	
+	Center Window 
+	SET WINDOW TITLE("HMS Article Library: "+String(Records in selection([HMSArtNo]))+" Article Numbers")
+	MODIFY SELECTION([HMSArtNo];*)
+	CLOSE WINDOW
+	<>vlHMSarProc:=0
+Else 
+	FORM SET OUTPUT([FabricLibrary];"FabricLibraryList")
+	Case of 
+		: ($1="Fabric")
+			vfHMSart:=False
+			QUERY([FabricLibrary];[FabricLibrary]Type=0)
+			QUERY SELECTION([FabricLibrary];[FabricLibrary]HMSANmaster=False)
+			vtTitle1:="Fabric Library"
+			vtTitle2:="Fabric"
+			vtTitle3:="Fiber Content"
+			vfTrim:=False
+			If (Screen width<1200)
+				vlWinWd:=Screen width-40
+			Else 
+				vlWinWd:=1200
+			End if 
+			vlWinHt:=600
+			vlWinType:=8
+			vsWinTitle:=""
+			<>CloseBox:=True
+			FORM SET INPUT([FabricLibrary];"FabricLibraryEntry")
+		Else 
+			QUERY([FabricLibrary];[FabricLibrary]Type>0)
+			vfHMSart:=False
+			vtTitle1:="Trim Library"
+			vtTitle2:="Trim Description"
+			vtTitle3:="Make Up"
+			vfTrim:=True
+			vlWinWd:=800
+			vlWinHt:=600
+			vlWinType:=8
+			vsWinTitle:=""
+			<>CloseBox:=True
+			FORM SET INPUT([FabricLibrary];"TrimLibraryEntry")
+	End case 
+	QUERY SELECTION([FabricLibrary];[FabricLibrary]ArticleNumber#"")
+	  //ALERT(String(Records in selection([FabricLibrary])))
+	
+	FORM SET OUTPUT([FabricLibrary];"FabricLibraryList")
+	SELECTION TO ARRAY([FabricLibrary]ArticleNumber;atArtNumber)
+	ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)
+	
+	Center Window 
+	If (vfTrim)
+		SET WINDOW TITLE("Trim Library: "+String(Records in selection([FabricLibrary]))+" Article Numbers")
+	Else 
+		SET WINDOW TITLE("Fabric Library: "+String(Records in selection([FabricLibrary]))+" Article Numbers")
+	End if 
+	
+	AccessMode (->[FabricLibrary];True)
+	TheFile:=->[FabricLibrary]
+	If (Screen width<1200)
+		MODIFY SELECTION([FabricLibrary])
+	Else 
+		MODIFY SELECTION([FabricLibrary];*)
+	End if 
+	If (vfTrim)
+		<>vlTrimLib:=0
+	Else 
+		<>FabLibProcID:=0
+	End if 
+	CLOSE WINDOW
+End if 

@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_TEXT(vtTable;$HTML)
+  //C_LONGINT($i)
+  //C_TEXT($dateText)
+  //C_DATE($start;$date)
+
+  //$start:=Current date(*)-(Day number(Current date(*))+5)
+  //$date:=$start
+  //
+vtDivisionList:=Char(1)
+vtDivisionList:=vtDivisionList+"<label>"
+vtDivisionList:=vtDivisionList+"<select name=DivisionList id=DivisionList>"
+vtDivisionList:=vtDivisionList+"<option value=All Divisions>All Divisions</option>"
+vtDivisionList:=vtDivisionList+"<option value=0-ILLIG>0-ILLIG</option>"
+vtDivisionList:=vtDivisionList+"<option value=1-Blouses>1-Blouses</option>"
+vtDivisionList:=vtDivisionList+"<option value=2-Dresses>2-Dresses</option>"
+vtDivisionList:=vtDivisionList+"<option value=3-Cupio>3-Cupio</option>"
+vtDivisionList:=vtDivisionList+"<option value=4-Social>4-Social</option>"
+vtDivisionList:=vtDivisionList+"<option value=5-Color_FX>5-Cupio Blouse</option>"
+vtDivisionList:=vtDivisionList+"<option value=6-Cable_&_Gauge>6-Cable & Gauge</option>"
+vtDivisionList:=vtDivisionList+"<option value=7-T's>7-T's</option>"
+vtDivisionList:=vtDivisionList+"<option value=8-Olio>8-Olio</option>"
+vtDivisionList:=vtDivisionList+"<option value=9-Spense Knits>9-Spense Knits</option>"
+vtDivisionList:=vtDivisionList+"</select>"
+vtDivisionList:=vtDivisionList+"</label>"
+
+vtSeasonList:=Char(1)
+vtSeasonList:=vtSeasonList+"<label>"
+vtSeasonList:=vtSeasonList+"<select name=SeasonList id=SeasonList>"
+
+If (Month of(Current date(*))<8)
+	vtSeasonList:=vtSeasonList+"<option value=Spring>Spring</option>"
+	vtSeasonList:=vtSeasonList+"<option value=Fall>Fall</option>"
+Else 
+	vtSeasonList:=vtSeasonList+"<option value=Fall>Fall</option>"
+	vtSeasonList:=vtSeasonList+"<option value=Spring>Spring</option>"
+End if 
+
+vtSeasonList:=vtSeasonList+"</select>"
+vtSeasonList:=vtSeasonList+"</label>"
+
+vtYearList:=Char(1)
+vtYearList:=vtYearList+"<label>"
+vtYearList:=vtYearList+"<select name=YearList id=YearList>"
+vtYearList:=vtYearList+"<option value="+String(Year of(Current date(*))-1)+">"+String(Year of(Current date(*))-1)+"</option>"
+vtYearList:=vtYearList+"<option value="+String(Year of(Current date(*)))+" selected=selected>"+String(Year of(Current date(*)))+"</option>"
+vtYearList:=vtYearList+"<option value="+String(Year of(Current date(*))+1)+">"+String(Year of(Current date(*))+1)+"</option>"
+
+WEB SEND FILE("sr_prep.html")
+

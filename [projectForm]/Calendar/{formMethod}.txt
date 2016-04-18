@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vdDayOne:=Current date(*)
+		SLR_CalendarUpdate 
+	: (Form event=On Outside Call)
+		CANCEL
+End case 
+

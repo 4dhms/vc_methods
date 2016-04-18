@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vlPage:=Records in selection([DesignLinkedPages])+1
+APPEND TO ARRAY(arMcol1;vlPage)
+
+FORM SET INPUT([DesignLinkedPages];"LinkedPage.i")
+  //CREATE SET([DesignLinkedPages];"pages")
+ADD RECORD([DesignLinkedPages];*)
+  //ADD TO SET([DesignLinkedPages];"pages")
+  //USE SET("pages")
+  //CLEAR SET("pages")
+QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=[DesignLines]DesignLineKey)
+ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+ACCEPT

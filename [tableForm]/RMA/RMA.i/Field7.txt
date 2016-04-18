@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (Position(" ";[ReturnStores]StoreEmail)>0)
+		[ReturnStores]StoreEmail:=Replace string([ReturnStores]StoreEmail;" ";"")
+	End if 
+End if 

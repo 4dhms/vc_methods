@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Sample_ReceivingInit (0)
+
+ARRAY TEXT(asDivisions;0)
+LIST TO ARRAY("Division Code No";asDivisions)
+INSERT IN ARRAY(asDivisions;0)
+asDivisions{1}:="Division"
+asDivisions:=1
+<>asSeasonName:=1
+<>asSeasonYear:=1
+
+Center Window (940;610;0;"";"WincBox")
+DIALOG("SampleStat")
+CLOSE WINDOW

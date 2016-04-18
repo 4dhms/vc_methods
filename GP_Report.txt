@@ -1,0 +1,148 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start;$end)
+C_TEXT($sort)
+C_TEXT($month)
+C_LONGINT($i)
+C_REAL($netprice;$unitcost)
+
+<>vlCounter:=0
+<>vtMessage:="Building report"
+EMail_SendingProc 
+
+REDUCE SELECTION([Orders];0)
+vlProgress:=0
+OBJECT SET VISIBLE(vlProgress;True)
+$start:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+$end:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+
+Case of 
+	: ($start=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: ($end=!00-00-00!)
+		WinPrompt ("End start date.")
+	Else 
+		If (cb12=1)
+			QUERY([Orders];[Orders]SeasonName=<>asSeasonName{<>asSeasonName})
+			QUERY SELECTION([Orders];[Orders]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+			
+		Else 
+			QUERY([Orders];[Orders]CancelDate>=$start)
+			QUERY SELECTION([Orders];[Orders]CancelDate<=$end;*)
+		End if 
+		
+		QUERY SELECTION([Orders]; & ;[Orders]Cancelled=False)
+		If (vsCustomer#"")
+			QUERY SELECTION([Orders];[Orders]Customer=vsCustomer)
+		End if 
+		If (asDivisions<Size of array(asDivisions))
+			QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+		End if 
+		
+		Case of 
+			: (pOne=1)
+				QUERY SELECTION([Orders];[Orders]SizeCategory="Petite")
+			: (pTwo=1)
+				QUERY SELECTION([Orders];[Orders]SizeCategory="Missy")
+			: (pThree=1)
+				QUERY SELECTION([Orders];[Orders]SizeCategory="Large")
+		End case 
+		
+		ORDER BY([Orders];[Orders]StyleNumber;>)
+		
+		$i:=1
+		FIRST RECORD([Orders])
+		
+		For ($i;1;Records in selection([Orders]))
+			If ($i%5=0)
+				<>vlCounter:=Int(($i/Records in selection([Orders]))*100)
+				CALL PROCESS(<>SendingWin)
+			End if 
+			
+			QUERY([Invoices];[Invoices]OrderNumber=[Orders]OrderNum)
+			QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			$netprice:=Round([Orders]Price*((100-[Orders]NetDiscount)*0.01);2)
+			
+			[Orders]RptGrossSales:=Round($netprice*[Orders]TotalOrderQuantity;2)
+			[Orders]RptShipped:=Sum([Invoices]InvoiceQuantity)
+			[Orders]RptActsSales:=Sum([Invoices]InvoiceAmount)
+			
+			RELATE MANY([Costing]SheetNumber)
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			FIRST RECORD([CostSheets])
+			
+			Case of 
+				: ([CostSheets]ShipSea) & (<>vfSupersheet)
+					$unitcost:=[CostSheets]UnitCostSeaWC
+				: ([CostSheets]ShipAir) & (<>vfSupersheet)
+					$unitcost:=[CostSheets]UnitCostAirWC
+				: ([CostSheets]ShipLDP) & (<>vfSupersheet)
+					$unitcost:=[CostSheets]UnitCostSeaWC
+				: ([CostSheets]ShipFOB) & (<>vfSupersheet)
+					$unitcost:=[CostSheets]UnitCostSeaWC
+				: ([CostSheets]ShipSea) & (Not(<>vfSupersheet))
+					$unitcost:=[CostSheets]UnitCostSea
+				: ([CostSheets]ShipAir) & (Not(<>vfSupersheet))
+					$unitcost:=[CostSheets]UnitCostAir
+				: ([CostSheets]ShipLDP) & (Not(<>vfSupersheet))
+					$unitcost:=[CostSheets]UnitCostSea
+				: ([CostSheets]ShipFOB) & (Not(<>vfSupersheet))
+					$unitcost:=[CostSheets]UnitCostSea
+			End case 
+			
+			[Orders]RptUnitCost:=$unitcost
+			
+			SAVE RECORD([Orders])
+			NEXT RECORD([Orders])
+		End for 
+		
+		
+		If (1=2)
+			  //  temporary fixer
+			C_LONGINT($i)
+			C_REAL($unitCost;$actSales)
+			
+			$i:=1
+			FIRST RECORD([Orders])
+			
+			For ($i;1;Records in selection([Orders]))
+				QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+				
+				
+				[Orders]RptGrossSales:=Round([Orders]TotalOrderQuantity*[CostSheets]NetUnitPrice;0)
+				[Orders]RptActsSales:=Round([CostSheets]ActualUnitsShipped*[CostSheets]Price;0)
+				
+				If ([CostSheets]ShipAir)
+					$unitCost:=[CostSheets]FOB+[CostSheets]FOB2+[CostSheets]DutyAmount+[CostSheets]FreightAIR+[CostSheets]NYMisc+[CostSheets]BrokerageChg+[CostSheets]Quota+[CostSheets]Quota2+[CostSheets]Cushion
+				Else 
+					$unitCost:=[CostSheets]FOB+[CostSheets]FOB2+[CostSheets]DutyAmount+[CostSheets]FreightBOAT+[CostSheets]NYMisc+[CostSheets]BrokerageChg+[CostSheets]Quota+[CostSheets]Quota2+[CostSheets]Cushion
+				End if 
+				[Orders]RptUnitCost:=$unitCost
+				$actSales:=Round($unitCost*[CostSheets]ActualUnitsShipped;0)
+				[Orders]RptProfit:=Round([Orders]RptActsSales-$actSales;0)
+				$unitCost:=([CostSheets]NetUnitPrice-$unitCost)*100
+				
+				[Orders]RptPercent:=Round($unitCost/[CostSheets]NetUnitPrice;2)
+				
+				$start:=[Orders]CancelDate
+				If (Month of([Orders]CancelDate)>9)
+					$month:=String(Month of([Orders]CancelDate))
+				Else 
+					$month:="0"+String(Month of([Orders]CancelDate))
+				End if 
+				$sort:=$month+"/"+String(Year of([Orders]CancelDate))
+				[Orders]MonthSorter:=$sort
+				SAVE RECORD([Orders])
+				$end:=[Orders]CancelDate
+				NEXT RECORD([Orders])
+			End for 
+			  // Rep_AvgMarkup 
+			
+			vtTitle:="Projected GP "+[Orders]Customer+"  ("+String($start)+" - "+String($end)+")"
+			
+		End if 
+End case 
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+  //SET VISIBLE(vlProgress;False)

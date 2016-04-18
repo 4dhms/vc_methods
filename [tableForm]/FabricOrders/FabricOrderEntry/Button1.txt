@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+FabOrder_BuildArt (1)
+If (Old([FabricOrders]ArticleNo)#[FabricOrders]ArticleNo)
+	FabPO_ChangedField (->[FabricOrders]ArticleNo)
+End if 

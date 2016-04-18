@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Undo line?")
+If (ok=1)
+	QUERY([Orders];[Orders]OrderNum=alPOOrder{alPOOrder})
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName=asSheetNames{asSheetNames})
+	arPrice{asSheetNames}:=[CostSheets]UnitCostSeaWC
+	vrLDP:=[CostSheets]UnitCostSeaWC
+	vrUnit1:=[CostSheets]FreightBOAT
+	vrUnit2:=[CostSheets]BrokerageChg
+	vrUnit3:=[CostSheets]Quota
+	vrUnit4:=[CostSheets]DutyRate
+	vsEntryNumber:=[CostSheets]CustomsEntryN
+	vdWhenDate:=[CostSheets]CustomsDate
+	
+	asXStyle{alPOOrder}:=[Orders]StyleNumber
+	asEnterer{alPOOrder}:=[CostSheets]CustomsEntryN
+	adXShip{alPOOrder}:=[CostSheets]CustomsDate
+	arMCol1{alPOOrder}:=[CostSheets]FreightBOAT
+	arMCol2{alPOOrder}:=[CostSheets]BrokerageChg
+	asSheetNames{alPOOrder}:=[CostSheets]SheetName
+	alCostLineKey{alPOOrder}:=[CostSheets]SheetID
+	arPrice{alPOOrder}:=[CostSheets]UnitCostSea
+	
+	afBatchList{alPOOrder}:=False
+	arFOB{alPOOrder}:=[CostSheets]FOB
+	alXQty{alPOOrder}:=[Orders]TotalOrderQuantity
+	arMCol3{alPOOrder}:=[CostSheets]Quota
+	arMCol4{alPOOrder}:=[CostSheets]Duty1
+	  //alTrackShipped{alPOOrder}:=[CostSheets]ActualUnitsShipped
+	  //afTrackShip{alPOOrder}:=False
+End if 

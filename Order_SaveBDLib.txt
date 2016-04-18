@@ -1,0 +1,59 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($size)
+C_TEXT($bdname;$message)
+
+$i:=1
+For ($i;1;10)
+	$size:=Get pointer("vsSize"+String($i))
+	If ($size->#"")
+		If ($bdName#"")
+			$bdName:=$bdName+"-"
+		End if 
+		$bdName:=$bdName+$size->
+	End if 
+	OBJECT SET VISIBLE($size->;False)
+End for 
+OBJECT SET VISIBLE(bSaveBD;False)
+
+QUERY([BreakDownLibrary];[BreakDownLibrary]BDName=$bdName)
+If (Records in selection([BreakDownLibrary])>0)
+	WinPrompt ("That breakdown already exists.")
+	asBreakdowns:=Find in array(asBreakdowns;$bdName)
+Else 
+	CREATE RECORD([BreakDownLibrary])
+	[BreakDownLibrary]BDKey:=Sequence number([BreakDownLibrary])
+	[BreakDownLibrary]BDName:=$bdName
+	[BreakDownLibrary]BDN1:=vsSize1
+	[BreakDownLibrary]BDN2:=vsSize2
+	[BreakDownLibrary]BDN3:=vsSize3
+	[BreakDownLibrary]BDN4:=vsSize4
+	[BreakDownLibrary]BDN5:=vsSize5
+	[BreakDownLibrary]BDN6:=vsSize6
+	[BreakDownLibrary]BDN7:=vsSize7
+	[BreakDownLibrary]BDN8:=vsSize8
+	[BreakDownLibrary]BDN9:=vsSize9
+	[BreakDownLibrary]BDN10:=vsSize10
+	SAVE RECORD([BreakDownLibrary])
+	
+	ARRAY TEXT(asBreakdowns;0)
+	ALL RECORDS([BreakDownLibrary])
+	SELECTION TO ARRAY([BreakDownLibrary]BDName;asBreakdowns)
+	SORT ARRAY(asBreakdowns;>)
+	INSERT IN ARRAY(asBreakdowns;1;1)
+	asBreakdowns{1}:="Breakdowns"
+	asBreakdowns:=1
+	APPEND TO ARRAY(asBreakdowns;"Add Breakdown")
+	asBreakdowns:=Find in array(asBreakdowns;$bdName)
+	Order_BuildBD (-9)
+	
+	ARRAY TEXT(asSubCC;2)
+	asSubCC{1}:="peter.goldberger@nubby.com"
+	asSubCC{2}:="phil@persinger.com"
+	$message:="New Breakdown:"+Char(13)+$bdname+Char(13)
+	$message:=$message+"Created by "+Current user+Char(13)+String(Current date(*))+"  "+String(Current time(*))
+	
+	Mail_SimpleSend ("List";"None";"New Breakdown ("+String(Current date(*))+")";$message+Char(13))
+	
+End if 
+

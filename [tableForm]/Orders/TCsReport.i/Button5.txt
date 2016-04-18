@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docRef)
+C_TEXT($packet)
+C_TEXT($rev)
+
+$docRef:=Create document("";"TEXT")
+If (ok=1)
+	$packet:="Order Number"+Char(9)
+	$packet:=$packet+"Style Number"+Char(9)
+	$packet:=$packet+"Factory"+Char(9)
+	$packet:=$packet+"XFactory"+Char(9)
+	$packet:=$packet+"Cancel Date"+Char(9)
+	$packet:=$packet+"Actual"+Char(9)
+	$packet:=$packet+"Customer"+Char(9)
+	$packet:=$packet+"Division"+Char(9)
+	$packet:=$packet+"Quantity"+Char(9)
+	$packet:=$packet+"Enterer"+Char(13)
+	
+	SEND PACKET($docRef;$packet)
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	
+	For ($i;1;Records in selection([Orders]))
+		Case of 
+			: ([Orders]Cancelled)
+				$rev:="CANCELLED"
+			: ([Orders]RevisionNumber>0)
+				$rev:="Revision "+String([Orders]RevisionNumber)
+			Else 
+				$rev:=""
+		End case 
+		
+		
+		$packet:=String([Orders]OrderNum)+Char(9)
+		$packet:=$packet+[Orders]StyleNumber+Char(9)
+		$packet:=$packet+[Orders]Factory+Char(9)
+		$packet:=$packet+String([Orders]ShipDateFactory)+Char(9)
+		$packet:=$packet+String([Orders]CancelDate)+Char(9)
+		$packet:=$packet+String([Orders]ActualDeliveryDate)+Char(9)
+		$packet:=$packet+[Orders]Customer+Char(9)
+		$packet:=$packet+[Orders]OrderDivision+Char(9)
+		$packet:=$packet+String([Orders]TotalOrderQuantity)+Char(9)
+		$packet:=$packet+[Orders]Order_Enterer+Char(13)
+		SEND PACKET($docRef;$packet)
+		NEXT RECORD([Orders])
+	End for 
+	CLOSE DOCUMENT($docRef)
+	WinPrompt ("File has been created on your desktop.")
+End if 

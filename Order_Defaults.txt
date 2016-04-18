@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Staff];[Staff]UserName=Current user)
+
+If ([Staff]CuttingTicket#"")
+	[Orders]Cutting Ticket:=[Staff]CuttingTicket
+	OBJECT SET FONT STYLE([Orders]Cutting Ticket;1)
+	OBJECT SET COLOR([Orders]Cutting Ticket;-(Black+(256*Yellow)))
+End if 
+If ([Staff]LabelSource#"")
+	[Orders]LabelSource:=[Staff]LabelSource
+	OBJECT SET FONT STYLE([Orders]LabelSource;1)
+	OBJECT SET COLOR([Orders]LabelSource;-(Black+(256*Yellow)))
+End if 
+If ([Staff]Care#"")
+	[Orders]Care Label:=[Staff]Care
+	OBJECT SET FONT STYLE([Orders]Care Label;1)
+	OBJECT SET COLOR([Orders]Care Label;-(Black+(256*Yellow)))
+End if 
+If ([Staff]PriceTerms#"")
+	[Orders]Price Terms:=[Staff]PriceTerms
+	OBJECT SET FONT STYLE([Orders]Price Terms;1)
+	OBJECT SET COLOR([Orders]Price Terms;-(Black+(256*Yellow)))
+End if 
+If ([Staff]AfterApproval#"")
+	[Orders]AfterApproval:=[Staff]AfterApproval
+	OBJECT SET FONT STYLE([Orders]AfterApproval;1)
+	OBJECT SET COLOR([Orders]AfterApproval;-(Black+(256*Yellow)))
+End if 
+If ([Staff]SizeCatagory#"")
+	[Orders]SizeCategory:=[Staff]SizeCatagory
+	Case of 
+		: ([Staff]SizeCatagory="Petite")
+			rPetite:=1
+			OBJECT SET COLOR(*;"xPetite";-(Black+(256*Yellow)))
+		: ([Staff]SizeCatagory="Missy")
+			rMissy:=1
+			OBJECT SET COLOR(*;"xMissy";-(Black+(256*Yellow)))
+		: ([Staff]SizeCatagory="Large")
+			rLarge:=1
+			OBJECT SET COLOR(*;"xLarge";-(Black+(256*Yellow)))
+	End case 
+End if 
+
+UNLOAD RECORD([Staff])

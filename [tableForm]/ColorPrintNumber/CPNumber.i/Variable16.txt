@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_BOOLEAN($continue)
+  //C_LONGINT($tester)
+  //
+  //If ([ColorPrintNumber]CPName="")
+  //WinPrompt ("Enter Name:")
+  //Else 
+  //If ([ColorPrintNumber]ColorCode#"")
+  //WinChoice ("Color code exists."+Char(13)+"Do you want to overwrite "+[ColorPrintNumber]ColorCode+"?")
+  //If (ok=1)
+  //$continue:=True
+  //End if 
+  //Else 
+  //$continue:=True
+  //End if 
+  //
+  //If ($continue)
+  //WinChoice ("Do you want the system to create the code or do you want to do it yourself?";"Auto";"Custom";"Cancel")
+  //If (ok=1)
+  //If (bChoice2=1)
+  //WinFind ("Color code";8)
+  //vsRequestString:=Uppercase(vsRequestString)
+  //Case of 
+  //: (Length(vsRequestString)>6)
+  //WinPrompt (vsRequestString+" is too long."+Char(13)+"(Six character limit)")
+  //: ([ColorPrintNumber]CPType=2)
+  //[ColorPrintNumber]ColorCode:=vsRequestString
+  //[ColorPrintNumber]ColorCodeCustom:=True
+  //Else 
+  //◊vlCodeCount:=-1
+
+  //While (◊vlCodeCount<0)
+  //End while 
+  //If (◊vlCodeCount>0)
+  //WinPrompt (vsRequestString+" exists already.")
+  //Else 
+  //[ColorPrintNumber]ColorCode:=vsRequestString
+  //[ColorPrintNumber]ColorCodeCustom:=True
+  //End if 
+  //End case 
+  //
+  //Else 
+  //CP_ColorCode ([ColorPrintNumber]CPName;6;[ColorPrintNumber]CPType;[ColorPrintNumber]CPNumber)
+  //[ColorPrintNumber]ColorCode:=vsColorCode
+  //[ColorPrintNumber]ColorCodeCustom:=True
+  //End if 
+  //End if 
+  //End if 
+  //End if 

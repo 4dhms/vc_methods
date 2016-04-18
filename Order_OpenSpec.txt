@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+C_LONGINT($i)
+
+ARRAY TEXT(atOpenSpec;0)
+QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+If (Records in selection([SpecFactory])>0)
+	[Orders]SpecSheet:=True
+	$show:=False
+Else 
+	QUERY([SpecFactory];[SpecFactory]DesignNumber=[Orders]DesignNumber)
+	If (Records in selection([SpecFactory])=0)
+		$show:=False
+	Else 
+		$i:=1
+		ORDER BY([SpecFactory];[SpecFactory]OrderNumber;>)
+		FIRST RECORD([SpecFactory])
+		If (Records in selection([SpecFactory])=1)
+			APPEND TO ARRAY(atOpenSpec;"Open Specsheet")
+		Else 
+			APPEND TO ARRAY(atOpenSpec;"Open Specsheets")
+		End if 
+		For ($i;1;Records in selection([SpecFactory]))
+			If ([SpecFactory]OrderNumber<0)
+				APPEND TO ARRAY(atOpenSpec;"Sample "+String(Abs([SpecFactory]OrderNumber)))
+			Else 
+				APPEND TO ARRAY(atOpenSpec;"Sample "+String([SpecFactory]OrderNumber))
+			End if 
+			NEXT RECORD([SpecFactory])
+		End for 
+		$show:=True
+		atOpenSpec:=1
+	End if 
+End if 
+
+OBJECT SET VISIBLE(atOpenSpec;$show)
+UNLOAD RECORD([SpecFactory])

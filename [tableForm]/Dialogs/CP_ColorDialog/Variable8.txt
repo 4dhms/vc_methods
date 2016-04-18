@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($print)
+C_TEXT($cpnumber)
+C_LONGINT($c)
+
+If (asSolidPrint{Find in array(asOrderType;vsCPType)}="Print")
+	$print:=True
+Else 
+	$print:=False
+End if 
+
+If ($print)
+	$cpnumber:=StripToNumber (vtThreadColor)
+	$cpnumber:=Replace string($cpnumber;"#";"")
+	$cpnumber:=Replace string($cpnumber;" ";"")
+	
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cpnumber)
+	QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+	
+	Case of 
+		: (Position($cpnumber;vtThreadColor)>3)
+			WinChoice ("Is the color number "+$cpnumber+"?")
+			If (ok=1)
+				vtThreadColor:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+			Else 
+				vtThreadColor:="Enter Color Number"
+				GOTO OBJECT(vtThreadColor)
+			End if 
+		: (Records in selection([ColorPrintNumber])=1)
+			vtThreadColor:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+		: (Records in selection([ColorPrintNumber])=0) | (vtThreadColor="Enter Color Number")
+			vtThreadColor:="Enter Color Number"
+			GOTO OBJECT(vtThreadColor)
+		Else 
+			vtThreadColor:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+	End case 
+End if 

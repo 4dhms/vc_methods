@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Designs]DivisionCodeN="05-Cupio Blouse") | ([Designs]DivisionCodeN="04-Cupio@")
+	[Samples]DivisionOverride:=True
+	[Samples]SampleDivision:="03-Cupio"
+	OBJECT SET VISIBLE([Designs]DivisionCodeN;False)
+	OBJECT SET VISIBLE([Samples]SampleDivision;True)
+Else 
+	[Samples]DivisionOverride:=False
+	[Samples]SampleDivision:=[Designs]DivisionCodeN
+	OBJECT SET VISIBLE([Designs]DivisionCodeN;True)
+	OBJECT SET VISIBLE([Samples]SampleDivision;False)
+End if 

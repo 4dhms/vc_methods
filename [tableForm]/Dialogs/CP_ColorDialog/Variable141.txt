@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (afCCoverride{asTypeList})
+		WinChoice ("The code for this color has been manually overriden."+Char(13)+"Clear that override and generate a new color code (recommended).";"Yes";"Keep")
+		If (ok=1)
+			vtColorCode:=""
+			vfCodeOverride:=False
+			afCCoverride{asTypeList}:=False
+			asCC{asTypeList}:=""
+			QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{asTypeList})
+			[CP_OrderXRef]ColorCode:=""
+			SAVE RECORD([CP_OrderXRef])
+			
+		End if 
+	End if 
+	CP_ProcessNumber 
+End if 

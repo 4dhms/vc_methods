@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Shift down)
+		If (Current user="Ping") | (Current user="Peter G") | (Current user="Ricky") | (Current user="Designer") & (<>vlOrderNumber>0) & (vsCPType="Self")
+			If (Current user#"Designer")
+				WinChoice ("Are you sure you want to"+Char(13)+"reset this color code?")
+			End if 
+			If (ok=1) | (Current user="designer")
+				vtColorCode:=""
+				asCC{asTypeList}:=""
+				QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum;*)
+				QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=vsCPNumber)
+				FIRST RECORD([CP_OrderXRef])
+				[CP_OrderXRef]ColorCode:=""
+				SAVE RECORD([CP_OrderXRef])
+				UNLOAD RECORD([CostSheets])
+				ACCEPT
+			End if 
+		Else 
+			WinPrompt ("Don't hold the shift down.")
+		End if 
+	: (vsCPNumber#"TBD") & (Current user#"Marisol") & (Current user#"Peter G") & (Current user#"Ricky") & (Current user#"Designer") & (<>vlOrderNumber>0) & ([Orders]UPC=1) & ([Orders]PODate#!00-00-00!)
+		WinPrompt ("UPC exists. You can not delete."+Char(13)+Char(13)+"Contact Peter G.")
+	Else 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alSelfKey{asTypeList})
+		
+		[CP_OrderXRef]ColorCode:=""
+		SAVE RECORD([CP_OrderXRef])
+		vtColorCode:=""
+		UNLOAD RECORD([CP_OrderXRef])
+		OBJECT SET VISIBLE(bMove;False)
+		OBJECT SET ENTERABLE(vsCPNumber;True)
+		GOTO OBJECT(vsCPNumber)
+End case 

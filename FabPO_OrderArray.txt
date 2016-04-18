@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asOrderNumbers;0)
+ARRAY DATE(adPODate;0)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(asTypeList;0)
+ARRAY TEXT(asXFactory;0)
+ARRAY TEXT(asTypeList;0)
+ARRAY LONGINT(alStyleFab;0)
+ARRAY LONGINT(alColorChange;0)
+
+C_LONGINT($i;$n)
+C_TEXT($order)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+  //fixes old system where the key is in the OrderXRef table
+
+CREATE SET([CP_OrderXRef];"colors")
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+
+FIRST RECORD([OrdersFabricXRef])
+$i:=1
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		ADD TO SET([CP_OrderXRef];"colors")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+USE SET("colors")
+CLEAR SET("colors")
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+
+For ($i;1;Records in selection([CP_OrderXRef]))
+	If (Find in array(asOrderNumbers;"@"+String([CP_OrderXRef]OrderNumber))<1)
+		asOrderNumbers:=0
+		FabPO_Populate ([CP_OrderXRef]OrderNumber)
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+UNLOAD RECORD([CP_OrderXRef])
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+
+ARRAY LONGINT($ordernumbers;0)
+SELECTION TO ARRAY([OrdersFabricXRef]OrderNumber;$ordernumbers)
+
+  //$i:=1
+  //FIRST RECORD([OrdersFabricXRef])
+  //For ($i;1;Records in selection([OrdersFabricXRef]))
+  //$order:="@"+String($ordernumbers{$i})
+  //If ($ordernumbers{$i}#0)
+  //FabPO_Populate ($ordernumbers{$i})
+  //End if 
+  //NEXT RECORD([OrdersFabricXRef])
+  //End for 
+
+UNLOAD RECORD([Orders])

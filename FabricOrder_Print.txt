@@ -1,0 +1,287 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$pixelcount;$c;$s)
+C_TEXT($rem1;$rem2;$rem)
+C_BOOLEAN($done;$break)
+
+FabPO_PrintPrep 
+SET PRINT OPTION(Orientation option;1)
+If (vfPDF)
+	vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+	SET PRINT OPTION(Destination option;3;vtPathName)
+End if 
+
+Print form([FabricOrders];"PrintHeader")
+Print form([FabricOrders];"PrintHeaderInfo")
+$pixelcount:=520
+
+$n:=1
+$c:=50
+FIRST RECORD([ShipTo])
+
+For ($n;1;Records in selection([ShipTo]))
+	$rem1:=[ShipTo]ShipTo
+	$rem2:=[ShipTo]ShippingInstrux
+	$done:=False
+	Repeat 
+		$break:=False
+		$c:=40
+		
+		Repeat 
+			Case of 
+				: (Shift down)
+					$break:=True
+				: (Position(Char(10);$rem1;*)<$c) & (Position(Char(10);$rem1;*)>0)
+					$c:=Position(Char(10);$rem1;*)
+					$break:=True
+				: (Position(Char(13);$rem1;*)<$c) & (Position(Char(13);$rem1;*)>0)
+					$c:=Position(Char(13);$rem1;*)
+					$break:=True
+				: (Length($rem1)<$c)
+					$c:=Length($rem1)+1
+					$break:=True
+				: ($rem1[[$c]]=Char(13))
+					$break:=True
+				: ($rem1[[$c]]=Char(10))
+					$break:=True
+				: ($rem1[[$c]]=" ")
+					$break:=True
+				: (Not($break))
+					$c:=$c-1
+			End case 
+		Until ($break) | (Shift down)
+		
+		vtField1:=Substring($rem1;1;$c)
+		$rem1:=Substring($rem1;$c+1;9999)
+		
+		$break:=False
+		$c:=30
+		Repeat 
+			Case of 
+				: (Shift down)
+					$break:=True
+				: (Position(Char(10);$rem2;*)<$c) & (Position(Char(10);$rem2;*)>0)
+					$c:=Position(Char(10);$rem2;*)
+					$break:=True
+				: (Position(Char(13);$rem2;*)<$c) & (Position(Char(13);$rem2;*)>0)
+					$c:=Position(Char(13);$rem2;*)
+					$break:=True
+				: (Length($rem2)<$c)
+					$c:=Length($rem2)+1
+					$break:=True
+				: ($rem2[[$c]]=Char(13))
+					$break:=True
+				: ($rem2[[$c]]=Char(10))
+					$break:=True
+				: ($rem2[[$c]]=" ")
+					$break:=True
+				: (Not($break))
+					$c:=$c-1
+			End case 
+			
+		Until ($break)
+		vtField2:=Substring($rem2;1;$c-1)
+		$rem2:=Substring($rem2;$c+1;9999)
+		
+		
+		Print form([FabricOrders];"PrintShipToLine")
+		$pixelcount:=$pixelcount-13
+		Case of 
+			: ($rem1="") & ($rem2="")
+				$done:=True
+			: (Current user="Designer") & (Shift down)
+				$done:=True
+		End case 
+	Until ($done) | (Shift down)
+	Print form([FabricOrders];"PrintSpace")
+	$pixelcount:=$pixelcount-12
+	NEXT RECORD([ShipTo])
+End for 
+
+
+If ([FabricOrders]POType=1)
+	vsColHead:="Ligne"
+Else 
+	vsColHead:="Width"
+End if 
+
+Print form([FabricOrders];"PrintFiber")
+$pixelcount:=$pixelcount-79
+
+$i:=1
+FIRST RECORD([FabPOLines])
+For ($i;1;Records in selection([FabPOLines]))
+	If ([FabricOrders]POType=1)
+		vsCol:=[FabPOLines]Ligne
+	Else 
+		vsCol:=[FabPOLines]POWidth
+	End if 
+	If ($pixelcount<24)
+		$pixelcount:=640
+		PAGE BREAK(>)
+		Print form([FabricOrders];"PrintHeader")
+		Print form([FabricOrders];"PrintSpace")
+		vtField3:="(continued)"
+		Print form([FabricOrders];"PrintNotes")
+		vtField3:=""
+		Print form([FabricOrders];"PrintNotes")
+		Print form([FabricOrders];"PrintFiber")
+		$pixelcount:=$pixelcount-79
+	End if 
+	  //ALERT(String(Length([FabPOLines]ColorPrint+[FabPOLines]ColorName))+"  "+[FabPOLines]ColorPrint+[FabPOLines]ColorName)
+	
+	If (Length([FabPOLines]ColorPrint+[FabPOLines]ColorName)>20)
+		Print form([FabricOrders];"PrintSpecialLine")
+		$pixelcount:=$pixelcount-28
+	Else 
+		Print form([FabricOrders];"PrintFiberLine")
+		$pixelcount:=$pixelcount-20
+	End if 
+	NEXT RECORD([FabPOLines])
+End for 
+
+Print form([FabricOrders];"PrintOrderSub")
+$pixelcount:=$pixelcount-49
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+CREATE SET([OrdersFabricXRef];"ordX")
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID;*)
+	QUERY([OrdersFabricXRef]; & ;[OrdersFabricXRef]OrderNumber=[CP_OrderXRef]OrderNumber)
+	ADD TO SET([OrdersFabricXRef];"ordX")
+	NEXT RECORD([CP_OrderXRef])
+End for 
+USE SET("ordX")
+CLEAR SET("ordX")
+
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	If ($pixelcount<24)
+		$pixelcount:=640
+		PAGE BREAK(>)
+		Print form([FabricOrders];"PrintHeader")
+		Print form([FabricOrders];"PrintSpace")
+		vtField3:="(continued)"
+		Print form([FabricOrders];"PrintNotes")
+		vtField3:=""
+		Print form([FabricOrders];"PrintNotes")
+	End if 
+	vlOrderNumber:=[OrdersFabricXRef]OrderNumber
+	FabricOrder_OrdersColors 
+	$pixelcount:=$pixelcount-14
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+
+  //QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+
+  //$i:=1
+  //FIRST RECORD([CP_OrderXRef])
+  //For ($i;1;Records in selection([CP_OrderXRef]))
+  //If ($pixelcount<24)
+  //$pixelcount:=640
+  //PAGE BREAK(>)
+  //Print form([FabricOrders];"PrintHeader")
+  //Print form([FabricOrders];"PrintSpace")
+  //vtField3:="(continued)"
+  //Print form([FabricOrders];"PrintNotes")
+  //vtField3:=""
+  //Print form([FabricOrders];"PrintNotes")
+  //End if 
+  //vlOrderNumber:=0
+  //FabricOrder_OrdersColors 
+  //$pixelcount:=$pixelcount-14
+  //NEXT RECORD([CP_OrderXRef])
+  //End for 
+
+$rem:=Replace string(vtPONote;"  ";" ")
+$rem:=Replace string($rem;Char(13);Char(10))
+
+  //If ($rem≤1≥=" ") 
+  //$rem:=Substring($rem;2;99999)
+  //End if 
+
+$done:=False
+Repeat 
+	Case of 
+		: ($rem[[1]]=Char(10)) | ($rem[[1]]=" ")
+			$rem:=Substring($rem;2;99999)
+		: ($rem[[1]]=Char(13)) | ($rem[[1]]=" ")
+			$rem:=Substring($rem;2;99999)
+	End case 
+	
+	Case of 
+		: (Length($rem)<1)
+			$done:=True
+		: ($rem[[1]]#Char(10))
+			$done:=True
+		: ($rem[[1]]#Char(13))
+			$done:=True
+	End case 
+	
+Until ($done)
+
+Print form([FabricOrders];"PrintSpace")
+$pixelcount:=$pixelcount-12
+
+$done:=False
+
+Repeat 
+	
+	If ($pixelcount<13) & (Length($rem)>1)
+		$pixelcount:=640
+		PAGE BREAK(>)
+		Print form([FabricOrders];"PrintHeader")
+		Print form([FabricOrders];"PrintSpace")
+		vtField3:="(continued)"
+		Print form([FabricOrders];"PrintNotes")
+		vtField3:=""
+		Print form([FabricOrders];"PrintNotes")
+	End if 
+	
+	Case of 
+		: (Current user="Designer") & (Shift down)
+			$done:=True
+		: ($rem="")
+			$done:=True
+	End case 
+	
+	$n:=70
+	$break:=False
+	Repeat 
+		Case of 
+			: (Current user="Designer") & (Shift down)
+				$break:=True
+				  //: (Position(Char(13);$rem;*)<$n) & (Position(Char(13);$rem;*)>0)
+				  //$break:=True
+				  //$n:=Position(Char(13);$rem;*)
+			: (Position(Char(10);$rem;*)<$n) & (Position(Char(10);$rem;*)>0)
+				$break:=True
+				$n:=Position(Char(10);$rem;*)
+			: (Length($rem)<$n)
+				$break:=True
+			: ($rem[[$n]]=Char(13))
+				$break:=True
+			: ($rem[[$n]]=Char(10))
+				$break:=True
+			: ($rem[[$n]]=" ")
+				$break:=True
+			Else 
+				$n:=$n-1
+		End case 
+		
+	Until ($break)
+	
+	vtField3:=Substring($rem;1;$n)
+	
+	If ($rem#"")
+		Print form([FabricOrders];"PrintNotes")
+		$pixelcount:=$pixelcount-13
+	End if 
+	$rem:=Substring($rem;$n+1;9999)
+	
+Until ($done)

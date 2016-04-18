@@ -1,0 +1,96 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$user;$pass;$host;$hostPath;$hostFolder)
+C_LONGINT($i;$ftpID;$errorCode;$inarray)
+C_DATE($deleteDate)
+C_BOOLEAN($upload;$0)
+vfUploading:=True
+$upload:=False
+
+ALL RECORDS([Preferences])
+$path:=[Preferences]Backuppath
+$host:=[Preferences]BackupFTP
+$user:=[Preferences]FTPUserName
+$pass:=[Preferences]FTPPassword
+UNLOAD RECORD([Preferences])
+
+$deleteDate:=Current date(*)-30
+
+If (Test path name($path)=0)
+	
+	ARRAY TEXT($names;0)
+	ARRAY LONGINT($sizes;0)
+	ARRAY LONGINT($kinds;0)
+	ARRAY DATE($modDates;0)
+	
+	C_TEXT($backupfile)
+	
+	If (Test path name($path)=0)
+		$backupfile:=Backup_FindFile ($path)
+		
+		$path:=Replace string($path+":"+$backupfile;"::";":")
+		
+		DELAY PROCESS(Current process;240)
+		
+		$errorcode:=FTP_Login ($host;$user;$pass;$ftpID)
+		EMail_Log (True;$errorcode;"FTP Login")
+		
+		$errorcode:=FTP_GetDirList ($ftpID;$hostFolder;$names;$sizes;$kinds;$modDates)
+		EMail_Log (True;$errorcode;"FTP List")
+		$inarray:=Find in array($names;$backupfile)
+		
+		$i:=1
+		For ($i;1;Size of array($names))
+			If (Position(".4B";$names{$i})>0)
+				If ($modDates{$i}<$deleteDate)
+					$hostPath:=$hostFolder+$names{$i}
+					$errorCode:=FTP_Delete ($ftpID;$hostPath)
+				End if 
+			End if 
+		End for 
+		
+		vtFailureMessage:=$backupfile
+		
+		Case of 
+			: ($inarray<1)
+				$upload:=True
+			: ($sizes{$inarray}<300)
+				$upload:=True
+			Else 
+		End case 
+		
+		If ($upload)
+			$errorcode:=FTP_Send ($ftpID;$path;$hostFolder+$backupfile;0)
+			EMail_Log (True;$errorcode;"FTP Send")
+			
+			ARRAY TEXT($names;0)
+			ARRAY LONGINT($sizes;0)
+			ARRAY LONGINT($kinds;0)
+			ARRAY DATE($modDates;0)
+			$errorcode:=FTP_GetDirList ($ftpID;$hostFolder;$names;$sizes;$kinds;$modDates)
+			EMail_Log (True;$errorcode;"FTP List")
+			
+			$inarray:=Find in array($names;$backupfile)
+			
+			If ($inarray>0)
+				If ($sizes{$inarray}>100)
+					Mail_SimpleSend ("phil@persinger.com";"None";"Backup Archive ("+String(Current date(*))+")";$backupfile)
+					EMail_Log (True;1;"Backup sent")
+					$0:=True
+				Else 
+					$0:=False
+				End if 
+			End if 
+			
+			$errorcode:=FTP_Logout ($ftpID)
+			EMail_Log (True;$errorcode;"FTP Logout")
+			vfUploading:=False
+			
+		Else 
+			$0:=True
+		End if 
+	Else 
+		$0:=True
+	End if 
+Else 
+	$0:=True
+End if 

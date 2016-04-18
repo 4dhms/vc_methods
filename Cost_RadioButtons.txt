@@ -1,0 +1,14 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (cbSG=1)
+		vfSample:=True
+		vsSubhead:="Enter Sample Order:"
+	: (cbDesign=1)
+		vfDesign:=True
+		vsSubhead:="Enter Design Number:"
+	: (cbStyle=1)
+		vfStyle:=True
+		vsSubhead:="Enter Style Number:"
+	Else 
+		vsSubhead:="Enter HMS Order Number:"
+End case 

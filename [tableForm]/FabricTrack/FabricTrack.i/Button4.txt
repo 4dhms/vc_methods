@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asMOrder;0)
+
+Case of 
+	: (Size of array(alSOrder)<1)
+		WinPrompt ("Enter orders to track.")
+	: ([FabricTrack]SheetName="")
+		WinPrompt ("This tracking sheet needs a name.")
+		GOTO OBJECT([FabricTrack]SheetName)
+	Else 
+		FabricTrack_Build 
+		
+		FORM GOTO PAGE(1)
+End case 

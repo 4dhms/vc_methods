@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY TEXT(asSizeName;12)
+C_POINTER($size)
+
+$i:=1
+For ($i;1;12)
+	$size:=Get pointer("vsSize"+String($i))
+	asSizeName{$i}:=$size->
+End for 
+INSERT IN ARRAY(asSizeName;1;1)
+asSizeName{1}:="Sizes"

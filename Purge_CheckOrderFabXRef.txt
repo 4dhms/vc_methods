@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$sample;$start)
+
+$start:=Records in selection([OrdersFabricXRef])
+
+$i:=1
+CREATE EMPTY SET([OrdersFabricXRef];"CS")
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	$sample:=Abs([OrdersFabricXRef]OrderNumber)
+	If ([OrdersFabricXRef]OrderNumber>0)
+		QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+		If (Records in selection([Orders])=0)
+			ADD TO SET([OrdersFabricXRef];"CS")
+		End if 
+	Else 
+		QUERY([Samples];[Samples]SampleNumber=$sample)
+		If (Records in selection([Samples])=0)
+			ADD TO SET([OrdersFabricXRef];"CS")
+		End if 
+	End if 
+	
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+
+USE SET("CS")
+CLEAR SET("CS")
+
+ALERT("Done: Start "+String($start)+" / "+String(Records in selection([OrdersFabricXRef])))
+

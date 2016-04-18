@@ -1,0 +1,73 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($g)
+C_TEXT($title)
+C_TEXT($groupType)
+ARRAY TEXT($groupList;0)
+C_LONGINT($uniqueNumber)
+$uniqueNumber:=1
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+APPLY TO SELECTION([DLPages];[DLPages]DLItemKey:=0)
+REDUCE SELECTION([DLPages];0)
+
+APPLY TO SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber:=0)
+
+Case of 
+	: ([DesignLines]GroupChoice="No grouping")
+		$groupType:="No Grouping"
+	: ([DesignLines]GroupChoice="Design Number")
+		$groupType:="Design Number"
+		DISTINCT VALUES([DesignLineIncluded]DesignNumber;$groupList)
+	: ([DesignLines]GroupChoice="Style Number")
+		$groupType:="Style Number"
+		DISTINCT VALUES([DesignLineIncluded]StyleNumber;$groupList)
+	: ([DesignLines]GroupChoice="Line Group")
+		$groupType:="Line Group"
+		DISTINCT VALUES([DesignLineIncluded]DLGroupName;$groupList)
+	: ([DesignLines]GroupChoice="Fiber")
+		$groupType:="Fiber"
+		DISTINCT VALUES([DesignLineIncluded]Fiber;$groupList)
+	: ([DesignLines]GroupChoice="Stitch")
+		$groupType:="Stitch"
+		DISTINCT VALUES([DesignLineIncluded]Stitch;$groupList)
+End case 
+SORT ARRAY($groupList;>)
+
+vlPage:=1
+vlLastPage:=1  //also current page
+CREATE SET([DesignLineIncluded];"LineSet")
+
+If ($groupType="No grouping")  //NO GROUPING
+	DL_BuildAllPages ("";"")
+Else   //GROUPED
+	$g:=1
+	For ($g;1;Size of array($groupList))
+		USE SET("LineSet")
+		Case of 
+			: ($groupType="Stitch")
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]Stitch=$groupList{$g})
+				$title:=[DesignLineIncluded]Stitch
+			: ($groupType="Fiber")
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]Fiber=$groupList{$g})
+				$title:=[DesignLineIncluded]Fiber
+			: ($groupType="Line Group")
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]DLGroupName=$groupList{$g})
+				$title:=[DesignLineIncluded]DLGroupName
+			: ($groupType="Design Number")
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]DesignNumber=$groupList{$g})
+				If (Num([DesignLineIncluded]DesignNumber)<0)
+					$title:="Special "+String($uniqueNumber)
+					$uniqueNumber:=$uniqueNumber+1
+				Else 
+					$title:=[DesignLineIncluded]DesignNumber
+				End if 
+			: ($groupType="Style Number")
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]StyleNumber=$groupList{$g})
+				$title:=[DesignLineIncluded]StyleNumber
+		End case 
+		If (Records in selection([DesignLineIncluded])>0)
+			DL_BuildAllPages ($groupType;$title)
+		End if 
+	End for 
+	CLEAR SET("LineSet")
+End if 

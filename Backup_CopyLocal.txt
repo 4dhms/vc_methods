@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$pathBK;$pathBL;$targetBK;$targetBL;$target)
+C_TEXT($backupfile;$logfile)
+C_LONGINT($i)
+C_LONGINT($hiBK;$hiBL)
+C_TEXT($testBK;$testBL)
+
+ARRAY TEXT($doclist;0)
+
+ALL RECORDS([Preferences])
+$path:=[Preferences]Backuppath
+UNLOAD RECORD([Preferences])
+
+$hiBK:=0
+$hiBL:=0
+
+If (Test path name($path)=0)
+	$path:=Replace string($path+":"+$backupfile;"::";":")
+	
+	DOCUMENT LIST($path;$doclist)
+	
+	$i:=1
+	For ($i;1;Size of array($doclist))
+		
+		Case of 
+			: ($doclist{$i}="HMSData14@4BK")
+				$testBK:=Substring($doclist{$i};1;Position("]";$doclist{$i}))
+				$testBK:=Substring($doclist{$i};Position("[";$doclist{$i});99)
+				If (Num($testBK)>$hiBK)
+					$hiBK:=Num($testBK)
+					$backupfile:=$doclist{$i}
+				End if 
+			: ($doclist{$i}="HMSData14@4BL")
+				$testBL:=Substring($doclist{$i};1;Position("]";$doclist{$i}))
+				$testBL:=Substring($doclist{$i};Position("]";$doclist{$i});99)
+				If (Num($testBL)>$hiBL)
+					$hiBL:=Num($testBL)
+					$logfile:=$doclist{$i}
+				End if 
+				  //ALERT($logfile)
+		End case 
+	End for 
+End if 
+
+If (Test path name("4D:")=0)
+	$target:="4D:Backup:"
+	If (Test path name($target)#0)
+		CREATE FOLDER($target)
+	End if 
+	
+	$pathBK:=$path+$backupfile
+	$pathBL:=$path+$logfile
+	$targetBK:=$target+$backupfile
+	$targetBL:=$target+$logfile
+	
+	If (Test path name($pathBK)=1) & (Test path name($pathBL)=1) & (Test path name($target)=0)
+		If (Test path name($targetBK)#1)
+			COPY DOCUMENT($pathBK;$targetBK)
+		End if 
+		If (Test path name($targetBL)#1)
+			COPY DOCUMENT($pathBL;$targetBL)
+		End if 
+	End if 
+End if 
+
+Backup_CleanUp 

@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($strip)
+C_BOOLEAN($pass)
+$pass:=True
+
+ARRAY TEXT($pref;0)
+
+LIST TO ARRAY("Division04 Prefix";$pref)
+
+If (<>vlOrderNumber>0)
+	$strip:=Substring([Orders]StyleNumber;1;Position(StripToNumber ([Orders]StyleNumber);[Orders]StyleNumber)-1)
+	If ([Orders]OrderDivision="04-Eldeen@")
+		If (Find in array($pref;$strip)<1)
+			WinPrompt ("Style Number contains an invalid prefix for Division "+[Orders]OrderDivision)
+			[Orders]StyleNumber:=""
+			$pass:=False
+		End if 
+	Else 
+		If (Find in array($pref;$strip)>0)
+			WinPrompt ("Style Number Prefix Warning:"+Char(13)+$strip+" is reserved for Division 04.")
+			[Orders]StyleNumber:=""
+			$pass:=False
+		End if 
+	End if 
+	
+	
+Else 
+	$strip:=Substring([Samples]StyleNum;1;Position(StripToNumber ([Samples]StyleNum);[Samples]StyleNum)-1)
+	If ([Samples]SampleDivision="04-Eldeen@")
+		If (Find in array($pref;$strip)<1)
+			WinPrompt ("Style Number contains an invalid prefix for Division "+[Samples]SampleDivision)
+			[Samples]StyleNum:=""
+			$pass:=False
+		End if 
+	Else 
+		If (Find in array($pref;$strip)>0)
+			WinPrompt ("Style Number Prefix Warning:"+Char(13)+$strip+" is reserved for Division 04.")
+			[Samples]StyleNum:=""
+			$pass:=False
+		End if 
+	End if 
+	
+End if 
+
+$0:=$pass

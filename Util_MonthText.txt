@@ -1,0 +1,38 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($month)
+
+Case of 
+	: (asSeasonA=2) & ($1<7)
+		$month:=$1+6
+	: (asSeasonA=2) & ($1>6)
+		$month:=$1-6
+	Else 
+		$month:=$1
+End case 
+
+Case of 
+	: ($month=1)
+		$0:="January"
+	: ($month=2)
+		$0:="February"
+	: ($month=3)
+		$0:="March"
+	: ($month=4)
+		$0:="April"
+	: ($month=5)
+		$0:="May"
+	: ($month=6)
+		$0:="June"
+	: ($month=7)
+		$0:="July"
+	: ($month=8)
+		$0:="August"
+	: ($month=9)
+		$0:="September"
+	: ($month=10)
+		$0:="October"
+	: ($month=11)
+		$0:="November"
+	: ($month=12)
+		$0:="December"
+End case 

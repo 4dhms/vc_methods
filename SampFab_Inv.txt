@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$next;$n)
+C_TEXT($inv;$path)
+C_BOOLEAN($done)
+C_TIME($docref)
+
+
+WinChoice ("Select function";"Find POs";"Import";"Invoice";"Excel";"Cancel")
+If (ok=1)
+	Case of 
+		: (bChoice4=1)
+			$docref:=Create document("";"xls")
+			If (ok=1)
+				$path:=Document
+				SEND PACKET($docref;"SF Order Number"+Char(9)+"Style Number"+Char(9)+"Design Number"+Char(9)+"Article Number"+Char(9)+"To"+Char(9)+"Description"+Char(13))
+				$i:=1
+				FIRST RECORD([SampleFabrics])
+				For ($i;1;Records in selection([SampleFabrics]))
+					SEND PACKET($docref;String([SampleFabrics]SampleFab PO Nu)+Char(9)+[SampleFabrics]Style Num+Char(9)+[SampleFabrics]Design Num+Char(9))
+					SEND PACKET($docref;[SampleFabrics]Sam FabArtNum 1+Char(9)+[SampleFabrics]Fabric Source+Char(9)+[SampleFabrics]DescriptionFab+Char(13))
+					NEXT RECORD([SampleFabrics])
+				End for 
+				
+				CLOSE DOCUMENT($docref)
+				SHOW ON DISK($path)
+			End if 
+		: (bChoice2=1)
+			SampFab_Import 
+		: (bChoice3=1)
+			$inv:=Request("Enter Invoice Number:")
+			If (ok=1)
+				$i:=1
+				FIRST RECORD([SampleFabrics])
+				For ($i;1;Records in selection([SampleFabrics]))
+					[SampleFabrics]Invoice:=$inv
+					SAVE RECORD([SampleFabrics])
+					NEXT RECORD([SampleFabrics])
+				End for 
+			End if 
+		Else 
+			CREATE EMPTY SET([SampleFabrics];"inv")
+			$done:=False
+			Repeat 
+				$next:=Num(Request("Enter next PO Number (Cancel when done):"))
+				Case of 
+					: (Shift down)
+						$done:=True
+					: (ok=0)
+						$done:=True
+					Else 
+						QUERY([SampleFabrics];[SampleFabrics]SampleFab PO Nu=$next)
+						Case of 
+							: (Records in selection([SampleFabrics])=0)
+								WinPrompt ("There is no sample fabric PO #"+String($next))
+							: ([SampleFabrics]Invoice#"")
+								WinPrompt ("PO"+String([SampleFabrics]SampleFab PO Nu)+" has been invoiced. Inv #"+[SampleFabrics]Invoice)
+							Else 
+								ADD TO SET([SampleFabrics];"inv")
+								USE SET("inv")
+						End case 
+				End case 
+			Until ($done)
+			CLEAR SET("inv")
+	End case 
+End if 

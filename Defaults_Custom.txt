@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Current user="Alex")
+		[Orders]Salesperson:="C& G Website"
+		[Orders]Customer:="Cable & Gauge"
+		[Orders]LabelSource:="Factory Supply"
+		[Orders]Price Terms:="Net"
+		[Orders]Price Tckt:="Not Required"
+		[Orders]Cutting Ticket:="Provided Herein"
+		[Orders]FabricSupplied:="Factory Supply"
+		[Orders]Care Label:="Factory to advise"
+		[Orders]AfterApproval:="Not Required"
+		[Orders]ShipMethod:="Flat Pack"
+		pFlat:=1
+End case 

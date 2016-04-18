@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked) | (Form event=On Double Clicked)
+	If (Size of array(asCustomerBuild)>0)
+		vsCustomer:=asCustomerBuild{asCustomerBuild}
+		OBJECT SET VISIBLE(asCustomerBuild;False)
+	End if 
+End if 

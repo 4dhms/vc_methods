@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($design)
+C_LONGINT($i;vlLeadDN)
+C_BOOLEAN($status)
+
+$design:=StripToNumber (asDesignNumbers{afProcess})+"@"
+$status:=afProcess{afProcess}
+
+If (afProcess=vlLeadDN)
+	$i:=1
+	For ($i;1;Size of array(asDesignNumbers))
+		If (asDesignNumbers{$i}=$design)
+			afProcess{$i}:=$status
+		End if 
+	End for 
+End if 

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($blob)
+C_PICTURE($logo;$xThumb)
+
+GET PICTURE FROM LIBRARY("HMSLogo";$logo)
+
+CREATE THUMBNAIL($logo;$xThumb;158;24;6)
+PICTURE TO GIF($xThumb;$blob)
+WEB SEND BLOB($blob;"image/gif")

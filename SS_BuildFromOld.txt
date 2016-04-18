@@ -1,0 +1,23 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+$i:=1
+
+For ($i;1;Size of array(asSpec))
+	CREATE RECORD([SpecSheetLines])
+	[SpecSheetLines]SF_KeyNumber:=[SpecFactory]SF_KeyNumber
+	[SpecSheetLines]SpecLineKey:=Sequence number([SpecSheetLines])
+	[SpecSheetLines]OtherDescription:=asSpec{$i}
+	[SpecSheetLines]PartNumber:=$1
+	[SpecSheetLines]SortOrder:=$i
+	[SpecSheetLines]Spec1A:=asShouldM{$i}
+	SAVE RECORD([SpecSheetLines])
+	ADD TO SET([SpecSheetLines];"ActiveLines")
+	ADD TO SET([SpecSheetLines];"AllLines")
+End for 
+UNLOAD RECORD([SpecLineCols])
+
+ARRAY TEXT(asSpec;0)
+ARRAY TEXT(asShouldM;0)
+ARRAY TEXT(asSampleM;0)
+
+USE SET("ActiveLines")

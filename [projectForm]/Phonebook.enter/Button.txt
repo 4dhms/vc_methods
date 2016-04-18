@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbOther)
+
+QUERY([Staff];[Staff]PBName=vtPart1)
+If (Records in selection([Staff])=0)
+	CREATE RECORD([Staff])
+End if 
+
+[Staff]StaffKey:=Sequence number([Staff])+100
+[Staff]PBName:=vtPart1
+[Staff]PBDept:=vtPart2
+[Staff]PBExt:=vtPart3
+[Staff]PBmail:=vtPart4
+If (cbOther=1)
+	[Staff]Misc:=True
+	[Staff]PhoneBook:=False
+Else 
+	[Staff]PhoneBook:=True
+	[Staff]Misc:=False
+End if 
+SAVE RECORD([Staff])
+If (asUsers=0)
+	Phonebook_Tab ("A")
+Else 
+	Phonebook_Tab (asUsers{asUsers})
+End if 
+ACCEPT

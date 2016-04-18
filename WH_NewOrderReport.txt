@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Orders];"NewOrderRep")
+FORM SET INPUT([Orders];"OrdEntSlsMed")
+
+Array_BuildDates 
+REDUCE SELECTION([Orders];0)
+SET WINDOW TITLE("New Order Report")
+
+Center Window (780;550;4;"";"WincBox")
+If (Screen width<820)
+	MODIFY SELECTION([Orders])
+Else 
+	MODIFY SELECTION([Orders];*)
+End if 
+
+CLOSE WINDOW
+<>vlNewOrdRep:=0
+<>vlNewOrdSum:=0

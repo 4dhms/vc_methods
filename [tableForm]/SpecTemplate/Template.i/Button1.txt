@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this template?";"No";"Yes")
+If (ok=1)
+Else 
+	WinChoice ("This action is irreversible.";"Stop";"Continue")
+	If (ok=1)
+	Else 
+		DELETE RECORD([SpecTemplate])
+		ALL RECORDS([SpecTemplate])
+		CANCEL
+	End if 
+End if 

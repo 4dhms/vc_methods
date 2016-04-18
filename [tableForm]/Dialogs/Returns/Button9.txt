@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlRMAnumber;$n)
+C_TEXT(vtRMAStyle)
+C_DATE(vdRMADate)
+
+Case of 
+	: (vlRMAnumber#0)
+		QUERY([RMA];[RMA]RMAkey=vlRMAnumber)
+	: (vtRMAStyle#"")
+		QUERY([RMA];[RMA]Digest="@"+vtRMAstyle+"@")
+	: (vdRMADate#!00-00-00!)
+		QUERY([RMA];[RMA]RMAdate=vdRMADate)
+	: (vsCustomer#"")
+		QUERY([ReturnStores];[ReturnStores]StoreName=vsCustomer)
+		
+		If (Records in selection([ReturnStores])=0)
+			WinChoice (vsCustomer+" does not exist. Do you want to create it?")
+			If (ok=1)
+				CREATE RECORD([ReturnStores])
+				[ReturnStores]StoreID:=Sequence number([ReturnStores])
+				[ReturnStores]StoreName:=vsCustomer
+				SAVE RECORD([ReturnStores])
+				vlRMAStoreKey:=[ReturnStores]StoreID
+				APPEND TO ARRAY(asCustomers;[ReturnStores]StoreName)
+				SORT ARRAY(asCustomers;>)
+				FORM SET INPUT([RMA];"RMA.i")
+				ADD RECORD([RMA];*)
+			Else 
+				CANCEL
+			End if 
+		End if 
+		vlRMAStoreKey:=[ReturnStores]StoreID
+		
+		QUERY([RMA];[RMA]StoreID=[ReturnStores]StoreID)
+		ORDER BY([RMA];[RMA]RMAdate;<)
+		FIRST RECORD([RMA])
+		$n:=1
+		For ($n;1;Records in selection([RMA]))
+			RMA_Digest 
+			NEXT RECORD([RMA])
+		End for 
+End case 
+vlRMAnumber:=0
+vtRMAstyle:=""
+vdRMADate:=!00-00-00!
+
+OBJECT SET ENABLED(bNewRMA;True)

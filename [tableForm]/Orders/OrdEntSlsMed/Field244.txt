@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]DCInfo)
+	[Orders]NYFabNOT:=False
+	[Orders]DCSent:=Current date(*)
+Else 
+	[Orders]NYFabNOT:=True
+End if 

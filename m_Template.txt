@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>vlSpecTemplate=0)
+		<>vlSpecTemplate:=New process("p_Template";0;"Style Number List")
+	Else 
+		SHOW PROCESS(<>vlSpecTemplate)
+		BRING TO FRONT(<>vlSpecTemplate)
+End case 

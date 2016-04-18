@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	
+	$i:=1
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		DL_AddUnit 
+		NEXT RECORD([Samples])
+	End for 
+	
+	UNLOAD RECORD([Samples])
+	CANCEL
+	vfCancel:=True
+	
+	CALL PROCESS(<>DLProc)
+	
+Else 
+	ALERT("Select a sample.")
+End if 

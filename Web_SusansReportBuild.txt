@@ -1,0 +1,44 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($names;0)
+ARRAY TEXT($values;0)
+ARRAY TEXT(asSeasonA;2)
+ARRAY TEXT(asDivisions;1)
+ARRAY LONGINT(alYearA;1)
+asSeasonA{1}:="Spring"
+asSeasonA{2}:="Fall"
+
+C_DATE($dayOneCurrent;$dayOneLast;$dayOneNext)
+C_TEXT($day)
+
+WEB GET VARIABLES($names;$values)
+alYearA{1}:=Num($values{Find in array($names;"YearList")})
+asDivisions{1}:=$values{Find in array($names;"DivisionList")}
+alYearA:=1
+asDivisions:=1
+
+If ($values{Find in array($names;"SeasonList")}="Spring")
+	asSeasonA:=1
+	$day:="1"
+Else 
+	$day:="7"
+	asSeasonA:=2
+End if 
+
+$dayOneCurrent:=Date("!"+$day+"/1/"+$values{Find in array($names;"YearList")}+"!")
+$dayOneLast:=Date("!"+$day+"/1/"+String(Num($values{Find in array($names;"YearList")})-1)+"!")
+$dayOneNext:=Date("!"+$day+"/1/"+String(Num($values{Find in array($names;"YearList")})+1)+"!")
+
+vdDayOne:=$dayOneCurrent
+vlLeadLine:=Num($day)
+
+SR_BuildSets ($dayOneLast;$dayOneNext)
+
+SR_Init (True)
+vrAvgA:=vlDollarsSubA/vlUnitsSubA
+vrAvgB:=vlDollarsSubB/vlUnitsSubB
+vrAvgAx:=vlDollarsSubAx/vlUnitsSubAx
+vrAvgBx:=vlDollarsSubBx/vlUnitsSubBx
+
+Web_ConvertSR 
+
+WEB SEND FILE("sr.html")

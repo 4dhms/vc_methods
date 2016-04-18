@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([Speedpost Form]NewPost)  //save number for recycling
+		WinChoice ("Are you sure you don't want to save this speed post?")
+		If (ok=1)
+			CREATE RECORD([Recycler])
+			[Recycler]SpeedpostNumber:=[Speedpost Form]Package number
+			[Recycler]NumberType:="speed"
+			SAVE RECORD([Recycler])
+		End if 
+	Else 
+End case 
+CANCEL
+Array_Factories 

@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>SpecProcID=0)
+		<>SpecProcID:=New process("p_SpecsB";0;"Specs")
+	Else 
+		SHOW PROCESS(<>SpecProcID)
+		BRING TO FRONT(<>SpecProcID)
+End case 

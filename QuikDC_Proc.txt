@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlQuikDC)
+
+Case of 
+	: (<>vlQuikDC>0)
+		SHOW PROCESS(<>vlQuikDC)
+		BRING TO FRONT(<>vlQuikDC)
+	: (<>vlQuikDC=0)
+		<>vlQuikDC:=New process("QuikDCWin";0;"Quik DC")
+	Else 
+		SHOW PROCESS(<>vlQuikDC)
+		BRING TO FRONT(<>vlQuikDC)
+End case 

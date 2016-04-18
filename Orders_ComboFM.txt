@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_LONGINT($i)
+  //C_TEXT($prev)
+  //C_BOOLEAN($combo)
+  //
+  //  //Initializes new combo system
+  //Case of 
+  //: (Record number([Orders])<0)
+  //vsOrderNumberFlag:=""
+  //: (Size of array(asSolidPrint)>0)
+  //If (asSolidPrint{1}="Print")
+  //vsOrderNumberFlag:=""
+  //OBJECT SET VISIBLE([Orders]ComboColorCode;False)
+  //Else 
+  //If (Find in array(asTypeList;"Combo@")>0)
+  //$i:=1
+  //For ($i;1;Size of array(asCPNumbers))
+  //Case of 
+  //: (asTypeList{$i}="Self")
+  //$prev:=asCPnumbers{$i}
+  //: (asTypeList{$i}="Combo 1")
+  //If (asCPNumbers{$i}#$prev)
+  //$combo:=True
+  //End if 
+  //End case 
+  //End for 
+  //End if 
+  //[Orders]ComboColorCode:=$combo
+  //
+  //Case of 
+  //: ([Orders]PlainOrderNumber>1)
+  //vsOrderNumberFlag:="Plain Order Number: "+String([Orders]PlainOrderNumber)
+  //OBJECT SET VISIBLE([Orders]ComboColorCode;True)
+  //: ([Orders]ComboOrderNumber>1)
+  //vsOrderNumberFlag:="Combo Order Number: "+String([Orders]ComboOrderNumber)
+  //OBJECT SET VISIBLE([Orders]ComboColorCode;True)
+  //Else 
+  //vsOrderNumberFlag:=""
+  //If (Find in array(asTypeList;"Combo@")>0)
+  //OBJECT SET VISIBLE([Orders]ComboColorCode;True)
+  //Else 
+  //OBJECT SET VISIBLE([Orders]ComboColorCode;False)
+  //End if 
+  //End case 
+  //End if 
+  //End case 
+  //

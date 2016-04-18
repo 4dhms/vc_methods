@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //vpFindTable:=->[FabricLibrary]
+  //Find_FabOrdAss 
+
+Case of 
+	: (Macintosh command down)
+		ORDER BY([FabricLibrary])
+	: (Shift down)
+		QUERY([FabricLibrary])
+	Else 
+		Fab_SetUpFind 
+End case 
+SET WINDOW TITLE("Fabric Library: "+String(Records in selection([FabricLibrary]))+" Article Numbers")

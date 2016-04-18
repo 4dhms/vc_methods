@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([Orders]KWCnS="Cut@")
+		APPEND TO ARRAY(asGroups;"C")
+	: ([Orders]KWCnS="Woven")
+		APPEND TO ARRAY(asGroups;"W")
+	: ([Orders]KWCnS="Knit")
+		APPEND TO ARRAY(asGroups;"K")
+	Else 
+		APPEND TO ARRAY(asGroups;"")
+End case 

@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asLDPStat;0)
+ARRAY REAL(arPrice;0)
+ARRAY TEXT(atFootnote;0)
+C_TEXT($sn)
+C_LONGINT($p)
+
+$docref:=Open document("";"txt")
+If (ok=1)
+	Repeat 
+		If (<>vlPlatform=3)
+			RECEIVE PACKET($docref;$sn;Char(13))
+		Else 
+			RECEIVE PACKET($docref;$sn;Char(10))
+		End if 
+		
+		$p:=Position(Char(9);$sn;*)
+		If ($p>0)
+			$sn:=Substring($sn;1;$p-1)
+		End if 
+		
+		$sn:=Replace string($sn;" ";"")
+		$sn:=Replace string($sn;Char(10);"";*)
+		$sn:=Replace string($sn;Char(13);"";*)
+		
+		If ($sn="Style@") | ($sn="")
+		Else 
+			APPEND TO ARRAY(asStyleNumbers;$sn)
+			APPEND TO ARRAY(asLDPStat;"")
+			APPEND TO ARRAY(arPrice;0)
+			APPEND TO ARRAY(atFootnote;"")
+		End if 
+	Until (ok=0)
+	CLOSE DOCUMENT($docref)
+End if 

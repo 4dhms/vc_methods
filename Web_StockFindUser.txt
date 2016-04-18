@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+vsWebUser:=$value{1}
+
+QUERY([Contacts];[Contacts]EmailAddress=vsWebUser)
+
+If (Records in selection([Contacts])=0)
+	
+Else 
+	Web_StockCatalog (vsWebStockID)
+End if 

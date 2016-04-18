@@ -1,0 +1,80 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($daterange)
+C_LONGINT($i;$pix;$page)
+C_TEXT($filename;$message)
+
+  // Create Revised Orders Set for orders that need to be add based on boolean conditions
+CREATE EMPTY SET([Orders];"Revised Orders")
+
+  //Query orders within date range with no factory set.
+QUERY([Orders];[Orders]Cancelled=False)
+
+  // Order by enterer then sales person then cancel date
+ORDER BY([Orders];[Orders]Order_Enterer;>;[Orders]Salesperson;>;[Orders]CancelDate;>)
+
+  // Check orders that meet conditions then add to Revised Orders set
+For ($i;1;Records in table([Orders]))
+	If ([Orders]RevisionNumber>0) & (Position("Revision "+String([Orders]RevisionNumber);[Orders]RevHistory)<1) & ([Orders]CancelDate>=Current date)
+		ADD TO SET([Orders];"Revised Orders")
+	End if 
+	  // Move to the next record
+	NEXT RECORD([Orders])
+End for 
+
+  //Use the data now added to the set
+USE SET("Revised Orders")
+
+
+
+$filename:=String(Milliseconds)+".pdf"
+ReportFolderTest 
+
+vtPDFPath:=vtPDFPath+$filename
+SET PRINT OPTION(Scale option;100)
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+SET PRINT OPTION(Destination option;3;vtPDFPath)
+
+$page:=1
+$i:=1
+$pix:=0
+vtTitle:="Unsent Revisions Report"
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	If ($pix<60)
+		If ($page>1)
+			PAGE BREAK(>)
+		End if 
+		vsPrintingHeader:="Printed "+String(Current date(*))+"   Page "+String($page)
+		$page:=$page+1
+		Print form("UnsentRevisionsHeader")
+		$pix:=580
+	End if 
+	
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+	
+	QUERY([Changes];[Changes]OrderNumber=[Orders]OrderNum;*)
+	QUERY([Changes]; & ;[Changes]RevisionNumber=[Orders]RevisionNumber;*)
+	QUERY([Changes]; & ;[Changes]FieldName="New Revision@")
+	
+	
+	Print form("UnsentRevisions")
+	$pix:=$pix-48
+	NEXT RECORD([Orders])
+End for 
+PAGE BREAK
+ARRAY TEXT(asSubCC;0)
+
+APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+
+
+$message:="If you are at HMS, view report here:"+Char(13)+"http://192.168.250.68:8081/Reports/"+$filename+Char(13)+Char(13)
+$message:=$message+"If you are off-site, view report here:"+Char(13)+"http://74.9.71.226:8081/Reports/"+$filename
+
+EMail_GetPreferences 
+
+Mail_SimpleSend ("List";"None";"Unsent Revisions Report";$message)
+
+
+

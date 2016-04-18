@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		WinPrompt ("This report is not available at this time.")
+	: (<>vlNewOrdRep>0)
+		SHOW PROCESS(<>vlNewOrdRep)
+		BRING TO FRONT(<>vlNewOrdRep)
+	: (<>vlNewOrdRep=0)
+		WinChoice ("Which report do you want?";"New Order";"TC's")
+		If (ok=1)
+			<>vlNewOrdRep:=New process("WH_NewOrderReport";0;"New Order Report")
+		Else 
+			<>vlNewOrdRep:=New process("WH_TCsReport";0;"New Order Report")
+		End if 
+	Else 
+		SHOW PROCESS(<>vlNewOrdRep)
+		HIDE PROCESS(<>vlNewOrdRep)
+		BRING TO FRONT(<>vlNewOrdRep)
+End case 

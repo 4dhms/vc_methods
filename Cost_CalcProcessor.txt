@@ -1,0 +1,92 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($amt;$amtactual;$qty)
+C_REAL($netPrice;$netnetprice)
+C_REAL($price;vrTestPrice;$netsales;$netnetsales)
+C_BOOLEAN(<>vfSupersheet)
+
+vrCFOB1:=[CostSheets]FOB+[CostSheets]Cushion
+vrCFOB2:=[CostSheets]FOB+[CostSheets]Cushion
+
+  //Duty
+$amt:=Round([CostSheets]FOB*([CostSheets]Duty1/100);2)
+$amt:=$amt+Round([CostSheets]FOB2*([CostSheets]Duty2/100);2)
+
+If ([CostSheets]DutyActual=0)
+	$amtactual:=$amt
+Else 
+	$amtactual:=Round([CostSheets]FOB*([CostSheets]DutyActual/100);2)
+	$amtactual:=$amtactual+Round([CostSheets]FOB2*([CostSheets]DutyActual/100);2)
+End if 
+
+vrDutyC:=Round(vrCFOB1*([CostSheets]Duty1/100);2)
+vrDutyC:=vrDutyC+Round([CostSheets]FOB2*([CostSheets]Duty2/100);2)
+
+  //Net Unit Price
+If (vrTestPrice>0)
+	$price:=vrTestPrice
+Else 
+	$price:=[Orders]Price
+End if 
+
+If ([CostSheets]Figurer=0)
+	$netPrice:=$price
+Else 
+	$netPrice:=Round($price*((100-[CostSheets]Figurer)/100);2)
+End if 
+[CostSheets]NetUnitPrice:=$netPrice
+
+  //Net Net Unit Price
+$netnetprice:=Round($netPrice*((100-[CostSheets]SpecialDiscount)/100);2)
+
+  //Net Sales Tot
+$qty:=Cost_Quantity 
+
+If (vrTestPrice>0)
+	$netsales:=Round(($qty*vrTestPrice)*((100-[CostSheets]Figurer)/100);2)
+Else 
+	$netsales:=Round(($qty*[Orders]Price)*((100-[CostSheets]Figurer)/100);2)
+End if 
+
+  //Net Net Sales Tot
+$netnetsales:=Round($netsales*((100-[CostSheets]SpecialDiscount)/100);2)
+
+[CostSheets]NetNetTotalSales:=$netnetsales
+[CostSheets]NetTotalSales:=$netsales
+[CostSheets]DutyAmount:=$amt
+[CostSheets]DutyAmountActual:=$amtactual
+[CostSheets]NetUnitPrice:=$netprice
+[CostSheets]NetNetUnitPrice:=$netnetprice
+If ([CostSheets]Quantity#$qty)
+	[CostSheets]Quantity:=$qty
+End if 
+SAVE RECORD([CostSheets])
+
+Cost_CalcUnitCost 
+Cost_CalcNetTotalProfit 
+Cost_CalcGrossProfit 
+
+If ([Orders]ActlDutyRate=0)
+	vsPrice1:=""
+Else 
+	vsPrice1:=String(Round([CostSheets]FOB*([Orders]ActlDutyRate/100);2)+Round([CostSheets]FOB2*([Orders]ActlDutyRate/100);2);"##0.00")
+End if 
+
+If (Not(User in group(vsWebUser;"Supercostsheets")) | (Not(<>vfSupersheet))) & (Not(User in group(vsWebUser;" "))) | (Not(<>vfSupersheet))
+	vrLDPBoat:=vrLDP1a
+	vrTotal1:=vrTotal1a
+	vrNetProfit1:=vrNetProfit1a
+	vrNetNetProfit1:=vrNetNetProfit1a
+	vrNetPercent1:=vrNetPercent1a
+	vrNetNetPercent1:=vrNetNetPercent1a
+	
+	vrLDPAir:=vrLDP2a
+	vrTotal2:=vrTotal2a
+	vrNetProfit2:=vrNetProfit2a
+	vrNetNetProfit2:=vrNetNetProfit2a
+	vrNetPercent2:=vrNetPercent2a
+	vrNetNetPercent2:=vrNetNetPercent2a
+End if 
+
+Cost_FreightToggle 
+
+

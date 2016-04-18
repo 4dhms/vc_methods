@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asPrevDate>1)
+	QUERY([Invoices];[Invoices]OrderNumber=alInvOrder{asPrevDate})
+	QUERY SELECTION([Invoices];[Invoices]InvoiceDate=asPrevDate{asPrevDate})
+	QUERY SELECTION([Invoices];[Invoices]InvoiceQuantity=asPrevQty{asPrevQty})
+	QUERY SELECTION([Invoices];[Invoices]InvoiceAmount=asPrevAmt{asPrevAmt})
+	
+	FORM SET INPUT([Invoices];"Change.i")
+	Center Window (250;200;1;"")
+	MODIFY RECORD([Invoices];*)
+	CLOSE WINDOW
+End if 

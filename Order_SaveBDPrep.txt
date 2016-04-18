@@ -1,0 +1,87 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfContinue;$stop;$calc)
+C_TEXT($message)
+C_LONGINT($packtot;$i;$c;$badline;$count)
+C_TEXT($letter)
+
+$i:=1
+$badline:=0
+For ($i;1;Size of array(alBDStores))
+	$c:=Position("total";asBDSelf{$i})
+	If ($c<1) & (alBD1{$i}+alBD2{$i}+alBD3{$i}+alBD4{$i}>0) & (alBDStores{$i}=0)
+		$badline:=$i
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array(asBDLetter))
+	
+	If (Position(" ";asBDLetter{$i})>0)
+		$letter:=Substring(asBDLetter{$i};1;Position(" ";asBDLetter{$i})-1)
+	Else 
+		$letter:=asBDLetter{$i}
+	End if 
+	
+	Case of 
+		: (Count in array(asBDLetter;$letter)>1) & (asBDLetter{$i}="@Total")
+			$count:=alCQty{Find in array(asCPLetter;$letter)}
+			$calc:=True
+		: (asBDLetter{$i}#"") & (Count in array(asBDLetter;$letter)=1)
+			$count:=alCQty{Find in array(asCPLetter;$letter)}
+			$calc:=True
+		Else 
+			$calc:=False
+	End case 
+	
+	If ($calc)
+		If (alBDPackTot{$i}#$count)
+			WinPrompt ("Quantity for "+Char(13)+asBDSelf{$i}+Char(13)+"should equal "+String($count)+Char(13)+"not "+String(alBDPackTot{$i}))
+			$stop:=True
+		End if 
+	End if 
+End for 
+
+If ($stop)
+	WinChoice ("Quantities on order do not equal quantities in breakdown.";"Continue";"I'll fix it")
+	If (ok=1)
+		$stop:=False
+	End if 
+End if 
+
+If (Not($stop))
+	If (Find in array(asBDLetter;"@Total@")>0)
+	Else 
+		$packtot:=Util_Array_Sum (->alBDPackTot)
+	End if 
+	
+	Case of 
+		: ($badline>0)
+			WinPrompt ("You are missing the number of stores in line "+String($badline)+"."+Char(13)+Char(13)+"That is required.")
+			
+		: (vlBDGrandTot=0) | (vlBDGrandTot=[Orders]TotalOrderQuantity) & (vfContinue)
+			Order_SaveBD 
+			vfContinue:=False
+			
+			
+		: (vlBDGrandTot=0) | (vlBDGrandTot=[Orders]TotalOrderQuantity)
+			Order_SaveBD 
+			ACCEPT
+		: (vlBDGrandTot>[Orders]TotalOrderQuantity)
+			$message:="Quarder quantity is "+String([Orders]TotalOrderQuantity;"###,##0")+"."+Char(13)+"You have breakdowns for "+String(vlBDGrandTot;"###,##0")+". "
+			$message:=$message+Char(13)+Char(13)+"You are over by "+String(vlBDGrandTot-[Orders]TotalOrderQuantity;"###,##0")+"."
+			WinChoice ($message;"Continue";"I'll fix it")
+			If (ok=1)
+				Order_SaveBD 
+				ACCEPT
+			End if 
+			
+		: (vlBDGrandTot<[Orders]TotalOrderQuantity)
+			$message:="Order quantity is "+String([Orders]TotalOrderQuantity;"###,##0")+"."+Char(13)+"You have breakdowns for "+String(vlBDGrandTot;"###,##0")+". "
+			$message:=$message+Char(13)+Char(13)+"You are short by "+String([Orders]TotalOrderQuantity-vlBDGrandTot;"###,##0")+"."
+			WinChoice ($message;"Continue";"I'll fix it")
+			If (ok=1)
+				Order_SaveBD 
+				ACCEPT
+			End if 
+	End case 
+End if 

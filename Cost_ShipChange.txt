@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($1)
+C_TEXT($newShip)
+vtContent:=""
+SAVE RECORD([CostSheets])
+
+If (Position("Actual";[CostSheets]SheetName)>0)
+	Case of 
+		: ($1="air")
+			$newShip:="Method changed to Air"
+		: ($1="sea")
+			$newShip:="Method changed to Sea"
+		: ($1="ldp")
+			$newShip:="Method changed to LDP"
+		: ($1="NY")
+			$newShip:="Destination changed to NY"
+		: ($1="LA")
+			$newShip:="Destination changed to LA"
+		: ($1="other")
+			$newShip:="Destination changed to "+[CostSheets]OtherShip
+	End case 
+	vtContent:=$newShip+" ("+Current user+", "+String(Current date(*))+" at "+String(Current time(*);2)+")"
+	  //If ($newship="Method@")
+	  //Digest_ShipChange 
+	  //End if 
+	If (<>vlOrderNumber>0)
+		If ($1="Other")
+			Rev_LogEvent ("Shipping changed to "+[CostSheets]OtherShip)
+		Else 
+			Rev_LogEvent ("Shipping changed to "+$1)
+		End if 
+	End if 
+End if 
+Cost_ShipToggle 

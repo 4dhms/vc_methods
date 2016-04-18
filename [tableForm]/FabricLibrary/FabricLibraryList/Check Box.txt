@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cb1=1)
+	QUERY([FabricLibrary];[FabricLibrary]HMSANmaster=True;*)
+	QUERY([FabricLibrary]; | ;[FabricLibrary]ArticleNumber="HMS@")
+Else 
+	ALL RECORDS([FabricLibrary])
+End if 
+ORDER BY([FabricLibrary];[FabricLibrary]FabricLibKey;<)
+SET WINDOW TITLE("Fabric Library: "+String(Records in selection([FabricLibrary]))+" Article Numbers")

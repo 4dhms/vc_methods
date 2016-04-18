@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($orderNumber;0)
+C_BOOLEAN($article;$zipper)
+C_LONGINT($i;$n)
+
+SAVE RECORD([Orders])
+
+If (Shift down)
+	Order_FindZipperArt 
+Else 
+	
+	CREATE SET([Orders];"Orig")
+	CREATE EMPTY SET([Orders];"Fabric")
+	
+	WinFind ("Enter article number:";1)
+	If (ok=1) & (vsRequestString#"")
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=vsRequestString)
+		
+		$i:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($i;1;Records in selection([OrdersFabricXRef]))
+			APPEND TO ARRAY($orderNumber;[OrdersFabricXRef]OrderNumber)
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+		
+		$i:=1
+		For ($i;1;Size of array($orderNumber))
+			If (vAddTo=1)
+				USE SET("Orig")
+			End if 
+			
+			QUERY([Orders];[Orders]OrderNum=$ordernumber{$i})
+			
+			$n:=1
+			FIRST RECORD([Orders])
+			For ($n;1;Records in selection([Orders]))
+				If (vAddTo=1)
+					ADD TO SET([Orders];"Orig")
+				Else 
+					ADD TO SET([Orders];"Fabric")
+				End if 
+			End for 
+		End for 
+		If (vAddTo=1)
+			USE SET("Orig")
+		Else 
+			USE SET("Fabric")
+		End if 
+	End if 
+	
+	WinChoice ("Do you want to include components?")
+	If (ok=1)
+		Order_FindCompArticle 
+	End if 
+	
+	
+	p_InputLayHMS 
+	p_SetWindowHMS 
+	CLEAR SET("Orig")
+	CLEAR SET("Fabric")
+	
+End if 

@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alFabricColor;$1)
+ARRAY DATE(adMCancel;$1)
+ARRAY TEXT(asFactories;$1)
+ARRAY TEXT(asMPO;$1)
+ARRAY REAL(arMcol1;$1)
+ARRAY REAL(arMcol2;$1)
+ARRAY REAL(arMcol3;$1)
+ARRAY REAL(arMcol4;$1)
+ARRAY REAL(arMcol5;$1)
+ARRAY REAL(arMcol6;$1)
+ARRAY REAL(arMcol7;$1)
+ARRAY REAL(arMcol8;$1)
+ARRAY REAL(arMcol9;$1)
+ARRAY REAL(arMcol10;$1)
+ARRAY REAL(arMcol11;$1)
+ARRAY REAL(arMcol12;$1)
+ARRAY REAL(arMcol13;$1)
+ARRAY REAL(arMcol14;$1)
+ARRAY REAL(arMcol15;$1)
+ARRAY REAL(arMcol16;$1)
+ARRAY REAL(arMcol17;$1)
+ARRAY REAL(arMcol18;$1)
+ARRAY REAL(arMcol19;$1)
+ARRAY TEXT(atMNote;$1)
+
+
+
+
+

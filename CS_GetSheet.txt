@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>vlOrderNumber=0)
+		REDUCE SELECTION([ComponentSheets];0)
+		REDUCE SELECTION([CS_Status];0)
+	: (<>vlOrderNumber<0)  //SAMPLE
+		QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlOrderNumber)
+	Else 
+		
+		SG_PO 
+		If (<>vlSGPO=-1)
+			QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlOrderNumber)
+		Else 
+			QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlSGPO)
+		End if 
+		If (Records in selection([ComponentSheets])<1)
+			QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlOrderNumber)
+		End if 
+End case 
+

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CS_Issues]Resolved=True)
+	[CS_Issues]ResolveDate:=Current date(*)
+	If ([CS_Issues]OrderNumber=0)
+		[CS_Issues]FontStyle:=0
+	Else 
+		[CS_Issues]FontStyle:=2
+	End if 
+	OBJECT SET VISIBLE([CS_Issues]ResolveDate;True)
+Else 
+	[CS_Issues]FontStyle:=5
+End if 

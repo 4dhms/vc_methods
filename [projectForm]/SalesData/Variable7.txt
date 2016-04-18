@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Getting Focus)
+		ARRAY TEXT(asColors;0)
+		
+	: (Form event=On Data Change)
+		If (vsCustomer#"")
+			QUERY([SLRAcct];[SLRAcct]SLRAcct=vsCustomer;*)
+			QUERY([SLRAcct]; & ;[SLRAcct]SLRStyleNumber=vsStyleNumber)
+			SLR_SetUp 
+			asColors:=1
+		End if 
+End case 
+
+
+
+

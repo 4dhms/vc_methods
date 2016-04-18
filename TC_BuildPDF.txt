@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+vlPage:=1
+vfEmail:=True
+vlDCKey:=[Spooler]OutputChoice
+
+If (Records in selection([Orders])=1)
+	vtPDFName:=String([Orders]OrderNum)+"_"+[Orders]StyleNumber+"_"+[Orders]Factory
+Else 
+	vtPDFName:="DC_Info ("+String(Records in selection([Orders]))+" orders)"
+End if 
+vtPDFName:=Replace string(vtPDFName;".";"")
+vtPDFName:=Replace string(vtPDFName;"/";"")
+
+vtPDFName:=Substring(vtPDFName;1;28)
+
+<>vlOrderNumber:=[Orders]OrderNum
+vtBodyText:="Attached is distribution information for:"+Char(13)
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	vtBodyText:=vtBodyText+"HMS PO:"+String([Orders]OrderNum)+" Style Number: "+[Orders]StyleNumber+" Factory: "+[Orders]Factory+Char(13)
+	NEXT RECORD([Orders])
+End for 
+vfPrintOne:=False
+
+Order_PrintDCsOnly 

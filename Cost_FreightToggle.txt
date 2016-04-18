@@ -1,0 +1,117 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($air;$sea;$both)
+C_BOOLEAN($true1;$true2;$ldpOnly)
+If ([CostSheets]ShipLDP) | ([CostSheets]ShipFOB)
+Else 
+	vsHead3:="LDP Sea"
+End if 
+
+Case of 
+	: ([CostSheets]ShipLDP)
+		vsHead3:="LDP Only"
+		$air:=False
+		$sea:=True
+		$both:=False
+	: ([CostSheets]ShipFOB)
+		vsHead3:="FOB Only"
+		$air:=False
+		$sea:=True
+		$both:=False
+	: (Not([CostSheets]ShipAir)) & (Not([CostSheets]ShipSea))
+		Case of 
+			: ([CostSheets]FreightAIR>0) & ([CostSheets]FreightBOAT>0)
+				$air:=True
+				$sea:=True
+				$both:=True
+			: ([CostSheets]FreightBOAT>0)
+				$sea:=True
+			: ([CostSheets]FreightAIR>0)
+				$air:=True
+			Else 
+				$sea:=True
+				$air:=True
+				$both:=True
+		End case 
+		
+		vsHead3:="LDP Sea"
+	: ([CostSheets]ShipAir)
+		$air:=True
+	: ([CostSheets]ShipSea)
+		vsHead3:="LDP Sea"
+		$sea:=True
+End case 
+
+
+Case of 
+	: ($both)
+		$true1:=True
+		$true2:=True
+		$ldpOnly:=True
+	: ($air)
+		$true1:=False
+		$true2:=True
+	: ($sea)
+		$true1:=True
+		$true2:=False
+End case 
+
+OBJECT SET VISIBLE(vsHead3;$true1)
+OBJECT SET VISIBLE(vrLDPBoat;$true1)
+OBJECT SET VISIBLE(vrTotal1;$true1)
+OBJECT SET VISIBLE(vrNetProfit1;$true1)
+OBJECT SET VISIBLE(vrNetNetProfit1;$true1)
+OBJECT SET VISIBLE(vrNetPercent1;$true1)
+OBJECT SET VISIBLE(vrNetNetPercent1;$true1)
+OBJECT SET VISIBLE(vrUnit1;$true1)
+
+OBJECT SET VISIBLE(vrTotal2;$true2)
+OBJECT SET VISIBLE(vrNetProfit2;$true2)
+OBJECT SET VISIBLE(vrNetNetProfit2;$true2)
+OBJECT SET VISIBLE(vrNetPercent2;$true2)
+OBJECT SET VISIBLE(vrNetNetPercent2;$true2)
+OBJECT SET VISIBLE(*;"xAir";$true2)
+OBJECT SET VISIBLE(vrLDPAir;True)
+OBJECT SET VISIBLE(vrUnit2;$true2)
+OBJECT SET VISIBLE(*;"xAir3";$true2)
+OBJECT SET VISIBLE(vrLDPAir;$true2)
+
+OBJECT SET VISIBLE(vrTotal1a;($true1) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetProfit1a;($true1) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetNetProfit1a;($true1) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetPercent1a;($true1) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetNetPercent1a;($true1) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrLDP1a;($true1) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrUnit1a;($true1) & (<>vfSupersheet))
+
+OBJECT SET VISIBLE(vrTotal2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetProfit2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetNetProfit2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetPercent2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrNetNetPercent2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrLDP2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(vrUnit2a;($true2) & (<>vfSupersheet))
+OBJECT SET VISIBLE(*;"xAir3";($true2) & (<>vfSupersheet))
+
+OBJECT SET VISIBLE(*;"xLDPSea";$true1)
+OBJECT SET VISIBLE(*;"xBoat";$true1)
+OBJECT SET VISIBLE(*;"xBoat1";$true1)
+OBJECT SET VISIBLE(*;"xBoat2";$true1)
+OBJECT SET VISIBLE(*;"xBoat3";$true1)
+OBJECT SET VISIBLE(*;"xBoat4";$true1)
+OBJECT SET VISIBLE(*;"xBoat5";$true1)
+OBJECT SET VISIBLE(*;"xBoat6";$true1)
+
+OBJECT SET VISIBLE(*;"xLDPAir";$true2)
+  //SET VISIBLE(*;"xAir2";$true2)
+OBJECT SET VISIBLE([CostSheets]FreightAIR;$air)
+OBJECT SET VISIBLE([CostSheets]FreightBOAT;$sea)
+
+vrLDP2b:=vrLDP2a
+vrLDP1b:=vrLDP1a
+OBJECT SET VISIBLE(vrLDP2b;$air)
+OBJECT SET VISIBLE(vrLDP1b;$sea)
+
+vrFOB:=[CostSheets]FOB+[CostSheets]Cushion
+OBJECT SET VISIBLE([Orders]CnF;([Orders]ShipLDP=True) | ([CostSheets]ShipLDP=True))
+
+

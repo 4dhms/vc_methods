@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE([Samples]Retired;([Samples]Retired#"") & ([Samples]SeasonName=""))
+OBJECT SET VISIBLE(<>asSeasonName;(([Samples]Retired="") | ([Samples]SeasonName#"")))
+OBJECT SET VISIBLE(<>asSeasonYear;(([Samples]Retired="") | ([Samples]SeasonName#"")))
+If ([Samples]Retired="")
+	vSeason:=[Samples]SeasonName+" "+[Samples]SeasonYear
+Else 
+	vSeason:=[Samples]Retired
+End if 
+
+If ([Samples]SeasonName="0")
+	[Samples]SeasonName:=""
+End if 
+If ([Samples]SeasonYear="0")
+	[Samples]SeasonYear:=""
+End if 
+
+Case of 
+	: (Find in array(<>asSeasonName;[Samples]SeasonName)<1)
+		<>asSeasonName:=1
+	Else 
+		<>asSeasonName:=Find in array(<>asSeasonName;[Samples]SeasonName)
+End case 
+Case of 
+	: (Find in array(<>asSeasonYear;[Samples]SeasonYear)<1)
+		<>asSeasonYear:=1
+	Else 
+		<>asSeasonYear:=Find in array(<>asSeasonYear;[Samples]SeasonYear)
+End case 

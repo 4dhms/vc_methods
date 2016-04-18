@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($invoice)
+$invoice:=False
+
+Case of 
+	: (vsPart1="") & (vsPart2="") & (vsPart3="") & (vdStart=!00-00-00!) & (vdEnd=!00-00-00!)
+		WinPrompt ("Enter find criterion.")
+	: (vsPart1#"")
+		QUERY([ShipInvoices];[ShipInvoices]InvNumber=vsPart1)
+		QUERY SELECTION([ShipInvoices];[ShipInvoices]PO=False)
+		$invoice:=True
+	: (vsPart2#"")
+		QUERY([ShipInvoices];[ShipInvoices]InvNumber=vsPart2)
+		QUERY SELECTION([ShipInvoices];[ShipInvoices]PO=True)
+		$invoice:=True
+	Else 
+		
+		If (vsPart3#"")
+			QUERY([ShipArchive];[ShipArchive]Archivist=vsPart3)
+		Else 
+			ALL RECORDS([ShipArchive])
+		End if 
+		If (vdStart#!00-00-00!)
+			QUERY SELECTION([ShipArchive];[ShipArchive]ArchiveDate>=vdStart)
+		End if 
+		
+		If (vdEnd#!00-00-00!)
+			QUERY SELECTION([ShipArchive];[ShipArchive]ArchiveDate<=vdEnd)
+		End if 
+		
+End case 
+
+If ($invoice)
+	$i:=1
+	FIRST RECORD([ShipInvoices])
+	CREATE EMPTY SET([ShipArchive];"inv")
+	
+	For ($i;1;Records in selection([ShipInvoices]))
+		QUERY([ShipArchive];[ShipArchive]ArchiveKey=[ShipInvoices]ArchiveKey)
+		ADD TO SET([ShipArchive];"inv")
+		NEXT RECORD([ShipArchive])
+	End for 
+	
+	USE SET("inv")
+	CLEAR SET("inv")
+End if 
+
+ORDER BY([ShipArchive];[ShipArchive]ArchiveKey;<)
+

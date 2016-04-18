@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+
+Web_StockVarLookUp 
+
+QUERY([StockOrdersLines];[StockOrdersLines]SOKey=Num($1))
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[StockOrdersLines]CP_OrdID)
+
+QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+QUERY([BreakDownLibrary];[BreakDownLibrary]BDKey=[Orders]BDHeaderKey)
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+vsMSRP:=String([StockOrdersLines]MSRP;"###.00")
+vsPrice:=String([StockOrdersLines]Price)
+
+Web_UserField 
+vtDescription:=[Designs]Description
+vtPullPicture:=Char(1)+"<IMG SRC=/4DCGI/DESIGN_"+[Orders]DesignNumber+" width=250 height 300 align=center>"
+If (Records in selection([BreakDownLibrary])=0)
+	vtBreakdown:=[Orders]BrkdnCutRatio
+Else 
+	vtBreakdown:=[BreakDownLibrary]BDName
+End if 
+
+vlOrderNumber:=Num($1)
+vtCPList:=Web_StockPullColors ([StockOrdersLines]Quantity)
+vtButton:=Char(1)+"<input type=submit name=Change id=Change value="+Char(34)+"Change Order"+Char(34)+">"
+vsFlag:="change"
+WEB SEND FILE("stockpo.html")
+
+

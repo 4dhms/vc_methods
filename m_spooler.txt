@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //Spooler procedure
+  //
+Case of 
+	: (<>vlSpoolerProc>0)
+		SHOW PROCESS(<>vlSpoolerProc)
+		BRING TO FRONT(<>vlSpoolerProc)
+	: (<>vlSpoolerProc=0)
+		<>vlSpoolerProc:=New process("p_spooler";0;"$spooler")
+	Else 
+		SHOW PROCESS(<>vlSpoolerProc)
+		BRING TO FRONT(<>vlSpoolerProc)
+End case 

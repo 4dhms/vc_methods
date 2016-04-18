@@ -1,0 +1,116 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($season;$division;$seasonname;$seasonyear)
+
+  //build season & division lists
+$season:=""
+$division:=""
+
+QUERY([Orders];[Orders]Customer="Stock")
+  //QUERY([Orders]; | [Orders]Stock=True;*)
+  //QUERY([Orders]; & [Orders]OffDL=False)
+  //QUERY([Orders]; & ;[Orders]SeasonName=<>asSeasonName{<>asSeasonName};*)
+  //QUERY([Orders]; & ;[Orders]SeasonYear=<>asSeasonYear{<>asSeasonYear};*)
+  //QUERY([Orders]; & ;[Orders]OrderDivision=asDivisions{asDivisions})
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]OffDL=False)
+
+CREATE SET([Orders];"orders")
+
+$i:=1
+CREATE EMPTY SET([Orders];"season")
+For ($i;1;Size of array(afReceived))
+	If (afReceived{$i}=True)
+		$seasonname:=Substring(asSeasonName{$i};1;Length(asSeasonName{$i})-5)
+		$seasonyear:=Substring(asSeasonName{$i};Length(asSeasonName{$i})-3;4)
+		$season:=$season+asSeasonName{$i}+Char(13)
+		QUERY([Orders];[Orders]SeasonName=$seasonname;*)
+		QUERY([Orders]; & ;[Orders]SeasonYear=$seasonyear)
+		
+		CREATE SET([Orders];"temp")
+		UNION("temp";"season";"season")
+		CLEAR SET("temp")
+	End if 
+End for 
+
+INTERSECTION("orders";"season";"orders")
+CLEAR SET("season")
+
+ARRAY TEXT($subdivision;0)
+$i:=1
+For ($i;1;Size of array(afInventory))
+	If (afInventory{$i}=True)
+		$division:=$division+asDivisions{$i}+Char(13)
+		APPEND TO ARRAY($subdivision;asDivisions{$i})
+	End if 
+End for 
+
+USE SET("orders")
+Case of 
+	: (Size of array($subdivision)=1)
+		QUERY SELECTION([Orders];[Orders]OrderDivision=$subdivision{1})
+	: (Size of array($subdivision)=1)
+		QUERY SELECTION([Orders];[Orders]OrderDivision=$subdivision{1};*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision=$subdivision{2})
+	Else 
+		$i:=1
+		For ($i;1;Size of array($subdivision))
+			Case of 
+				: ($i=1)
+					QUERY SELECTION([Orders];[Orders]OrderDivision=$subdivision{1};*)
+				: ($i=Size of array($subdivision))
+					QUERY SELECTION([Orders]; | ;[Orders]OrderDivision=$subdivision{$i})
+				Else 
+					QUERY SELECTION([Orders]; | ;[Orders]OrderDivision=$subdivision{$i};*)
+			End case 
+		End for 
+End case 
+
+CREATE SET([Orders];"orders")
+
+QUERY SELECTION([Orders];[Orders]CancelMonth=!00-00-00!)
+
+Order_CancelMonth 
+USE SET("orders")
+CLEAR SET("orders")
+
+ORDER BY([Orders];[Orders]CancelMonth;>;[Orders]StyleNumber;>)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+CREATE SET([DesignLineIncluded];"dl")
+
+FIRST RECORD([Orders])
+  //$cancel:=[Orders]CancelMonth
+
+
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	USE SET("dl")
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]OrderNumber=[Orders]OrderNum)
+	If (Records in selection([DesignLineIncluded])=0)
+		CREATE RECORD([DesignLineIncluded])
+		[DesignLineIncluded]CancelDate:=[Orders]CancelMonth
+		[DesignLineIncluded]DesignNumber:=[Orders]DesignNumber
+		[DesignLineIncluded]DesignLineKey:=[DesignLines]DesignLineKey
+		[DesignLineIncluded]OrderNumber:=[Orders]OrderNum
+		[DesignLineIncluded]StyleNumber:=[Orders]StyleNumber
+		[DesignLines]QSeason:=$season
+		[DesignLines]Division:=$division
+		[DesignLineIncluded]Stock:=True
+		[DesignLineIncluded]MSRP:=[Orders]RetailPrice
+		[DesignLineIncluded]Price:=String(Round([Orders]RetailPrice/2;2);"###.00")
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		[DesignLineIncluded]Name:=[Designs]Description
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		[DesignLineIncluded]Fiber:=[OrdersFabricXRef]FabricName
+	End if 
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	DL_PullColors (False)
+	SAVE RECORD([DesignLineIncluded])
+	ADD TO SET([DesignLineIncluded];"dl")
+	NEXT RECORD([Orders])
+End for 
+USE SET("DL")
+
+FORM GOTO PAGE(1)

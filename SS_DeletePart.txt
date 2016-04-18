@@ -1,0 +1,68 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_TEXT($sheet)
+C_LONGINT($sheetLevel;$i;$n)
+
+Case of 
+	: (pOne=1)
+		$sheet:=[SpecFactory]Part1
+		$sheetLevel:=1
+	: (pTwo=1)
+		$sheet:=[SpecFactory]Part2
+		$sheetLevel:=2
+	: (pThree=1)
+		$sheet:=[SpecFactory]Part3
+		$sheetLevel:=3
+End case 
+WinChoice ("Are you sure you want to delete"+Char(13)+$sheet+"?")
+If (ok=1)
+	WinChoice ("The action is irreversible.";"Stop";"Continue")
+	If (ok=1)
+	Else 
+		QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+		QUERY([SpecSheetLines]; & ;[SpecSheetLines]PartNumber=$sheetLevel)
+		
+		$i:=1
+		FIRST RECORD([SpecSheetLines])
+		For ($i;1;Records in selection([SpecSheetLines]))
+			QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey)
+			DELETE SELECTION([SpecLineCols])
+			NEXT RECORD([SpecSheetLines])
+		End for 
+		DELETE SELECTION([SpecSheetLines])
+		
+		Case of 
+			: ($sheetLevel<3)
+				QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+				If ($sheetLevel=2)
+					QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=3)
+					[SpecFactory]Part2:=[SpecFactory]Part3
+				Else 
+					[SpecFactory]Part1:=[SpecFactory]Part2
+					[SpecFactory]Part2:=[SpecFactory]Part3
+				End if 
+				
+				If (Records in selection([SpecSheetLines])>0)
+					$n:=1
+					FIRST RECORD([SpecSheetLines])
+					For ($n;1;Records in selection([SpecSheetLines]))
+						[SpecSheetLines]PartNumber:=[SpecSheetLines]PartNumber-1
+						SAVE RECORD([SpecSheetLines])
+						NEXT RECORD([SpecSheetLines])
+					End for 
+				End if 
+		End case 
+		[SpecFactory]Part3:=""
+		SORT ARRAY(alPartNumber;>)
+		DELETE FROM ARRAY(alPartNumber;Size of array(alPartNumber);1)
+		
+		OBJECT SET VISIBLE(pThree;False)
+		OBJECT SET VISIBLE(pTwo;Size of array(alPartNumber)>1)
+		OBJECT SET VISIBLE(pOne;Size of array(alPartNumber)>0)
+		pOne:=1
+		PTwo:=0
+		SAVE RECORD([SpecFactory])
+		SS_GetPart 
+		SS_Build 
+		GOTO OBJECT(vsEmpty)
+	End if 
+End if 

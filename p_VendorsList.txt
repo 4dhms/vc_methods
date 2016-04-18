@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //p_VendorsList global procedure
+BRING TO FRONT(<>VendorsPrcID)
+
+Closed:=False
+SET MENU BAR(16)
+QUERY([Vendors];[Vendors]VendorName#"")
+
+ORDER BY([Vendors];[Vendors]VendorName;>)
+FORM SET OUTPUT([Vendors];"VendorList")
+FORM SET INPUT([Vendors];"VendorEntry")
+
+<>CloseBox:=True
+vlCPRouter:=0
+Array_VendorTypes 
+<>asVendorTypes:=1
+
+Center Window (600;600;8;"")
+SET WINDOW TITLE("Suppliers")
+
+AccessMode (->[Vendors];True)
+TheFile:=->[Vendors]
+MODIFY SELECTION([Vendors];*)
+CLOSE WINDOW
+<>VendorsPrcID:=0
+
+
+
+

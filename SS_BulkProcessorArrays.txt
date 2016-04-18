@@ -1,0 +1,47 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_TEXT($stripped)
+C_LONGINT($i;$c)
+SAVE RECORD([SpecFactory])
+
+If (cbStrip=1)
+	$stripped:=StripToNumber (<>vsDesignNumber)
+	$stripped:=$stripped+"@"
+Else 
+	$stripped:=<>vsDesignNumber
+End if 
+
+QUERY([Orders];[Orders]StyleNumber=<>vsStyleNumber;*)
+QUERY([Orders]; | ;[Orders]DesignNumber=$stripped)
+
+ORDER BY([Orders];[Orders]OrderNum;>)
+
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(aStyle;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY DATE(adDates;0)
+ARRAY TEXT(asFactories;0)
+
+ARRAY BOOLEAN(afSpecSheet;0)
+ARRAY BOOLEAN(afApproved;0)
+ARRAY LONGINT(alMasterSpecSheet;0)
+ARRAY LONGINT(alMasterApproved;0)
+
+SELECTION TO ARRAY([Orders]OrderNum;alOrders;[Orders]StyleNumber;aStyle;[Orders]DesignNumber;asDesignNumbers;[Orders]Factory;asFactories;[Orders]CancelDate;adDates)
+$c:=Size of array(alOrders)
+ARRAY BOOLEAN(afSpecSheet;$c)
+ARRAY BOOLEAN(afApproved;$c)
+ARRAY LONGINT(alMasterSpecSheet;$c)
+ARRAY LONGINT(alMasterApproved;$c)
+
+$i:=1
+For ($i;1;Size of array(alOrders))
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=alOrders{$i})
+	If (Records in selection([SpecFactory])>0)
+		  //afSpecSheet{$i}:=True
+		alMasterSpecSheet{$i}:=[SpecFactory]OrderNumber
+		If ([SpecFactory]ApprovedForProd)
+			alMasterApproved{$i}:=[SpecFactory]OrderNumber
+		End if 
+	End if 
+End for 
+USE SET("ThisSpecSheet")

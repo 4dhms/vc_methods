@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+ARRAY LONGINT($cleanorders;0)
+ARRAY TEXT($cleantypes;0)
+ARRAY TEXT($cleancolors;0)
+SELECTION TO ARRAY([CP_OrderXRef]OrderNumber;$cleanorders;[CP_OrderXRef]CPType;$cleantypes;[CP_OrderXRef]CPNumber;$cleancolors)
+
+$i:=1
+For ($i;1;Size of array($cleanorders))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$cleanorders{$i};*)
+	QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPType=$cleantypes{$i};*)
+	QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=$cleancolors{$i};*)
+	QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]FabOrderKey=0)
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		  //ALERT(String(Records in selection([CP_OrderXRef]))+"  "+String([CP_OrderXRef]OrderNumber))
+		
+		If ([CP_OrderXRef]FabOrderKey=0)
+			[CP_OrderXRef]FabOrderKey:=[FabricOrders]FabOrderKey
+			SAVE RECORD([CP_OrderXRef])
+			NEXT RECORD([CP_OrderXRef])
+		End if 
+	End for 
+End for 
+

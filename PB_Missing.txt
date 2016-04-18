@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($return;$ext;$floor;$name;$rem)
+
+$docref:=Open document("";"txt")
+If (ok=1)
+	Repeat 
+		RECEIVE PACKET($docref;$return;Char(13))
+		$name:=Substring($return;1;Position(Char(9);$return)-1)
+		$rem:=Substring($return;Position(Char(9);$return)+1;99)
+		$ext:=Substring($rem;1;Position(Char(9);$rem)-1)
+		$rem:=Substring($rem;Position(Char(9);$rem)+1;99)
+		$floor:=$rem
+		QUERY([Staff];[Staff]PhoneBook=True;*)
+		QUERY([Staff]; & ;[Staff]PBName=$name)
+		CONFIRM(String(Records in selection([Staff]))+"  "+$name+"  "+$ext+"  "+$floor)
+		If (Records in selection([Staff])=0)
+			CREATE RECORD([Staff])
+			[Staff]PBName:=$name
+			[Staff]PhoneBook:=True
+			[Staff]Misc:=True
+			[Staff]PBExt:=$ext
+			[Staff]PBDept:=$floor
+			SAVE RECORD([Staff])
+		End if 
+	Until (ok=0)
+End if 
+CLOSE DOCUMENT($docref)
+
+ALERT("Done")

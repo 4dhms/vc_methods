@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run1)
+If (Form event=On Double Clicked)
+	$run1:=New process("Order_Preview";0;"Preview";Num(Column10{Column10}))
+End if 

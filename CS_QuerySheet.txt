@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSGPO)
+
+If (<>vlSGPO#0) & ($1>0)
+	QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlSGPO)
+	If (Records in selection([ComponentSheets])<1)
+		QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=$1)
+	End if 
+Else 
+	QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=$1)
+End if 
+<>vlCSId:=[ComponentSheets]CS_ID

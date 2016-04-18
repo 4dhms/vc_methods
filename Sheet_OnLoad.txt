@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //◊lOrderNumber:=[Costing]OrderNumber
+  //QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+
+If (Records in selection([CostSheets])>0)
+	ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	Cost_NavGoTo 
+End if 
+Cost_EntryScreen 

@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+QUERY([Samples];[Samples]SampleOrderDate>=vdStart;*)
+QUERY([Samples]; & ;[Samples]SampleOrderDate<=vdEnd;*)
+QUERY([Samples]; & ;[Samples]Void=False;*)
+QUERY([Samples]; & ;[Samples]Sam Type="Proto Sample")
+CREATE SET([Samples];"Protos")
+
+If (Records in selection([Samples])=0)
+	WinPrompt ("No Protos in that date range.")
+Else 
+	ARRAY TEXT(asEnterer;0)
+	ARRAY TEXT(asDivisions;0)
+	
+	DISTINCT VALUES([Samples]OrderEnterer SG;asEnterer)
+	If (Find in array(asEnterer;Current user)<1)
+		APPEND TO ARRAY(asEnterer;Current user)
+	End if 
+	SORT ARRAY(asEnterer;>)
+	asEnterer:=Find in array(asEnterer;Current user)
+	
+	DISTINCT VALUES([Samples]SampleDivision;asDivisions)
+	SORT ARRAY(asDivisions;>)
+	INSERT IN ARRAY(asDivisions;1;1)
+	asDivisions{1}:="Select Division"
+	asDivisions:=1
+	
+	FORM GOTO PAGE(2)
+End if 
+

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+CREATE EMPTY SET([SLRWkLibrary];"off")
+
+$i:=1
+FIRST RECORD([SLRWkLibrary])
+For ($i;1;Records in selection([SLRWkLibrary]))
+	If (Day number([SLRWkLibrary]WkEnd)#7)
+		ADD TO SET([SLRWkLibrary];"off")
+	End if 
+	NEXT RECORD([SLRWkLibrary])
+End for 
+USE SET("off")
+CLEAR SET("off")

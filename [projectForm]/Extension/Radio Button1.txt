@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cb12:=1
+cb11:=0
+GOTO OBJECT(vdDate)

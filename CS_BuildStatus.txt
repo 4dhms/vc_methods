@@ -1,0 +1,126 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY REAL(arPrice;0)
+C_DATE(vdStart;vdEnd)
+C_LONGINT($i;$n;$s;$c)
+C_LONGINT($status)
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	Else 
+		QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+		QUERY([Orders]; & ;[Orders]CancelDate<vdEnd)
+		QUERY SELECTION([Orders];[Orders]Customer#"cancelled";*)
+		QUERY SELECTION([Orders]; & ;[Orders]ActualDeliveryDate=!00-00-00!)
+		QUERY SELECTION([Orders]; & ;[Orders]Cancelled=False)
+		
+		CREATE SET([Orders];"Orders")
+		
+		If (vsFactory#"")
+			QUERY SELECTION([Orders];[Orders]Factory=vsFactory)
+		End if 
+		
+		CREATE EMPTY SET([Orders];"All")
+		CREATE EMPTY SET([Orders];"Approved")
+		CREATE EMPTY SET([Orders];"Incomplete")
+		$i:=1
+		FIRST RECORD([Orders])
+		For ($i;1;Records in selection([Orders]))
+			
+			  //STATUS COLORS
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			$s:=1
+			CREATE EMPTY SET([CP_OrderXRef];"Faux")
+			FIRST RECORD([OrdersFabricXRef])
+			For ($s;1;Records in selection([OrdersFabricXRef]))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				$c:=1
+				For ($c;1;Records in selection([CP_OrderXRef]))
+					ADD TO SET([CP_OrderXRef];"Faux")
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+				NEXT RECORD([OrdersFabricXRef])
+			End for 
+			USE SET("Faux")
+			CLEAR SET("Faux")
+			
+			If (Records in selection([CP_OrderXRef])>0)
+				$status:=1
+			Else 
+				$status:=0
+			End if 
+			
+			
+			$n:=1
+			FIRST RECORD([CP_OrderXRef])
+			
+			For ($n;1;Records in selection([CP_OrderXRef]))
+				If ([CP_OrderXRef]CPStatus="ning apprd bulk") | ([CP_OrderXRef]CPStatus="ning apprd@") | ([CP_OrderXRef]CPStatus="Approved Bulk") | ([CP_OrderXRef]CPStatus="Approved")
+				Else 
+					$status:=-1
+				End if 
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			
+			If ([Orders]SGPO="")
+				QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=[Orders]OrderNum)
+			Else 
+				SG_PO 
+				QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=[Orders]OrderNum;*)
+				QUERY([ComponentSheets]; | ;[ComponentSheets]HMSOrderNumber=<>vlSGPO)
+			End if 
+			
+			If (Records in selection([ComponentSheets])=0)
+			Else 
+				QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID;*)
+				QUERY([CS_Lines]; | ;[CS_Lines]OrderNumber=[Orders]OrderNum)
+				
+				$n:=1
+				FIRST RECORD([CS_Lines])
+				For ($n;1;Records in selection([CS_Lines]))
+					Case of 
+						: ([CS_Lines]OrderNumber#0) & ([CS_Lines]OrderNumber#[Orders]OrderNum)
+						: ([CS_Lines]CurrentStatus="Approved Bulk") | ([CS_Lines]CurrentStatus="Approved") | ([CS_Lines]CurrentStatus="ling ap@")
+						Else 
+							$status:=-1
+					End case 
+					NEXT RECORD([CS_Lines])
+				End for 
+			End if 
+			
+			
+			Case of 
+				: ($status=1)
+					ADD TO SET([Orders];"Approved")
+					ADD TO SET([Orders];"All")
+				: ($status=-1)
+					ADD TO SET([Orders];"Incomplete")
+					ADD TO SET([Orders];"All")
+			End case 
+			
+			NEXT RECORD([Orders])
+		End for 
+		Case of 
+			: (asSGStatus{asSGStatus}="Show All")
+				USE SET("All")
+			: (asSGStatus{asSGStatus}="Approved")
+				USE SET("Approved")
+			: (asSGStatus{asSGStatus}="Incomplete")
+				USE SET("Incomplete")
+		End case 
+		
+		CLEAR SET("Approved")
+		CLEAR SET("Incomplete")
+		CLEAR SET("All")
+		ORDER BY([Orders];[Orders]OrderNum;>)
+		
+		
+		vRecNum:=String(Records in selection([Orders]))+" Orders"
+		OBJECT SET ENABLED(bPrint;True)
+End case 

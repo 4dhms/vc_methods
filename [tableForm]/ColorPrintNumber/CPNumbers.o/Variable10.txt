@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start;$end)
+
+$start:=Date(Request("Enter date range start:"))
+
+Case of 
+	: (ok=1) & ($start#!00-00-00!)
+		$end:=Date(Request("Enter date range end:"))
+		Case of 
+			: (ok=1) & ($start#!00-00-00!)
+				WinChoice ("Report colors created by:";Current user;"Everyone";"Cancel")
+				Case of 
+					: (ok=1) & (bChoice2=1)
+						Color_NewReport ($start;$end;"all")
+					: (ok=1)
+						Color_NewReport ($start;$end;Current user)
+				End case 
+			: (ok=1)
+				ALERT("Bad date format. Try again."+Char(13)+"Example: "+String(Current date(*)))
+		End case 
+	: (ok=1)
+		ALERT("Bad date format. Try again."+Char(13)+"Example: "+String(Current date(*)))
+End case 

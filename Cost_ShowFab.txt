@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+ARRAY REAL(arMcol20;0)
+ARRAY REAL(arMcol21;0)
+ARRAY REAL(arMcol22;0)
+ARRAY REAL(arMcol23;0)
+
+QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt;*)
+QUERY([FabricLibrary]; & ;[FabricLibrary]ArticleNumber="HMS@")
+If (Records in selection([FabricLibrary])>0)
+	QUERY([FabricLibRates];[FabricLibRates]FabricLibKey=[FabricLibrary]FabricLibKey)
+	ORDER BY([FabricLibRates];[FabricLibRates]SortOrder;>)
+	If (Records in selection([FabricLibRates])>0)
+		SELECTION TO ARRAY([FabricLibRates]Supplier;asList1;[FabricLibRates]Content;asList2;[FabricLibRates]FOBo;arMcol20;[FabricLibRates]CIFchina;arMcol21;[FabricLibRates]LDPla;arMcol22;[FabricLibRates]LDPny;arMcol23)
+	End if 
+	INSERT IN ARRAY(asList1;1;1)
+	INSERT IN ARRAY(asList2;1;1)
+	INSERT IN ARRAY(asList3;1;1)
+	INSERT IN ARRAY(arMcol20;1;1)
+	INSERT IN ARRAY(arMcol21;1;1)
+	INSERT IN ARRAY(arMcol22;1;1)
+	INSERT IN ARRAY(arMcol23;1;1)
+	asList1{1}:=[FabricLibrary]Supplier
+	asList2{1}:=[FabricLibrary]FiberContent
+	arMcol20{1}:=[FabricLibrary]FOBo
+	arMcol21{1}:=[FabricLibrary]CIFchina
+	arMcol22{1}:=[FabricLibrary]LDPla
+	arMcol23{1}:=[FabricLibrary]LDPny
+End if 

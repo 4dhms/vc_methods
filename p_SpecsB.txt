@@ -1,0 +1,69 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+CREATE EMPTY SET([SpecSheetLines];"AllLines")
+CREATE EMPTY SET([SpecSheetLines];"ActiveLines")
+vlDupeOrderNumber:=0
+vsNewGarmentPart:=""
+cbPort:=0
+C_BOOLEAN($continue)
+vtFootnote:=""
+vlCloneRouter:=0
+
+If (<>vlOrderNumber>0)
+	vlOpenSheetID:=0
+End if 
+
+If (<>vlOrderNumber=0)
+	ok:=1
+	$continue:=True
+Else 
+	QUERY([Changes];[Changes]OrderNumber=<>vlOrderNumber;*)
+	QUERY([Changes]; & ;[Changes]FieldName="Factory")
+	
+	Case of 
+		: (Records in selection([Changes])=0)
+			vtChange:=""
+		: ([Changes]OldData="")
+			vtChange:=""
+		Else 
+			vtChange:="Factory changed ("+String([Changes]RevDate)+")"+Char(13)
+			vtChange:=vtChange+"from "+[Changes]OldData
+	End case 
+	
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=<>vlOrderNumber)
+	
+	If (Records in selection([SpecFactory])=0)
+		If (<>ComponentSheet)
+			$message:="Do you want to create"+Char(13)+"a new component sheet?"
+		Else 
+			$message:="Do you want to create"+Char(13)+"a new spec sheet?"
+		End if 
+		WinChoice ($message)
+	End if 
+	
+	If (ok=1)
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	If (Shift down) & (Macintosh command down)
+		Center Window (1250;800;4;"";"WincBox")
+		FORM SET INPUT([SpecFactory];"Spec.i")
+	Else 
+		Open window((Screen width/2)-500;(Screen height/2)-325;(Screen width/2)+500;(Screen height/2)+375;4;"";"WincBox")
+		FORM SET INPUT([SpecFactory];"SimpleSheet.i")
+	End if 
+	SET MENU BAR(13)
+	
+	If (Record number([SpecFactory])=-1)
+		ADD RECORD([SpecFactory];*)
+	Else 
+		MODIFY RECORD([SpecFactory];*)
+	End if 
+	CLOSE WINDOW
+	UNLOAD RECORD([SpecTempBuilder])
+	UNLOAD RECORD([SpecFactory])
+End if 
+
+<>SpecProcID:=0

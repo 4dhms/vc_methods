@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($fieldPtr)
+
+$i:=1
+For ($i;1;Size of array(alFieldNumber))
+	If (alFieldNumber{$i}>0)
+		$fieldptr:=Field(vlTableNum;alFieldNumber{$i})
+		OBJECT SET FONT STYLE($fieldptr->;0)
+		OBJECT SET COLOR($fieldptr->;-(15+(256*0)))
+	End if 
+End for 

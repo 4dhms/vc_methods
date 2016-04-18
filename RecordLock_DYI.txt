@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$n;$r)
+C_POINTER($tableptr)
+
+$c:=Get last table number
+$i:=1
+
+For ($i;1;$c)
+	$tableptr:=Table($i)
+	ALL RECORDS($tableptr->)
+	FIRST RECORD($tableptr->)
+	$n:=1
+	For ($n;1;Records in selection($tableptr->))
+		If (Locked($tableptr->))
+			ALERT(Table name(Table($i)))
+		End if 
+		NEXT RECORD($tableptr->)
+	End for 
+End for 
+
+ALERT("Done")

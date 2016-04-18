@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($pathName)
+C_TIME($docref)
+C_LONGINT($i;$n)
+C_POINTER($thiscol)
+
+If (<>vlPlatform<3)
+	$pathName:=Substring(System folder;1;Position(":";System folder))+"4D Excel"
+Else 
+	$pathName:="C:\\4D Excel"
+End if 
+
+If (Test path name($pathName)#0)
+	CREATE FOLDER($pathName)
+End if 
+
+$pathName:=$pathName+":"+vtArticleNumber+" "+Replace string(String(Current date(*));"/";"_")+".xls"
+
+If (<>vlPlatform<3)
+Else 
+	  //$pathName:=Replace string($pathName;":";"\")
+End if 
+
+$docRef:=Create document($pathName;"xls")
+
+SEND PACKET($docRef;"Order"+Char(9)+"X Factory"+Char(9)+"Factory"+Char(9)+"PO"+Char(9)+"Note"+Char(9))
+$i:=1
+For ($i;1;Size of array(asColors))
+	SEND PACKET($docRef;asColors{$i}+Char(9))
+End for 
+SEND PACKET($docref;Char(13)+Char(13))
+
+$i:=1
+For ($i;1;Size of array(asMOrder))
+	
+	SEND PACKET($docref;asMOrder{$i}+Char(9))
+	If (String(adMCancel{$i})="00/00/00")
+		SEND PACKET($docref;""+Char(9))
+	Else 
+		SEND PACKET($docref;String(adMCancel{$i})+Char(9))
+	End if 
+	SEND PACKET($docref;asFactories{$i}+Char(9)+asMPO{$i}+Char(9)+atMNote{$i}+Char(9))
+	$n:=1
+	For ($n;1;Size of array(asColors))
+		$thiscol:=Get pointer("arMcol"+String($n))
+		
+		If ($thiscol->{$i}=0)
+			SEND PACKET($docRef;""+Char(9))
+		Else 
+			SEND PACKET($docRef;String($thiscol->{$i})+Char(9))
+		End if 
+	End for 
+	SEND PACKET($docref;Char(13))
+End for 
+CLOSE DOCUMENT($docref)
+
+
+SHOW ON DISK($pathName;*)

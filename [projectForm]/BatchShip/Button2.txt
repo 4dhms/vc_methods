@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(adXShip))
+	adXShip{$i}:=vdWhenDate
+End for 

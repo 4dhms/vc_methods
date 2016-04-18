@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  // Anthony 12/17/2015 @ 3:29PM
+C_LONGINT($i)
+  // Unix timestamp
+C_TIME($docref)
+C_BOOLEAN($continue)
+C_TEXT($path)
+
+  // Users that will received excel document email always
+ARRAY TEXT(asSubCC;0)
+  //APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+
+  // Query Design Line Plan table based on Design Line Key of current design line plan
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]StyleNumber;>)
+
+  // Create excel document and if it is created continue
+$docRef:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	$continue:=True
+End if 
+
+If ($continue)
+	  // Excel Document Headers
+	SEND PACKET($docRef;"Design #"+Char(9))
+	SEND PACKET($docRef;"Style #"+Char(9))
+	SEND PACKET($docRef;"Description"+Char(9))
+	
+	SEND PACKET($docRef;"Price"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([DesignLineIncluded])
+	For ($i;1;Records in selection([DesignLineIncluded]))
+		SEND PACKET($docRef;[DesignLineIncluded]DesignNumber+Char(9))
+		SEND PACKET($docRef;[DesignLineIncluded]StyleNumber+Char(9))
+		SEND PACKET($docRef;Replace string([DesignLineIncluded]Name;Char(13);"")+Char(9))
+		
+		
+		SEND PACKET($docRef;[DesignLineIncluded]Price+Char(13))
+		
+		NEXT RECORD([DesignLineIncluded])
+	End for 
+	CLOSE DOCUMENT($docRef)
+	  // Excel document has been created
+	
+	  // Send email with document attachted
+	  //Mail_SimpleSend ("anthony@nubby.com";$path;"List View: Design Line Plans ("+String(Current date(*))+")";"Attached is the list view of the requested line plan.")
+	
+	  // Show where document has been saved on the local machine
+	SHOW ON DISK($path)
+	
+End if 

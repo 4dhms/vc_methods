@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($target)
+
+ARRAY TEXT($docs;0)
+ARRAY TEXT(asSubCC;0)
+APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+
+$target:="4D:Backup:"
+
+If (Test path name($target)=0)
+	DOCUMENT LIST($target;$docs)
+	
+	If (Size of array($docs)>15)
+		Mail_SimpleSend ("List";"None";"Clean Backup";"There are "+String(Size of array($docs))+" backup files on HMS FileServer.")
+	End if 
+Else 
+	Mail_SimpleSend ("List";"None";"Incomplete 4D Backup";"Remount the 4D Folder on HMSFILESERVER.")
+End if 

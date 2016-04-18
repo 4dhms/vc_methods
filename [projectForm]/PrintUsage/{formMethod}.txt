@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(bTest;Current user="Designer")
+		
+		ARRAY TEXT(asSeasonYear;0)
+		COPY ARRAY(<>asSeasonYear;asSeasonYear)
+		ARRAY TEXT(asSeasonName;10)
+		asSeasonName{1}:="Fall"
+		asSeasonName{2}:="Holiday"
+		asSeasonName{3}:="Resort"
+		asSeasonName{4}:="Spring"
+		asSeasonName{5}:="Spring II"
+		asSeasonName{6}:="Summer"
+		asSeasonName{7}:="Transition"
+		asSeasonName{8}:="Downtime"
+		asSeasonName{9}:="Full Year"
+		asSeasonName{10}:="Select Season"
+		asSeasonName:=Size of array(asSeasonName)
+		
+		asSeasonYear:=1
+		
+		pOne:=1
+		
+		CP_BuildDivArray (4)
+End case 

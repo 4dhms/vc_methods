@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+vsSize:=[SpecFactory]Size
+vsSource:=[SpecFactory]PatternSource
+<>vsFactory:=[SpecFactory]Factory
+vsRec1:=""
+vsRec2:=""
+vsRec3:=""
+
+Case of 
+	: (vlColNo1>2)
+		vsPrint3H:=[SpecFactory]Colhead
+		vsPrint3D:=String([SpecFactory]Submit)
+		If ([SpecFactory]Received#!00-00-00!)
+			vsRec3:="Rec: "+Char(13)+String([SpecFactory]Received)
+		End if 
+		QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+		QUERY([SpecLineSample];[SpecLineSample]ColumnNumber=vlColNo1-1)
+		vsPrint2H:=[SpecLineSample]ColumnHeader
+		vsPrint2D:=String([SpecLineSample]SubmitDue)
+		If ([SpecLineSample]Received#!00-00-00!)
+			vsRec2:="Rec: "+Char(13)+String([SpecLineSample]Received)
+		End if 
+		QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+		QUERY([SpecLineSample];[SpecLineSample]ColumnNumber=vlColNo1-2)
+		vsPrint1H:=[SpecLineSample]ColumnHeader
+		vsPrint1D:=String([SpecLineSample]SubmitDue)
+		If ([SpecLineSample]Received#!00-00-00!)
+			vsRec1:="Rec: "+Char(13)+String([SpecLineSample]Received)
+		End if 
+	: (vlColNo1>1)
+		vsPrint2H:=[SpecFactory]Colhead
+		vsPrint2D:=String([SpecFactory]Submit)
+		If ([SpecFactory]Received#!00-00-00!)
+			vsRec2:="Rec: "+Char(13)+String([SpecFactory]Received)
+		End if 
+		QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+		QUERY([SpecLineSample];[SpecLineSample]ColumnNumber=vlColNo1-1)
+		vsPrint1H:=[SpecLineSample]ColumnHeader
+		vsPrint1D:=String([SpecLineSample]SubmitDue)
+		If ([SpecLineSample]Received#!00-00-00!)
+			vsRec1:="Rec: "+Char(13)+String([SpecLineSample]Received)
+		End if 
+	Else 
+		vsPrint1H:=[SpecFactory]Colhead
+		vsPrint1D:=String([SpecFactory]Submit)
+		If ([SpecFactory]Received#!00-00-00!)
+			vsRec1:="Rec: "+Char(13)+String([SpecFactory]Received)
+		End if 
+End case 

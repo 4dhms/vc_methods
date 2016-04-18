@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtFullName:=String(vdStart)+" - "+String(vdEnd)
+
+ACCUMULATE([Orders]OrderNum)
+BREAK LEVEL(0)
+
+PAGE SETUP([CostSheets];"Shipping.print")
+SET PRINT OPTION(Orientation option;2)
+FORM SET OUTPUT([CostSheets];"Shipping.print")
+Print_Selection (->[CostSheets])
+
+

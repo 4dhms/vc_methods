@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	ARRAY TEXT(asCustomers;0)
+	ALL RECORDS([CustomerList])
+	SELECTION TO ARRAY([CustomerList]Customer;asCustomers)
+End if 

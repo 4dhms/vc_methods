@@ -1,0 +1,115 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$oldkey)
+C_BOOLEAN($sample)
+C_POINTER($tn;$dn)
+C_TEXT($message)
+
+WinChoice ("Are you sure you want to convert this line plan to a linked version?")
+If (ok=1)
+	WinChoice ("Are you really sure?";"No";"Yes")
+	If (ok=0)
+		WinChoice ("Do you want to link to sample or production orders?";"Samples";"Production")
+		If (ok=1)
+			$sample:=True
+		End if 
+		
+		$oldkey:=[DesignLines]DesignLineKey
+		
+		DUPLICATE RECORD([DesignLines])
+		[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+		[DesignLines]DLCreationDate:=Current date(*)
+		[DesignLines]DLCreator:=Current user
+		[DesignLines]Linked:=True
+		[DesignLines]Title:=[DesignLines]Title+" [LINKED]"
+		SAVE RECORD([DesignLines])
+		
+		QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$oldkey)
+		CREATE SET([DesignLineIncluded];"lines")
+		ARRAY LONGINT($pagenumber;0)
+		SELECTION TO ARRAY([DesignLineIncluded]PageNumber;$pagenumber)
+		SORT ARRAY($pagenumber;<)
+		$c:=$pagenumber{1}
+		
+		$i:=1
+		For ($i;1;$c)
+			USE SET("lines")
+			QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=$i;*)
+			QUERY SELECTION([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber<13)
+			
+			ORDER BY([DesignLineIncluded];[DesignLineIncluded]ItemNumber;>)
+			FIRST RECORD([DesignLineIncluded])
+			
+			QUERY([DLPages];[DLPages]DLItemKey=$oldkey)
+			QUERY SELECTION([DLPages];[DLPages]PageNumber=$i)
+			
+			CREATE RECORD([DesignLinkedPages])
+			[DesignLinkedPages]DesignLineKey:=[DesignLines]DesignLineKey
+			[DesignLinkedPages]PageNumber:=$i
+			[DesignLinkedPages]PageTitle:=[DLPages]PageTitle
+			
+			$n:=1
+			For ($n;1;Records in selection([DesignLineIncluded]))
+				$tn:=Field(116;$n+3)
+				$dn:=Field(116;$n+15)
+				
+				Case of 
+					: ([DesignLineIncluded]StyleNumber="")
+						$tn->:=1
+						$dn->:=[DesignLineIncluded]DesignNumber
+					: ($sample)
+						QUERY([Samples];[Samples]StyleNum=[DesignLineIncluded]StyleNumber)
+						If (Records in selection([Samples])=0)
+							QUERY([Samples];[Samples]DesignNum=[DesignLineIncluded]DesignNumber)
+							If (Records in selection([Samples])=0)
+								QUERY([Designs];[Designs]DesignNum=[DesignLineIncluded]DesignNumber)
+								If (Records in selection([Designs])>0)
+									$message:="There is no sample order with Style #"+[DesignLineIncluded]StyleNumber+"."+Char(13)
+									$message:=$message+"Would you like to use Design #"+[DesignLineIncluded]DesignNumber+"?"
+									WinChoice ($message;"Yes";"No")
+									If (ok=1)
+										$tn->:=1
+										$dn->:=[DesignLineIncluded]DesignNumber
+									End if 
+								End if 
+							Else 
+								ORDER BY([Samples];[Samples]SampleNumber;<)
+								FIRST RECORD([Samples])
+								$message:="There is no sample order with Style #"+[DesignLineIncluded]StyleNumber+"."+Char(13)
+								$message:=$message+"Would you like to substitute Style #"+[Samples]StyleNum
+								$message:=$message+" of Design #"+[Samples]DesignNum+"?"
+								WinChoice ($message;"Yes";"No")
+								If (ok=1)
+									$tn->:=2
+									$dn->:=String([Samples]SampleNumber)
+								End if 
+							End if 
+						Else 
+							$tn->:=2
+							$dn->:=String([Samples]SampleNumber)
+						End if 
+					Else 
+						QUERY([Orders];[Orders]StyleNumber=[DesignLineIncluded]StyleNumber)
+						If (Records in selection([Orders])=0)
+							QUERY([Samples];[Samples]StyleNum=[DesignLineIncluded]StyleNumber)
+							If (Records in selection([Samples])>0)
+								$tn->:=2
+								$dn->:=String([Samples]SampleNumber)
+							End if 
+						Else 
+							$tn->:=3
+							$dn->:=String([Orders]OrderNum)
+						End if 
+				End case 
+				NEXT RECORD([DesignLineIncluded])
+			End for 
+			SAVE RECORD([DesignLinkedPages])
+		End for 
+	End if 
+End if 
+
+UNLOAD RECORD([DesignLineIncluded])
+UNLOAD RECORD([DesignLinkedPages])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Samples])
+REDUCE SELECTION([DesignLines];0)
+

@@ -1,0 +1,93 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlListRouter;$i)
+C_POINTER($fieldPtr;$artPtr)
+ARRAY TEXT(atListContents;0)
+ARRAY TEXT(atAllListContents;0)
+ARRAY TEXT(atListArt;0)
+ARRAY TEXT(atAllListArt;0)
+
+$fieldPtr:=$2
+vtAddToList:=""
+vlListRouter:=1
+vsList1Name:=$1
+
+If (vsList1Name="Lining") | (vsList1Name="Lining Color") | (vsList1Name="Thread Color") | (vsList1Name="Zipper") | (vsList1Name="Shoulder Pads") | (vsList1Name="Buttons") | (vsList1Name="Buckles") | (vsList1Name="Snaps") & (Records in selection([Lists])=0)
+	QUERY([Lists];[Lists]ListName=vsList1Name)
+	CREATE EMPTY SET([Lists];"NewList")
+	ARRAY TEXT($atList;0)
+	LIST TO ARRAY(vsList1Name;$atList)
+	$i:=1
+	
+	For ($i;1;Size of array($atList))
+		CREATE RECORD([Lists])
+		[Lists]ListName:=vsList1Name
+		[Lists]ListItem:=$atList{$i}
+		SAVE RECORD([Lists])
+		ADD TO SET([Lists];"NewList")
+	End for 
+	USE SET("NewList")
+	
+	CLEAR SET("NewList")
+	UNLOAD RECORD([Lists])
+Else 
+	QUERY([Lists];[Lists]ListName=vsList1Name)
+End if 
+
+QUERY SELECTION([Lists];[Lists]ListItem#"")
+
+If (Records in selection([Lists])=0) & ($1#"Comp Source")
+	  //WinPrompt ("There is no list for "+$1)
+Else 
+	  //If (vsList1Name="Fiber")
+	  //If (◊vlOrderNumber>0)
+	  //QUERY SELECTION([Lists];[Lists]KWCS=[Orders]KWCS)
+	  //Else 
+	  //If ([Samples]KWCS="")
+	  //WinChoice ("Select content type:";"Knit";"Woven";"Cut 'n Sew")
+	  //If (ok=1)
+	  //If (bChoice2=1)
+	  //[Samples]KWCS:="Woven"
+	  //cbWoven:=1
+	  //Else 
+	  //[Samples]KWCS:="Knit"
+	  //cbKnit:=1
+	  //End if 
+	  //Else 
+	  //[Samples]KWCS:="CutSew"
+	  //cbCutSew:=1
+	  //End if 
+	  //QUERY SELECTION([Lists];[Lists]KWCS=[Samples]Fiber Type)
+	  //End if 
+	  //
+	  //End if 
+	  //List_Fiber 
+	  //Else 
+	CREATE SET([Lists];"Lists")
+	QUERY SELECTION([Lists];[Lists]UserName="")
+	SELECTION TO ARRAY([Lists]ListItem;atAllListContents)
+	SORT ARRAY(atAllListContents;>)
+	
+	USE SET("Lists")
+	CLEAR SET("Lists")
+	QUERY SELECTION([Lists];[Lists]UserName=Current user)
+	SELECTION TO ARRAY([Lists]ListItem;atListContents)
+	SORT ARRAY(atListContents;>)
+	  //End if 
+End if 
+vsList3Name:=Current user+"'s "+vsList1Name+" List"
+vsList4Name:="Complete "+vsList1Name+" List"
+
+
+Center Window (550;580;1;vsList1Name;"cb_generic")
+DIALOG([Dialogs];"List.win")
+CLOSE WINDOW
+
+If (ok=1) & (vtReturn#"")
+	If (vsList1Name="Fiber")
+		If (Count parameters>2)
+			$artPtr:=$3
+			$artPtr->:=vsArticle
+		End if 
+	End if 
+	$fieldPtr->:=vtReturn
+End if 

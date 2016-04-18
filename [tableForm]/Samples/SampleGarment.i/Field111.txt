@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]YdFusibles>0) & ([CostSheets]PriceFusibles>0)
+	[CostSheets]FusiblesCost:=[CostSheets]YdFusibles*[CostSheets]PriceFusibles
+End if 
+Cost_EntryCalculate 

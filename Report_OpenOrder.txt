@@ -1,0 +1,101 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($daterange)
+C_LONGINT($i;$pix;$page)
+C_TEXT($filename;$message)
+$daterange:=Current date(*)+14
+
+QUERY([Orders];[Orders]Factory="")
+QUERY SELECTION([Orders];[Orders]CancelDate>=$daterange;*)
+QUERY SELECTION([Orders]; & ;[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Hold=False)
+ORDER BY([Orders];[Orders]Order_Enterer;>;[Orders]Salesperson;>;[Orders]CancelDate;>)
+
+$filename:=String(Milliseconds)+".pdf"
+ReportFolder 
+
+vtPDFPath:=vtPDFPath+$filename
+
+SET PRINT OPTION(Scale option;100)
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+SET PRINT OPTION(Destination option;3;vtPDFPath)
+
+$page:=1
+$i:=1
+$pix:=0
+vtTitle:="Open Orders"
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	If ($pix<60)
+		If ($page>1)
+			PAGE BREAK(>)
+		End if 
+		vsPrintingHeader:="Printed "+String(Current date(*))+"   Page "+String($page)
+		$page:=$page+1
+		Print form("Header4")
+		$pix:=580
+	End if 
+	
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+	
+	Print form("OpenOrder")
+	$pix:=$pix-48
+	NEXT RECORD([Orders])
+End for 
+PAGE BREAK
+ARRAY TEXT(asSubCC;0)
+APPEND TO ARRAY(asSubCC;"susan@nubby.com")
+APPEND TO ARRAY(asSubCC;"mark@nubby.com")
+APPEND TO ARRAY(asSubCC;"michael@nubby.com")
+APPEND TO ARRAY(asSubCC;"theresa@nubby.com")
+APPEND TO ARRAY(asSubCC;"sara@nubby.com")
+APPEND TO ARRAY(asSubCC;"larry@nubby.com")
+APPEND TO ARRAY(asSubCC;"marisol@nubby.com")
+APPEND TO ARRAY(asSubCC;"bing@nubby.com")
+APPEND TO ARRAY(asSubCC;"nicole@nubby.com")
+APPEND TO ARRAY(asSubCC;"betty@nubby.com")
+APPEND TO ARRAY(asSubCC;"tom@nubby.com")
+APPEND TO ARRAY(asSubCC;"nestor@nubby.com")
+APPEND TO ARRAY(asSubCC;"laimun@nubby.com")
+APPEND TO ARRAY(asSubCC;"maggie@nubby.com")
+APPEND TO ARRAY(asSubCC;"dusha@nubby.com")
+APPEND TO ARRAY(asSubCC;"lorna@nubby.com")
+APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+
+APPEND TO ARRAY(asSubCC;"sharon@nubby.com")
+APPEND TO ARRAY(asSubCC;"lina@nubby.com")
+APPEND TO ARRAY(asSubCC;"morgan@nubby.com")
+APPEND TO ARRAY(asSubCC;"ann@nubby.com")
+APPEND TO ARRAY(asSubCC;"spenser@nubby.com")
+APPEND TO ARRAY(asSubCC;"thomas@nubby.com")
+APPEND TO ARRAY(asSubCC;"nicholas@nubby.com")
+
+APPEND TO ARRAY(asSubCC;"shari@nubby.com")
+APPEND TO ARRAY(asSubCC;"andrea@nubby.com")
+APPEND TO ARRAY(asSubCC;"jessica@nubby.com")
+APPEND TO ARRAY(asSubCC;"melanie@nubby.com")
+APPEND TO ARRAY(asSubCC;"melaniem@nubby.com")
+APPEND TO ARRAY(asSubCC;"aaron.bell@nubby.com")
+APPEND TO ARRAY(asSubCC;"darlinys.fernandez@nubby.com")
+APPEND TO ARRAY(asSubCC;"maryjo@nubby.com")
+APPEND TO ARRAY(asSubCC;"krystina.baez@nubby.com")
+APPEND TO ARRAY(asSubCC;"amanda.gonzalez@nubby.com")
+APPEND TO ARRAY(asSubCC;"nestor@nubby.com")
+APPEND TO ARRAY(asSubCC;"thomas@nubby.com")
+APPEND TO ARRAY(asSubCC;"aldo@nubby.com")
+APPEND TO ARRAY(asSubCC;"jody.remache@nubby.com")
+APPEND TO ARRAY(asSubCC;"melaniem@nubby.com")
+APPEND TO ARRAY(asSubCC;"robert@nubby.com")
+
+$message:="If you are at HMS, view report here:"+Char(13)+"http://192.168.250.68:8081/Reports/"+$filename+Char(13)+Char(13)
+$message:=$message+"If you are off-site, view report here:"+Char(13)+"http://74.9.71.226:8081/Reports/"+$filename
+
+EMail_GetPreferences 
+
+Mail_SimpleSend ("List";"None";"Open Order Report";$message)
+
+
+
+

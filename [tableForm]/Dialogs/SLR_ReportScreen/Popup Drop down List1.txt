@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asXStyleNumbers>0)
+	APPEND TO ARRAY(asStyleNumbers;asXStyleNumbers{asXStyleNumbers})
+	DELETE FROM ARRAY(asXStyleNumbers;asXStyleNumbers;1)
+	SORT ARRAY(asStyleNumbers;>)
+End if 
+

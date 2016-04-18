@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Not(Is new record([Quota])))
+	WinChoice ("Are you sure you want to delete this "+[Quota]Category+" "+[Quota]Description+"?")
+	
+	If (ok=1)
+		DELETE RECORD([Quota])
+		DELETE FROM ARRAY(asDutyType;asDutyType;1)
+		DELETE FROM ARRAY(alDutyStyle;asDutyType;1)
+		DELETE FROM ARRAY(<>asCategory;asDutyType;1)
+		DELETE FROM ARRAY(asNames;asDutyType;1)
+		DELETE FROM ARRAY(arDutyRates;asDutyType;1)
+		DELETE FROM ARRAY(asHTSCode;asDutyType;1)
+		DELETE FROM ARRAY(atNote;asDutyType;1)
+	End if 
+	
+End if 
+CANCEL

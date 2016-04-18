@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtTable;$HTML)
+vtTable:=""
+
+vsFindSubhead:="Find HMS Order:"
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsFindType>"
+$HTML:=$HTML+"<option>Order Number</option>"
+$HTML:=$HTML+"<option>Design Number</option>"
+$HTML:=$HTML+"<option>Style Number</option>"
+$HTML:=$HTML+"</select><br><br>"
+$HTML:=$HTML+"<input type=text name=vsFindString>"
+
+
+vtTable:=$HTML
+WEB SEND FILE("query.html")

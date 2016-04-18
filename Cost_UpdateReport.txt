@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($update)
+
+Case of 
+	: (Application type=5)
+		  //server
+	: (<>vfPreview)
+		
+	: ([CostSheets]SheetName="Actual@")
+		$update:=True
+	: ([CostSheets]SheetName="Confirmed@") & (Find in array(asSheetNames;"Actual@")<1)
+		$update:=True
+	: (Find in array(asSheetNames;"Actual@")<1) & (Find in array(asSheetNames;"Confirmed@")<1)
+		$update:=True
+End case 
+
+If ($update)
+	[Costing]ReportQuantity:=[CostSheets]Quantity
+	[Costing]ReportTotalNetSales:=[CostSheets]NetTotalSales
+	[Costing]ReportNetPrice:=[Orders]Price*Round(((100-[CostSheets]Figurer)/100);2)
+	SAVE RECORD([Costing])
+End if 

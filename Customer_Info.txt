@@ -1,0 +1,115 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$right;$bottom)
+vtNote:=""
+
+QUERY([Customers];[Customers]CustomerName=<>vsCustomer;*)
+QUERY([Customers]; | ;[Customers]CustomerName=<>vsCustomer)
+
+If (Records in selection([Customers])>0)
+	
+	If ([Customers]Label#"")
+		vtNote:="Label:"+Char(13)+[Customers]Label+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]HangTag#"")
+		vtNote:=vtNote+"Hang Tag:"+Char(13)+[Customers]HangTag+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]Packing#"")
+		vtNote:=vtNote+"Packing:"+Char(13)+[Customers]Packing+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]CartonMU#"")
+		vtNote:=vtNote+"Carton Marking:"+Char(13)+[Customers]CartonMU+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]Folding#"")
+		vtNote:=vtNote+"Folding:"+Char(13)+[Customers]Folding+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]RN#"")
+		vtNote:=vtNote+"RN#:"+Char(13)+[Customers]RN+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]OverShort#"")
+		vtNote:=vtNote+"Overage/Shortage:"+Char(13)+[Customers]OverShort+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]FitSize#"")
+		vtNote:=vtNote+"Fit Sample Size:"+Char(13)+[Customers]OverShort+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]PPSize#"")
+		vtNote:=vtNote+"PP Sample size:"+Char(13)+[Customers]PPSize
+		If ([Customers]PPCount#"")
+			vtNote:=vtNote+" ("+[Customers]PPCount+" pc.)"
+		End if 
+		vtNote:=vtNote+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]TOPSize#"")
+		vtNote:=vtNote+"TOP Sample size:"+Char(13)+[Customers]TOPSize
+		If ([Customers]TOPCount#"")
+			vtNote:=vtNote+" ("+[Customers]TOPCount+" pc.)"
+		End if 
+		vtNote:=vtNote+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]ColorTrimOK#"")
+		vtNote:=vtNote+"Color/Trim Approval:"+Char(13)+[Customers]ColorTrimOK+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]Testing#"")
+		vtNote:=vtNote+"Testing:"+Char(13)+[Customers]Testing+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]FactoryAudit)
+		vtNote:=vtNote+"Factory Audit"+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]POAudit)
+		vtNote:=vtNote+"PO Audit"+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]ShipTo#"")
+		vtNote:=vtNote+"Ship To:"+Char(13)+[Customers]ShipTo+Char(13)+Char(13)
+	End if 
+	
+	If ([Customers]NotesInternal#"")
+		vtNote:=vtNote+"Special_Instructions:"+Char(13)+[Customers]NotesInternal+Char(13)+Char(13)
+	End if 
+	
+	UNLOAD RECORD([Customers])
+	
+	If (vtNote#"")
+		Case of 
+			: (Screen width>1150) & (Screen width-<>vlRight<100)
+				$left:=5
+				$right:=205
+				
+			: (Screen width>1150) & (<>vlRight+205>Screen width)
+				$left:=Screen width-205
+				$right:=Screen width-5
+				
+			: (Screen width>1150)
+				$left:=<>vlRight+5
+				$right:=<>vlRight+205
+				$bottom:=<>vlTop+610
+			Else 
+				$left:=Screen width-205
+				$right:=Screen width-5
+				$bottom:=<>vlTop+610
+		End case 
+		
+		$bottom:=<>vlTop+610
+		
+		FORM SET INPUT([Dialogs];"InfoSheet")
+		
+		Open window($left;<>vlTop;$right;$bottom;1984;[Customers]CustomerName)
+		  //UNLOAD RECORD([Customers])
+		ADD RECORD([Dialogs])
+		CLOSE WINDOW
+		<>vlCustomerInfo:=0
+	End if 
+End if 
+

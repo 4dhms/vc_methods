@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($poNumber)
+  //global procedure to search for PO in Sam Fabrics
+SAVE RECORD([SampleFabrics])
+$poNumber:=Num(Request("Find Order Number:"))
+If (OK=1)
+	QUERY([SampleFabrics];[SampleFabrics]SampleFab PO Nu=$poNumber)
+End if 
+p_SetWndwSamF 

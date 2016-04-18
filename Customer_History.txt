@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldptr)
+C_TEXT($old;$new;$added;$router;$fieldname;$entry)
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Get last field number(72))
+	If (Is field number valid(72;$i))
+		$fieldptr:=Field(72;$i)
+		If (Field name($fieldptr)#"CustomerKey") & (Field name($fieldptr)#"FactoryAudit") & (Field name($fieldptr)#"PO Audit") & (Field name($fieldptr)#"POAudit")
+			
+			$old:=Old($fieldptr->)
+			$new:=$fieldptr->
+			$router:=""
+			
+			If ($old#$new)
+				
+				CompareText ($old;$new)
+				
+				Case of 
+					: ($old="")
+						$router:="Added"
+						$added:=$new
+					: (Position($old;$new)>0)
+						$added:=Replace string($new;$old;"")
+						$router:="Added"
+				End case 
+				
+				If ($router#"")
+					Case of 
+						: (Field name($fieldptr)="NotesInternal")
+							$fieldname:="Notes (Internal)"
+					End case 
+					
+					$entry:=$fieldname+" "+$router+" by "+Current user+" "+String(Current date(*))+" "+String(Current time(*))
+					$entry:=$entry+$added+Char(13)
+					
+					[Customers]History:=$entry+Char(13)+[Customers]History
+					
+				End if 
+			End if 
+		End if 
+	End if 
+End for 
+

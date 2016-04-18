@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY DATE(adDates;30)
+FORM SET INPUT([Dialogs];"EmailLog")
+C_LONGINT($i)
+For ($i;1;30)
+	adDates{$i}:=Current date(*)-($i-1)
+End for 
+adDates:=1
+
+vlWinWd:=600
+vlWinHt:=420
+vlWinType:=1
+vsWinTitle:=""
+
+Center Window 
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>MailLog:=0
+ARRAY TEXT(<>asFactories;0)
+ARRAY DATE(adDates;0)

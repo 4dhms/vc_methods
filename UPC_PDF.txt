@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+C_LONGINT($i;$pixies)
+
+vsStyleNumber:=asStyleNumbers{1}
+
+$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"+vsStyleNumber+".pdf"
+
+
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+SET PRINT OPTION(Destination option;3;$path)
+$pixies:=0
+vlPage:=1
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	If ($pixies<14)
+		If (vlPage>1)
+			PAGE BREAK(>)
+		End if 
+		$pixies:=550
+		Print form("UPC.phead")
+		vlPage:=vlPage+1
+	End if 
+	
+	vtPart1:=asColors{$i}
+	vtPart2:=asList1{$i}
+	vtPart3:=asSizes{$i}
+	vtPart4:=asList2{$i}
+	vtPart5:=asColorCodes{$i}
+	Print form("UPC.pline")
+	$pixies:=$pixies-14
+End for 
+
+PAGE BREAK
+
+SHOW ON DISK($path)
+

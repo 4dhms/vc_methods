@@ -1,0 +1,51 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$top;$right;$bottom)
+C_TEXT(<>vtSpecialGarment;$design)
+
+  //p_SalesEntry global procedure
+  //initializes variable
+
+If (<>vtSpecialGarment="")
+	ALL RECORDS([Orders])
+Else 
+	$design:=StripToNumber (<>vtSpecialGarment)+"@"
+	QUERY([Orders];[Orders]DesignNumber=$design)
+End if 
+
+Order_PrepSalesEntry 
+
+GET WINDOW RECT($left;$top;$right;$bottom)
+If (Current user="Designer") | (Current user="Lai Mun") & (User in group("Designer";"SuperDuperCostSheets")) & (<>vfSupersheet)
+	QUERY([CostSheets];[CostSheets]Cushion>50)
+	If (Records in selection([CostSheets])>0)
+		RELATE ONE SELECTION([CostSheets];[Costing])
+		RELATE ONE SELECTION([Costing];[Orders])
+		If (Records in selection([Orders])=1)
+			WinPrompt ("This order has an unusually high cushion.")
+		Else 
+			WinPrompt ("These orders have an unusually high cushion.")
+		End if 
+	Else 
+		ALL RECORDS([Orders])
+	End if 
+End if 
+
+If (<>vtSpecialGarment#"")
+	ORDER BY([Orders];[Orders]DesignNumber;>)
+	<>vtSpecialGarment:=""
+Else 
+	ORDER BY([Orders];[Orders]OrderNum;<)
+End if 
+
+Case of 
+	: (Current user="Designer") & (Shift down)
+		MODIFY SELECTION([Orders])
+	: (Screen height<650)
+		MODIFY SELECTION([Orders])
+	Else 
+		MODIFY SELECTION([Orders];*)
+End case 
+CLOSE WINDOW
+UNLOAD RECORD([Orders])
+<>SalesPrcID:=0
+

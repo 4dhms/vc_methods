@@ -1,0 +1,92 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pix;$page;$c;$s)
+C_POINTER($part)
+C_TEXT($strip)
+
+
+$pix:=0
+$page:=1
+
+ARRAY TEXT($styles;0)
+ARRAY TEXT($rawS;0)
+SELECTION TO ARRAY([Samples]StyleNum;$rawS)
+
+For ($i;1;Size of array($rawS))
+	$strip:=StripToNumber ($rawS{$i})
+	If (Find in array($styles;$strip)<1)
+		APPEND TO ARRAY($styles;$strip)
+	End if 
+End for 
+SORT ARRAY($styles;>)
+
+ARRAY TEXT($unusedstyles;0)
+For ($i;1;Size of array($styles))
+	QUERY([Orders];[Orders]StyleNumber="@"+$styles{$i})
+	If (Records in selection([Orders])=0)
+		APPEND TO ARRAY($unusedstyles;$styles{$i})
+	End if 
+End for 
+
+$i:=1
+PRINT SETTINGS
+
+For ($i;1;Size of array($unusedstyles))
+	If ($pix<48)
+		If ($i>1)
+			PAGE BREAK(>)
+		End if 
+		vsPart1:=vtTitle
+		vsPart2:="Page "+String($page)
+		$page:=$page+1
+		Print form("Glory_Header")
+		$pix:=660
+	End if 
+	
+	If ($i=1)
+		$c:=1
+		For ($c;1;15)
+			$part:=Get pointer("vsPart"+String($c))
+			$part->:=""
+		End for 
+		vsPart1:="Unused Styles"
+		vsPart3:=String(Size of array($unusedstyles))
+		Print form("Glory_Stats")
+		Print form("Glory_Space")
+		Print form("Glory_Space")
+		$pix:=$pix-30
+	End if 
+	
+	$c:=1
+	For ($c;1;15)
+		$part:=Get pointer("vsPart"+String($c))
+		$part->:=""
+	End for 
+	
+	vsPart2:="S/N"
+	vsPart3:=$unusedstyles{$i}
+	QUERY([Samples];[Samples]StyleNum=vsPart3)
+	QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+	vsPart7:="D/N"
+	vsPart8:=[Designs]DesignNum
+	vsPart13:=[Designs]Description
+	vxSketch:=[Designs]Sketch
+	
+	If (vsPart3#"")
+		Print form("Glory_Color")
+	End if 
+	$pix:=$pix-48
+	Print form("Glory_Space")
+	Print form("Glory_Space")
+	
+End for 
+Print form("Glory_Space")
+Print form("Glory_Space")
+Print form("Glory_Space")
+$c:=1
+For ($c;1;15)
+	$part:=Get pointer("vsPart"+String($c))
+	$part->:=""
+End for 
+
+PAGE BREAK
+

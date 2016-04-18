@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($colptr)
+
+$colptr:=Get pointer("arMcol"+String($1+19))
+
+If ($colptr->>0)
+	Case of 
+		: (vsCPType="Self")
+			[CostSheets]PriceFabric:=$colptr->{$colptr->}
+		: (vsCPType="Combo 1")
+			[CostSheets]PriceCombo1:=$colptr->{$colptr->}
+		: (vsCPType="Combo 2")
+			[CostSheets]PriceCombo2:=$colptr->{$colptr->}
+		: (vsCPType="Combo 3")
+			[CostSheets]PriceCombo3:=$colptr->{$colptr->}
+	End case 
+	CANCEL
+End if 

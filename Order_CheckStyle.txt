@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($checkstyle;$i)
+ARRAY TEXT(<>asRangeTest;0)
+C_BOOLEAN($fail)
+$fail:=False
+
+$checkstyle:=New process("Order_GetStyle";0;"StyleTest";[Orders]StyleNumber)
+
+Repeat 
+Until (Size of array(<>asRangeTest)>0) | (Shift down)
+
+
+DELETE FROM ARRAY(<>asRangeTest;1;1)
+
+For ($i;1;Size of array(<>asRangeTest))
+	
+	Case of 
+		: (<>asRangeTest{$i}#[Orders]BrkdnCutRatio)
+			[Orders]SizeRangeConflict:=True
+			WinPrompt ("Size range on another order for this style number is "+Char(13)+<>asRangeTest{$i}+". This might create problems with the UPC.")
+			$fail:=True
+	End case 
+End for 
+
+If (Not($fail))
+	[Orders]SizeRangeConflict:=False
+End if 
+

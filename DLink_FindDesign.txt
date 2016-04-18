@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($code)
+
+If (<>asSeasonName>1)
+	QUERY([Designs];[Designs]SeasonName=<>asSeasonName{<>asSeasonName};*)
+	QUERY([Designs]; & ;[Designs]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+Else 
+	ALL RECORDS([Designs])
+End if 
+If (asDivisions>1)
+	$code:=Substring(asDivisions{asDivisions};1;Position("-";asDivisions{asDivisions}))+"@"
+	QUERY SELECTION([Designs];[Designs]DivisionCodeN=$code)
+End if 
+
+If (vsCustomer#"")
+	QUERY SELECTION([Designs];[Designs]Customer=vsCustomer)
+End if 
+If (vsDesignNumber#"")
+	QUERY SELECTION([Designs];[Designs]DesignNum=vsDesignNumber)
+End if 
+
+SELECTION TO ARRAY([Designs]Sketch;aSketch;[Designs]DesignNum;asDesignNumbers)
+ARRAY TEXT(asStyleNumbers;Size of array(asDesignNumbers))
+ARRAY LONGINT(alOrders;Size of array(asDesignNumbers))
+ARRAY TEXT(asGroups;Size of array(asDesignNumbers))

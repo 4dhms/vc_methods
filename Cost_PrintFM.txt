@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Costing];[Costing]SheetNumber=[CostSheets]SheetNumber)
+QUERY([Designs];[Designs]DesignNum=[Costing]DesignNumber)
+
+vfNewCostsheet:=True
+
+Cost_FreightToggle 
+  // 
+Cost_EntryShow 
+SS_PrintPrepFabric 
+
+Case of 
+	: (<>vfPreview)
+		If ([Costing]OrderNumber>0)
+			cbSG:=0
+		Else 
+			cbSG:=1
+		End if 
+		FORM GOTO PAGE(3)
+End case 
+OBJECT SET VISIBLE([Designs]Sketch;[CostSheets]SheetNumber#-1)
+OBJECT SET VISIBLE(*;"xTemplate";[CostSheets]SheetNumber=-1)
+
+  //SET VISIBLE(vlOrderNumber;vlOrderNumber#0)

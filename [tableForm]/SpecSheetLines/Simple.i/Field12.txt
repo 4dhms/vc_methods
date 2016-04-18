@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Mouse Enter)
+		GET MOUSE(vlX;vlY;vlZ)
+	: (Form event=On Data Change)
+		Spec_TrackChange ([SpecFactory]Colhead;->[SpecSheetLines]Spec1A;"S/B")
+End case 

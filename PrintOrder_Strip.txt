@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$break)
+C_TEXT($char)
+C_TEXT($return)
+C_BOOLEAN($stop)
+$return:=Char(13)
+
+While (Substring(vtRemaining;Length(vtRemaining);1)=$return)
+	vtRemaining:=Substring(vtRemaining;1;Length(vtRemaining)-1)
+End while 
+
+If (Substring(vtRemaining;Length(vtRemaining);1)#Char(13))
+	vtRemaining:=vtRemaining+Char(13)
+End if 
+
+vtRemaining:=Replace string(vtRemaining;Char(10);Char(13))
+
+$i:=90
+Repeat 
+	If (Shift down)
+		TRACE
+	End if 
+	Case of 
+		: (Position(Char(13);vtRemaining;*)<90)
+			  //If (Position($return;vtRemaining)=1)
+			  //$break:=2
+			  //Else 
+			$break:=Position(Char(13);vtRemaining;*)
+			
+			  //End if 
+			$stop:=True
+		: (Position(" ";vtRemaining)<1)
+			$break:=90
+			$stop:=True
+		Else 
+			$char:=Substring(vtRemaining;$i;1)
+			  //If (vlColorFieldNum=150)
+			  //ALERT("Ascii :"+String(ascii(" "))+"  "+String(Ascii($char))+"  |"+$char+"|")
+			  //
+			  //End if 
+			Case of 
+				: (Character code($char)=202) | (Character code($char)=32)
+					$break:=$i
+					$stop:=True
+			End case 
+			$i:=$i-1
+			If ($i<10)
+				$break:=90
+				$stop:=True
+			End if 
+	End case 
+Until ($stop) | (Shift down)
+
+vtLine:=Substring(vtRemaining;1;$break)
+vtRemaining:=Substring(vtRemaining;$break+1;32000)
+
+
+

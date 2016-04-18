@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asSGStatus{asSGStatus}#"Incomplete")
+	WinPrompt ("This report only shows unapproved components. "+"For other reporting, use the production status reports.")
+Else 
+	CS_PrintUnapproved 
+End if 

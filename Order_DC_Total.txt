@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$total;$n)
+C_POINTER($arrayPtr)
+C_BOOLEAN($report)
+
+If (Count parameters>0)
+	$report:=$1
+End if 
+
+$n:=1
+
+For ($n;1;14)
+	$i:=1
+	$total:=0
+	$arrayPtr:=Get pointer("asColor"+String($n))
+	If ($arrayPtr->{$i}#"")
+		For ($i;1;Size of array(asColor1)-3)
+			$total:=$total+Num($arrayPtr->{$i+1})
+		End for 
+		$arrayPtr->{Size of array(asColor1)-1}:=String($total)
+		$arrayPtr->{Size of array(asColor1)}:=String(Num($arrayPtr->{1})-$total)
+		If (Not($report))
+			If (Table name(Current form table)="Dialogs")
+				vlSubtotal:=$total
+			End if 
+		End if 
+	End if 
+End for 
+
+

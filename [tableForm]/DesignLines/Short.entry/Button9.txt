@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you really sure that you want to duplicate this design line plan?")
+If (ok=1)
+	FORM GOTO PAGE(3)
+	DL_DupeLine 
+End if 

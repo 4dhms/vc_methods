@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asFactoryAlpha;0)
+ALL RECORDS([Factories])
+SELECTION TO ARRAY([Factories]AlphaKey;asFactoryAlpha)
+
+  // global to add new Speedpost record
+CREATE SET([Speedpost Form];"SpeedSet")
+SET WINDOW TITLE("New Speedpost Record")
+ADD RECORD([Speedpost Form])
+ADD TO SET([Speedpost Form];"SpeedSet")
+CLOSE WINDOW
+USE SET("SpeedSet")
+p_SetWndwSpdpst 
+CLEAR SET("SpeedSet")
+ORDER BY([Speedpost Form];[Speedpost Form]SPDate;<;[Speedpost Form]Package number;<)

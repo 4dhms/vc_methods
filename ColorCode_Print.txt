@@ -1,0 +1,83 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($familycode)
+C_TEXT($number)
+C_TEXT($version)
+
+$number:=Substring([CP_OrderXRef]CPNumber;1;Position("-";[CP_OrderXRef]CPNumber)-1)
+$version:=Substring([CP_OrderXRef]CPNumber;Position("-";[CP_OrderXRef]CPNumber)+1;3)
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyKey=[ColorPrintNumber]CPFamilyKey)
+
+Case of 
+	: ([ColorPrintFamilies]CPFamilyName="ANIMAL@")
+		$familycode:="ANMAL"
+	: ([ColorPrintFamilies]CPFamilyName="BLACK")
+		$familycode:="Black"
+	: ([ColorPrintFamilies]CPFamilyName="BOUCLE")
+		$familycode:="BOUCL"
+	: ([ColorPrintFamilies]CPFamilyName="CAMO")
+		$familycode:="CAMO"
+	: ([ColorPrintFamilies]CPFamilyName="Checks@")
+		$familycode:="CHECK"
+	: ([ColorPrintFamilies]CPFamilyName="Conversation@")
+		$familycode:="CONVR"
+	: ([ColorPrintFamilies]CPFamilyName="Dip Dye")
+		$familycode:="DPDYE"
+	: ([ColorPrintFamilies]CPFamilyName="Dot")
+		$familycode:="DOT"
+	: ([ColorPrintFamilies]CPFamilyName="Ethnic@")
+		$familycode:="ETHST"
+	: ([ColorPrintFamilies]CPFamilyName="Floral@")
+		$familycode:="FLORL"
+	: ([ColorPrintFamilies]CPFamilyName="Graphic@")
+		$familycode:="GRPHC"
+	: ([ColorPrintFamilies]CPFamilyName="Jacquard@")
+		$familycode:="JCQRD"
+	: ([ColorPrintFamilies]CPFamilyName="Lace")
+		$familycode:="LACE"
+	: ([ColorPrintFamilies]CPFamilyName="Oriental@")
+		$familycode:="ORNTL"
+	: ([ColorPrintFamilies]CPFamilyName="Paisley@")
+		$familycode:="PASLY"
+	: ([ColorPrintFamilies]CPFamilyName="Plaid")
+		$familycode:="PLAID"
+	: ([ColorPrintFamilies]CPFamilyName="Pucci")
+		$familycode:="PUCCI"
+	: ([ColorPrintFamilies]CPFamilyName="Purple")
+		$familycode:="PURPL"
+	: ([ColorPrintFamilies]CPFamilyName="Red")
+		$familycode:="Red"
+	: ([ColorPrintFamilies]CPFamilyName="Solid@")
+		$familycode:="SLDVR"
+	: ([ColorPrintFamilies]CPFamilyName="Stripes")
+		$familycode:="STRIP"
+	: ([ColorPrintFamilies]CPFamilyName="Tie Dye@")
+		$familycode:="TIDYE"
+	: ([ColorPrintFamilies]CPFamilyName="Tropical")
+		$familycode:="TRPCL"
+	Else 
+		$familycode:="MULTI"
+End case 
+
+Case of 
+	: ([ColorPrintNumber]CPType=6)
+		vtColorCode:=Replace string($number;"NV";"")+"NVTY"+$version
+		If (Length(vtColorCode)>10)
+			vtColorCode:=Uppercase(Substring(vtColorCode;Length(vtColorCode)-9;10))
+		End if 
+		
+	: (Length($number)>5)
+		vtColorCode:=Substring($number;1;5)+$familycode+$version
+		If (Length(vtColorCode)>10)
+			vtColorCode:=Uppercase(Substring(vtColorCode;1;10-Length($version)))+$version
+		End if 
+	: (Length($version)=2) & (Length($number+$familycode)>8)
+		vtColorCode:=Substring($number+$familycode;1;8)+$version
+	: (Length($version)=1) & (Length($number+$familycode)>9)
+		vtColorCode:=Substring($number+$familycode;1;9)+$version
+	: (Length($version)=1)
+		vtColorCode:=$number+$familycode+$version
+	Else 
+		vtColorCode:=$number+Substring($familycode;1;4)+$version
+End case 

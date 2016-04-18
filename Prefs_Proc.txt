@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>PrefsProc>0)
+		SHOW PROCESS(<>PrefsProc)
+		BRING TO FRONT(<>PrefsProc)
+	: (<>PrefsProc=0)
+		<>PrefsProc:=New process("Prefs_Edit";0;"Preferences")
+	Else 
+		SHOW PROCESS(<>PrefsProc)
+		BRING TO FRONT(<>PrefsProc)
+End case 

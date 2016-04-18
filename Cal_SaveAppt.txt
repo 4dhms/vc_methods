@@ -1,0 +1,100 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue;$inform)
+C_LONGINT($i)
+C_LONGINT($stHr;$endHr)
+C_TEXT($group)
+C_LONGINT($duration)
+ARRAY TEXT($attendees;0)
+ARRAY BOOLEAN($testCustomer;0)
+C_BOOLEAN($stop)
+
+If (Record number([Appts])=-3)
+	$inform:=True
+Else 
+	WinChoice ("Do you want to email attendees?")
+	If (ok=1)
+		$inform:=True
+	Else 
+		$inform:=False
+	End if 
+End if 
+
+Case of 
+	: ([Appts]ApptWith="")
+		WinChoice ("Are you sure you want to schedule a meeting with nobody?")
+		If (ok=1)
+			$continue:=True
+		End if 
+	Else 
+		$continue:=True
+End case 
+
+If ($continue)
+	QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey)
+	
+	ORDER BY([Attendees];[Attendees]Customer;>)
+	SELECTION TO ARRAY([Attendees]Attendee;$attendees;[Attendees]Customer;$testCustomer)
+	CREATE SET([Attendees];"InGroup")
+	
+	$i:=1
+	For ($i;1;Size of array(asMeeting))
+		If (asMeeting{$i}#"")
+			$group:=$group+asMeeting{$i}
+		End if 
+		If ($i<Size of array(asMeeting))
+			$group:=$group+", "
+		End if 
+	End for 
+	
+	If (Find in array($testCustomer;True)>0)
+		$group:=$group+Char(13)+Char(13)+"Meeting with: "
+		$i:=1
+		For ($i;1;Size of array(asMeetingCust))
+			If (asMeetingCust{$i}#"")
+				$group:=$group+asMeetingCust{$i}
+			End if 
+			If ($i<Size of array(asMeetingCust))
+				$group:=$group+", "
+			End if 
+		End for 
+	End if 
+	
+	If (asStHour<20)
+		$stHr:=asStHour+5
+	Else 
+		$stHr:=asStHour-19
+	End if 
+	If (asEndHour<20)
+		$endHr:=asEndHour+5
+	Else 
+		$endHr:=asEndHour-19
+	End if 
+	
+	[Appts]ApptStart:=Time("?"+String($stHr)+":"+asStMin{asStMin}+"?")
+	[Appts]ApptEnd:=Time("?"+String($endHr)+":"+asEndMin{asEndMin}+"?")
+	[Appts]ApptGroup:=$group
+	[Appts]StHr:=asStHour
+	[Appts]StMin:=asStMin
+	[Appts]EndHr:=asEndHour
+	[Appts]EndMin:=asEndMin
+	[Appts]Team:=asTeam{asTeam}
+	SAVE RECORD([Appts])
+	$duration:=[Appts]ApptEnd-[Appts]ApptStart
+	
+	If ($inform)
+		Cal_Inform 
+	End if 
+	
+	If ($duration<0)
+		WinPrompt ("This meeting ends before it start.")
+		$stop:=True
+	End if 
+	
+	If (Not($stop))
+		ACCEPT
+		
+	End if 
+	Cal_ConflictCatcher 
+	Cal_FindSched 
+	Cal_ConflictFlag 
+End if 

@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($t;$descript;$code)
+
+$t:=Char(9)
+
+ORDER BY([Changes];[Changes]ChangeKey;<)
+QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+$descript:=Replace string([Designs]Description;Char(13);" ")
+
+If ([Changes]NewChange="CC") & ([Changes]NewChange="Added")
+	$code:="NC"
+Else 
+	$code:=$1
+End if 
+
+If (vfFirst)
+	  //QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	SEND PACKET(vhDocref;$code+$t+vsStyleNumber+$t+$t+$descript+$t+[Orders]OrderDivision+$t)
+	vfFirst:=False
+Else 
+	SEND PACKET(vhDocref;$code+$t+$t+$t+$t+$t)
+End if 
+
+If ([Changes]NewChange="CC") & ([Changes]NewChange="Added")
+	SEND PACKET(vhDocref;$t+$t+$t+$t+$t+$t+[Changes]FieldName+$t+"from "+[Changes]OldData+$t+Char(13))
+Else 
+	SEND PACKET(vhDocref;$t+$t+$t+$t+$t+$t+[Changes]FieldName+$t+"from "+[Changes]OldData+$t+"to "+[Changes]NewChange+Char(13))
+	
+End if 
+
+

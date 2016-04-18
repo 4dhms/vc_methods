@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+If (alOrders>0)
+	vlOrderNumber:=alOrders{alOrders}
+	QUERY([Invoices];[Invoices]OrderNumber=alOrders{alOrders})
+	$c:=Records in selection([Invoices])
+	
+	ARRAY TEXT(asPrevDate;$c)
+	ARRAY TEXT(asPrevQty;$c)
+	ARRAY TEXT(asPrevAmt;$c)
+	ARRAY LONGINT(alInvOrder;$c)
+	
+	LISTBOX SELECT ROW(PastInvList;1)
+	INSERT IN ARRAY(asPrevDate;1;1)
+	INSERT IN ARRAY(asPrevQty;1;1)
+	INSERT IN ARRAY(asPrevAmt;1;1)
+	INSERT IN ARRAY(alInvOrder;1;1)
+	
+	$i:=1
+	FIRST RECORD([Invoices])
+	For ($i;1;$c)
+		asPrevDate{$i+1}:=String([Invoices]InvoiceDate)
+		asPrevQty{$i+1}:=String([Invoices]InvoiceQuantity;"###,###")
+		asPrevAmt{$i+1}:=String([Invoices]InvoiceAmount;"###,###,###.00")
+		alInvOrder{$i+1}:=[Invoices]OrderNumber
+		NEXT RECORD([Invoices])
+	End for 
+End if 

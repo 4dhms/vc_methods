@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($new)
+
+If (Is new record([FabricLibrary]))
+	$new:=True
+End if 
+
+FabricLib_Save 
+
+If ($new)
+	QUERY([FabricLibrary];[FabricLibrary]Type>0)
+	QUERY SELECTION([FabricLibrary];[FabricLibrary]ArticleNumber#"")
+	ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)
+End if 

@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pcount)
+vlPage:=1
+
+PRINT SETTINGS
+
+
+For ($i;1;Size of array(asSSDesignNumber))
+	
+	If ($pcount<48)
+		vsPrintingHeader:="Page "+String(vlPage)
+		vlPage:=vlPage+1
+		If ($i>2)
+			Print form("14PTslug")
+			Print form("Usage_PrintDetailFooter")
+			PAGE BREAK(>)
+		End if 
+		Print form("Usage_PrintDetailHeader")
+		$pcount:=660
+	End if 
+	vtColor1:=asSSDesignNumber{$i}
+	vtColor2:=asSSDescript{$i}
+	vlItem1:=alSSSamples{$i}
+	vlItem2:=alOrders{$i}
+	vlItem3:=alUnits{$i}
+	Print form("Usage_PrintDetailLine")
+	$pcount:=$pcount-14
+End for 
+vtColor1:=""
+vtColor2:="Total"
+vlItem1:=vlTotalSamp
+vlItem2:=vlTotQty
+vlItem3:=vlColCount
+
+Print form("14PTslug")
+Print form("Usage_PrintDetailLine")
+$pcount:=$pcount-28
+
+Repeat 
+	Print form("14PTslug")
+	$pcount:=$pcount-14
+Until ($pcount<24)
+
+Print form("Usage_PrintDetailFooter")
+PAGE BREAK

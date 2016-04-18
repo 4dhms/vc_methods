@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+For ($i;1;Size of array(asBDLetter))
+	If (alBDColor{$i}=14149350)
+		alBDColor{$i}:=16711690
+	End if 
+End for 
+OBJECT SET VISIBLE(bUpdate;True)

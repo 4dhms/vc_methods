@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	PrintCat_GetPix (6;[PCPage]Print6)
+End if 

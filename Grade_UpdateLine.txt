@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+C_POINTER($headPtr)
+C_LONGINT($sampleSize)
+ARRAY REAL($final;10)
+
+Grade_SizeArray (False)
+ARRAY REAL($adjust;Size of array(asSizeName))
+
+$n:=1
+$headPtr:=Get pointer("vsSize"+String(vlColSlider))
+$sampleSize:=Find in array(asSizeName;$headPtr->)
+
+For ($n;1;Size of array(asSizeName))
+	Case of 
+		: ($n=1)
+			$adjust{$n}:=0
+		: ($n=10)
+			$adjust{$n}:=$adjust{$n-1}+Abs(arSizeCalc{$n})
+		: ($n=$sampleSize)
+			$adjust{$n}:=$adjust{$n-1}+Abs(arSizeCalc{$n-1})
+		: ($n-1=$sampleSize)
+			$adjust{$n}:=$adjust{$n-1}+Abs(arSizeCalc{$n})
+		: ($n>vlColSlider)
+			$adjust{$n}:=$adjust{$n-1}+Abs(arSizeCalc{$n})
+		Else 
+			$adjust{$n}:=$adjust{$n-1}+Abs(arSizeCalc{$n-1})
+	End case 
+End for 
+
+
+$n:=1
+For ($n;1;10)
+	$headPtr:=Get pointer("vsSize"+String($n))
+	If ($headPtr->#"")
+		$final{$n}:=$adjust{Find in array(asSizeName;$headPtr->)}
+	End if 
+End for 
+
+[SpecLibGrade]Adj1:=0
+[SpecLibGrade]Adj2:=$final{2}
+[SpecLibGrade]Adj3:=$final{3}
+[SpecLibGrade]Adj4:=$final{4}
+[SpecLibGrade]Adj5:=$final{5}
+[SpecLibGrade]Adj6:=$final{6}
+[SpecLibGrade]Adj7:=$final{7}
+[SpecLibGrade]Adj8:=$final{8}
+[SpecLibGrade]Adj9:=$final{9}
+[SpecLibGrade]Adj10:=$final{10}
+SAVE RECORD([SpecLibGrade])

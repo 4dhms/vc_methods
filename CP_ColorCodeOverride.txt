@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($reset)
+If (Length(vtColorCode)>10)
+	WinPrompt ("Color code can not exceed 10 characters.")
+Else 
+	vtColorCode:=Uppercase(vtColorCode)
+	vfCodeOverride:=True
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{asTypeList})
+	If ([CP_OrderXRef]DontShowCode)
+		$reset:=True
+	End if 
+	
+	[CP_OrderXRef]ColorCodeOverride:=True
+	[CP_OrderXRef]ColorCodeNew:=vtColorCode
+	[CP_OrderXRef]DontShowCode:=False
+	SAVE RECORD([CP_OrderXRef])
+	ACCEPT
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=<>vlOrderNumber)
+	APPLY TO SELECTION([CP_OrderXRef];[CP_OrderXRef]DontShowCode:=False)
+	UNLOAD RECORD([CP_OrderXRef])
+	CALL PROCESS(Current process)
+	<>vlCostRouter:=-169
+End if 

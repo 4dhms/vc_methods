@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_BOOLEAN($pass)
+
+If (Shipping_Get )
+	$continue:=True
+	$pass:=True
+Else 
+	$continue:=False
+End if 
+
+If ($continue) & (FORM Get current page=3)
+	
+	Case of 
+		: ([Orders]Factory="")
+			WinAlertSmall ("Enter FACTORY.")
+			GOTO OBJECT([Orders]Factory)
+			$pass:=False
+			
+			  //: ([Orders]PODate=!00/00/0000!)
+			  //WinAlertSmall ("Enter PO Date.")
+			  //GOTO OBJECT([Orders]PODate)
+			  //$pass:=False
+			
+		: ([Orders]ShipDateFactory=!00-00-00!)
+			WinAlertSmall ("Enter SHIP Date.")
+			GOTO OBJECT([Orders]ShipDateFactory)
+			$pass:=False
+		Else 
+			$pass:=True
+	End case 
+End if 
+$0:=$pass

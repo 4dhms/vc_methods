@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Designs];[Designs]ArchivedPict=True)
+CONFIRM("Clear archive "+String(Records in selection([Designs])))
+If (ok=1)
+	$i:=1
+	FIRST RECORD([Designs])
+	For ($i;1;Records in selection([Designs]))
+		[Designs]ArchivedPict:=False
+		SAVE RECORD([Designs])
+		NEXT RECORD([Designs])
+	End for 
+End if 

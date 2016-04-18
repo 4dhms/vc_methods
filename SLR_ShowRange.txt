@@ -1,0 +1,93 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start)
+
+Case of 
+	: (asPOdate{asPOdate}="Last week")
+		$start:=vdWTD
+	: (asPOdate{asPOdate}="Month")
+		$start:=vdMTD
+	: (asPOdate{asPOdate}="Season")
+		$start:=vdSTD
+	: (asPOdate{asPOdate}="Year")
+		$start:=vdYTD
+	: (asPOdate{asPOdate}="Life")
+		$start:=!2011-02-01!
+End case 
+
+If ([SLRReporter]Wk2>=$start)
+	OBJECT SET VISIBLE(*;"w1";False)
+Else 
+	OBJECT SET VISIBLE(*;"w1";True)
+End if 
+
+If ([SLRReporter]Wk3>=$start)
+	OBJECT SET VISIBLE(*;"w2";False)
+Else 
+	OBJECT SET VISIBLE(*;"w2";True)
+End if 
+
+If ([SLRReporter]Wk4>=$start)
+	OBJECT SET VISIBLE(*;"w3";False)
+Else 
+	OBJECT SET VISIBLE(*;"w3";True)
+End if 
+
+If ([SLRReporter]Wk5>=$start)
+	OBJECT SET VISIBLE(*;"w4";False)
+Else 
+	OBJECT SET VISIBLE(*;"w4";True)
+End if 
+
+If ([SLRReporter]Wk6>=$start)
+	OBJECT SET VISIBLE(*;"w5";False)
+Else 
+	OBJECT SET VISIBLE(*;"w5";True)
+End if 
+
+
+
+  //If ([SLRReporter]Wk2<$start)
+  //SET VISIBLE([SLRReporter]Units2;False)
+  //SET VISIBLE([SLRReporter]Total2;False)
+  //SET VISIBLE([SLRReporter]AUR2;False)
+  //SET VISIBLE([SLRReporter]SOP2;False)
+  //SET VISIBLE([SLRReporter]OHU2;False)
+  //SET VISIBLE([SLRReporter]WOS2;False)
+  //End if 
+  //
+  //If ([SLRReporter]Wk3<$start)
+  //SET VISIBLE([SLRReporter]Units3;False)
+  //SET VISIBLE([SLRReporter]Total3;False)
+  //SET VISIBLE([SLRReporter]AUR3;False)
+  //SET VISIBLE([SLRReporter]SOP3;False)
+  //SET VISIBLE([SLRReporter]OHU3;False)
+  //SET VISIBLE([SLRReporter]WOS3;False)
+  //End if 
+  //
+  //If ([SLRReporter]Wk4<$start)
+  //SET VISIBLE([SLRReporter]Units4;False)
+  //SET VISIBLE([SLRReporter]Total4;False)
+  //SET VISIBLE([SLRReporter]AUR4;False)
+  //SET VISIBLE([SLRReporter]SOP4;False)
+  //SET VISIBLE([SLRReporter]OHU4;False)
+  //SET VISIBLE([SLRReporter]WOS4;False)
+  //End if 
+  //
+  //If ([SLRReporter]Wk5<$start)
+  //SET VISIBLE([SLRReporter]Units5;False)
+  //SET VISIBLE([SLRReporter]Total5;False)
+  //SET VISIBLE([SLRReporter]AUR5;False)
+  //SET VISIBLE([SLRReporter]SOP5;False)
+  //SET VISIBLE([SLRReporter]OHU5;False)
+  //SET VISIBLE([SLRReporter]WOS5;False)
+  //End if 
+  //
+  //If ([SLRReporter]Wk6<$start)
+  //SET VISIBLE([SLRReporter]Units6;False)
+  //SET VISIBLE([SLRReporter]Total6;False)
+  //SET VISIBLE([SLRReporter]AUR6;False)
+  //SET VISIBLE([SLRReporter]SOP6;False)
+  //SET VISIBLE([SLRReporter]OHU6;False)
+  //SET VISIBLE([SLRReporter]WOS6;False)
+  //End if 
+  //

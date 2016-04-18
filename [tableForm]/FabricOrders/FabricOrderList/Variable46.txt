@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($article)
+
+Case of 
+	: (vtQPrint#"")
+		QUERY([FabPOLines];[FabPOLines]ColorPrint=vtQPrint+"@")
+		RELATE ONE SELECTION([FabPOLines];[FabricOrders])
+		
+	: (vsQOrderNumber#"")
+		If (vsQOrderNumber=String(Num(vsQOrderNumber))) & ([FabricOrders]POType=0)
+			QUERY([FabricOrders];[FabricOrders]PONumber="FB-"+vsQOrderNumber)
+		Else 
+			QUERY([FabricOrders];[FabricOrders]PONumber=vsQOrderNumber)
+		End if 
+		
+	: (vtQArticle#"")
+		$article:=Fabric_ArtCode (vtQArticle)
+		QUERY([FabricOrders];[FabricOrders]ArticleNo=$article)
+		
+	: (vtQFactory#"")
+		QUERY([FabricOrders];[FabricOrders]VendorName=vtQFactory+"@")
+End case 
+
+ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)
+vsQOrderNumber:=""
+vtQArticle:=""
+vtQFactory:=""

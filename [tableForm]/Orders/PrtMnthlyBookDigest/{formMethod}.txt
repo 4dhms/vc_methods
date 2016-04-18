@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfDivision)
+C_LONGINT($c)
+
+Order_PrintMonthlyBookFM 
+Case of 
+	: (Form event=On Printing Break)
+		vrAvgPrice:=Round(vlSubTotal/vProdStQty;2)
+		
+End case 

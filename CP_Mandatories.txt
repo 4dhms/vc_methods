@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($continue)
+$continue:=True
+
+ARRAY TEXT($asType;0)
+ARRAY TEXT($asSolid;0)
+ARRAY TEXT($fabric;0)
+ARRAY TEXT($fiber;0)
+ARRAY TEXT($supplier;0)
+
+SELECTION TO ARRAY([OrdersFabricXRef]OrdType;$asType;[OrdersFabricXRef]SolidPrint;$asSolid)
+SELECTION TO ARRAY([OrdersFabricXRef]FabricName;$fabric;[OrdersFabricXRef]FiberContent;$fiber)
+SELECTION TO ARRAY([OrdersFabricXRef]FabSupplier;$Supplier)
+$i:=1
+For ($i;1;Size of array($asType))
+	Case of 
+		: ($asSolid{$i}="")
+			$continue:=False
+			WinPrompt ("Select SOLID or PRINT for "+$asType{$i})
+		: ($fabric{$i}="")
+			$continue:=False
+			WinPrompt ("Enter FABRIC for "+$asType{$i})
+		: ($fiber{$i}="")
+			$continue:=False
+			WinPrompt ("Enter FIBER for "+$asType{$i})
+		: ($supplier{$i}="")
+			$continue:=False
+			WinPrompt ("Enter SUPPLIER for "+$asType{$i})
+	End case 
+End for 
+
+$0:=$continue

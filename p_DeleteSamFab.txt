@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //p_DeleteSamFab deletes a record in Sample Fabrics
+If (Records in set("UserSet")=1)
+	USE SET("UserSet")
+	SET WINDOW TITLE("Sample Fabrics: "+String(Records in selection([SampleFabrics]))+" of "+String(Records in table([SampleFabrics])))
+	CONFIRM("Are you absolutely sure?")
+	Case of 
+		: (OK=1)
+			DELETE RECORD([SampleFabrics])
+			ALL RECORDS([SampleFabrics])
+			SET WINDOW TITLE("Sample Fabrics: "+String(Records in selection([SampleFabrics]))+" of "+String(Records in table([SampleFabrics])))
+		: (OK=0)
+			ALL RECORDS([SampleFabrics])
+			SET WINDOW TITLE("Sample Fabrics: "+String(Records in selection([SampleFabrics]))+" of "+String(Records in table([SampleFabrics])))
+	End case 
+Else 
+	ALERT("Please highlight a record first.")
+End if 

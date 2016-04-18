@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$p)
+ARRAY LONGINT($pages;0)
+$i:=1
+For ($i;1;Size of array(asSortOrder))
+	APPEND TO ARRAY($pages;Num(asSortOrder{$i}))
+End for 
+
+vfPrinting:=True
+cbOther:=0
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+vlRecCount:=Records in selection([DLPages])
+
+CREATE SET([DLPages];"Pages")
+FIRST RECORD([DLPages])
+$i:=1
+For ($i;1;Records in selection([DLPages]))
+	If (Find in array($pages;[DLPages]PageNumber)<1)
+		REMOVE FROM SET([DLPages];"Pages")
+	End if 
+	NEXT RECORD([DLPages])
+End for 
+USE SET("Pages")
+CLEAR SET("Pages")
+
+vfPrinting:=True
+vPge:=1
+
+PAGE SETUP([DLPages];"DesignLine.print")
+
+ORDER BY([DLPages];[DLPages]PageNumber;>)
+
+  //If (cbOther=1)
+  //OUTPUT FORM([DLPages];"Coverpage.print")
+  //If (cbEmail=1)
+  //PRINT RECORD([DLPages];*)
+  //Else 
+  //PRINT RECORD([DLPages])
+  //End if 
+  //End if 
+
+If (cbDL=1)
+	vfVisible:=True
+Else 
+	vfVisible:=False
+End if 
+
+$p:=1
+vPge:=1
+If ([DesignLines]8Up)
+	FORM SET OUTPUT([DLPages];"DesignLine8Up.print")
+Else 
+	FORM SET OUTPUT([DLPages];"DesignLine.print")
+End if 
+PAGE SETUP([DLPages];"DesignLine.print")
+vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+
+SET CURRENT PRINTER("PDF_Direct")
+SET PRINT OPTION(Scale option;95)
+SET PRINT OPTION(Orientation option;2)
+SET PRINT OPTION(Mac spool file format option;0)
+SET PRINT OPTION(Destination option;3;vtPathName)
+
+PRINT SELECTION([DLPages];*)
+
+vfPrinting:=False

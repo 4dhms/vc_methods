@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($key)
+
+vtContactKey:=Substring($1;Position("_";$1)+1;99)
+$key:=Num(Substring($1;1;Position("_";$1)-1))
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+QUERY SELECTION([StockOrdersLines];[StockOrdersLines]CP_OrdID=$key)
+
+[StockOrdersLines]TempID:=-1*[StockOrdersLines]TempID
+SAVE RECORD([StockOrdersLines])
+UNLOAD RECORD([StockOrdersLines])
+
+QUERY([Contacts];[Contacts]ContactID=Num(vtContactKey))
+QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+vtCustomerAddress:=[Customers]DefaultAddress
+vtShipTo:=[Customers]ShipTo
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+ORDER BY([StockOrdersLines];[StockOrdersLines]SOKey;<)
+WEB SEND FILE("stockorder.html")
+

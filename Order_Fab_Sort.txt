@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($typenum;0)
+ARRAY TEXT($type;0)
+C_LONGINT($i)
+C_BOOLEAN($run)
+
+$i:=1
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]SortOrder;>)
+SELECTION TO ARRAY([OrdersFabricXRef]OrdType;$type;[OrdersFabricXRef]SortOrder;$typenum)
+
+For ($i;1;Size of array($type))
+	If ($typenum{$i}+1#$i)
+		$run:=True
+	End if 
+End for 
+
+If ($run)
+	$i:=1
+	FIRST RECORD([OrdersFabricXRef])
+	
+	For ($i;1;Records in selection([OrdersFabricXRef]))
+		If ([OrdersFabricXRef]OrdType="Zipper")
+			[OrdersFabricXRef]SortOrder:=99
+		Else 
+			[OrdersFabricXRef]SortOrder:=Num([OrdersFabricXRef]OrdType)
+		End if 
+		SAVE RECORD([OrdersFabricXRef])
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+End if 
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]SortOrder;>)

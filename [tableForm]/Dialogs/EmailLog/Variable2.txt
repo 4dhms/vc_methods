@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$s)
+
+If (<>asFactories=1)
+	vsSubhead:="EMAIL REPORT (All mail -- "+String(adDates{adDates})+")"
+Else 
+	vsSubhead:="EMAIL REPORT ("+<>asFactories{<>asFactories}+" -- "+String(adDates{adDates})+")"
+End if 
+
+CREATE SET([EMailSent];"Mail")
+ARRAY TEXT($mailTypes;0)
+DISTINCT VALUES([EMailSent]EMSentOrderType;$mailTypes)
+
+<>vtMessage:="On "+String(adDates{adDates})+" the following orders were emailed"
+If (asUsers>2)
+	<>vtMessage:=<>vtMessage+" by "+asUsers{asUsers}+":"
+End if 
+<>vtMessage:=<>vtMessage+":"+Char(13)+Char(13)
+
+$i:=1
+For ($i;1;Size of array($mailTypes))
+	USE SET("Mail")
+	QUERY SELECTION([EMailSent];[EMailSent]EMSentOrderType=$mailTypes{$i})
+	ORDER BY([EMailSent];[EMailSent]EMOrderNumber;>)
+	If (Records in selection([EMailSent])>0)
+		<>vtMessage:=<>vtMessage+$mailTypes{$i}+"s:"+Char(13)
+		$s:=1
+		For ($s;1;Records in selection([EMailSent]))
+			If ($s<Records in selection([EMailSent]))
+				<>vtMessage:=<>vtMessage+[EMailSent]EMOrderNumber+",  "
+			Else 
+				<>vtMessage:=<>vtMessage+[EMailSent]EMOrderNumber+Char(13)+Char(13)
+			End if 
+			NEXT RECORD([EMailSent])
+		End for 
+	End if 
+End for 
+
+USE SET("Mail")
+CLEAR SET("Mail")
+
+FORM SET OUTPUT([Dialogs];"EmailReport.print")
+Print_Record (->[Dialogs])

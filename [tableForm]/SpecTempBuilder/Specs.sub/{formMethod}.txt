@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([SpecTempBuilder]Delete=True)
+	CREATE SET([SpecTempBuilder];"Lines")
+	DELETE RECORD([SpecTempBuilder])
+	USE SET("Lines")
+	CLEAR SET("Lines")
+	ORDER BY([SpecTempBuilder];[SpecTempBuilder]SortOrder;>)
+End if 

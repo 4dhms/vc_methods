@@ -1,0 +1,35 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global to search for design in sample garments
+SAVE RECORD([Samples])
+CREATE SET([Samples];"DesPreSet")
+If (Records in selection([Samples])=0)
+	ALL RECORDS([Samples])
+Else 
+End if 
+WinFind ("Enter design:")
+
+If (OK=0)
+	CLOSE WINDOW
+	USE SET("DesPreSet")
+	FORM SET INPUT([Samples];"SampleGarment.i")
+	CLEAR SET("DesPreSet")
+Else 
+	If (vAddTo=1)
+		QUERY([Samples];[Samples]DesignNum=vsRequestString)
+		CREATE SET([Samples];"DesignSGSet")
+		UNION("DesPreSet";"DesignSGSet";"NewSGSet")
+		CLOSE WINDOW
+		CLEAR SET("DesSGSet")
+		CLEAR SET("DesPreSet")
+		USE SET("NewSGSet")
+		FORM SET INPUT([Samples];"SampleGarment.i")
+		CLEAR SET("NewSGSet")
+	Else 
+		QUERY([Samples];[Samples]DesignNum=vsRequestString)
+		CLEAR SET("DesPreSet")
+		CLOSE WINDOW
+		FORM SET INPUT([Samples];"SampleGarment.i")
+	End if 
+End if 
+p_SetWndwSamGar 
+FORM SET INPUT([Samples];"SampleGarment.i")

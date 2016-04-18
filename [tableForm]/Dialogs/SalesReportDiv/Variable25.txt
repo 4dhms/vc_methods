@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_BOOLEAN($done)
+
+Case of 
+	: (asDivisions<1)
+		cbOrder:=0
+		WinPrompt ("Select a division.")
+	Else 
+		vlRouter:=0
+		USE SET("SalesReport")
+		QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+		$n:=1
+		FIRST RECORD([Orders])
+		CREATE EMPTY SET([CostSheets];"Costs")
+		
+		For ($n;1;Records in selection([Orders]))
+			QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			ARRAY TEXT($asSheetNames;0)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			ORDER BY([CostSheets];[CostSheets]SheetNumber;<)
+			SELECTION TO ARRAY([CostSheets]SheetName;$asSheetNames)
+			FIRST RECORD([CostSheets])
+			
+			If (Find in array($asSheetNames;"Actual B")>0) & (Find in array($asSheetNames;"Confirm@")>0)
+				$i:=1
+				$done:=False
+				Repeat 
+					Case of 
+						: ($asSheetNames{$i}="Confirm@")
+							QUERY SELECTION([CostSheets];[CostSheets]SheetName=$asSheetNames{$i})
+							$done:=True
+						: ($i>Size of array($asSheetNames))
+							FIRST RECORD([CostSheets])
+							$done:=True
+					End case 
+					$i:=$i+1
+				Until ($done)
+				FIRST RECORD([CostSheets])
+			End if 
+			ADD TO SET([CostSheets];"Costs")
+			NEXT RECORD([Orders])
+		End for 
+		USE SET("Costs")
+		CLEAR SET("Cost")
+		Report_OrderScreenSub 
+		FORM GOTO PAGE(3)
+End case 

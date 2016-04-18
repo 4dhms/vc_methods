@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atGarmentLib;0)
+
+ALL RECORDS([SpecialDuty])
+SELECTION TO ARRAY([SpecialDuty]SDName;atGarmentLib)
+SORT ARRAY(atGarmentLib;>)
+INSERT IN ARRAY(atGarmentLib;1;2)
+atGarmentLib{1}:="No"
+atGarmentLib{2}:="Add New"
+vrDutyEntry:=0
+vsPart1:=""
+vtDescription:=""
+vsPart:=""
+atGarmentLib:=0
+
+<>CloseBox:=True
+Center Window (400;300;1;"")
+DIALOG("SD_Library")
+CLOSE WINDOW
+SD_GarmentArray 

@@ -1,0 +1,75 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Rev_ArrayInit (0)
+
+APPEND TO ARRAY(atDataName;"Special Discount")
+APPEND TO ARRAY(atOldData;String([CostSheets]SpecialDiscount))
+
+APPEND TO ARRAY(atDataName;"CMT")
+APPEND TO ARRAY(atOldData;String([CostSheets]CMT))
+
+APPEND TO ARRAY(atDataName;"Misc")
+APPEND TO ARRAY(atOldData;String([CostSheets]Misc))
+
+APPEND TO ARRAY(atDataName;"Broker Charge")
+APPEND TO ARRAY(atOldData;String([CostSheets]BrokerageChg))
+
+APPEND TO ARRAY(atDataName;"NY Misc")
+APPEND TO ARRAY(atOldData;String([CostSheets]NYMisc))
+
+APPEND TO ARRAY(atDataName;"My FOB")
+If ([CostSheets]MyFOB)
+	APPEND TO ARRAY(atOldData;"True")
+Else 
+	APPEND TO ARRAY(atOldData;"False")
+End if 
+
+APPEND TO ARRAY(atDataName;"NY Misc")
+APPEND TO ARRAY(atOldData;String([CostSheets]NYMisc))
+
+APPEND TO ARRAY(atDataName;"Ship")
+APPEND TO ARRAY(atDataName;"Freight")
+Case of 
+	: ([CostSheets]ShipSea)
+		APPEND TO ARRAY(atOldData;"Sea")
+		APPEND TO ARRAY(atOldData;String([CostSheets]FreightBOAT))
+	: ([CostSheets]ShipAir)
+		APPEND TO ARRAY(atOldData;"Air")
+		APPEND TO ARRAY(atOldData;String([CostSheets]FreightAIR))
+	: ([CostSheets]ShipLDP)
+		APPEND TO ARRAY(atOldData;"LDP")
+		APPEND TO ARRAY(atOldData;"")
+	: ([CostSheets]ShipFOB)
+		APPEND TO ARRAY(atOldData;"FOB")
+		APPEND TO ARRAY(atOldData;"")
+	Else 
+		APPEND TO ARRAY(atOldData;"")
+		APPEND TO ARRAY(atOldData;"")
+End case 
+
+APPEND TO ARRAY(atDataName;"Destination")
+APPEND TO ARRAY(atOldData;[CostSheets]OtherShip)
+
+APPEND TO ARRAY(atDataName;"FOB")
+APPEND TO ARRAY(atOldData;String([CostSheets]FOB))
+
+APPEND TO ARRAY(atDataName;"FOB 2")
+APPEND TO ARRAY(atOldData;String([CostSheets]FOB2))
+
+APPEND TO ARRAY(atDataName;"Quota")
+APPEND TO ARRAY(atOldData;String([CostSheets]Quota))
+
+APPEND TO ARRAY(atDataName;"Quota 2")
+APPEND TO ARRAY(atOldData;String([CostSheets]Quota2))
+
+APPEND TO ARRAY(atDataName;"Duty")
+APPEND TO ARRAY(atOldData;String([CostSheets]Duty1))
+
+APPEND TO ARRAY(atDataName;"Duty 2")
+APPEND TO ARRAY(atOldData;String([CostSheets]Duty2))
+
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+ALL RECORDS([PCatalog])
+ORDER BY([PCatalog];[PCatalog]CreationDate;<)
+FORM SET INPUT([PCatalog];"Catalog.i")
+FORM SET OUTPUT([PCatalog];"Catalog.o")
+FORM SET INPUT([Dialogs];"SpecGarmentDuty")
+Center Window (1100;650;8;"";"WincBox")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+
+<>vlSDproc:=0

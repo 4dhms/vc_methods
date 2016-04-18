@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldptr)
+C_TEXT($log)
+C_LONGINT($fieldtype)
+
+$fieldptr:=$2
+GET FIELD PROPERTIES($fieldptr;$fieldType)
+
+Case of 
+	: ($fieldType=4)
+		Case of 
+			: (Table name($fieldptr)="SpecFactory")
+				Case of 
+					: (Field name($fieldptr)="Received")
+						$log:=[SpecFactory]Colhead+" received: "+String([SpecFactory]Received)+" by "+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+						[SpecFactory]History:=$log+[SpecFactory]History
+						SAVE RECORD([SpecSheetLines])
+					: (Field name($fieldptr)="Submit")
+						$log:=[SpecFactory]Colhead+" submit: "+String([SpecFactory]Submit)+" by "+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+						[SpecFactory]History:=$log+[SpecFactory]History
+						SAVE RECORD([SpecSheetLines])
+				End case 
+			: (Table name($fieldptr)="SpecLineSample")
+				Case of 
+					: (Field name($fieldptr)="Received")
+						$log:=[SpecLineSample]ColumnHeader+" received: "+String([SpecLineSample]Received)+" by "+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+						[SpecFactory]History:=$log+[SpecFactory]History
+						SAVE RECORD([SpecSheetLines])
+					: (Field name($fieldptr)="SubmitDue")
+						$log:=[SpecLineSample]ColumnHeader+" submit: "+String([SpecLineSample]SubmitDue)+" by "+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+						[SpecFactory]History:=$log+[SpecFactory]History
+						SAVE RECORD([SpecSheetLines])
+					: (Field name($fieldptr)="Received2")
+						$log:=[SpecLineSample]ColHead2+" received: "+String([SpecLineSample]Received2)+" by "+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+						[SpecFactory]History:=$log+[SpecFactory]History
+						SAVE RECORD([SpecSheetLines])
+					: (Field name($fieldptr)="SubmitDue2")
+						$log:=[SpecLineSample]ColHead2+" submit: "+String([SpecLineSample]SubmitDue2)+" by "+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+						[SpecFactory]History:=$log+[SpecFactory]History
+						SAVE RECORD([SpecSheetLines])
+				End case 
+		End case 
+	: ($fieldType=0) | ($fieldtype=2)
+		
+		If ($fieldptr->#"") & (Old($fieldptr->)#"") & (Old($fieldptr->)#$fieldptr->)
+			$log:=$1+": "+[SpecSheetLines]OtherDescription
+			If ($3="")
+				$log:=$log+" from "
+			Else 
+				$log:=$log+" ("+$3+") from "
+			End if 
+			$log:=$log+Old($fieldptr->)+" to "+$fieldptr->+" by "
+			$log:=$log+Current user+", "+String(Current date(*))+" - "+String(Current time(*))+Char(13)+Char(13)
+			
+			[SpecFactory]History:=$log+[SpecFactory]History
+			SAVE RECORD([SpecSheetLines])
+		End if 
+End case 

@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$used;$unused)
+C_TIME($docref)
+C_TEXT($path)
+C_BOOLEAN($continue)
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber<13)
+
+$docref:=Create document("";"xls")
+
+If (ok=1)
+	$path:=document
+	
+	SEND PACKET($docref;"Style Number"+Char(9)+"Design Number"+Char(9)+"Orders"+Char(13))
+	$used:=0
+	$unused:=0
+	$i:=1
+	FIRST RECORD([DesignLineIncluded])
+	For ($i;1;Records in selection([DesignLineIncluded]))
+		
+		Case of 
+			: ([DesignLineIncluded]StyleNumber="") & ([DesignLineIncluded]DesignNumber#"")
+				QUERY([Orders];[Orders]DesignNumber=[DesignLineIncluded]DesignNumber)
+				QUERY SELECTION([Orders];[Orders]Cancelled=False)
+				SEND PACKET($docref;Char(9)+[DesignLineIncluded]DesignNumber+Char(9))
+				$continue:=True
+			: ([DesignLineIncluded]StyleNumber#"")
+				QUERY([Orders];[Orders]StyleNumber=[DesignLineIncluded]StyleNumber)
+				QUERY SELECTION([Orders];[Orders]Cancelled=False)
+				SEND PACKET($docref;[DesignLineIncluded]StyleNumber+Char(9)+[DesignLineIncluded]DesignNumber+Char(9))
+				$continue:=True
+			Else 
+				$continue:=False
+		End case 
+		
+		Case of 
+			: (Not($continue))
+				
+			: (Records in selection([Orders])=0)
+				SEND PACKET($docref;"0"+Char(13))
+				$unused:=$unused+1
+			Else 
+				SEND PACKET($docref;String(Records in selection([Orders]))+Char(13))
+				$used:=$used+1
+		End case 
+		NEXT RECORD([DesignLineIncluded])
+	End for 
+	
+	SEND PACKET($docref;Char(13))
+	SEND PACKET($docref;"Used:"+Char(9)+String($used)+Char(13))
+	SEND PACKET($docref;"Unused:"+Char(9)+String($unused)+Char(13))
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+	
+End if 

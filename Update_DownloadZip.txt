@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$path2)
+C_LONGINT($c)
+C_TIME($docref)
+
+
+$path:=Get 4D folder
+$c:=Position(":";$path)
+$c:=Position(":";$path;$c+1)
+$c:=Position(":";$path;$c+1)
+
+$path:=Substring($path;1;$c)+"Desktop:Upgrade.zip"
+$path2:=Replace string($path;"Upgrade.zip";"Upgrade4D.app:")
+If (Test path name($path)=1)
+	DELETE DOCUMENT($path)
+End if 
+
+If (Test path name($path2)=0)
+	  //WinPrompt ("The Upgrade4D script is already on your desktop.")
+Else 
+	
+	$docref:=Create document($path)
+	If (ok=1)
+		CLOSE DOCUMENT($docref)
+		
+		QUERY([Spooler];[Spooler]Genre="Blob")
+		BLOB TO DOCUMENT(Document;[Spooler]SortArray)
+		UNLOAD RECORD([Spooler])
+		
+		$path:=Substring($path;Position("User";$path);999)
+		
+		$path2:="/"+Replace string($path;":";"/")
+		  //$path2:=Replace string($path;"Upgrade.zip";"Upgrade4D.app")
+		
+		LAUNCH EXTERNAL PROCESS("open "+$path2)
+		DELAY PROCESS(Current process;60)
+		If (Test path name($path)=1)
+			DELETE DOCUMENT($path)
+		End if 
+		
+		  //LAUNCH EXTERNAL PROCESS("open "+$path2)
+	End if 
+End if 

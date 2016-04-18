@@ -1,0 +1,41 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($fieldType)
+C_TEXT($text)
+C_BOOLEAN($old)
+
+$old:=$2
+
+vpFieldPtr:=$1
+
+GET FIELD PROPERTIES(vpFieldPtr;$fieldType)
+
+Case of 
+	: ($fieldType=3) | ($fieldType=7) | ($fieldType=30)
+		  //picture, subtable or blob    
+		$text:=""
+	: ($fieldType=0) | ($fieldType=2)  //text or alpha
+		If ($old)
+			$text:=Old(vpfieldPtr->)
+		Else 
+			$text:=vpfieldPtr->
+		End if 
+	: ($fieldType=1) | ($fieldType=8) | ($fieldType=9) | ($fieldType=4) | ($fieldType=11)  //number or time
+		If ($old)
+			$text:=String(Old(vpfieldPtr->))
+		Else 
+			$text:=String(vpfieldPtr->)
+		End if 
+	: ($fieldType=6)
+		Case of 
+			: ($old) & (Old(vpfieldPtr->)=True)
+				$text:="True"
+			: ($old) & (Old(vpfieldPtr->)=False)
+				$text:="False"
+			: (vpfieldPtr->=True)
+				$text:="True"
+			Else 
+				$text:="False"
+		End case 
+End case 
+
+$0:=$text

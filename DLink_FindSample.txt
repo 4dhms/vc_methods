@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($code)
+ARRAY LONGINT(alOrders;0)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(asGroups;0)
+
+
+If (<>asSeasonName>1)
+	QUERY([Samples];[Samples]SeasonName=<>asSeasonName{<>asSeasonName};*)
+	QUERY([Samples]; & ;[Samples]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+Else 
+	ALL RECORDS([Samples])
+End if 
+If (asDivisions>1)
+	$code:=Substring(asDivisions{asDivisions};1;Position("-";asDivisions{asDivisions}))+"@"
+	QUERY SELECTION([Samples];[Samples]SampleDivision=$code)
+End if 
+
+If (vsCustomer#"")
+	QUERY SELECTION([Samples];[Samples]Customer=vsCustomer)
+End if 
+If (vsDesignNumber#"")
+	QUERY SELECTION([Samples];[Samples]DesignNum=vsDesignNumber)
+End if 
+If (vStyle#"")
+	QUERY SELECTION([Samples];[Samples]StyleNum=vStyle)
+End if 
+If (vGroupName#"")
+	QUERY SELECTION([Samples];[Samples]Group=vGroupName)
+End if 
+
+If (cbSort=1)
+	ORDER BY([Samples];[Samples]Group;>;[Samples]StyleNum;>)
+End if 
+
+SELECTION TO ARRAY([Samples]StyleNum;asStyleNumbers;[Samples]DesignNum;asDesignNumbers;[Samples]SampleNumber;alOrders;[Samples]Group;asGroups)
+ARRAY PICTURE(aSketch;Size of array(asDesignNumbers))
+
+$i:=1
+For ($i;1;Size of array(asDesignNumbers))
+	QUERY([Designs];[Designs]DesignNum=asDesignNumbers{$i})
+	aSketch{$i}:=[Designs]Sketch
+End for 

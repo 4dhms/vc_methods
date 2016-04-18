@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=1)
+		OBJECT SET TITLE(bNameOk;"Make Sheet")
+		Case of 
+			: (cbNew=1)
+				Cost_RouterArray (vlNewSheetNumber;<>vlOrderNumber)
+				ORDER BY([CostSheets];[CostSheets]SheetID;<)
+		End case 
+		vsFlag:="Name New Sheet"
+		OBJECT SET VISIBLE(*;"xFavorites";cbFavorites=1)
+		FORM GOTO PAGE(2)
+	: (FORM Get current page=2)
+		If (asRouter>0)
+			Namer_Execute 
+			ACCEPT
+		End if 
+End case 
+

@@ -1,0 +1,109 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($oldName)
+<>vlQuantity:=0
+<>vlPrice:=0
+<>vsTerms:=""
+If (<>vlOrderNumber<0)
+	<>vlQuantity:=[Samples]SGQuantity
+	<>vlPrice:=[Samples]Price
+	<>vsTerms:=""
+Else 
+	<>vlQuantity:=[Orders]TotalOrderQuantity
+	<>vlPrice:=[Orders]Price
+	<>vsTerms:=[Orders]Price Terms
+End if 
+
+vlOldKey:=[CostSheets]SheetID
+DUPLICATE RECORD([CostSheets])
+
+If (<>vfDCS)
+	[CostSheets]SheetName:=asRouter{asRouter}
+Else 
+	$oldName:=[CostSheets]SheetName
+	[CostSheets]SheetName:="Fr: "
+	If (cbSG=1)
+		[CostSheets]SheetName:=[CostSheets]SheetName+"> SG"
+	End if 
+	If (vlOldOrderNumber#0)
+		[CostSheets]SheetName:=[CostSheets]SheetName+String(vlOldOrderNumber)
+	End if 
+	[CostSheets]SheetName:=[CostSheets]SheetName+"  "+$oldName
+End if 
+
+[CostSheets]SheetNumber:=vlNewSheetNumber
+[CostSheets]SheetID:=Sequence number([CostSheets])
+[CostSheets]CustomsEntryN:=""
+[CostSheets]FOBConfirmed:=False
+[CostSheets]CustomsDate:=!00-00-00!
+[CostSheets]Quota1Confirm:=False
+[CostSheets]Quota2Confirm:=False
+[CostSheets]IECompany:=""
+[CostSheets]IEUnitPrice:=0
+[CostSheets]FOB2Confirmed:=False
+[CostSheets]QuotaInvoice:=""
+[CostSheets]QuotaSupplier:=""
+[CostSheets]QuotaPayDate:=!00-00-00!
+[CostSheets]ActualUnitsShipped:=0
+If ([CostSheets]Cushion=0)
+	If (Current user="Designer")
+		[CostSheets]Cushion:=0
+	Else 
+		[CostSheets]Cushion:=0.3
+	End if 
+End if 
+If ([CostSheets]FreightBOAT>0)
+	[CostSheets]FreightBOAT:=0.35
+End if 
+cbNY:=0
+cbLA:=0
+
+Case of 
+	: (Position("air";[Orders]ShipInfo)>0)
+		[CostSheets]ShipAir:=True
+		[CostSheets]ShipSea:=False
+		[CostSheets]ShipLDP:=False
+		[CostSheets]ShipFOB:=False
+	: (Position("sea";[Orders]ShipInfo)>0)
+		[CostSheets]ShipAir:=False
+		[CostSheets]ShipSea:=True
+		[CostSheets]ShipLDP:=False
+		[CostSheets]ShipFOB:=False
+	: (Position("ldp";[Orders]ShipInfo)>0)
+		[CostSheets]ShipAir:=False
+		[CostSheets]ShipSea:=False
+		[CostSheets]ShipLDP:=True
+		[CostSheets]ShipFOB:=False
+	: (Position("fob";[Orders]ShipInfo)>0)
+		[CostSheets]ShipAir:=False
+		[CostSheets]ShipSea:=False
+		[CostSheets]ShipLDP:=False
+		[CostSheets]ShipFOB:=True
+End case 
+OBJECT SET VISIBLE([CostSheets]FreightAIR;([CostSheets]ShipAir) | ([CostSheets]FreightAIR>0))
+OBJECT SET VISIBLE([CostSheets]FreightBOAT;([CostSheets]ShipSea) | ([CostSheets]FreightBOAT>0))
+Case of 
+	: (Position("LA";[Orders]ShipInfo)>0)
+		cbCostLA:=1
+	: (Position("NY";[Orders]ShipInfo)>0)
+		cbCostNY:=1
+End case 
+
+[CostSheets]Quantity:=Cost_Quantity 
+
+[CostSheets]PriceTerms:=<>vsTerms
+SAVE RECORD([CostSheets])
+
+If (<>vfDCS)
+	DCS_AddNew 
+	DCS_BuildArray 
+	DCS_Calc 
+Else 
+	INSERT IN ARRAY(asSheetNames;1;1)
+	asSheetNames{1}:=[CostSheets]SheetName
+	asSheetNames:=1
+	
+End if 
+
+
+
+

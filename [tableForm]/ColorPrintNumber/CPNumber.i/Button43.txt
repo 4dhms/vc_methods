@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($path)
+If ([ColorPrintNumber]Image)
+	$choice:=Pop up menu("Larger View;Get Picture;Move to Desktop;Close Menu")
+	
+	Case of 
+		: ($choice=1)
+			FORM GOTO PAGE(2)
+		: ($choice=2)
+			CP_GetScan ("CP")
+		: ($choice=3)
+			$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+			
+			$path:=$path+[ColorPrintNumber]CPNumber+".jpg"
+			WRITE PICTURE FILE($path;vxSketch;"JPEG")
+	End case 
+End if 

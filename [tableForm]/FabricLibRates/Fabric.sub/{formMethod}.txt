@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		If ([FabricLibRates]SortOrder=0)
+			[FabricLibRates]SortOrder:=Records in selection([FabricLibRates])+10
+			SAVE RECORD([FabricLibRates])
+			GOTO OBJECT([FabricLibRates]Supplier)
+		End if 
+End case 

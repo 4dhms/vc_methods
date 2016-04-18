@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+APPEND TO ARRAY(asList11;$1)
+APPEND TO ARRAY(asList12;"missy")
+APPEND TO ARRAY(asList13;$2+"-M")
+
+APPEND TO ARRAY(asList11;"")
+APPEND TO ARRAY(asList12;"petite")
+APPEND TO ARRAY(asList13;$2+"-P")
+
+APPEND TO ARRAY(asList11;"")
+APPEND TO ARRAY(asList12;"woman")
+APPEND TO ARRAY(asList13;$2+"-W")
+

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Sample_StyleField 
+SG_UpdateKWCS 
+Sample_RequiredFlag 

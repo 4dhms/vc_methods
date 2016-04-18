@@ -1,0 +1,72 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+
+Case of 
+		  //: (Form event=On Header )
+		  // vfShow:=True
+	: (Form event=On Printing Detail)
+		
+		OBJECT SET VISIBLE(*;"xDivLine2";Selected record number([CS_Status])=1)
+		  //vfShow:=False
+		
+		
+		QUERY([CS_Tracking];[CS_Tracking]CS_LineKey=[CS_Lines]CS_LineKey)
+		QUERY SELECTION([CS_Tracking];[CS_Tracking]OrderNumber=<>vlOrderNumber;*)
+		QUERY SELECTION([CS_Tracking]; | ;[CS_Tracking]OrderNumber=0)
+		
+		If (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltMini#"")
+			OBJECT SET VISIBLE([CS_Tracking]AltMini;True)
+			OBJECT SET VISIBLE([CS_Lines]Minidescription;False)
+		Else 
+			OBJECT SET VISIBLE([CS_Tracking]AltMini;False)
+			OBJECT SET VISIBLE([CS_Lines]Minidescription;True)
+		End if 
+		
+		vtDescription:=""
+		Case of 
+			: (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltDescription#"")
+				vtDescription:="DESCRIPTION:  "+[CS_Tracking]AltDescription
+				
+			: ([CS_Lines]Description#"")
+				vtDescription:="DESCRIPTION:  "+[CS_Lines]Description
+		End case 
+		
+		Case of 
+			: (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltSource#"")
+				vtFrom:=[CS_Tracking]AltSource
+				
+			: ([CS_Lines]Source#"")
+				vtFrom:=[CS_Lines]Source
+			: ([CS_Lines]Source="") & ([ComponentSheets]FactorySupplied)
+				vtFrom:="Factory Supplied"
+			Else 
+				vtFrom:=""
+		End case 
+		
+		If ([CS_Status]Notes#"")
+			If (vtDescription#"")
+				vtDescription:=vtDescription+Char(13)
+			End if 
+			vtDescription:=vtDescription+"NOTES:  "+[CS_Status]Notes
+		End if 
+		
+		  //----------------
+		
+		  //----------------
+		
+		
+		If (vDesc=[CS_Lines]ComponentName)
+			$show:=False
+		Else 
+			$show:=True
+			vDesc:=[CS_Lines]ComponentName
+		End if 
+		OBJECT SET VISIBLE([CS_Lines]ComponentName;$show)
+		
+		If ([CS_Lines]OrderNumber=0)
+			OBJECT SET FONT STYLE([CS_Lines]ComponentName;0)
+		Else 
+			OBJECT SET FONT STYLE([CS_Lines]ComponentName;6)
+		End if 
+		
+End case 

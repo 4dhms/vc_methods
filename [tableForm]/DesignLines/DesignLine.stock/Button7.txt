@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([DesignLines])
+  //QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+  //ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;<)
+  //If ([DesignLines]PageCount#[DesignLineIncluded]PageNumber)
+  //[DesignLines]PageCount:=[DesignLineIncluded]PageNumber
+  //SAVE RECORD([DesignLines])
+  //End if 
+ACCEPT

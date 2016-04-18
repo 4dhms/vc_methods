@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfVisible:=True
+vf8up:=False
+DL_BuildPageArray 
+DL_BuildPage (1;True)
+
+vfStockInv:=True
+FORM SET INPUT([DLPages];"PageEditor")
+MODIFY RECORD([DLPages])
+

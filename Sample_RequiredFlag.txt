@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Samples]SampleOrderDate#!00-00-00!)
+	OBJECT SET COLOR(*;"xDate@";-(Black+(256*Light grey)))
+End if 
+
+
+If ([Samples]OrderEnterer SG#"")
+	OBJECT SET COLOR(*;"xEnterer@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]Sam Type#"")
+	OBJECT SET COLOR(*;"xSampleType@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]StyleNum#"")
+	OBJECT SET COLOR(*;"xStyle@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]DesignNum#"")
+	OBJECT SET COLOR(*;"xDesign@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]Customer#"")
+	OBJECT SET COLOR(*;"xCustomer@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]SeasonYear#"") & ([Samples]SeasonName#"") | ([Samples]Retired#"")
+	OBJECT SET COLOR(*;"xSeason@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]Sam Msrmnts#"")
+	OBJECT SET COLOR(*;"xSize@";-(Black+(256*Light grey)))
+End if 
+
+If ([Samples]KWCnS#"")
+	OBJECT SET COLOR(cbWoven;-(Black+(256*Light grey)))
+	OBJECT SET COLOR(cbKnit;-(Black+(256*Light grey)))
+	OBJECT SET COLOR(cbCutSew;-(Black+(256*Light grey)))
+Else 
+	OBJECT SET COLOR(cbWoven;-(Red+(256*Light grey)))
+	OBJECT SET COLOR(cbKnit;-(Red+(256*Light grey)))
+	OBJECT SET COLOR(cbCutSew;-(Red+(256*Light grey)))
+End if 
+

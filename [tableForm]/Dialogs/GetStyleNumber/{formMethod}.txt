@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	ARRAY TEXT(AStyle;0)
+	vlStyleNumberCount:=1
+	Case of 
+		: (<>GetStyleNumber>0)
+			<>vsDesignNumber:=""
+		: (<>vlOrderNumber>0)
+			<>vsDesignNumber:=[Orders]DesignNumber
+		Else 
+			<>vsDesignNumber:=[Samples]DesignNum
+	End case 
+	
+	vsFlag:=""
+	OBJECT SET ENABLED(bValidate;False)
+	vsPrefix:=""
+	vsSuffix:=""
+	vsStyleNumber:=""
+	<>vsCustomer:=[Orders]Customer
+	vsWriter:=Current user
+	Case of 
+		: (<>vsStyleNumber="new")
+			FORM GOTO PAGE(1)
+			<>vsStyleNumber:=""
+		: (<>vsStyleNumber#"")
+			FORM GOTO PAGE(3)
+			OBJECT SET ENABLED(bValidate;True)
+			OBJECT SET ENABLED(bGet;False)
+			OBJECT SET ENABLED(bNext;False)
+			vsStyleNumber:=<>vsStyleNumber
+	End case 
+End if 

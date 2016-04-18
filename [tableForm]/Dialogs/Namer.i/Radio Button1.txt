@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($baseDN)
+WinFind ("Enter Style Number:";5)
+$baseDN:=vsRequestString
+If (ok=1)
+	vsFlag:="Related Style Numbers"
+	QUERY([Costing];[Costing]StyleNumber=$baseDN+"@")
+	ORDER BY([Costing];[Costing]StyleNumber;>)
+	If (Records in selection([Costing])>0)
+		Cost_HList 
+		vlNamerState:=14
+	Else 
+		vlNamerState:=1
+	End if 
+End if 

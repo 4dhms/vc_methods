@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+ARRAY LONGINT($orders;0)
+
+QUERY([Orders];[Orders]StyleNumber=vsChange1)
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+
+$i:=1
+CREATE EMPTY SET([Changes];"chg")
+For ($i;1;Size of array($orders))
+	QUERY([Changes];[Changes]OrderNumber=$orders{$i})
+	$n:=1
+	FIRST RECORD([Changes])
+	For ($n;1;Records in selection([Changes]))
+		ADD TO SET([Changes];"chg")
+		NEXT RECORD([Changes])
+	End for 
+End for 
+USE SET("chg")
+CLEAR SET("chg")
+
+Case of 
+	: (vsChange2="SR")
+		QUERY SELECTION([Changes];[Changes]FieldName="Size Range")
+		If ([Changes]OldData="")
+			vsChange3:=vsChange2
+		Else 
+			vsChange3:=vsChange2+" from "+[Changes]OldData
+		End if 
+		
+	: (vsChange2="PC")
+		QUERY SELECTION([Changes];[Changes]FieldName="Price")
+		If ([Changes]OldData="")
+			vsChange3:=vsChange2
+		Else 
+			vsChange3:=vsChange2+" from "+[Changes]OldData
+		End if 
+		
+	: (vsChange2="CS")
+		QUERY SELECTION([Changes];[Changes]FieldName="StyleNumber")
+		If ([Changes]OldData="")
+			vsChange3:=vsChange2
+		Else 
+			vsChange3:=vsChange2+" from "+[Changes]OldData
+		End if 
+		
+	: (vsChange2="SN")
+		QUERY SELECTION([Changes];[Changes]FieldName="SeasonName";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="SeasonYear")
+		ORDER BY([Changes];[Changes]FieldName;>)
+		FIRST RECORD([Changes])
+		If ([Changes]OldData="")
+			vsChange3:=vsChange2
+		Else 
+			vsChange3:=vsChange2+" from "+[Changes]OldData
+		End if 
+		If (Records in selection([Changes])>1)
+			NEXT RECORD([Changes])
+			vsChange3:=vsChange3+" "+[Changes]OldData
+		End if 
+	: (vsChange2="DV")
+		QUERY SELECTION([Changes];[Changes]FieldName="OrderDivision")
+		vsChange3:=vsChange2+" from "+[Changes]OldData
+	Else 
+		vsChange3:=vsChange2
+End case 
+
+UNLOAD RECORD([Orders])

@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfNew)
+
+If (Form event=On Load)
+	If (vfNew)
+		vrCCostCount:=0
+		vrCCostPrice:=0
+		vrCCostTotal:=0
+		vrCCostDuty:=0
+		vtItemName:=""
+		vtNote:=""
+		vsColHead1:="Units"
+		vsColHead2:="Price"
+		vsColHead3:="Total"
+		vlKey:=0
+		cbDuty:=0
+		OBJECT SET TITLE(bOk;"Add")
+	Else 
+		vtItemName:=[DCS]Item
+		vrCCostCount:=[DCS]Qty
+		vrCCostPrice:=[DCS]Price
+		vrCCostTotal:=[DCS]Ext
+		vtNote:=[DCS]Notes
+		vlKey:=[DCS]ItemKey
+		
+		OBJECT SET VISIBLE(bRemove;True)
+		OBJECT SET TITLE(bOk;"Save")
+		If ([DCS]Duty)
+			cbDuty:=1
+			vrCCostDuty:=[DCS]DutyRate
+		End if 
+		
+		DCS_Show 
+	End if 
+End if 

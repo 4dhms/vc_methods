@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message;$suffix;$serial)
+
+$message:="Creating new HMS Article Number."
+WinChoice ($message)
+
+If (ok=1)
+	CREATE RECORD([HMSArtNo])
+	$serial:=PO_GetNumber ("Article")
+	[HMSArtNo]HANkey:=Num($serial)
+	[HMSArtNo]HANumber:="HMS"+$serial
+	[HMSArtNo]CreateDate:=Current date(*)
+	[HMSArtNo]CreatedBy:=Current user
+	SAVE RECORD([HMSArtNo])
+	ADD TO SET([HMSArtNo];"AN")
+	
+	CREATE RECORD([FabricLibrary])
+	[FabricLibrary]ArticleNumber:=[HMSArtNo]HANumber
+	[FabricLibrary]HMSANmaster:=True
+	[FabricLibrary]FabricName:=vsFabric
+	[FabricLibrary]FiberContent:=asFiber{asFiber}
+	[FabricLibrary]HMSANkey:=[HMSArtNo]HANkey
+	[FabricLibrary]HMSANumber:=[HMSArtNo]HANumber
+	[FabricLibrary]Restricted:=[HMSArtNo]Restricted
+	SAVE RECORD([FabricLibrary])
+	REDUCE SELECTION([Vendors];0)
+	OBJECT SET VISIBLE(*;"xRestrict";[HMSArtNo]Restricted#"")
+	FORM GOTO PAGE(1)
+End if 
+

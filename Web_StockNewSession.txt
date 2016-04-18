@@ -1,0 +1,58 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($HTML;$param;$prev;$char)
+C_TEXT($strip;$html;vsWebUser;vsWebSession)
+C_BOOLEAN($myline)
+
+If ($1="M@")
+	$myline:=True
+	vsFlag:="M"
+Else 
+	$myline:=False
+	vsFlag:="B"
+End if 
+$param:=Substring($1;3;11)
+
+vlKey:=Num(Substring($param;1;Position("_";$param)-1))
+$strip:=Substring($param;Position("_";$param)+1;40)
+vlPage:=Num(Substring($strip;1;Position("_";$strip)-1))
+$strip:=Substring($strip;Position("_";$strip)+1;40)
+vlCount:=Num(Substring($strip;Position("_";$strip);40))
+
+QUERY([Contacts];[Contacts]Store=True)
+QUERY SELECTION([Contacts];[Contacts]CText="")
+
+$i:=1
+FIRST RECORD([Contacts])
+For ($i;1;Records in selection([Contacts]))
+	QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+	[Contacts]CText:=[Customers]CustomerName
+	SAVE RECORD([Contacts])
+	NEXT RECORD([Contacts])
+End for 
+
+QUERY([Contacts];[Contacts]Store=True)
+ORDER BY([Contacts];[Contacts]CText;>;[Contacts]Contact;>)
+
+ARRAY TEXT($goto;0)
+$i:=1
+FIRST RECORD([Contacts])
+$prev:=[Contacts]CText
+$char:=Substring([Contacts]CText;1;1)
+
+For ($i;1;Records in selection([Contacts]))
+	If (Substring([Contacts]CText;1;1)#$char)
+		APPEND TO ARRAY($goto;$prev)
+		$prev:=[Contacts]CText
+		$char:=Substring([Contacts]CText;1;1)
+	End if 
+	NEXT RECORD([Contacts])
+End for 
+
+$i:=1
+$html:=Char(1)
+For ($i;1;Size of array($goto))
+	$html:=$html+"<a href="+Char(34)+"#"+$goto{$i}+Char(34)+">"+Uppercase(Substring($goto{$i};1;1))+"</a> "
+End for 
+  //vtHTML:=$html+"<bp>"
+WEB SEND FILE("newsession.html")

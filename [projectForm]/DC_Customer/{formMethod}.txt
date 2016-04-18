@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Unload)
+		vfOpen:=False
+	: (Form event=On Load)
+		vtDCCustomer:=""
+		ARRAY TEXT(asXCustomer;0)
+		If (vlListRouter=2)
+			FORM GOTO PAGE(2)
+		Else 
+		End if 
+End case 
+

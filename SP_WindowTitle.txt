@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+
+Case of 
+	: ($1="Spec")
+		SET WINDOW TITLE("Spec Sheet")
+	: ($1="FO")
+		SET WINDOW TITLE("Order")
+	: ($1="Status")
+		SET WINDOW TITLE("Status")
+	: ($1="VS")
+		SET WINDOW TITLE("VS")
+	: ($1="UN")
+		SET WINDOW TITLE("Unshipd")
+	: ($1="Fitting")
+		SET WINDOW TITLE("Fitting")
+	: ($1="PO") | ($1="POs")
+		SET WINDOW TITLE("POs")
+		vtSubjectLine:="Purchase orders."
+		vtBodyText:=Email_GroupBodyText ($1)
+	: ($1="SG")
+		SET WINDOW TITLE("SGs")
+		vtSubjectLine:="Sample garment orders."
+		vtBodyText:=Email_GroupBodyText ($1)
+	: ($1="SF")
+		SET WINDOW TITLE("SFs")
+		vtSubjectLine:="Sample fabric orders."
+		vtBodyText:=Email_GroupBodyText ($1)
+	: ($1="SP")
+		SET WINDOW TITLE("Speed Post")
+		vtSubjectLine:="Speed Post"
+		vtBodyText:=Email_GroupBodyText ($1)
+	: ($1="DL")
+		SET WINDOW TITLE("Design Library")
+		vtSubjectLine:="Design Library"
+	: ($1="DP@")
+		SET WINDOW TITLE("Design Line Plan")
+		$n:=Position("$%&";[Spooler]SpoolMessage)
+		vtSubjectLine:=Substring([Spooler]SpoolMessage;1;$n-1)
+		vtBodyText:=Substring([Spooler]SpoolMessage;$n+3;999)
+End case 

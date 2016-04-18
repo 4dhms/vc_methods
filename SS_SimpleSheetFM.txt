@@ -1,0 +1,164 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtSpecNotes)
+C_LONGINT($i)
+C_BOOLEAN(vfCloneApp)
+
+
+CREATE EMPTY SET([SpecFactory];"AllLines")
+CREATE EMPTY SET([SpecFactory];"ActiveLines")
+READ ONLY([Designs])
+
+<>vlWindowCount:=1
+CREATE SET([SpecFactory];"Found")
+
+vlColSlider:=[SpecFactory]SampleCol
+vlX:=0
+vlY:=0
+vlZ:=0
+vfReadytoChange:=False
+pOne:=1
+vrSampleSize:=[SpecFactory]SampleCol
+QUERY([SpecPix];[SpecPix]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+QUERY SELECTION([SpecPix];[SpecPix]SF_KeyNumber#0)
+
+SS_Build 
+Comp_ArrayInit 
+If (<>vsDesignNumber="")
+	REDUCE SELECTION([Designs];0)
+Else 
+	If ([SpecFactory]DesignNumber#<>vsDesignNumber)
+		[SpecFactory]DesignNumber:=<>vsDesignNumber
+	End if 
+	
+	QUERY([Designs];[Designs]DesignNum=[SpecFactory]DesignNumber)
+	vtDescription:=[Designs]Description
+End if 
+
+OBJECT SET VISIBLE(*;"xPOM";False)
+
+vfCancel:=False
+CREATE SET([SpecFactory];"ThisSpecsheet")
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+
+  //transition
+FIRST RECORD([SpecSheetLines])
+$i:=1
+For ($i;1;Records in selection([SpecSheetLines]))
+	If ([SpecSheetLines]OtherDescription="")
+		QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+		If (Records in selection([SpecLibrary])=1)
+			[SpecSheetLines]OtherDescription:=[SpecLibrary]DescriptionA+[SpecLibrary]DecriptConnect+[SpecSheetLines]SpecialMeasure+[SpecLibrary]DescriptionB
+			SAVE RECORD([SpecSheetLines])
+		End if 
+	End if 
+	NEXT RECORD([SpecSheetLines])
+End for 
+
+SS_PartArray 
+  //SET VISIBLE(asRowHeaders;Size of array(asRowHeaders)>0)
+OBJECT SET VISIBLE(*;"xBlock1";Size of array(asRowHeaders)<1)
+OBJECT SET VISIBLE(*;"xBlock2";Size of array(asRowHeaders)<1)
+OBJECT SET VISIBLE(*;"xBlock3";Size of array(asRowHeaders)<1)
+OBJECT SET VISIBLE(*;"xBlock4";Size of array(asRowHeaders)<1)
+OBJECT SET VISIBLE(*;"xBlock5";Size of array(asRowHeaders)<1)
+
+If (Is new record([SpecFactory]))
+	[SpecFactory]SF_KeyNumber:=Sequence number([SpecFactory])
+	SAVE RECORD([SpecFactory])
+	CREATE SET([SpecFactory];"ThisSpecSheet")
+	If (Records in set("Found")>0)
+		ADD TO SET([SpecFactory];"Found")
+	End if 
+	
+	If (Not(SS_GrabSameDesign ))
+		vfCancel:=True
+		CANCEL
+	Else 
+		USE SET("ThisSpecSheet")
+		If (vfCloneApp)
+			vfCloneApp:=False
+			[SpecFactory]ApproveDate:=vdApprovalDate
+			[SpecFactory]ApprovedForProd:=True
+		End if 
+		
+		[SpecFactory]OrderNumber:=<>vlOrderNumber
+		[SpecFactory]DesignNumber:=<>vsDesignNumber
+		[SpecFactory]StyleNumber:=<>vsStyleNumber
+		[SpecFactory]CreationDate:=Current date(*)
+		[SpecFactory]CreatedBy:=Current user
+		[SpecFactory]Factory:=<>vsFactory
+		[SpecFactory]XFactory:=<>vdXFactory
+		[SpecFactory]PatternSource:=<>vsSource
+		
+		If (vtSpecNotes#"")
+			WinChoice ("Import Note?";"No";"Yes")
+			If (ok=0)
+				[SpecFactory]Note:="Notes from old specssheet: "+vtSpecNotes
+			Else 
+				[SpecFactory]Note:=""
+			End if 
+		End if 
+		Case of 
+			: (<>vlOrderNumber>0)
+				[SpecFactory]KnitWoven1:=<>vsKnitWoven
+		End case 
+		Case of 
+			: (asDesignNumbers<1)
+				  //do nothing
+			: (asSGOrder{asSGOrder}="SG@")
+				[SpecFactory]CloneHistory:="Copied from Sample "+String(Abs(Num(asSGOrder{asSGOrder})))
+			: (asSGOrder{asSGOrder}="Old Style@")
+				[SpecFactory]CloneHistory:="From old system: Design "+asDesignNumbers{asDesignNumbers}
+			Else 
+				[SpecFactory]CloneHistory:="Copied from Order "+asSGOrder{asSGOrder}
+		End case 
+		
+		SAVE RECORD([SpecFactory])
+		REDUCE SELECTION([SpecSheetLines];0)
+		SS_PullMain 
+		
+		Case of 
+			: (cbPort=1)
+				SS_BuildFromOld (1)
+			: (vlDupeOrderNumber#0)
+				SS_CloneSpecs (alRecordKey{asDesignNumbers};[SpecFactory]SF_KeyNumber)
+				
+			: (vsNewGarmentPart#"")
+				SS_CloneTemplate 
+			Else 
+				vfCancel:=True
+				CANCEL
+		End case 
+	End if 
+End if 
+
+If (Not(vfCancel))
+	USE SET("ThisSpecSheet")
+	[SpecFactory]SampleCol:=vlColSlider
+	SAVE RECORD([SpecFactory])
+	
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+	CREATE SET([SpecSheetLines];"AllLines")
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+	CREATE SET([SpecSheetLines];"ActiveLines")
+	FORM GOTO PAGE(1)
+	
+	SS_BuildPartCB (False)  //true if printing 
+	  //End if
+	
+	If (<>vlPreviewSS>0)
+		OBJECT SET ENABLED(bFrstHMS;False)
+		OBJECT SET ENABLED(bPrvHMS;False)
+		OBJECT SET ENABLED(bNxtHMS;False)
+		OBJECT SET ENABLED(bLstHMS;False)
+		FORM GOTO PAGE(<>vlPreviewSS)
+	End if 
+	SS_Show 
+End if 
+If ([SpecFactory]Part1="")
+	GOTO OBJECT([SpecFactory]Part1)
+End if 
+

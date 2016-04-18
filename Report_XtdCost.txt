@@ -1,0 +1,121 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+C_LONGINT($quantityTot)
+C_LONGINT($netSales;$netprofit;$netnetSales;$netnetprofit)
+C_LONGINT($netSalesTot;$netprofitTot;$netnetSalesTot;$netnetprofitTot)
+C_LONGINT($grossSales;$grossSalesTot)
+C_LONGINT($discAmt;$discAmtTot)
+C_LONGINT($cost;$costTot;$netMU;$netnetMU)
+C_LONGINT($order)
+C_REAL($netorderprice)
+
+$n:=1
+FIRST RECORD([Orders])
+CREATE EMPTY SET([CostSheets];"Costs")
+
+$grossSalesTot:=0
+$discAmtTot:=0
+$costTot:=0
+
+For ($n;1;Records in selection([Orders]))
+	If (Shift down)
+		CANCEL
+	Else 
+		$netorderprice:=Round([Orders]Price*((100-[Orders]NetDiscount)/100);2)
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		If (Records in selection([Costing])>0)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			CREATE SET([CostSheets];"Sheet")
+			QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual A")
+			If (Records in selection([CostSheets])=0)
+				USE SET("Sheet")
+				QUERY SELECTION([CostSheets];[CostSheets]SheetName="Confirm@")
+				If (Records in selection([CostSheets])=0)
+					USE SET("Sheet")
+				End if 
+			End if 
+			
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			$quantityTot:=$quantityTot+[Orders]TotalOrderQuantity
+			Cost_CalcNetNetUnit 
+			If (Records in selection([CostSheets])>0)
+				If ([CostSheets]Price#[Orders]Price) | ([CostSheets]Figurer#[Orders]NetDiscount)
+					[CostSheets]Price:=[Orders]Price
+					[CostSheets]Figurer:=[Orders]NetDiscount
+					[CostSheets]NetUnitPrice:=Round([CostSheets]Price*((100-[CostSheets]Figurer)/100);2)
+					SAVE RECORD([CostSheets])
+				End if 
+				$netSales:=[CostSheets]NetUnitPrice*[Orders]TotalOrderQuantity
+				$netnetSales:=[CostSheets]NetNetUnitPrice*[Orders]TotalOrderQuantity
+			Else 
+				$netSales:=Round([Orders]Price*((100-[Orders]NetDiscount)/100);2)*[Orders]TotalOrderQuantity
+				$netnetSales:=$netSales
+			End if 
+			  //If ([Orders]OrderDivision="5@") & ($netnetSales>$netSales)
+			  //End if 
+			$netSalesTot:=$netSalesTot+$netSales
+			$netnetSalesTot:=$netnetSalesTot+$netnetSales
+			
+			
+			If ([CostSheets]ShipAir)
+				$netProfit:=$netSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostAir)
+				$netProfitTot:=$netProfitTot+$netProfit
+				$netnetProfit:=$netnetSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostAir)
+				$netnetProfitTot:=$netnetProfitTot+$netnetProfit
+				$cost:=[CostSheets]UnitCostAir*[Orders]TotalOrderQuantity
+				$costTot:=$costTot+$cost
+			Else 
+				$netProfit:=$netSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostSea)
+				$netProfitTot:=$netProfitTot+$netProfit
+				$netnetProfit:=$netnetSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostSea)
+				$netnetProfitTot:=$netnetProfitTot+$netnetProfit
+				$cost:=[CostSheets]UnitCostSea*[Orders]TotalOrderQuantity
+				$costTot:=$costTot+$cost
+			End if 
+		Else 
+			  //$quantityTot:=$quantityTot+[Orders]TotalOrderQuantity
+			  //$netSales:=[Orders]Price*[Orders]TotalOrderQuantity
+			  //$netSalesTot:=$netSalesTot+$netSales
+			  //$netnetSalesTot:=$netnetSalesTot+$netSales
+			If (vtFootNote#"")
+				vtFootnote:=vtFootnote+", "
+			End if 
+			INSERT IN ARRAY(alMakesheet;1;1)
+			alMakeSheet{1}:=$netSales
+		End if 
+		
+		$grossSales:=[Orders]Price*[Orders]TotalOrderQuantity
+		$discAmt:=$grossSales-$netSales
+		
+		$discAmtTot:=$discAmtTot+$discAmt
+		$grossSalesTot:=$grossSalesTot+$grossSales
+		$order:=[Orders]OrderNum
+		
+		NEXT RECORD([Orders])
+	End if 
+End for 
+If (vtFootNote#"")
+	vtFootnote:="No costsheets for: "+vtFootNote+" for a total of "+String($netSales;"$###,###")
+End if 
+
+If ($1<0)
+	asBDDivisions{Abs($1)}:=String($order)
+Else 
+	asBDDivisions{Abs($1)}:=asFactories{Abs($1)}
+End if 
+alBDQuantity{Abs($1)}:=$quantityTot
+alBDGrossSales{Abs($1)}:=$grossSalesTot
+alBDDiscAmt{Abs($1)}:=$discAmtTot
+alBDCost{Abs($1)}:=$costTot
+arBDNetSales{Abs($1)}:=$netsalesTot
+arBDNetProfit{Abs($1)}:=$netProfitTot
+arBDNetNetSales{Abs($1)}:=$netnetSalesTot
+arBDNetNetProfit{Abs($1)}:=$netnetProfitTot
+
+$netMU:=Round(($netProfitTot/$netsalesTot)*100;1)
+$netNetMU:=Round(($netnetProfitTot/$netnetSalesTot)*100;1)
+
+arBDAvgNetMarkup{Abs($1)}:=$netMU
+arBDAvgNetNetMarkup{Abs($1)}:=$netNetMU
+arBDSpecialDiscount{Abs($1)}:=$netsalesTot-$netnetSalesTot
+

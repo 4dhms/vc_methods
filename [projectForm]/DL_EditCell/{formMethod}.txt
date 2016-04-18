@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	vtTitle:=""
+	vsSubhead:=""
+	asSampleTypes:=1
+	GOTO OBJECT(vsEntryNumber)
+	FORM GOTO PAGE(vlPage)
+End if 

@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE SET([Samples];"SmGrSet")
+vlWinWd:=600
+vlWinHt:=420
+vlWinType:=8
+vsWinTitle:="New Record Sample Garments"
+
+  //Center Window 
+vlFabStatus:=0
+REDUCE SELECTION([OrdersFabricXRef];0)
+REDUCE SELECTION([CP_OrderXRef];0)
+
+ADD RECORD([Samples];*)
+ADD TO SET([Samples];"SmGrSet")
+  //CLOSE WINDOW
+  //USE SET("SmGrSet")
+  //p_SetWndwSamGar 
+  //CLEAR SET("SmGrSet")

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this issue?")
+If (ok=1)
+	CREATE SET([CS_Issues];"issues")
+	REMOVE FROM SET([CS_Issues];"issues")
+	DELETE RECORD([CS_Issues])
+	USE SET("issues")
+	CLEAR SET("issues")
+	ACCEPT
+End if 

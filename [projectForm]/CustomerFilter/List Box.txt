@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	If (asCustomers>0) & (asCustomers{asCustomers}#"")
+		APPEND TO ARRAY(asXCustomer;asCustomers{asCustomers})
+		DELETE FROM ARRAY(asCustomers;asCustomers;1)
+		SORT ARRAY(asXCustomer;>)
+		asCustomers:=0
+		asXCustomer:=0
+	End if 
+End if 

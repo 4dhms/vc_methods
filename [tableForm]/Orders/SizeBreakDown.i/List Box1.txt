@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+
+Case of 
+	: (Form event=On Double Clicked)
+		WinChoice ("Are you sure you want to delete this line?")
+		If (ok=1)
+			$c:=asCtnPO
+			If (alCtnKey{$c}>0)
+				QUERY([Cartons];[Cartons]CtnKey=alCtnKey{$c})
+				DELETE RECORD([Cartons])
+			End if 
+			
+			DELETE FROM ARRAY(alCtnKey;$c;1)
+			DELETE FROM ARRAY(asCtnColor;$c;1)
+			DELETE FROM ARRAY(asCtnColorCode;$c;1)
+			DELETE FROM ARRAY(alCtnQty;$c;1)
+			DELETE FROM ARRAY(alCtnBG;$c;1)
+			
+			DELETE FROM ARRAY(alCtnIn;$c;1)
+			DELETE FROM ARRAY(asCtnBreak;$c;1)
+			DELETE FROM ARRAY(alCtnCount;$c;1)
+			DELETE FROM ARRAY(asCtnPO;$c;1)
+			DELETE FROM ARRAY(asCtnPack;$c;1)
+			DC_Ctn_Color 
+			Ctn_Total 
+		End if 
+	: (Form event=On Drop)
+		Ctn_Add 
+End case 

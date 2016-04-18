@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlOrderNumber;$run;$i)
+
+vlOrderNumber:=Num(vsPart1)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=asList17{asList17})
+
+  //QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=vsPart3)
+
+vtChange:=""
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+	If ([OrdersFabricXRef]FabArtNo#[FabricOrders]ArticleNo)
+		vtChange:="Wrong Art #: "+[OrdersFabricXRef]FabArtNo
+	End if 
+	APPEND TO ARRAY(asCPNumbers;[CP_OrderXRef]CPNumber)
+	APPEND TO ARRAY(asCPColorName;[ColorPrintNumber]CPName)
+	Case of 
+		: ([CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+			APPEND TO ARRAY(asSource;"THIS PO")
+		: ([CP_OrderXRef]FabOrderKey#0)
+			<>vtFBPO:=""
+			$run:=New process("Fab_GetPO";0;"GetPO";[FabricOrders]FabOrderKey)
+			Repeat 
+			Until (<>vtFBPO#"") | (Shift down)
+			If (<>vtFBPO="none")
+				APPEND TO ARRAY(asSource;"")
+			Else 
+				APPEND TO ARRAY(asSource;<>vtFBPO)
+			End if 
+		Else 
+			APPEND TO ARRAY(asSource;"")
+	End case 
+	APPEND TO ARRAY(atDType;[CP_OrderXRef]CPType)
+	APPEND TO ARRAY(alColorKey;[CP_OrderXRef]CPOrdID)
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+FORM GOTO PAGE(2)

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	OBJECT SET VISIBLE(*;"xCustomer";<>vtCustomerStyle#"")
+	OBJECT SET VISIBLE(<>vtCustomerStyle;<>vtCustomerStyle#"")
+	  //OBJECT SET VISIBLE(*;"xPM";vsSize1#"")
+End if 

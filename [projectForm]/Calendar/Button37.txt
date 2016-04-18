@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vdDayOne:=vdDayOne+35
+SLR_CalendarUpdate 

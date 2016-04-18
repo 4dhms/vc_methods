@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($typelist;0)
+
+LIST TO ARRAY("Sample Type";$typeList)
+If (Find in array($typeList;[Samples]Sam Type)>0)
+	$0:=True
+Else 
+	If ([Samples]Sam Type#"")
+		WinChoice ([Samples]Sam Type+" is not a valid sample type.";"Ok";"List")
+		[Samples]Sam Type:=""
+	End if 
+	GOTO OBJECT([Samples]Sam Type)
+	$0:=False
+End if 

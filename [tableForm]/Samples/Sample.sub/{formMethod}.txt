@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Is new record([Samples]))
+	CANCEL
+	WinPrompt ("Create new sample orders in the Sample Garment screen.")
+End if 

@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asSeasonA{asSeasonA}="Date range")
+	Array_BuildDates 
+	vsSeason1A:=""
+	vsSeason2A:=""
+	vfDateRange:=True
+	SR_Init (False)
+	FORM GOTO PAGE(5)
+Else 
+	
+	vtFootNote:=""
+	OBJECT SET VISIBLE(atQueryText;False)
+	OBJECT SET ENABLED(bPrint;False)
+	ARRAY TEXT(atQueryText;0)
+	APPEND TO ARRAY(atQueryText;"Customer Q")
+	If (asSeasonA=1)
+		APPEND TO ARRAY(atQueryText;"Q1")
+		APPEND TO ARRAY(atQueryText;"Q2")
+		APPEND TO ARRAY(atQueryText;"Q3")
+		APPEND TO ARRAY(atQueryText;"Q4")
+	Else 
+		APPEND TO ARRAY(atQueryText;"Q3")
+		APPEND TO ARRAY(atQueryText;"Q4")
+		APPEND TO ARRAY(atQueryText;"Q1")
+		APPEND TO ARRAY(atQueryText;"Q2")
+	End if 
+	atQueryText:=1
+	SR_Init (False)
+End if 

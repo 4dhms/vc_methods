@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($color)
+
+If (Form event=On Clicked)
+	If (Shift down)
+		asList3{asList3}:=asList1{asList3}+"/"+asList2{asList3}
+	Else 
+		$color:=Request("Enter New Color:";asList3{asList3})
+		If (ok=1)
+			asList3{asList3}:=$color
+		End if 
+	End if 
+End if 

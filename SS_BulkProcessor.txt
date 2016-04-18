@@ -1,0 +1,25 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+SS_BulkProcessorArrays 
+ARRAY LONGINT(alRowColors;Size of array(alOrders))
+
+$i:=1
+For ($i;1;Size of array(alOrders))
+	Case of 
+		: (Find in array(alMasterApproved;alOrders{$i})>0)
+			alRowColors{$i}:=8903680
+		: (Find in array(alMasterSpecSheet;alOrders{$i})>0)
+			alRowColors{$i}:=16776969
+			  //SELECT LISTBOX ROW(*;"DesignList";$i;1)Else 
+		Else 
+			alRowColors{$i}:=16777215
+	End case 
+End for 
+
+If (FORM Get current page=10)
+	FORM GOTO PAGE(1)
+Else 
+	vDesign:=<>vsDesignNumber
+	vStyle:=<>vsStyleNumber
+	FORM GOTO PAGE(9)
+End if 

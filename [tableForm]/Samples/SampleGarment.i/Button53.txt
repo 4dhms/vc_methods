@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asSheetNames{asSheetNames}="No Costsheet")
+	WinPrompt ("You need to create a new costsheet.")
+Else 
+	
+	vfNew:=True
+	If ([CostSheets]Method="")
+		[CostSheets]Method:=atMethod{atMethod}
+	End if 
+	DCS_AddLine 
+End if 

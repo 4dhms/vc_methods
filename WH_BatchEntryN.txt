@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY LONGINT($orders;0)
+
+QUERY([CostSheets];[CostSheets]CustomsEntryN=vsEntryNumber)
+$i:=1
+FIRST RECORD([CostSheets])
+For ($i;1;Records in selection([CostSheets]))
+	QUERY([Costing];[Costing]SheetNumber=[CostSheets]SheetNumber)
+	QUERY([Orders];[Orders]OrderNum=[Costing]OrderNumber)
+	
+	APPEND TO ARRAY($orders;[Orders]OrderNum)
+	ADD TO SET([Orders];"orders")
+	NEXT RECORD([CostSheets])
+End for 
+
+Case of 
+	: (Records in selection([CostSheets])=0)
+		WinPrompt ("There is no cost sheet for entry number: "+vsEntryNumber)
+	Else 
+		FIRST RECORD([CostSheets])
+		$i:=1
+		For ($i;1;Size of array($orders))
+			USE SET("orders")
+			QUERY SELECTION([Orders];[Orders]OrderNum=$orders{$i})
+			QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			
+			CREATE SET([Costing];"temp")
+			UNION("temp";"costing";"costing")
+			CREATE SET([CostSheets];"temp")
+			UNION("temp";"costsheets";"costsheets")
+			CLEAR SET("temp")
+			
+			vsOrderNumber:=""
+			
+			
+			If ([CostSheets]Duty2>0)
+				WinPrompt ("The costsheet for "+String([Orders]OrderNum)+" has two duty rates."+Char(13)+"Please update the costsheet.")
+			Else 
+				WH_AppendBatch 
+			End if 
+		End for 
+End case 
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CostSheets])

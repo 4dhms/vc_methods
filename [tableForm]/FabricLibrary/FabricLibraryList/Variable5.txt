@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([FabricLibrary];[FabricLibrary]Type=0)
+QUERY SELECTION([FabricLibrary];[FabricLibrary]ArticleNumber#"")
+ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)

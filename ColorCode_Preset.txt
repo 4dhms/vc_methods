@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asSelf;0)
+ARRAY TEXT(asNames;0)
+ARRAY TEXT(asPrintNumber;0)
+ARRAY TEXT(asPrintName;0)
+ARRAY TEXT(asPrintNumber2;0)
+ARRAY TEXT(asPrintName2;0)
+ARRAY TEXT(asPrintNumber3;0)
+ARRAY TEXT(asPrintName3;0)
+ARRAY TEXT(asCC;0)
+
+vtStyleNo:=""
+vtColor1:=""
+vtColor2:=""
+vtColor3:=""
+vtColor4:=""
+
+Center Window (950;400;4;"")
+DIALOG([Dialogs];"ColorCodes_Preset")
+CLOSE WINDOW
+<>vlPreset:=0

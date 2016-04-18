@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+Case of 
+	: (FORM Get current page=1)
+		If ([Specs]Spl Type 1="")
+			WinPrompt ("Enter Sample Type.")
+			$0:=False
+		Else 
+			$0:=True
+		End if 
+	: (FORM Get current page=2)
+		If ([Specs]Spl Type 2="")
+			WinPrompt ("Enter Sample Type.")
+			$0:=False
+		Else 
+			$0:=True
+		End if 
+	: (FORM Get current page=3)
+		If ([Specs]Spl Type 3="")
+			WinPrompt ("Enter Sample Type.")
+			$0:=False
+		Else 
+			$0:=True
+		End if 
+	: (FORM Get current page=4)
+		If ([Specs]Spl Type 4="")
+			WinPrompt ("Enter Sample Type.")
+			$0:=False
+		Else 
+			$0:=True
+		End if 
+	: (FORM Get current page=5)
+		If ([Specs]Spl Type 5="")
+			WinPrompt ("Enter Sample Type.")
+			$0:=False
+		Else 
+			$0:=True
+		End if 
+	: (FORM Get current page=6)
+		If ([Specs]Spl Type 6="")
+			WinPrompt ("Enter Sample Type.")
+			$0:=False
+		Else 
+			$0:=True
+		End if 
+	Else 
+		$0:=True
+End case 

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Customers];[Customers]CustomerName=[Orders]Customer)
+
+If (Records in selection([Customers])>0)
+	If (Records in selection([Customers])>1)
+		QUERY([Customers];[Customers]PriceTicketDefault#"")
+	End if 
+	Case of 
+		: (Current user="Alex")
+			  //do nothing
+		: ([Orders]Price Tckt="")
+			[Orders]Price Tckt:=[Customers]PriceTicketDefault
+		: ([Orders]Price Tckt=[Customers]PriceTicketDefault)
+			  //do nothing
+		: ([Customers]PriceTicketDefault#"")
+			WinChoice ("Do you want to replace the current Price Ticket with the default from the customer library?")
+			If (ok=1)
+				[Orders]Price Tckt:=[Customers]PriceTicketDefault
+			End if 
+	End case 
+End if 
+UNLOAD RECORD([Customers])

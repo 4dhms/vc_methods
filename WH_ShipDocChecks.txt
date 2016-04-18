@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (cb1=1)
+		[ShippingDocs]ProofDelivery:=2
+	: (cb2=1)
+		[ShippingDocs]ProofDelivery:=1
+	: (cb3=1)
+		[ShippingDocs]ProofDelivery:=3
+End case 
+OBJECT SET VISIBLE([Orders]WH_ProofDelivery;[ShippingDocs]ProofDelivery=2)
+OBJECT SET VISIBLE([Orders]WH_ProofoDeliveryDate;[ShippingDocs]ProofDelivery=2)
+OBJECT SET VISIBLE([Orders]WH_Packing;[ShippingDocs]ProofDelivery=2)
+OBJECT SET VISIBLE([Orders]WH_PackingDate;[ShippingDocs]ProofDelivery=2)
+
+Case of 
+	: (cb4=1)
+		[ShippingDocs]BillLading:=2
+	: (cb5=1)
+		[ShippingDocs]BillLading:=1
+	: (cb6=1)
+		[ShippingDocs]BillLading:=3
+End case 
+OBJECT SET VISIBLE([Orders]WH_BilloLading;[ShippingDocs]BillLading=2)
+OBJECT SET VISIBLE([Orders]WH_BilloLadingDate;[ShippingDocs]BillLading=2)
+
+Case of 
+	: (cb7=1)
+		[ShippingDocs]ShippingDoc:=2
+	: (cb8=1)
+		[ShippingDocs]ShippingDoc:=1
+	: (cb9=1)
+		[ShippingDocs]ShippingDoc:=3
+End case 
+OBJECT SET VISIBLE([Orders]WH_ShippingDoc;[ShippingDocs]ShippingDoc=2)
+OBJECT SET VISIBLE([Orders]WH_ShippingDocDate;[ShippingDocs]ShippingDoc=2)
+
+
+

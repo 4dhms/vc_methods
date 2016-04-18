@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //SAVE RECORD([ChineseDictionary])
+APPEND TO ARRAY(aspom;[ChineseDictionary]EnglishName)
+SORT ARRAY(asPom;>)
+
+ACCEPT

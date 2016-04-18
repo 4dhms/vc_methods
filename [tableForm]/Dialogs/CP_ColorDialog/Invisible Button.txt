@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($thread)
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber)
+QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+
+$thread:=Replace string([ColorPrintNumber]ThreadColor;"#";"")
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$thread)
+QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+
+If (Records in selection([ColorPrintNumber])=0)
+	$thread:=StripToNumber ($thread)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$thread)
+	QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+End if 
+
+If (Records in selection([ColorPrintNumber])=1)
+	vtThreadColor:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+	If (alStyleFab{vlLine}>4)
+		alStyleFab{vlLine}:=1
+	Else 
+		alStyleFab{vlLine}:=0
+	End if 
+End if 

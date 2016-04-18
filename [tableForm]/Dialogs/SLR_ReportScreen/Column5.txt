@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked)
+		  //USE SET("range")
+		  //QUERY SELECTION([SLRAcct];[SLRAcct]SLRAcct=asCustomers{asCustomers})
+		  //DISTINCT VALUES([SLRAcct]SLRStyleNumber;asXStyleNumbers)
+		  //SORT ARRAY(asXStyleNumbers;>)
+		  //Case of 
+		  //: (Size of array(asXStyleNumbers)=1)
+		  //APPEND TO ARRAY(asStyleNumbers;asXStyleNumbers)
+		  //: (Size of array(asXStyleNumbers)>0)
+		  //SET VISIBLE(asXStyleNumbers;True)
+		  //End case 
+		
+	: (Form event=On Double Clicked)
+		If (asCustomers>0)
+			APPEND TO ARRAY(asDCCustomer;asCustomers{asCustomers})
+			SORT ARRAY(asDCCustomer;>)
+			DELETE FROM ARRAY(asCustomers;asCustomers;1)
+		End if 
+		REDUCE SELECTION([SLRReporter];0)
+		OBJECT SET ENABLED(bPrint;False)
+End case 

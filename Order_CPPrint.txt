@@ -1,0 +1,75 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style;$color)
+
+Case of 
+	: (Form event=On Printing Detail)
+		If ([CP_OrderXRef]CPType="Self") & (vlPrintedPixels>50)
+			OBJECT SET COLOR([CP_OrderXRef]Quantity;-(15+(256*0)))
+			OBJECT SET VISIBLE(*;"xLineA";True)
+			$style:=1
+			OBJECT SET VISIBLE(*;"xBox";True)
+		Else 
+			OBJECT SET COLOR([CP_OrderXRef]Quantity;-(0+(256*0)))
+			OBJECT SET VISIBLE(*;"xLineA";False)
+			OBJECT SET VISIBLE(*;"xBox";False)
+			$style:=0
+		End if 
+		
+		If ([CP_OrderXRef]DontShowCode)
+			OBJECT SET VISIBLE(*;"xBox";False)
+		End if 
+		
+		QUERY([Changes];[Changes]RecordKey=[CP_OrderXRef]CPOrdID)
+		QUERY SELECTION([Changes];[Changes]FabPrint="Color")
+		Case of 
+			: (Records in selection([Changes])>0) | ([CP_OrderXRef]TempSelfKey=-1)
+				$style:=7
+				$color:=3
+			: ([CP_OrderXRef]CPType="self")
+				$style:=1
+				$color:=15
+			Else 
+				$style:=0
+				$color:=15
+		End case 
+		  //lines
+		If ([CP_OrderXRef]CPType="self")
+			  //SET COLOR([ CP_OrderXRef]Quantity;-(15+(256*0)))
+			OBJECT SET COLOR(*;"xLine";-(13+(256*0)))
+		Else 
+			OBJECT SET COLOR(*;"xLine";-(0+(256*0)))
+		End if 
+		OBJECT SET VISIBLE([CP_OrderXRef]CPStatusDate;[CP_OrderXRef]CPStatusDate#!00-00-00!)
+		OBJECT SET VISIBLE([CP_OrderXRef]ColorCode;[CP_OrderXRef]CPType="Self")
+		OBJECT SET VISIBLE([ChineseHeads]_Self;[CP_OrderXRef]CPType="Self")
+		OBJECT SET VISIBLE([ColorPrintNumber]CPName;[ColorPrintNumber]CPNumber#"")
+		
+		OBJECT SET FONT STYLE([CP_OrderXRef]CPType;$style)
+		OBJECT SET COLOR([CP_OrderXRef]CPType;-($color+(256*0)))
+		OBJECT SET FONT STYLE([CP_OrderXRef]CPNumber;$style)
+		OBJECT SET FONT STYLE([ColorPrintNumber]CPName;$style)
+		
+		OBJECT SET COLOR([CP_OrderXRef]CPNumber;-($color+(256*0)))
+		OBJECT SET COLOR([ColorPrintNumber]CPName;-($color+(256*0)))
+		
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		If ([ColorPrintNumber]BuyDivision="") | ([ColorPrintNumber]BuyDivision="false")
+			[ColorPrintNumber]BuyDivision:=[ColorPrintNumber]Division
+			SAVE RECORD([ColorPrintNumber])
+		End if 
+		If ([ColorPrintNumber]BuySeason="") | ([ColorPrintNumber]BuySeason="false")
+			[ColorPrintNumber]BuySeason:=[ColorPrintNumber]SeasonName+" "+[ColorPrintNumber]SeasonYear
+			SAVE RECORD([ColorPrintNumber])
+		End if 
+		
+		Case of 
+			: ([Orders]OrderDivision="8@") | ([CP_OrderXRef]DontShowCode)
+				vtColorCode:=""
+			: ([Orders]PODate<!2008-09-08!) & ([Orders]PODate>!00-00-00!) & (Not([CP_OrderXRef]ColorCodeOverride))
+				vtColorCode:=""
+			: ([CP_OrderXRef]CPType="Self") & (<>vlOrderNumber>0) & (Not([CP_OrderXRef]ColorCodeOverride)) & (Not([CP_OrderXRef]DontShowCode))
+				vtColorCode:=[CP_OrderXRef]ColorCode
+			Else 
+				vtColorCode:=[CP_OrderXRef]ColorCodeNew
+		End case 
+End case 

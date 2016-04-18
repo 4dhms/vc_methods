@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([CostSheets];"SampleEst")
+FORM SET INPUT([CostSheets];"SampleEst")
+
+SeasonArrays 
+
+REDUCE SELECTION([CostSheets];0)
+SET WINDOW TITLE("Sample Season Estimate Report")
+
+If (Screen width<780)
+	Center Window (760;550;4;"";"WincBox")
+	MODIFY SELECTION([CostSheets])
+Else 
+	Center Window (940;610;4;"";"WincBox")
+	MODIFY SELECTION([CostSheets];*)
+End if 
+
+CLOSE WINDOW
+
+
+<>vlSampleEstReport:=0
+
+

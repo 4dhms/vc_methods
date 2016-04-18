@@ -1,0 +1,51 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asLDesignNumber;0)
+ARRAY TEXT(asLOrderNumber;0)
+ARRAY TEXT(asLName;0)
+ARRAY TEXT(asLMini;0)
+ARRAY TEXT(asLSource;0)
+ARRAY TEXT(asLArticle;0)
+ARRAY TEXT(asLDescript;0)
+ARRAY LONGINT(alLKey;0)
+ARRAY LONGINT(alLLineKey;0)
+C_BOOLEAN($buildUpdate)
+C_LONGINT($i)
+
+If (Find in array(asSSName;[CS_Lines]ComponentName)>0)
+	$i:=1
+	If (Size of array(afLUpdate)<1)
+		$buildUpdate:=True
+	End if 
+	For ($i;1;Size of array(asSSName))
+		If (asSSName{$i}=[CS_Lines]ComponentName)
+			INSERT IN ARRAY(asLDesignNumber;1;1)
+			INSERT IN ARRAY(asLOrderNumber;1;1)
+			INSERT IN ARRAY(asLName;1;1)
+			INSERT IN ARRAY(asLMini;1;1)
+			INSERT IN ARRAY(asLDescript;1;1)
+			INSERT IN ARRAY(alLKey;1;1)
+			INSERT IN ARRAY(afLChange;1;1)
+			INSERT IN ARRAY(afLUpdate;1;1)
+			INSERT IN ARRAY(asLSource;1;1)
+			INSERT IN ARRAY(asLArticle;1;1)
+			INSERT IN ARRAY(alLLineKey;1;1)
+			
+			asLDesignNumber{1}:=asSSDesignNumber{$i}
+			asLOrderNumber{1}:=asSSOrderNumber{$i}
+			asLName{1}:=asSSName{$i}
+			asLMini{1}:=asSSMini{$i}
+			asLDescript{1}:=asSSDescript{$i}
+			alLKey{1}:=alSSKey{$i}
+			asLSource{1}:=asSSSource{$i}
+			asLArticle{1}:=asSSArticle{$i}
+			alLLineKey{1}:=alSSLineKey{$i}
+			If (Find in array(asSSUpdateNos;asLOrderNumber{1})>0)
+				afLUpdate{1}:=True
+			Else 
+				afLUpdate{1}:=False
+			End if 
+		End if 
+	End for 
+End if 
+
+

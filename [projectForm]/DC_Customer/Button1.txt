@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtPart11:=asCustomers{asCustomers}
+vtPart12:=""
+vfNewFactory:=True
+
+FORM GOTO PAGE(2)

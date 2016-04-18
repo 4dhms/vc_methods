@@ -1,0 +1,65 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$remainder;$n;$pages;$perpage)
+
+$i:=1
+Case of 
+	: ([DesignLines]OnePerPage)
+		$perPage:=1
+	: ([DesignLines]8Up)
+		$perPage:=8
+	Else 
+		$perPage:=12
+End case 
+
+
+If ($perPage>1)
+	$remainder:=Records in selection([DesignLineIncluded])%$perPage
+Else 
+	$remainder:=0
+End if 
+
+$pages:=Int(Records in selection([DesignLineIncluded])/$perPage)
+Case of 
+	: ($remainder>0)
+		$pages:=Int(Records in selection([DesignLineIncluded])/$perPage)+1
+	Else 
+		$pages:=Int(Records in selection([DesignLineIncluded])/$perPage)
+End case 
+
+  //SORT BY SELECTION
+
+DL_SortOrder 
+
+FIRST RECORD([DesignLineIncluded])
+  //build pages
+
+For ($i;1;$pages)
+	QUERY([DLPages];[DLPages]DLItemKey=0)
+	If (Records in selection([DLPages])<1)
+		CREATE RECORD([DLPages])
+	End if 
+	[DLPages]DLItemKey:=[DesignLines]DesignLineKey
+	[DLPages]PageNumber:=vlLastPage
+	[DLPages]PageTitle:=$2
+	SAVE RECORD([DLPages])
+	NEXT RECORD([DLPages])
+	
+	If ($i=$pages) & ($remainder>0)
+		  //allows for the last page
+		$c:=$remainder
+	Else 
+		$c:=$perPage
+	End if 
+	
+	$n:=1
+	For ($n;1;$c)  //builds page
+		If ([DesignLineIncluded]ItemNumber=0)
+			[DesignLineIncluded]PageNumber:=vlLastPage
+			[DesignLineIncluded]ItemNumber:=$n
+			SAVE RECORD([DesignLineIncluded])
+		End if 
+		NEXT RECORD([DesignLineIncluded])
+	End for 
+	vlLastPage:=vlLastPage+1
+End for 
+

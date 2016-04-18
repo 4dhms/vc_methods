@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=2)
+		vfIncomplete:=False
+		If (Num(arPrice{arPrice})=0)
+			arPrice{arPrice}:=-1
+		End if 
+		CANCEL
+	: (FORM Get current page=4)
+		UNLOAD RECORD([DC_Spreads])
+		CANCEL
+	Else 
+		UNLOAD RECORD([OrdersBreakdowns])
+		CANCEL
+End case 

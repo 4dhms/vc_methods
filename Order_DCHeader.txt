@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($arrayPtr)
+C_TEXT($header)
+
+$i:=1
+For ($i;1;14)
+	$header:="HEADER"+String($i+22)
+	$arrayPtr:=Get pointer("asColor"+String($i))
+	If ($i>Size of array(asXColors))
+		$arrayPtr->{1}:=""
+		OBJECT SET TITLE(*;$header;"")
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=asXColors{$i})
+		If (pTwo=1)
+			OBJECT SET TITLE(*;$header;[ColorPrintNumber]CPNumber)
+		Else 
+			OBJECT SET TITLE(*;$header;[ColorPrintNumber]CPName)
+		End if 
+	End if 
+End for 

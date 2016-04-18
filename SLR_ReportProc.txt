@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSLReportProc)
+C_TEXT(vsStyleNumber)
+
+Case of 
+	: (<>vlSLReportProc>0)
+		SHOW PROCESS(<>vlSLReportProc)
+		BRING TO FRONT(<>vlSLReportProc)
+	: (<>vlSLReportProc=0)
+		If (vsStyleNumber#"")
+			<>vlSLReportProc:=New process("SLR_ReportScreen";0;"SLR";vsStyleNumber)
+		Else 
+			<>vlSLReportProc:=New process("SLR_ReportScreen";0;"SLR")
+		End if 
+	Else 
+		SHOW PROCESS(<>vlSLReportProc)
+		BRING TO FRONT(<>vlSLReportProc)
+End case 

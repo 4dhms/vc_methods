@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($range)
+C_LONGINT($i)
+C_TIME($docref)
+C_TEXT($path)
+
+$range:=Current date(*)+60
+
+QUERY([Orders];[Orders]CancelDate>=Current date(*);*)
+QUERY([Orders]; & ;[Orders]CancelDate<=$range;*)
+QUERY([Orders]; & ;[Orders]Cancelled=False;*)
+QUERY([Orders]; & ;[Orders]CustPONumber="";*)
+QUERY([Orders]; & ;[Orders]Customer#"Stock@")
+ORDER BY([Orders];[Orders]Salesperson;>;[Orders]OrderNum;>)
+
+SET WINDOW TITLE(String(Records in selection([Orders]))+" Unconfirmed HMS Orders")
+
+$docref:=Create document("";"xls")
+
+If (ok=1)
+	$path:=Document
+	SEND PACKET($docref;"HMS PO Number"+Char(9)+"Customer"+Char(9)+"Salesperson"+Char(9)+"Style Number"+Char(9)+"Cancel Date"+Char(13))
+	
+	FIRST RECORD([Orders])
+	$i:=1
+	For ($i;1;Records in selection([Orders]))
+		SEND PACKET($docref;String([Orders]OrderNum)+Char(9)+[Orders]Customer+Char(9)+[Orders]Salesperson+Char(9)+[Orders]StyleNumber+Char(9)+String([Orders]CancelDate)+Char(13))
+		NEXT RECORD([Orders])
+	End for 
+	
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+	
+End if 
+

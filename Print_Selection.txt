@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($tablePtr)
+C_BOOLEAN(vfEmail;vfPDF)
+
+$tablePtr:=$1
+
+If (<>vsPrintBox="no") | (vfEmail) | (vfPDF)
+	PRINT SELECTION($1->;*)
+Else 
+	PRINT SELECTION($1->)
+End if 

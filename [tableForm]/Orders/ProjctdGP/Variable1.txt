@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Orders];"prtPrjctGP")
+vlMonthCount:=0
+vlTotCount:=0
+vrWtMonth:=0
+vrWtTot:=0
+vrNetPercentMonth:=0
+vrNetPercentTot:=0
+
+ORDER BY([Orders];[Orders]MonthSorter;>;[Orders]CancelDate;>)
+BREAK LEVEL(1)
+
+ACCUMULATE([Orders]TotalOrderQuantity;[Orders]RptGrossSales;[Orders]RptShipped;[Orders]RptActsSales;[Orders]RptProfit;[Orders]RptPercent)
+PAGE SETUP([Orders];"prtPrjctGP")
+FORM SET OUTPUT([Orders];"prtPrjctGP")
+Print_Selection (->[Orders])
+FORM SET OUTPUT([Orders];"ProjctdGP")

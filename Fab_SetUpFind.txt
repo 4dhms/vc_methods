@@ -1,0 +1,59 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asFactories;0)
+ARRAY TEXT(asCPFabric;0)
+ARRAY TEXT(asCPFiber;0)
+C_TEXT($articleCode)
+DISTINCT VALUES([FabricLibrary]Supplier;<>asFactories)
+DISTINCT VALUES([FabricLibrary]FabricName;asCPFabric)
+DISTINCT VALUES([FabricLibrary]FiberContent;asCPFiber)
+SORT ARRAY(<>asFactories;>)
+SORT ARRAY(asCPFabric;>)
+SORT ARRAY(asCPFiber;>)
+INSERT IN ARRAY(<>asFactories;1;1)
+INSERT IN ARRAY(asCPFabric;1;1)
+INSERT IN ARRAY(asCPFiber;1;1)
+<>asFactories{1}:="All"
+asCPFabric{1}:="All"
+asCPFiber{1}:="All"
+<>asFactories:=0
+asCPFabric:=0
+asCPFiber:=0
+WinFindList ("Select factory:";21)
+
+$articleCode:=Replace string(vsArticle;" ";"")
+
+If (ok=1)
+	If (cbAdd=1)
+		CREATE SET([FabricLibrary];"FirstSet")
+	End if 
+	If (vsArticle#"")
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArticle)
+	Else 
+		
+		If (<>asFactories>0)
+			QUERY([FabricLibrary];[FabricLibrary]Type=0)
+			QUERY SELECTION([FabricLibrary];[FabricLibrary]ArticleNumber#"")
+			
+			If (<>asFactories>1)
+				QUERY SELECTION([FabricLibrary];[FabricLibrary]Supplier=<>asFactories{<>asFactories})
+			End if 
+			If (asCPFabric>1)
+				QUERY SELECTION([FabricLibrary];[FabricLibrary]FabricName=asCPFabric{asCPFabric})
+			End if 
+			If (asCPFiber>1)
+				QUERY SELECTION([FabricLibrary];[FabricLibrary]FiberContent=asCPFiber{asCPFiber})
+			End if 
+		Else 
+		End if 
+	End if 
+End if 
+
+If (cbAdd=1)
+	CREATE SET([FabricLibrary];"SecondSet")
+	CREATE EMPTY SET([FabricLibrary];"ThirdSet")
+	UNION("FirstSet";"SecondSet";"ThirdSet")
+	USE SET("ThirdSet")
+	CLEAR SET("FirstSet")
+	CLEAR SET("SecondSet")
+	CLEAR SET("ThirdSet")
+End if 

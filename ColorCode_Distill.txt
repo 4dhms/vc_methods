@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($1;$2;$3;$code;$test1;$test2;$test3)
+If (Shift down)
+	ALERT($1)
+End if 
+
+Case of 
+	: (Count parameters>1)
+		If ($2#"")
+			
+			Case of 
+				: ($1=$2)
+					$code:=ColorCode_Root ($1;10)
+				: (Count parameters>2)
+					If ($3#"")
+						$test1:=ColorCode_Root ($1;5)
+						$test2:=ColorCode_Root ($2;3)
+						$test3:=ColorCode_Root ($3;2)
+						$code:=$test1+$test2+$test3
+					End if 
+				Else 
+					$test1:=ColorCode_Root ($1;6)
+					$test2:=ColorCode_Root ($2;10-(Length($test1)))
+					$code:=$test1+$test2
+			End case 
+		End if 
+	Else 
+		$code:=ColorCode_Root ($1;10)
+End case 
+
+$0:=$code

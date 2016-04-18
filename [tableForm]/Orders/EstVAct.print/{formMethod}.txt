@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:="PRINTED "+String(Current date(*))+" PAGE "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		QUERY([Invoices];[Invoices]OrderNumber=[Orders]OrderNum)
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		vlNetSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+		
+		vlInvQty:=0
+		vrRptNetSales:=0
+		Case of 
+			: (Records in selection([Invoices])=1)
+				vlInvQty:=[Invoices]InvoiceQuantity
+				vrRptNetSales:=[Invoices]InvoiceAmount
+			: (Records in selection([Invoices])>1)
+				ARRAY LONGINT($sum;0)
+				ARRAY REAL($amount;0)
+				SELECTION TO ARRAY([Invoices]InvoiceQuantity;$sum;[Invoices]InvoiceAmount;$amount)
+				$i:=1
+				vlInvQty:=0
+				For ($i;1;Size of array($sum))
+					vlInvQty:=vlInvQty+$sum{$i}
+					vrRptNetSales:=vrRptNetSales+$amount{$i}
+				End for 
+			Else 
+				vlInvQty:=0
+				vrRptNetSales:=0
+		End case 
+		
+		If (Shift down)
+			ALERT([Orders]StyleNumber+"  "+String([Orders]OrderNum)+"  "+String([Invoices]OrderNumber)+"  "+String([Invoices]InvoiceQuantity)+"  "+String(vlInvQty))
+		End if 
+		
+		vlDiff:=[Orders]TotalOrderQuantity-vlInvQty
+		If (vlDiff=0)
+			vlDiffPC:=0
+		Else 
+			vlDiffPC:=Round((vlDiff/[Orders]TotalOrderQuantity)*100;0)
+		End if 
+		vlDiffPC:=Round((vlDiff/[Orders]TotalOrderQuantity)*100;0)
+		vlDiffSales:=Round(vlNetSales-vrRptNetSales;2)
+		If (vlDiffSales=0)
+			vlDiffSalesPC:=0
+		Else 
+			vlDiffSalesPC:=Round((vlDiffSales/vlNetSales)*100;0)
+		End if 
+End case 

@@ -1,0 +1,68 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;cbGSZ;cbGHZ;cbGDom;cbGVN)
+
+vXdate1:=Current date(*)-30
+vsSource:=""
+ARRAY TEXT(atSub1;0)
+
+Center Window (300;220;3;"")
+DIALOG([Dialogs];"SampleAppRange")
+CLOSE WINDOW
+
+If (ok=1)
+	QUERY([Orders];[Orders]ActualDeliveryDate=!00-00-00!)
+	QUERY SELECTION([Orders];[Orders]Cancelled=False;*)
+	QUERY SELECTION([Orders]; & ;[Orders]CancelDate>=vXdate1)
+	Case of 
+		: (cbGSZ=1) | (cbGHZ=1) | (cbGDom=1) | (cbGVN=1)
+			$n:=1
+			For ($n;1;Size of array(atSub1))
+				Case of 
+					: (Size of array(atSub1)=1)
+						QUERY SELECTION([Orders];[Orders]Factory=atSub1{1})
+					: ($n=1)
+						QUERY SELECTION([Orders];[Orders]Factory=atSub1{1};*)
+					: ($n=Size of array(atSub1))
+						QUERY SELECTION([Orders]; | ;[Orders]Factory=atSub1{$n})
+					Else 
+						QUERY SELECTION([Orders]; | ;[Orders]Factory=atSub1{$n};*)
+				End case 
+			End for 
+			
+		: (cbAll=0) & (vsSource#"")
+			QUERY SELECTION([Orders];[Orders]Factory=vsSource)
+	End case 
+	
+	WinChoice ("Do you want to limit the selection?";"All";"Knit";"Woven";"Cut & Sew")
+	Case of 
+		: (ok=1) & (bChoice2=1)
+			QUERY SELECTION([Orders];[Orders]KWCnS="Knit")
+		: (ok=1) & (bChoice3=1)
+			QUERY SELECTION([Orders];[Orders]KWCnS="Woven")
+		: (ok=0)
+			QUERY SELECTION([Orders];[Orders]KWCnS="CutSew")
+	End case 
+	
+	
+	CREATE EMPTY SET([Orders];"Unapproved")
+	FIRST RECORD([Orders])
+	$i:=1
+	For ($i;1;Records in selection([Orders]))
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+		QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+		Case of 
+			: (Records in selection([SpecFactory])=0) & (Records in selection([Specs])=0)
+				ADD TO SET([Orders];"Unapproved")
+			: (Records in selection([SpecFactory])>0)
+				If (Not([SpecFactory]ApprovedForProd))
+					ADD TO SET([Orders];"Unapproved")
+				End if 
+			: (Records in selection([Specs])>0) & (Not([Specs]AppvdForProd))
+				ADD TO SET([Orders];"Unapproved")
+		End case 
+		NEXT RECORD([Orders])
+	End for 
+	USE SET("Unapproved")
+	CLEAR SET("Unapproved")
+	SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+End if 

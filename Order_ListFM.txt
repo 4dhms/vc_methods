@@ -1,0 +1,180 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbShowAS)
+
+Case of 
+	: (Form event=On Load)
+		ARRAY LONGINT(alRecordNumber;0)
+		OBJECT SET VISIBLE(*;"xAdd";False)
+		OBJECT SET VISIBLE(*;"xStop";<>vfSupersheet)
+		
+		ARRAY TEXT(asSort;0)
+		APPEND TO ARRAY(asSort;"Sort Order")
+		APPEND TO ARRAY(asSort;"Order")
+		APPEND TO ARRAY(asSort;"Style")
+		APPEND TO ARRAY(asSort;"Design")
+		APPEND TO ARRAY(asSort;"Factory")
+		APPEND TO ARRAY(asSort;"Customer")
+		APPEND TO ARRAY(asSort;"Ship Date Factory")
+		APPEND TO ARRAY(asSort;"Schedule")
+		APPEND TO ARRAY(asSort;"Actual Ship")
+		APPEND TO ARRAY(asSort;"Start Date")
+		APPEND TO ARRAY(asSort;"Cancel Date")
+		APPEND TO ARRAY(asSort;"In DC")
+		
+		asSort:=1
+		nav1:=1
+		
+		vsPart1:=""
+		vsPart2:=""
+		vsPart3:=""
+		vsPart4:=""
+		vsPart5:=""
+		vsPart6:=""
+		vsPart7:=""
+		vsPart8:=""
+		vsPart9:=""
+		vsPart10:=""
+		Sample_ArrowInit 
+		CREATE SET([Orders];"LastFound")
+		vdStart:=!00-00-00!
+		vdEnd:=!00-00-00!
+		vsQOrderNumber:=""
+		vsQStyle:=""
+		vsQDesign:=""
+		vtQFactory:=""
+		vdQCancel:=!00-00-00!
+		
+		Fabric_TypeArray 
+		Order_SeasonArray 
+		
+		
+		OBJECT SET VISIBLE(bTest;Current user="Designer")
+		vfNewCostsheet:=False
+		Print_Box 
+	: (Form event=On Outside Call)
+		Case of 
+				  //: (◊vlSDproc>0) & (◊vlOrderNumber>0)
+				  //READ ONLY([Orders])
+				  //QUERY([Orders];[Orders]OrderNum=◊vlOrderNumber)
+				
+			: (Size of array(alRecordNumber)>0)
+				ColorCode_BuildSelection 
+		End case 
+		
+	: (Form event=On Unload)
+		CLEAR SET("LastFound")
+		UNLOAD RECORD([Orders])
+		
+		
+		<>orderForm:="Order"
+		vfNewCostsheet:=False
+		
+	: (Form event=On Close Box)
+		CANCEL
+	: (Form event=On Display Detail)
+		OBJECT SET VISIBLE([Orders]Schedule Date;[Orders]Schedule Date#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]ActualDeliveryDate;[Orders]ActualDeliveryDate#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]ShipDateFactory;[Orders]ShipDateFactory#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]StartDate;[Orders]StartDate#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]InDC;[Orders]InDC#!00-00-00!)
+		OBJECT SET VISIBLE(*;"xMaster";[Orders]MasterSpec=True)
+		OBJECT SET VISIBLE(*;"xReorder";[Orders]ReorderPP=True)
+		
+		If ([Designs]ArchivedPict)
+			OBJECT SET FONT STYLE([Orders]DesignNumber;4)
+		Else 
+			OBJECT SET FONT STYLE([Orders]DesignNumber;0)
+		End if 
+		
+		  //Order_Total 
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+		If (Records in selection([SpecFactory])>0)
+			[Orders]SpecSheet:=True
+		Else 
+			[Orders]SpecSheet:=False
+		End if 
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		If (Records in selection([Costing])>0)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			If (Records in selection([CostSheets])>0)
+				ORDER BY([CostSheets];[CostSheets]SheetID;<)
+				[Orders]LastCostSheet:=[CostSheets]SheetName
+			End if 
+		Else 
+			[Orders]LastCostSheet:=""
+		End if 
+		
+		  //Order_PullCP ([Orders]OrderNum)
+		SAVE RECORD([Orders])
+		
+		Case of 
+			: ([Orders]LastCostSheet="") & ([Orders]RevisionNumber>0) & (Position("Revision "+String([Orders]RevisionNumber);[Orders]RevHistory)<1)
+				OBJECT SET COLOR([Orders]OrderNum;-(3+(256*1)))
+			: ([Orders]RevisionNumber>0) & ([Orders]RevisionNumber>0) & (Position("Revision "+String([Orders]RevisionNumber);[Orders]RevHistory)<1)
+				OBJECT SET COLOR([Orders]OrderNum;-(15+(256*1)))
+			: ([Orders]LastCostSheet="")
+				OBJECT SET COLOR([Orders]OrderNum;-(3+(256*0)))
+			Else 
+				OBJECT SET COLOR([Orders]OrderNum;-(15+(256*0)))
+		End case 
+		
+		If ([Orders]ApprovalDate#!00-00-00!)
+			OBJECT SET FONT STYLE([Orders]StyleNumber;1)
+			OBJECT SET COLOR([Orders]StyleNumber;-(Dark green+(256*0)))
+		Else 
+			QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+			If (Records in selection([SpecFactory])>0) & ([SpecFactory]Colhead="Pre-Prod@")
+				OBJECT SET FONT STYLE([Orders]StyleNumber;1)
+				OBJECT SET COLOR([Orders]StyleNumber;-(Orange+(256*0)))
+			Else 
+				OBJECT SET FONT STYLE([Orders]StyleNumber;0)
+				OBJECT SET COLOR([Orders]StyleNumber;-(15+(256*0)))
+			End if 
+		End if 
+		
+		Case of 
+			: (cbShowAS=1)
+				If ([Orders]Factory="cancelled") | ([Orders]Cancelled)
+					vsFlag:="X"
+				Else 
+					QUERY([Samples];[Samples]HMSOrderNumber=[Orders]OrderNum)
+					If (Records in selection([Samples])>0)
+						vsFlag:="S"
+					Else 
+						vsFlag:=""
+					End if 
+				End if 
+			: (User in group(Current user;"SuperDuperCostsheets"))
+				Case of 
+					: ([Orders]LastCostSheet="DCS Estimate@")
+						vsFlag:="e"+String(Num([Orders]LastCostSheet))
+					: ([Orders]LastCostSheet="DCS Original@")
+						vsFlag:="q"
+					: ([Orders]LastCostSheet="DCS Confirm@")
+						vsFlag:="c"+String(Num([Orders]LastCostSheet))
+					: ([Orders]LastCostSheet="DCS Actual@")
+						vsFlag:=""+Substring([Orders]LastCostSheet;8;1)
+					: ([Orders]Hold)
+						vsFlag:="H"
+					: ([Orders]Factory="cancelled") | ([Orders]Cancelled)
+						vsFlag:="X"
+					: ([Orders]LastCostSheet="Estimate@")
+						vsFlag:="E"+String(Num([Orders]LastCostSheet))
+					: ([Orders]LastCostSheet="Original@")
+						vsFlag:="Q"
+					: ([Orders]LastCostSheet="Confirm@")
+						vsFlag:="C"+String(Num([Orders]LastCostSheet))
+					: ([Orders]LastCostSheet="Actual@")
+						vsFlag:=Substring([Orders]LastCostSheet;8;1)
+					Else 
+						vsFlag:=""
+				End case 
+			: ([Orders]Hold)
+				vsFlag:="H"
+			: ([Orders]Factory="cancelled") | ([Orders]Cancelled)
+				vsFlag:="X"
+			Else 
+				vsFlag:=""
+		End case 
+End case 
+

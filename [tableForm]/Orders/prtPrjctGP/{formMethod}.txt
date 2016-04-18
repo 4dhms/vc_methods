@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vPrjGPQty)
+C_REAL(vToSalSum)
+C_LONGINT(vUntsSldSum)
+C_REAL(vActSalSum)
+C_REAL(vProfSum)
+C_REAL(vProfAvg)
+C_REAL(vPerAvg)
+
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:="PRINTED ON: "+String(Current date(*))+"    PAGE "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		
+		vlMonthCount:=vlMonthCount+[Orders]TotalOrderQuantity
+		vlTotCount:=vlTotCount+[Orders]TotalOrderQuantity
+		vrWtMonth:=vrWtMonth+([Orders]TotalOrderQuantity*[Orders]Price)
+		vrWtTot:=vrWtTot+([Orders]TotalOrderQuantity*[Orders]Price)
+		vrNetPercentMonth:=vrNetPercentMonth+([Orders]RptPercent*[Orders]TotalOrderQuantity)
+		vrNetPercentTot:=vrNetPercentTot+([Orders]RptPercent*[Orders]TotalOrderQuantity)
+		
+	: (Form event=On Printing Break)
+		vPrjGPQty:=Subtotal([Orders]TotalOrderQuantity)
+		vToSalSum:=Subtotal([Orders]RptGrossSales)
+		vUntsSldSum:=Subtotal([Orders]RptShipped)
+		vActSalSum:=Subtotal([Orders]RptActsSales)
+		vTotPrSum:=Subtotal([Orders]RptProfit)
+		
+		If (Level=1)
+			If (vlMonthCount>0)
+				vrShowWt:=Round(vrWtMonth/vlMonthCount;2)
+				
+				vPerAvg:=Round(vrNetPercentMonth/vlMonthCount;2)
+				vlMonthCount:=0
+				vrWtMonth:=0
+				vrNetPercentMonth:=0
+			End if 
+		Else 
+			vrShowWt:=Round(vrWtTot/vlTotCount;2)
+			vPerAvg:=Round(vrNetPercentTot/vlTotCount;2)
+		End if 
+End case 

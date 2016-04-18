@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+ARRAY LONGINT(alItemNumber;0)
+ALL RECORDS([SpecLibrary])
+DISTINCT VALUES([SpecLibrary]PartKey;alItemNumber)
+
+QUERY([SpecLibrary];[SpecLibrary]PartKey=0)
+ORDER BY([SpecLibrary];[SpecLibrary]SpecEnglish;>)
+SELECTION TO ARRAY([SpecLibrary]SpecEnglish;asList1)
+FORM GOTO PAGE(3)

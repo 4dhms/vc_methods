@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$oldkey;$newkey)
+
+WinChoice ("Are you sure you want to duplicate this line plan?")
+If (ok=1)
+	WinChoice ("Really really sure?";"No";"Really")
+	If (ok=0)
+		
+		$oldkey:=[DesignLines]DesignLineKey
+		
+		DUPLICATE RECORD([DesignLines])
+		[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+		$newkey:=[DesignLines]DesignLineKey
+		[DesignLines]DLCreationDate:=Current date(*)
+		[DesignLines]DLCreator:=Current user
+		[DesignLines]Title:=[DesignLines]Title+" [DUPED]"
+		SAVE RECORD([DesignLines])
+		
+		QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=$oldkey)
+		ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;<)
+		
+		$c:=[DesignLinkedPages]PageNumber
+		$i:=1
+		For ($i;1;$c)
+			QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=$oldkey)
+			QUERY SELECTION([DesignLinkedPages];[DesignLinkedPages]PageNumber=$i)
+			If (Records in selection([DesignLinkedPages])=1)
+				DUPLICATE RECORD([DesignLinkedPages])
+				[DesignLinkedPages]DesignLineKey:=$newkey
+				SAVE RECORD([DesignLinkedPages])
+			End if 
+		End for 
+		
+		QUERY([DL_Other];[DL_Other]DesignKey=$oldkey)
+		If (Records in selection([DL_Other])=1)
+			[DL_Other]DesignKey:=$newkey
+			SAVE RECORD([DL_Other])
+		End if 
+		
+		QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=$newkey)
+		ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+	End if 
+End if 

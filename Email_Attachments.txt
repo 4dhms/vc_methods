@@ -1,0 +1,67 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($orderNumber)
+
+ARRAY TEXT(asAttachedNos;Records in selection(vptablePtr->))
+FIRST RECORD(vptablePtr->)
+$i:=1
+
+For ($i;1;Size of array(asAttachedNos))
+	Case of 
+		: ($1="RMA") | ($1="DPN")
+			asAttachedNos{$i}:="RMA"+String([Spooler]RecordNumber)
+		: ($1="DPY") | ($1="DPN")
+			asAttachedNos{$i}:="Design Line Plan"
+		: ($1="Status")
+			asAttachedNos{$i}:="Status"
+		: ($1="PO") | ($1="POs")
+			Mail_LogSent (String([Orders]OrderNum);[Orders]Factory;"HMS Order")
+			If ([Orders]Cancelled)
+				asAttachedNos{$i}:="X"+String([Orders]OrderNum)
+			Else 
+				asAttachedNos{$i}:="PO"+String([Orders]OrderNum)
+			End if 
+		: ($1="TC")
+			If (Records in selection([Orders])=1)
+				asAttachedNos{$i}:="PO"+String([Orders]OrderNum)+"  S/N "+[Orders]StyleNumber+"  "+[Orders]Factory
+			Else 
+				asAttachedNos{$i}:="Distribution"
+			End if 
+		: ($1="FO") | ($1="FOs")
+			Mail_LogSent ([FabricOrders]PONumber;[FabricOrders]VendorName;"PO")
+			asAttachedNos{$i}:=vpNumberPtr->
+		: ($1="SG")
+			Mail_LogSent (String([Samples]SampleNumber);[Samples]SamGarFactry;"Sample Garment")
+			asAttachedNos{$i}:=$1+String(vpNumberPtr->)
+		: ($1="SF")
+			Mail_LogSent (String([SampleFabrics]SampleFab PO Nu);[SampleFabrics]Fabric Source;"Sample Fabric")
+			asAttachedNos{$i}:=$1+String(vpNumberPtr->)
+		: ($1="DL")
+			Mail_LogSent ([Designs]DesignNum;vtVendor;"Design Library")
+			asAttachedNos{$i}:=$1+vpNumberPtr->
+		: ($1="SP")
+			Mail_LogSent ([Speedpost Form]Package number;vtVendor;"Speed Post")
+			$orderNumber:=vpNumberPtr->
+			$orderNumber:=Replace string(vpNumberPtr->;"sp_";"")
+			asAttachedNos{$i}:=$orderNumber
+		Else 
+			asAttachedNos{$i}:=$1+String(vpNumberPtr->)
+	End case 
+	NEXT RECORD(vptablePtr->)
+End for 
+
+Case of 
+	: ($1="TC")
+		
+	: ($1="CS")
+		vtPDFName:="Cost_"+String([Costing]OrderNumber)
+	: ($1="Status") | ($1="POS")
+		vtPDFName:=$1
+	: (Size of array(asAttachedNos)<1)
+		  //do nothing.    
+	: (Size of array(asAttachedNos)>1)
+		vtPDFName:=$1+"s"
+	Else 
+		vtPDFName:=asAttachedNos{1}
+End case 
+

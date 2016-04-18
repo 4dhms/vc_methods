@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If ([FabPOLines]FabOrderKey=0)
+		[FabPOLines]FabOrderKey:=[FabricOrders]FabOrderKey
+		[FabPOLines]LineID:=Sequence number([FabPOLines])
+	End if 
+	QUERY([Deliveries];[Deliveries]LineID=[FabPOLines]LineID)
+End if 

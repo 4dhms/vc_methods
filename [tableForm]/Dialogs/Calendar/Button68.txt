@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($print)
+
+If (Size of array(asList1)<1)
+	WinChoice ("Do you want to print all customers? Or a selection?";"Print All";"Selection")
+	If (ok=1)
+		ARRAY TEXT(asList1;0)
+		COPY ARRAY(asCustomers;asList1)
+		$print:=True
+	End if 
+Else 
+	$print:=True
+End if 
+
+If ($print)
+	$i:=1
+	QUERY([Customers];[Customers]CustomerName=asList1{1};*)
+	For ($i;1;Size of array(asList1))
+		QUERY([Customers]; | ;[Customers]CustomerName=asList1{$i};*)
+	End for 
+	QUERY([Customers]; & ;[Customers]CustomerName#"")
+	
+	RELATE MANY SELECTION([Contacts]CustomerKey)
+	FORM SET OUTPUT([Contacts];"Contacts.print")
+	ORDER BY([Contacts];[Customers]CustomerName;>;[Contacts]Contact;>)
+	BREAK LEVEL(1)
+	ACCUMULATE([Contacts]CustomerKey)
+	PAGE SETUP([Contacts];"Contacts.print")
+	Print_Selection (->[Contacts])
+End if 
+

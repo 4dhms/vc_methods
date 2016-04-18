@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtTitle:=asDivisions{asDivisions}
+
+If (nav1+nav2>0) & (1=2)
+	Case of 
+		: (nav2=1)
+			vtTitle:=vtTitle+" (Hi to Low"
+		: (nav1=1)
+			vtTitle:=vtTitle+" (Low to Hi"
+	End case 
+	Case of 
+		: (c1=1)
+			vtTitle:=vtTitle+" by Units)"
+		: (c2=1)
+			vtTitle:=vtTitle+" by Sell off)"
+		: (c3=1)
+			vtTitle:=vtTitle+" by Sales)"
+	End case 
+End if 

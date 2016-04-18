@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+		
+	: (Form event=On Outside Call)
+		vxSketch:=<>vxSketch
+		GET PICTURE FROM LIBRARY("empty.jpg";<>vxSketch)
+		
+	: (Form event=On Unload)
+		If (Records in set("Prints")>0)
+			USE SET("Prints")
+			CLEAR SET("Prints")
+		End if 
+		ARRAY TEXT(asFabric;0)
+		ARRAY TEXT(asFiber;0)
+		ARRAY TEXT(asTreatment;0)
+		ARRAY LONGINT(alOrders;0)
+		ARRAY LONGINT(alUnits;0)
+		
+		If ([ColorPrintNumber]Dropped)
+			  //OBJECT SET COLOR([ColorPrintNumber]Customer;-(0+(256*15)))
+			  //OBJECT SET COLOR([ColorPrintNumber]Division;-(0+(256*15)))
+		Else 
+		End if 
+		
+	: (Form event=On Load)
+		If (Record number([ColorPrintNumber])<0) & (<>CPRouter=5)
+			OBJECT SET VISIBLE(cbChange;True)
+			
+		Else 
+			OBJECT SET VISIBLE(cbChange;False)
+		End if 
+		
+		OBJECT SET ENABLED(bCode;False)
+		ARRAY TEXT(asDivisions;0)
+		ARRAY TEXT(atFabrication;0)
+		atFabrication:=0
+		asDivisions:=0
+		
+		CP_FM_Load 
+		
+End case 

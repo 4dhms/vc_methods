@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($lasttype)
+
+$i:=1
+For ($i;1;Size of array(asDutyType))
+	If ($i=1)
+		$lasttype:=asDutyType{1}
+	End if 
+	
+	If (asDutyType{$i}="0")
+		asDutyType{$i}:=""
+	End if 
+	If (asHTSCode{$i}="0")
+		asHTSCode{$i}:=""
+	End if 
+	
+	If (afSpecial{$i}=True)
+		alDutyStyle{$i}:=1
+	Else 
+		alDutyStyle{$i}:=0
+	End if 
+	If (afSpecial{$i}=True)
+		alDutyColor{$i}:=16766935
+	Else 
+		alDutyColor{$i}:=16777215
+	End if 
+End for 

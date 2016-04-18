@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	SD_GarmentArray 
+	cbMultiStyles:=0
+	
+	vrDutyRate:=0
+	vtNote:=""
+	vsName:=""
+	vdStart:=Current date(*)
+	vdEnd:=Current date(*)+90
+	pOne:=0
+	pTwo:=1
+	OBJECT SET ENABLED(bOK;False)
+	
+	GOTO OBJECT(vdStart)
+End if 

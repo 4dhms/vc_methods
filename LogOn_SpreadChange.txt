@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$s)
+C_TEXT($status;$t;$key)
+$t:=Char(9)
+
+QUERY([Orders];[Orders]StyleNumber=vsStyleNumber)
+ORDER BY([Orders];[Orders]OrderNum;<)
+
+$status:=atChange{Find in array(asStyleNumbers;vsStyleNumber)}
+
+If ($status="@NC")
+	$status:=Replace string($status;"NC ";"")
+End if 
+$key:=$status
+If (Position(" ";$key)>0)
+	$key:=Substring($key;1;Position(" ";$key))
+Else 
+	$key:=$status
+End if 
+
+$n:=1
+FIRST RECORD([Orders])
+CREATE EMPTY SET([Changes];"change")
+For ($n;1;Records in selection([Orders]))
+	QUERY([Changes];[Changes]OrderNumber=[Orders]OrderNum)
+	$s:=1
+	FIRST RECORD([Changes])
+	For ($s;1;Records in selection([Changes]))
+		ADD TO SET([Changes];"change")
+		NEXT RECORD([Changes])
+	End for 
+	NEXT RECORD([Orders])
+End for 
+
+FIRST RECORD([Orders])
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+
+  //SEND PACKET(vhDocref;$key+$t+vsStyleNumber+$t+[Designs]Description+$t+[Orders]OrderDivision+$t)
+
+  //DV SC SR PC
+If ($status="@DV@")
+	USE SET("change")
+	QUERY SELECTION([Changes];[Changes]FieldName="OrderDivision")
+	LogOn_SpreadChangeLine ("DV")
+End if 
+
+If ($status="@SC@")
+	USE SET("change")
+	QUERY SELECTION([Changes];[Changes]FieldName="SeasonName";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="SeasonYear")
+	LogOn_SpreadChangeLine ("SC")
+End if 
+
+If ($status="@SR@")
+	USE SET("change")
+	QUERY SELECTION([Changes];[Changes]FieldName="Size Range")
+	LogOn_SpreadChangeLine ("SR")
+End if 
+
+If ($status="@PC@")
+	USE SET("change")
+	QUERY SELECTION([Changes];[Changes]FieldName="Price";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="Terms")
+	LogOn_SpreadChangeLine ("PC")
+End if 
+
+If ($status="@CC@")
+	USE SET("change")
+	QUERY SELECTION([Changes];[Changes]FieldName="Self Color@";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="Combo@Color")
+	LogOn_SpreadChangeLine ("CC")
+End if 
+UNLOAD RECORD([Orders])
+CLEAR SET("change")

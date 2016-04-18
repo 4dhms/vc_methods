@@ -1,0 +1,70 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($sn;$rem)
+C_LONGINT($p;$i)
+C_TEXT($style;$color;$size;$upc;$nrfcolor;$nrfsize)
+C_BOOLEAN($done;$last)
+
+$docref:=Open document("";"txt")
+If (ok=1)
+	Repeat 
+		  //If (<>vlPlatform=3)
+		RECEIVE PACKET($docref;$sn;Char(10))
+		
+		If (ok=0)
+			$last:=True
+		End if 
+		  //Else 
+		  //RECEIVE PACKET($docref;$sn;Char(10))
+		  //$cr:=Char(10)
+		  //End if 
+		
+		ARRAY TEXT($line;0)
+		
+		$rem:=Replace string($sn;"  ";" ")
+		
+		$i:=1
+		For ($i;1;11)
+			If ($i=11)
+				APPEND TO ARRAY($line;$rem)
+			Else 
+				$p:=Position(Char(9);$rem)
+				APPEND TO ARRAY($line;Substring($rem;1;$p-1))
+				$rem:=Substring($rem;Position(Char(9);$rem)+1;999)
+			End if 
+		End for 
+		$style:=Replace string($line{1};" ";"")
+		$color:=$line{3}
+		If ($color="@ ")
+			$color:=Substring($color;1;Length($color)-1)
+		End if 
+		$nrfcolor:=Replace string($line{4};" ";"")
+		
+		$size:=Replace string($line{7};" ";"")
+		$nrfsize:=Replace string($line{8};" ";"")
+		$upc:=Replace string($line{11};" ";"")
+		If ($style="Style")
+		Else 
+			QUERY([UPCCodes];[UPCCodes]StyleNumber=$style;*)
+			QUERY([UPCCodes]; & ;[UPCCodes]Color=$color;*)
+			QUERY([UPCCodes]; & ;[UPCCodes]Size=$size)
+			If (Records in selection([UPCCodes])=0) & ($style#"")
+				CREATE RECORD([UPCCodes])
+				[UPCCodes]StyleNumber:=$style
+				[UPCCodes]Color:=$color
+				[UPCCodes]NRFColor:=$nrfcolor
+				[UPCCodes]Size:=$size
+				[UPCCodes]NRFSize:=$nrfsize
+				[UPCCodes]UPC:=$upc
+				SAVE RECORD([UPCCodes])
+			End if 
+			UNLOAD RECORD([UPCCodes])
+		End if 
+		If ($last)
+			CLOSE DOCUMENT($docref)
+			$done:=True
+		End if 
+	Until ($done)
+End if 
+
+ALERT("Done")

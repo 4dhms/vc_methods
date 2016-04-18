@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Not([RMA]ShipBack)) & (cb1=0)
+		WinPrompt ("Does customer need to return item(s).")
+	: (Not([RMA]Credit)) & (cb2=0)
+		WinPrompt ("Credit or replacement?")
+	Else 
+		
+		RMA_Save 
+		If (Records in selection([Returns])=0)
+			WinPrompt ("There is nothing to print.")
+		Else 
+			If ([ReturnStores]StoreEmail#"")
+				WinChoice ("Do you want to email to Susan?")
+				If (ok=1)
+					RMA_Email (False)
+				End if 
+			End if 
+			
+			FORM SET OUTPUT([Returns];"Returns.print")
+			PRINT SELECTION([Returns])
+		End if 
+End case 

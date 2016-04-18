@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE RECORD([Quota])
+SAVE RECORD([Quota])
+asList1:=1
+asHTSCode:=0
+asKWCS:=1
+FORM GOTO PAGE(2)

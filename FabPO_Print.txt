@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+FORM SET OUTPUT([FabricOrders];"PrtFabPO")
+PAGE SETUP([FabricOrders];"PrtFabPO")
+If (Records in selection([FabricOrders])=1) | (Records in selection([FabricOrders])>50)
+	Print_Record (->[FabricOrders])
+Else 
+	WinChoice ("Print single order or selection?";"Single";"Selection";"Cancel")
+	If (ok=1)
+		If (bChoice2=1)
+			Print_Selection (->[FabricOrders])
+		Else 
+			Print_Record (->[FabricOrders])
+		End if 
+	End if 
+End if 
+
+FORM SET OUTPUT([FabricOrders];"FabricOrderList")

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+If (SG_Mandatories )
+	Spec_Close 
+	$choice:=Pop up menu("Sample Number;Style Number;Design Number;Close Menu")
+	If ($choice<4)
+		Orders_Refind ($choice;-1)
+	End if 
+End if 

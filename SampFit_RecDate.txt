@@ -1,0 +1,163 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_DATE(vdSubmitDate;vdLastSample)
+
+vsSampRec:=""
+[Orders]SampleStatus:=""
+
+QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+
+If (Records in selection([SpecFactory])=0) & ([Orders]ApprovalDate#!00-00-00!)
+	[Orders]ApprovalDate:=!00-00-00!
+End if 
+
+If (Records in selection([SpecFactory])>0)
+	ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+	If ([SpecFactory]ApprovedForProd)
+		[Orders]ApprovalDate:=[SpecFactory]ApproveDate
+		$0:=True
+	Else 
+		$0:=False
+		[Orders]ApprovalDate:=!00-00-00!
+	End if 
+	
+	Case of 
+		: ([SpecFactory]Colhead="To Customer")
+			[Orders]SampleStatus:="At Customer "+String([SpecFactory]Submit)
+		: ([SpecFactory]Submit=!00-00-00!) & ([SpecFactory]Received#!00-00-00!)
+			[Orders]SampleStatus:=[SpecFactory]Colhead+" (R: "+String([SpecFactory]Received)+")"
+		: ([SpecFactory]Submit#!00-00-00!) & ([SpecFactory]Received#!00-00-00!)
+			[Orders]SampleStatus:=[SpecFactory]Colhead+" (R: "+String([SpecFactory]Received)+")"
+		: ([SpecFactory]Submit#!00-00-00!) & ([SpecFactory]Received=!00-00-00!)
+			[Orders]SampleStatus:=[SpecFactory]Colhead+" (W: "+String([SpecFactory]Submit)+")"
+			If (Records in selection([SpecLineSample])>0) & ([SpecLineSample]Received#!00-00-00!)
+				[Orders]SampleStatus:=[Orders]SampleStatus+Char(13)+[SpecLineSample]ColumnHeader+" (R: "+String([SpecLineSample]Received)+")"
+			End if 
+		: ([SpecFactory]Submit=!00-00-00!) & ([SpecFactory]Received=!00-00-00!)
+			If (Records in selection([SpecLineSample])>0)
+				Case of 
+					: ([SpecLineSample]Received#!00-00-00!)
+						[Orders]SampleStatus:=[SpecLineSample]ColumnHeader+" (R: "+String([SpecLineSample]Received)+")"
+					: ([SpecLineSample]SubmitDue#!00-00-00!)
+						[Orders]SampleStatus:=[SpecLineSample]ColumnHeader+" (W: "+String([SpecLineSample]SubmitDue)+")"
+					Else 
+						[Orders]SampleStatus:=[SpecFactory]Colhead+" (?)"
+				End case 
+			Else 
+				[Orders]SampleStatus:=""
+			End if 
+	End case 
+	vdSubmitDate:=[SpecFactory]Submit
+	vdLastSample:=[SpecLineSample]Received
+	OBJECT SET VISIBLE([SpecFactory]Note;True)
+	OBJECT SET VISIBLE([Specs]Comments;False)
+	OBJECT SET VISIBLE([SpecFactory]PatternReady;True)
+	OBJECT SET VISIBLE([Specs]PattrnReadyDate;False)
+	
+Else 
+	QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+	OBJECT SET VISIBLE([SpecFactory]Note;False)
+	OBJECT SET VISIBLE([Specs]Comments;True)
+	OBJECT SET VISIBLE([SpecFactory]PatternReady;False)
+	OBJECT SET VISIBLE([Specs]PattrnReadyDate;True)
+	If (Records in selection([Specs])>0)
+		If (Is new record([Orders]))
+			[Orders]SampleStatus:=""
+		Else 
+			Case of 
+					  //WAITING
+				: ([Specs]Spl Typ 6 Rec D#!00-00-00!) & ([Specs]Spl Type 6#"")
+					[Orders]SampleStatus:="(R)"+[Specs]Spl Type 6
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 6 Rec D
+				: ([Specs]Spl Typ 6 REQ D#!00-00-00!) & ([Specs]Spl Type 6#"")
+					[Orders]SampleStatus:="(W) "+[Specs]Spl Type 6
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 6 REQ D
+				: ([Specs]Spl Typ 5 Rec D#!00-00-00!) & ([Specs]Spl Type 5#"")
+					[Orders]SampleStatus:="(R) "+[Specs]Spl Type 5
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 5 Rec D
+				: ([Specs]Spl Typ 5 REQ D#!00-00-00!) & ([Specs]Spl Type 5#"")
+					[Orders]SampleStatus:="(W) "+[Specs]Spl Type 5
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 5 REQ D
+				: ([Specs]Spl Typ 4 Rec D#!00-00-00!) & ([Specs]Spl Type 4#"")
+					[Orders]SampleStatus:="(R) "+[Specs]Spl Type 4
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 4 Rec D
+				: ([Specs]Spl Typ 4 REQ D#!00-00-00!) & ([Specs]Spl Type 4#"")
+					[Orders]SampleStatus:="(W) "+[Specs]Spl Type 4
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 4 REQ D
+				: ([Specs]Spl Typ 3 Rec D#!00-00-00!) & ([Specs]Spl Type 3#"")
+					[Orders]SampleStatus:="(R) "+[Specs]Spl Type 3
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 3 Rec D
+				: ([Specs]Spl Typ 3 REQ D#!00-00-00!) & ([Specs]Spl Type 3#"")
+					[Orders]SampleStatus:="(W) "+[Specs]Spl Type 3
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 3 REQ D
+				: ([Specs]Spl Typ 2 Rec D#!00-00-00!) & ([Specs]Spl Type 2#"")
+					[Orders]SampleStatus:="(R) "+[Specs]Spl Type 2
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 2 Rec D
+				: ([Specs]Spl Typ 2 REQ D#!00-00-00!) & ([Specs]Spl Type 2#"")
+					[Orders]SampleStatus:="(W) "+[Specs]Spl Type 2
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 2 REQ D
+				: ([Specs]Spl Typ 1 Rec D#!00-00-00!) & ([Specs]Spl Type 1#"")
+					[Orders]SampleStatus:="(R) "+[Specs]Spl Type 1
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 1 Rec D
+				: ([Specs]Spl Typ 1 REQ D#!00-00-00!) & ([Specs]Spl Type 1#"")
+					[Orders]SampleStatus:="(W) "+[Specs]Spl Type 1
+					[Orders]SampleStatusDate:=[Specs]Spl Typ 1 REQ D
+				Else 
+					[Orders]SampleStatus:=""
+					[Orders]SampleStatusDate:=!00-00-00!
+			End case 
+			[Orders]SampleStatus:=[Orders]SampleStatus+Char(13)+"OLD STYLE SPECSHEET"
+			If ([Specs]AppvdForProd)
+				[Orders]ApprovalDate:=[Specs]ProdAppvdDate
+				$0:=True
+			Else 
+				$0:=False
+				[Orders]ApprovalDate:=!00-00-00!
+			End if 
+			Case of   //populates Please submit variable
+				: ([Specs]Spl Typ 6 REQ D#!00-00-00!)
+					vdSubmitDate:=[Specs]Spl Typ 6 REQ D
+				: ([Specs]Spl Typ 5 REQ D#!00-00-00!)
+					vdSubmitDate:=[Specs]Spl Typ 5 REQ D
+				: ([Specs]Spl Typ 4 REQ D#!00-00-00!)
+					vdSubmitDate:=[Specs]Spl Typ 4 REQ D
+				: ([Specs]Spl Typ 3 REQ D#!00-00-00!)
+					vdSubmitDate:=[Specs]Spl Typ 3 REQ D
+				: ([Specs]Spl Typ 2 REQ D#!00-00-00!)
+					vdSubmitDate:=[Specs]Spl Typ 2 REQ D
+				: ([Specs]Spl Typ 1 REQ D#!00-00-00!)
+					vdSubmitDate:=[Specs]Spl Typ 1 REQ D
+				Else 
+					OBJECT SET VISIBLE(vdSubmitDate;False)
+			End case 
+			
+			Case of   //populates last sample date variable
+				: ([Specs]Spl Typ 6 Rec D#!00-00-00!)
+					vdLastSample:=[Specs]Spl Typ 6 Rec D
+				: ([Specs]Spl Typ 5 Rec D#!00-00-00!)
+					vdLastSample:=[Specs]Spl Typ 5 Rec D
+				: ([Specs]Spl Typ 4 Rec D#!00-00-00!)
+					vdLastSample:=[Specs]Spl Typ 4 Rec D
+				: ([Specs]Spl Typ 3 Rec D#!00-00-00!)
+					vdLastSample:=[Specs]Spl Typ 3 Rec D
+				: ([Specs]Spl Typ 2 Rec D#!00-00-00!)
+					vdLastSample:=[Specs]Spl Typ 2 Rec D
+				: ([Specs]Spl Typ 1 Rec D#!00-00-00!)
+					vdLastSample:=[Specs]Spl Typ 1 Rec D
+				Else 
+					vdLastSample:=!00-00-00!
+					OBJECT SET VISIBLE(vdLastSample;False)
+			End case 
+		End if 
+		[Orders]SampleNextDate:=vdLastSample
+	End if 
+End if 
+
+  //clean up
+[Orders]SampleStatus:=Replace string([Orders]SampleStatus;"   ";" ")
+UNLOAD RECORD([SpecFactory])
+UNLOAD RECORD([SpecLineCols])
+UNLOAD RECORD([SpecLineSample])
+
+vsSampRec:=[Orders]SampleStatus

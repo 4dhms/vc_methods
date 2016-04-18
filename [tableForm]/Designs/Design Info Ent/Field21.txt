@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($poe;0)
+
+If (Form event=On Data Change)
+	
+	LIST TO ARRAY("Point of Entry";$poe)
+	
+	If (Find in array($poe;[Designs]PofE)<1)
+		WinPrompt ([Designs]PofE+" is not on the Point of Entry list.")
+		[Designs]PofE:=""
+		GOTO OBJECT([Designs]PofE)
+	End if 
+End if 

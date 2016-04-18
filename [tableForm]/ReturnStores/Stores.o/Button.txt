@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([ReturnStores];"Stores.i")
+CREATE SET([ReturnStores];"RS")
+ADD RECORD([ReturnStores];*)
+ADD TO SET([ReturnStores];"RS")
+USE SET("RS")
+CLEAR SET("RS")
+ORDER BY([ReturnStores];[ReturnStores]StoreName;>)

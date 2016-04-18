@@ -1,0 +1,193 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;$c;$i;$n;$s)
+C_TEXT($lastCombo)
+C_REAL(vrUsage)
+
+If (vfNewFabric)
+	asSorP{1}:="Select type"
+	asSorP:=1
+	Case of 
+		: (Find in array(asOrderType;"Zipper")>0)
+			$c:=Count in array(asOrderType;"Combo@")+1
+			vsCPType:="Combo "+String($c)
+			OBJECT SET VISIBLE(bPart;True)
+			OBJECT SET VISIBLE(*;"xArrowhead";True)
+			OBJECT SET VISIBLE(vsPart;True)
+		: (Find in array(asOrderType;"Self")>0)
+			vsCPType:="Combo "+String(Count in array(asOrderType;"Combo@")+1)
+			OBJECT SET VISIBLE(bPart;True)
+			OBJECT SET VISIBLE(*;"xArrowhead";True)
+			OBJECT SET VISIBLE(vsPart;True)
+		Else 
+			vsCPType:="Self"
+			OBJECT SET VISIBLE(bPart;False)
+			OBJECT SET VISIBLE(*;"xArrowhead";False)
+			OBJECT SET VISIBLE(vsPart;False)
+	End case 
+	vtFabric:=""
+	vsFiber:=""
+	vsTreatment:=""
+	vsArt:=""
+	vtSupplier:=""
+	vsPart:=""
+	vtGauge:=""
+	vtYarnSize:=""
+Else 
+	vsCPType:=asOrderType{asOrderType}
+	If (Find in array(asSorP;asSolidPrint{asOrderType})>0)
+		asSorP:=Find in array(asSorP;asSolidPrint{asOrderType})
+	Else 
+		asSorP:=1
+	End if 
+	
+	$line:=asOrderType
+	vtFabric:=asFabric{$line}
+	vsFiber:=asFiber{$line}
+	vsTreatment:=asTreatment{$line}
+	vsArt:=atArtNumber{$line}
+	vtSupplier:=asFabSpler{$line}
+	vsPart:=asGarPart{$line}
+	vrUsage:=arUsage{$line}
+	vrActual:=arActual{$line}
+	vtGauge:=asGauge{$line}
+	vtYarnSize:=asYarnSize{$line}
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=<>vlOrderNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=asOrderType{$line})
+	QUERY([FabricOrders];[FabricOrders]FabOrderKey=[CP_OrderXRef]FabOrderKey)
+	vtFabPO:=[FabricOrders]PONumber
+	UNLOAD RECORD([FabricOrders])
+End if 
+
+Center Window (350;185;1;"")
+DIALOG([Dialogs];"CP_FabricDialog")
+CLOSE WINDOW
+
+
+If (ok=1)
+	If (vfNewFabric)
+		If (Find in array(asOrderType;"Zipper")>0)
+			$c:=Find in array(asOrderType;"Zipper")
+		Else 
+			$c:=LISTBOX Get number of rows(fabricList)+1
+		End if 
+		$line:=$c
+		INSERT IN ARRAY(asOrderType;$c;1)
+		INSERT IN ARRAY(asSolidPrint;$c;1)
+		INSERT IN ARRAY(asFabric;$c;1)
+		INSERT IN ARRAY(asFiber;$c;1)
+		INSERT IN ARRAY(asTreatment;$c;1)
+		INSERT IN ARRAY(atArtNumber;$c;1)
+		INSERT IN ARRAY(asFabSpler;$c;1)
+		INSERT IN ARRAY(asGarPart;$c;1)
+		INSERT IN ARRAY(arUsage;$c;1)
+		INSERT IN ARRAY(arActual;$c;1)
+		INSERT IN ARRAY(alFabricSelf;$c;1)
+		INSERT IN ARRAY(alFabricColor;$c;1)
+		INSERT IN ARRAY(alXrefKeys;$c;1)
+		INSERT IN ARRAY(axCompound;$c;1)
+		INSERT IN ARRAY(alFabricChange;$c;1)
+		INSERT IN ARRAY(alColorChange;$c;1)
+		INSERT IN ARRAY(asGauge;$c;1)
+		INSERT IN ARRAY(asYarnSize;$c;1)
+		
+		alFabricColor{$c}:=16777215
+		
+		
+		If (vsCPType="Self") & (Size of array(asTypeList)=0)
+			  //CP_AddArrayLine (1)
+			  //asTypeList{1}:="Self"
+			  //alSelfColor{1}:=1
+		Else 
+			$i:=1
+			If (vsCPtype="Zipper")
+				$s:=Count in array(asOrderType;"Combo@")+1
+			Else 
+				$s:=Num(vsCPtype)
+			End if 
+			$c:=0
+			
+			If (Size of array(asTypeList)>0)
+				For ($i;1;Size of array(asTypeList))
+					If (asTypeList{$i}="Self")
+						$c:=$c+1
+					End if 
+				End for 
+				
+				Case of 
+					: (vsCPtype="Zipper") & (Find in array(asOrderType;"Combo@")>0)
+						$lastcombo:="Combo "+String(Count in array(asOrderType;"Combo@"))
+					: (vsCPtype="Zipper")
+						$lastcombo:="Self"
+					: ($s<2)
+						$lastcombo:="Self"
+					Else 
+						$lastcombo:="Combo "+String(Num(vsCPtype)-1)
+				End case 
+				
+				$c:=($s+1)*$c
+				
+				$n:=1
+				
+				Repeat 
+					If (asTypeList{$n}=$lastcombo)
+						$n:=$n+1
+						CP_AddArrayLine ($n)
+						asTypeList{$n}:=vsCPType
+						alStyleFab{$n}:=2
+						alSelfKey{$n}:=alSelfKey{$n-1}
+					End if 
+					$n:=$n+1
+				Until ($n>$c)
+			End if 
+		End if 
+	End if 
+	
+	asOrderType{$line}:=vsCPType
+	If (vsCPType="Zipper")
+		asSolidPrint{$line}:="Zipper"
+	Else 
+		asSolidPrint{$line}:=asSorP{asSorP}
+	End if 
+	asFabric{$line}:=vtFabric
+	asFiber{$line}:=vsFiber
+	asTreatment{$line}:=vsTreatment
+	atArtNumber{$line}:=vsArt
+	asFabSpler{$line}:=vtSupplier
+	asGarPart{$line}:=vsPart
+	arUsage{$line}:=vrUsage
+	If (<>vlOrderNumber>0)
+		arActual{$line}:=vrActual
+	End if 
+	asGauge{$line}:=vtGauge
+	asYarnSize{$line}:=vtYarnSize
+	
+	$i:=1
+	For ($i;1;Size of array(asOrderType))
+		If (asOrderType{$i}=vsCPType)
+			alFabricColor{$i}:=14149350
+		Else 
+			alFabricColor{$i}:=16777215
+		End if 
+	End for 
+	
+	
+	$i:=1
+	
+	For ($i;1;Size of array(asTypeList))
+		If (asTypeList{$i}=vsCPType)
+			alShadeFab{$i}:=14149350
+		Else 
+			alShadeFab{$i}:=16777215
+		End if 
+		  //Case of 
+		  //: (asTypeList{$i}=asOrderType{Size of array(asOrderType)})
+		  //alShadeFab{$i}:=14149350
+		  //Else 
+		  //alShadeFab{$i}:=16777215
+		  //End case 
+	End for 
+End if 
+vtOrderChanges:=vtOrderChanges+"_Fabric_Color"
+vfNewFabric:=False
+

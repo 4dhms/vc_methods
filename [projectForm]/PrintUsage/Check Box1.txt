@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($param)
+C_TEXT($strip)
+
+Case of 
+	: (vtTitle="@12@")
+		$param:=12
+	Else 
+		$strip:=Substring(vtTitle;Position("-";vtTitle)-1;1)
+		$param:=Num($strip)
+End case 
+
+PrintUsage_BreakoutPrint ($param)

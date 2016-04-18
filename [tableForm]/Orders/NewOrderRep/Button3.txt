@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in selection([Orders])<1)
+	Report_BuildNewOrd 
+End if 
+vlCount:=0
+vfReset:=False
+
+Case of 
+	: (<>vlNewOrdSum>0)  //Spenser's digest report
+		QUERY SELECTION([Orders];[Orders]Cancelled=False)
+		ORDER BY([Orders];[Orders]OrderDivision;>;[Orders]OrderNum;>)
+		BREAK LEVEL(1)
+		ACCUMULATE([Orders]OrderDivision;[Orders]TotalOrderQuantity;[Orders]TotalSales)
+		FORM SET OUTPUT([Orders];"NewOrderSummary.p")
+	Else 
+		If (<>vfFactory)
+			ORDER BY([Orders];[Orders]Factory;>;[Orders]PODate;>;[Orders]OrderNum;>)
+			BREAK LEVEL(1)
+			ACCUMULATE([Orders]Factory;[Orders]TotalOrderQuantity)
+		Else 
+			ORDER BY([Orders];[Orders]PODate;>;[Orders]OrderNum;>)
+			BREAK LEVEL(1)
+			ACCUMULATE([Orders]PODate;[Orders]TotalOrderQuantity)
+		End if 
+		FORM SET OUTPUT([Orders];"NewOrdRep.p")
+End case 
+
+PAGE SETUP([Orders];"NewOrdRep.p")
+Print_Selection (->[Orders])
+
+

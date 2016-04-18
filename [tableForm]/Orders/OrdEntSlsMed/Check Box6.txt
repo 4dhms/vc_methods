@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbOther=1)
+	cbLA:=0
+	cbNY:=0
+	OBJECT SET VISIBLE([Orders]OtherShip;True)
+	OBJECT SET ENTERABLE([Orders]OtherShip;True)
+	Order_AirSeaBuild 
+	GOTO OBJECT([Orders]OtherShip)
+End if 
+

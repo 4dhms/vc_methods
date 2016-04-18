@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfNewFOSys)
+
+Case of 
+	: (Form event=On Load)
+		vsQOrderNumber:=""
+		vtQArticle:=""
+		vtQFactory:=""
+		vtQPrint:=""
+		
+		Tabber_Setup 
+		OBJECT SET VISIBLE(*;"xBeta";vfNewFOSys)
+		
+		If (vfNewFOSys)
+			vsSubhead:=Uppercase("Fabric Orders")
+			OBJECT SET VISIBLE(<>asVendorTypes;False)
+		Else 
+			vsSubhead:=Uppercase(<>asVendorTypes{<>asVendorTypes}+" Orders")
+			OBJECT SET VISIBLE(<>asVendorTypes;True)
+		End if 
+		
+		ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)
+	: (Form event=On Display Detail)
+		Case of 
+			: ([FabricOrders]Void=True)
+				vsFlag:="VOID"
+			: ([FabricOrders]NewSys=True)
+				vsFlag:="N"
+			Else 
+				vsFlag:=""
+		End case 
+End case 

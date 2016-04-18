@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($line)
+C_LONGINT($i)
+ARRAY DATE($rev;0)
+
+$i:=1
+For ($i;1;15)
+	$line:=Field(10;$i+117)
+	APPEND TO ARRAY($rev;$line->)
+End for 
+
+SORT ARRAY($rev;<)
+[SampleFabrics]LastRevise:=$rev{1}

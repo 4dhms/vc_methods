@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+WinChoice ("Are you sure you want to delete "+[SpecFactory]Colhead+"?";"No";"Yes")
+If (ok=0)
+	WinChoice ("Really sure?";"Honest";"Stop")
+	If (ok=1)
+		[SpecFactory]History:=[SpecFactory]Colhead+" deleted by "+Current user+" on "+String(Current date(*))+" "+String(Current time(*))+Char(13)+Char(13)+[SpecFactory]History
+		
+		[SpecFactory]Colhead:=[SpecLineSample]ColumnHeader
+		[SpecFactory]Submit:=[SpecLineSample]SubmitDue
+		[SpecFactory]Received:=[SpecLineSample]Received
+		[SpecFactory]PatternSource:=[SpecLineSample]PatternSource
+		SAVE RECORD([SpecFactory])
+		
+		$i:=1
+		FIRST RECORD([SpecSheetLines])
+		For ($i;1;Records in selection([SpecSheetLines]))
+			[SpecSheetLines]Spec1A:=[SpecSheetLines]Spec2A
+			[SpecSheetLines]Spec1C:=[SpecSheetLines]Spec2C
+			[SpecSheetLines]Spec2A:=[SpecSheetLines]Spec3A
+			[SpecSheetLines]Spec2C:=[SpecSheetLines]Spec3C
+			[SpecSheetLines]Spec3A:=""
+			[SpecSheetLines]Spec3C:=""
+			SAVE RECORD([SpecSheetLines])
+			NEXT RECORD([SpecSheetLines])
+		End for 
+		
+		
+		DELETE RECORD([SpecLineSample])
+		DELETE FROM ARRAY(asRowHeaders;Size of array(asRowHeaders);1)
+		
+		SS_SimpleSheetFM 
+		SS_PullPrevious 
+	End if 
+End if 

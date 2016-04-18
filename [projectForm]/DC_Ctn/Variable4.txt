@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$line)
+C_POINTER($color)
+
+
+If (Form event=On Data Change)
+	$line:=alBDPack
+	$c:=alBDPack{alBDPack}
+	vsPart1:=""
+	If (vlDCcount>0)
+		vlRunningTotal:=alBDPack{alBDPack}*vlDCcount
+		vlTotQty:=vlRunningTotal*vlCtnCount
+		
+		$i:=1
+		For ($i;1;10)
+			$color:=Get pointer("alBD"+String($i))
+			If ($color->{$line}>0)
+				If ($i>1)
+					vsPart1:=vsPart1+"-"
+				End if 
+				vsPart1:=vsPart1+String($color->{alBDPack})
+			End if 
+		End for 
+	End if 
+End if 

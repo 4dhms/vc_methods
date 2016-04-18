@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		C_DATE(vdWhenDate)
+		C_REAL(vrLDP1a;vrLDP2a)
+		vrUnit1:=0
+		vrUnit2:=0
+		vrUnit3:=0
+		vrUnit4:=0
+		vsEntryNumber:=""
+		
+		ARRAY LONGINT(alPOOrder;0)
+		ARRAY TEXT(asXStyle;0)
+		ARRAY TEXT(asEnterer;0)
+		ARRAY DATE(adXShip;0)
+		ARRAY REAL(arCostLineCost;0)
+		
+		ARRAY TEXT(asSheetNames;0)
+		ARRAY REAL(arPrice;0)
+		ARRAY LONGINT(alCostLineKey;0)
+		
+		ARRAY BOOLEAN(afBatchList;0)
+		ARRAY REAL(arFOB;0)
+		ARRAY REAL(alXQty;0)
+		ARRAY REAL(arMCol1;0)
+		ARRAY REAL(arMCol2;0)
+		ARRAY REAL(arMCol3;0)
+		ARRAY REAL(arMCol4;0)
+		ARRAY LONGINT(alTrackShipped;0)
+		ARRAY BOOLEAN(afTrackShip;0)
+		ARRAY TEXT(atMNote;0)
+		
+		CREATE EMPTY SET([Orders];"orders")
+		CREATE EMPTY SET([Costing];"costing")
+		CREATE EMPTY SET([CostSheets];"costsheets")
+	: (Form event=On Unload)
+		CLEAR SET("orders")
+		CLEAR SET("costing")
+		CLEAR SET("costsheets")
+End case 
+

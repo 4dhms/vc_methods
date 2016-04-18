@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbOther=1)
+	cbOther:=0
+Else 
+	cbOther:=1
+	GOTO OBJECT(vtDCdept)
+End if 

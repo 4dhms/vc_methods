@@ -1,0 +1,72 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+Case of 
+	: (Form event=On Load)
+		SG_PopDivision 
+		
+	: (Form event=On Header)
+		If (vsPrintingFooter#"More")
+			Order_PrintLoadHeader (False)
+		End if 
+		
+		  //SET VISIBLE(*;"xAddress";vOrd="")
+		OBJECT SET VISIBLE(*;"xHeader1";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeader2";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeader3";vOrd#"")
+		OBJECT SET VISIBLE(*;"xPO1";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeadLine";vOrd#"")
+		
+		If (Printing page>vlLastPage)
+			vlLastPage:=Printing page
+			vlPage:=vlPage+1
+		End if 
+		
+		If (vlPage=1) | (vlPage=0)
+			vsPrintingHeader:=""
+		Else 
+			vsPrintingHeader:="PAGE "+String(vlPage)
+		End if 
+		vDesc:=""
+		
+	: (Form event=On Printing Detail)
+		vxSketch:=[Designs]Sketch
+		<>vlOrderNumber:=-1*[Samples]SampleNumber
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		vxSketch:=[Designs]Sketch
+		Revise_Array 
+		Revise_SG_FlagFields (Not([Samples]Revised))
+		OBJECT SET VISIBLE(*;"xStyle";[Samples]MultipleStyles)
+		OBJECT SET VISIBLE([Samples]Retired;[Samples]SeasonName="")
+		OBJECT SET VISIBLE([Samples]SeasonName;[Samples]SeasonName#"")
+		OBJECT SET VISIBLE([Samples]SeasonYear;[Samples]SeasonName#"")
+		
+		Case of 
+			: ([Samples]KWCnS="Woven")
+				vsKWCS:="Woven"
+			: ([Samples]KWCnS="Knit")
+				vsKWCS:="Knit"
+			: ([Samples]KWCnS="CutSew")
+				vsKWCS:="Cut and Sew"
+			Else 
+				vsKWCS:=""
+		End case 
+		
+		
+		Case of 
+			: ([Samples]Void)
+				vsPOFlag:="CANCELLED"
+			: ([Samples]NoOrder)
+				vsPOFlag:="This is NOT an order"
+			: ([Samples]RevisionNumber>0)
+				vsPOFlag:="Revision "+String([Samples]RevisionNumber)
+			Else 
+				vsPOFlag:=""
+		End case 
+		<>vlSGPO:=<>vlOrderNumber
+		QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+		OBJECT SET VISIBLE(*;"xCat";[Costing]QHTS1#"")
+		OBJECT SET VISIBLE(*;"xHTS";[Costing]QHTS1#"")
+End case 
+

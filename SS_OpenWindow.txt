@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+If (Records in selection([SpecFactory])>0)
+	cbRemove:=1
+	vfNewFactory:=False
+	<>vlOrderNumber:=[SpecFactory]OrderNumber
+	FIRST RECORD([SpecFactory])
+	SS_Build 
+	
+	FORM SET INPUT([SpecFactory];"SimpleSheet.i")
+	Center Window (940;680;4;"";"WincBox")
+	MODIFY RECORD([SpecFactory];*)
+	CLOSE WINDOW
+End if 

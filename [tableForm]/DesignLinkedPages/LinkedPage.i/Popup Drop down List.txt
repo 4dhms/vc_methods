@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($target)
+
+If (asMove>1)
+	$target:=Num(asMove{asMove})
+	Case of 
+		: (asMove=2)
+			[DesignLinkedPages]PageNumber:=0
+		: (asMove=Size of array(asMove)) & (asMove{asMove}="After@")
+			[DesignLinkedPages]PageNumber:=asMove+1
+		Else 
+			[DesignLinkedPages]PageNumber:=$target-0.5
+	End case 
+	SAVE RECORD([DesignLinkedPages])
+	DLink_Reorder 
+	asMove:=1
+	ACCEPT
+End if 

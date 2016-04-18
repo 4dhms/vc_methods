@@ -1,0 +1,95 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfFunctionChange;<>vfGuideFlag)
+C_LONGINT(<>vlPreview)
+
+Case of 
+	: (Form event=On Page Change)
+		If (FORM Get current page=14)
+			atPages:=1
+		End if 
+		
+	: (Form event=On Data Change)
+		Order_RequiredFlag 
+		
+	: (Form event=On Unload)
+		SET MENU BAR(2)
+		vfNewCostSheet:=False
+		UNLOAD RECORD([Costing])
+		UNLOAD RECORD([CostSheets])
+		UNLOAD RECORD([SpecFactory])
+		If (Records in set("fabrics")>0)
+			CLEAR SET("fabrics")
+		End if 
+		If (Records in set("ThisSheet")>0)
+			CLEAR SET("ThisSheet")
+		End if 
+		CALL PROCESS(<>vlCustomerInfo)
+		Spec_Close 
+		
+	: (Form event=On Load)
+		OBJECT SET ENABLED(bComp;False)
+		
+		OBJECT SET VISIBLE(asPOV;<>vlPreview<1)
+		ARRAY TEXT(asCustomerBuild;0)
+		LIST TO ARRAY("Customers";asCustomerBuild)
+		
+		OBJECT SET VISIBLE(bBuild;User in group(Current user;"Customers"))
+		OBJECT SET VISIBLE(*;"xVoid";[Orders]Cancelled)
+		
+		GET WINDOW RECT(vlLeft;vlTop;vlRight;vlBottom)
+		
+		  //SET TIMER(15)
+		SET MENU BAR(19)
+		If (Not(User in group(Current user;"DesignAccess")))
+			LISTBOX DELETE COLUMN(fabriclist;13)
+			LISTBOX DELETE COLUMN(colorlist;11;3)
+		End if 
+		vtFactoryHZ:="HZ"
+		vtFactorySZ:="SZ"
+		
+		Orders_FM_EnterOnLoad 
+		
+		
+	: (Form event=On Validate)
+		<>Enter:=False
+	: (Form event=On Outside Call)
+		Case of 
+				  //: (<>vfUnload)
+				  //<>vfUnload:=False
+				  //Order_ForceUnload 
+			: (<>vlCostRouter=-61)
+				<>vlCostRouter:=0
+				[Orders]MasterSpec:=True
+				SAVE RECORD([Orders])
+			: (<>vlCostRouter=-62)
+				<>vlCostRouter:=0
+				[Orders]MasterSpec:=False
+				SAVE RECORD([Orders])
+				
+			: (<>vlCostRouter=-71)
+				<>vlCostRouter:=0
+				[Orders]ReorderPP:=True
+				SAVE RECORD([Orders])
+			: (<>vlCostRouter=-72)
+				<>vlCostRouter:=0
+				[Orders]ReorderPP:=False
+				SAVE RECORD([Orders])
+				
+			: (<>vlCostRouter=10)
+				SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+				ACCEPT
+			: (<>vlCostRouter=-10)
+				<>vlCostRouter:=0
+				Orders_FM_EnterOnLoad 
+			: (<>vlCostRouter=-169)
+				OBJECT SET COLOR(asCC;-(15+(256*0)))
+				<>vlCostRouter:=0
+		End case 
+		
+	: (Form event=On Activate)
+		SampFit_RecDate 
+		  //If (FORM Get current page=3) & (Not(User in group(Current user;"PO")))
+		  //FORM GOTO PAGE(1)
+		  //End if 
+End case 
+

@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlStockReport)
+  //
+Case of 
+	: (<>vlStockReport>0)
+		SHOW PROCESS(<>vlStockReport)
+		BRING TO FRONT(<>vlStockReport)
+	: (<>vlStockReport=0)
+		<>vlStockReport:=New process("p_StockReport";0;"Stock Report")
+	Else 
+		SHOW PROCESS(<>vlStockReport)
+		BRING TO FRONT(<>vlStockReport)
+End case 

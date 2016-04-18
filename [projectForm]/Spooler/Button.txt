@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>done)
+	OBJECT SET TITLE(bGo;"Stop")
+	<>done:=False
+	<>vtMessage:="Spooler running"
+	vlCounter:=11
+Else 
+	OBJECT SET TITLE(bGo;"Start")
+	<>done:=True
+	<>vtMessage:="Standing by"
+	vsMeasure:=""
+End if 

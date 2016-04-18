@@ -1,0 +1,95 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($all;0)
+ARRAY TEXT($prints;0)
+ARRAY TEXT($allnotes;0)
+ARRAY PICTURE($allsketch;0)
+ARRAY TEXT($notes;0)
+ARRAY PICTURE($sketch;0)
+C_PICTURE($empty)
+C_LONGINT($i)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+APPEND TO ARRAY($all;[PCPage]Print1)
+APPEND TO ARRAY($all;[PCPage]Print2)
+APPEND TO ARRAY($all;[PCPage]Print3)
+APPEND TO ARRAY($all;[PCPage]Print4)
+APPEND TO ARRAY($all;[PCPage]Print5)
+APPEND TO ARRAY($all;[PCPage]Print6)
+APPEND TO ARRAY($all;[PCPage]Print7)
+APPEND TO ARRAY($all;[PCPage]Print8)
+APPEND TO ARRAY($all;[PCPage]Print9)
+APPEND TO ARRAY($all;[PCPage]Print10)
+
+APPEND TO ARRAY($allnotes;[PCPage]Note1)
+APPEND TO ARRAY($allnotes;[PCPage]Note2)
+APPEND TO ARRAY($allnotes;[PCPage]Note3)
+APPEND TO ARRAY($allnotes;[PCPage]Note4)
+APPEND TO ARRAY($allnotes;[PCPage]Note5)
+APPEND TO ARRAY($allnotes;[PCPage]Note6)
+APPEND TO ARRAY($allnotes;[PCPage]Note7)
+APPEND TO ARRAY($allnotes;[PCPage]Note8)
+APPEND TO ARRAY($allnotes;[PCPage]Note9)
+APPEND TO ARRAY($allnotes;[PCPage]Note10)
+
+APPEND TO ARRAY($allsketch;vxSketch1)
+APPEND TO ARRAY($allsketch;vxSketch2)
+APPEND TO ARRAY($allsketch;vxSketch3)
+APPEND TO ARRAY($allsketch;vxSketch4)
+APPEND TO ARRAY($allsketch;vxSketch5)
+APPEND TO ARRAY($allsketch;vxSketch6)
+APPEND TO ARRAY($allsketch;vxSketch7)
+APPEND TO ARRAY($allsketch;vxSketch8)
+APPEND TO ARRAY($allsketch;vxSketch9)
+APPEND TO ARRAY($allsketch;vxSketch10)
+
+
+$i:=1
+For ($i;1;10)
+	If ($all{$i}#"")
+		APPEND TO ARRAY($prints;$all{$i})
+		APPEND TO ARRAY($notes;$allnotes{$i})
+		APPEND TO ARRAY($sketch;$allsketch{$i})
+	End if 
+End for 
+
+$i:=1
+For ($i;1;10)
+	If ($i>Size of array($prints))
+		APPEND TO ARRAY($prints;"")
+		APPEND TO ARRAY($notes;"")
+		APPEND TO ARRAY($sketch;$empty)
+	End if 
+End for 
+
+[PCPage]Print1:=$prints{1}
+[PCPage]Print2:=$prints{2}
+[PCPage]Print3:=$prints{3}
+[PCPage]Print4:=$prints{4}
+[PCPage]Print5:=$prints{5}
+[PCPage]Print6:=$prints{6}
+[PCPage]Print7:=$prints{7}
+[PCPage]Print8:=$prints{8}
+[PCPage]Print9:=$prints{9}
+[PCPage]Print10:=$prints{10}
+
+vxSketch1:=$sketch{1}
+vxSketch2:=$sketch{2}
+vxSketch3:=$sketch{3}
+vxSketch4:=$sketch{4}
+vxSketch5:=$sketch{5}
+vxSketch6:=$sketch{6}
+vxSketch7:=$sketch{7}
+vxSketch8:=$sketch{8}
+vxSketch9:=$sketch{9}
+vxSketch10:=$sketch{10}
+
+[PCPage]Note1:=$notes{1}
+[PCPage]Note2:=$notes{2}
+[PCPage]Note3:=$notes{3}
+[PCPage]Note4:=$notes{4}
+[PCPage]Note5:=$notes{5}
+[PCPage]Note6:=$notes{6}
+[PCPage]Note7:=$notes{7}
+[PCPage]Note8:=$notes{8}
+[PCPage]Note9:=$notes{9}
+[PCPage]Note10:=$notes{10}

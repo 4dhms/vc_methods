@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+DELETE FROM ARRAY(asMOrders;$1;1)
+DELETE FROM ARRAY(asSelf;$1;1)
+DELETE FROM ARRAY(asNames;$1;1)
+DELETE FROM ARRAY(asCombo1;$1;1)
+DELETE FROM ARRAY(asName1;$1;1)
+DELETE FROM ARRAY(asCombo2;$1;1)
+DELETE FROM ARRAY(asName2;$1;1)
+DELETE FROM ARRAY(asCombo3;$1;1)
+DELETE FROM ARRAY(asName3;$1;1)
+DELETE FROM ARRAY(asCC;$1;1)
+DELETE FROM ARRAY(alFabricColor;$1;1)

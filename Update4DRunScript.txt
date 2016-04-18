@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($path)
+
+$docref:=Open document("")
+$path:=Document
+CLOSE DOCUMENT($docref)
+$path:=Substring($path;1;Length($path)-1)
+
+ALERT($path)
+
+LAUNCH EXTERNAL PROCESS("osascript "+$path)

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([WebArrays];[WebArrays]UserName=vsWebUser)
+  //vsWebSession:=String(Tickcount)
+If (Records in selection([WebArrays])=0)
+	CREATE RECORD([WebArrays])
+	[WebArrays]UserName:=vsWebUser
+End if 
+
+[WebArrays]SessionKey:=vsWebSession
+VARIABLE TO BLOB(alOrders;[WebArrays]Array)
+SAVE RECORD([WebArrays])
+UNLOAD RECORD([WebArrays])

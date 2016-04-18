@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($start;$end)
+C_TEXT($newText;$replaceText;$fullText)
+
+If (Count parameters>0)
+	GET HIGHLIGHT($2->;$start;$end)
+	
+	Case of 
+		: ($end=1)
+			$newText:=$1->+$2->
+		: ($end>1)
+			$newText:=Substring($2->;1;$start)
+			$newText:=$newText+$1->
+			If ($end<Length($2->))
+				$newText:=$newText+Substring($2->;$end+1;999)
+			End if 
+			
+		Else 
+			$newText:=$2->
+	End case 
+	
+	$2->:=$newText
+	HIGHLIGHT TEXT($2->;Length($newText);Length($newText)+1)
+	
+Else 
+	GET HIGHLIGHT(Focus object->;$start;$end)
+	
+	$fullText:=Focus object->
+	ALERT($fullText)
+	$replaceText:=Substring(Focus object->;$start;($end+1)-$start)
+	ALERT($replaceText)
+	Focus object->:=Replace string($fullText;$replaceText;<>vtCopyNotes)
+End if 

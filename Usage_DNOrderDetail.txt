@@ -1,0 +1,120 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($set)
+C_TEXT($key)
+C_LONGINT($qty;$tot)
+
+ARRAY TEXT(asCustomers;0)
+ARRAY TEXT(asSSDesignNumber;0)
+ARRAY TEXT(asSSDescript;0)
+  //ARRAY TEXT(asOrderNumbers;0)
+ARRAY LONGINT(alUnits;0)
+ARRAY LONGINT(alSSSamples;0)
+ARRAY LONGINT(alDNColor;0)
+ARRAY TEXT(atFootnote;0)
+  //ARRAY TEXT(asSeasonName;0)
+
+READ ONLY([Orders])
+If (cb11=1)
+	$set:=Substring(asChartDivisions{asChartDivisions};1;2)
+Else 
+	$set:=Substring(asDivisions{asDivisions};1;2)
+End if 
+If ($set="05")
+	$set:="03"
+End if 
+
+USE SET($set)
+ORDER BY([Designs];[Designs]DesignNum;>)
+
+<>vtMessage:="Building report"
+<>vlCounter:=0
+EMail_SendingProc 
+
+vlTotCount:=0
+
+USE SET($set)
+ORDER BY([Designs];[Designs]DesignNum;>)
+vlTotCount:=0
+
+$i:=1
+FIRST RECORD([Designs])
+For ($i;1;Records in selection([Designs]))
+	If ($i%5=0)
+		<>vlCounter:=($i/Records in selection([Designs])*100)
+		CALL PROCESS(<>SendingWin)
+	End if 
+	
+	$key:=""
+	QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum+"@")
+	QUERY SELECTION([Samples];[Samples]Sam Type="@sales sample@")
+	If (Records in selection([Samples])>0)
+		$key:="SS  "
+	End if 
+	
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum+"@")
+	$tot:=Records in selection([Orders])
+	
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	If (Records in selection([Orders])<$tot)
+		$key:="XX  "
+	End if 
+	
+	ARRAY TEXT($season;0)
+	DISTINCT VALUES([Orders]SeasonName;$season)
+	If (Size of array($season)>1)
+		$key:=$key+"MS  "
+	End if 
+	
+	ARRAY TEXT($division;0)
+	DISTINCT VALUES([Orders]OrderDivision;$division)
+	If (Size of array($division)>1)
+		$key:=$key+"MD  "
+	End if 
+	
+	ARRAY TEXT($customer;0)
+	DISTINCT VALUES([Orders]Customer;$customer)
+	If (Size of array($customer)>1)
+		$key:=$key+"MC  "
+	End if 
+	$key:="  "+$key
+	
+	If (Records in selection([Orders])=0)
+		QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum+"@")
+		FIRST RECORD([Orders])
+		APPEND TO ARRAY(asSSDesignNumber;[Designs]DesignNum)
+		APPEND TO ARRAY(asSSDescript;[Designs]Description)
+		APPEND TO ARRAY(asCustomers;"")
+		APPEND TO ARRAY(atFootnote;$key)
+		APPEND TO ARRAY(alUnits;0)
+		APPEND TO ARRAY(alDNColor;16711685)
+	Else 
+		ARRAY LONGINT($units;0)
+		SELECTION TO ARRAY([Orders]TotalOrderQuantity;$units)
+		$qty:=Util_Array_Sum (->$units)
+		
+		APPEND TO ARRAY(asSSDesignNumber;[Designs]DesignNum)
+		APPEND TO ARRAY(asSSDescript;[Designs]Description)
+		
+		ORDER BY([Orders];[Orders]TotalOrderQuantity;<)
+		FIRST RECORD([Orders])
+		APPEND TO ARRAY(asCustomers;[Orders]Customer)
+		APPEND TO ARRAY(atFootnote;$key)
+		APPEND TO ARRAY(alUnits;$qty)
+		APPEND TO ARRAY(alDNColor;16777215)
+	End if 
+	
+	NEXT RECORD([Designs])
+End for 
+vlTotCount:=Util_Array_Sum (->alUnits)
+
+<>CloseBox:=True
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+Center Window (600;660;1;"")
+DIALOG([Dialogs];"UsageOrderList")
+
+CLOSE WINDOW
+SET WINDOW TITLE("")
+

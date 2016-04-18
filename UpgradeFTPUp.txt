@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$user;$pass;$host;$hostPath;$hostFolder;$app)
+C_LONGINT($i;$ftpID;$errorCode;$inarray)
+C_DATE($deleteDate)
+C_BOOLEAN($upload)
+
+ALL RECORDS([Preferences])
+$path:=[Preferences]Backuppath
+$host:=[Preferences]BackupFTP
+$user:=[Preferences]FTPUserName
+$pass:=[Preferences]FTPPassword
+UNLOAD RECORD([Preferences])
+$app:="Mount.app"
+$path:="PTG IV:Applications:"+$app
+ALERT($path+"  "+String(Test path name($path)))
+
+$errorcode:=FTP_Login ($host;$user;$pass;$ftpID)
+EMail_Log (True;$errorcode;"FTP Login")
+
+$errorcode:=FTP_Send ($ftpID;$path;$app;1)
+EMail_Log (True;$errorcode;"FTP Send")
+ALERT($path+"  "+$hostFolder+"/"+$app+"  "+String($errorcode))
+
+
+$errorcode:=FTP_Logout ($ftpID)
+EMail_Log (True;$errorcode;"FTP Logout")
+ALERT(String($errorcode))
+

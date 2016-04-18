@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+C_TEXT($test)
+
+Case of 
+	: (Form event=On Display Detail)
+		If ([SpecSheetLines]OtherDescription="")
+			[SpecSheetLines]OtherDescription:=[SpecLibrary]DescriptionA+[SpecLibrary]DecriptConnect+[SpecSheetLines]SpecialMeasure+[SpecLibrary]DescriptionB
+		End if 
+		
+		OBJECT SET VISIBLE([ChineseDictionary]ChineseName;[SpecSheetLines]ChineseOverride=False)
+		OBJECT SET VISIBLE([SpecSheetLines]ChineseNew;[SpecSheetLines]ChineseOverride=True)
+		
+		OBJECT SET VISIBLE([SpecSheetLines]Spec3A;asRowHeaders>1)
+		OBJECT SET VISIBLE([SpecSheetLines]Spec3C;asRowHeaders>1)
+		OBJECT SET VISIBLE([SpecSheetLines]Spec2A;asRowHeaders>0)
+		OBJECT SET VISIBLE([SpecSheetLines]Spec2C;asRowHeaders>0)
+		
+		$test:=Replace string([SpecSheetLines]Spec2C;" ";"")
+		
+		If (Replace string([SpecSheetLines]Spec1A;" ";"")#$test) & ([SpecSheetLines]Spec2C#"")
+			OBJECT SET VISIBLE(*;"xBlock3";True)
+		Else 
+			OBJECT SET VISIBLE(*;"xBlock3";False)
+		End if 
+End case 

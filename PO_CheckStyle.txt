@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]StyleNumber=<>vtStyleTest)
+QUERY([Samples];[Samples]StyleNum=<>vtStyleTest)
+
+If (Records in selection([Orders])>0) | (Records in selection([Samples])>0)
+	<>vtStyleTest:="Crash"
+Else 
+	<>vtStyleTest:="Good"
+End if 

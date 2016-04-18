@@ -1,0 +1,56 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($mainFolder;$subFolder;$subSubFolder;$path)
+C_LONGINT($recordNumber;$subRecord;$subSubRecord)
+
+$path:=Substring(Data file;1;Position(":";Data file))
+$recordNumber:=$1
+$subRecord:=$recordNumber+10000
+$subSubRecord:=Num(Substring(String($subRecord);3;3))
+$subRecord:=Num(Substring(String($subRecord);2;4))
+
+If ($subrecord<1000)
+	$subFolder:="0"
+Else 
+	$subFolder:=Substring(String($subRecord);1;1)
+End if 
+
+If ($subSubRecord<100)
+	$subSubFolder:="0"
+Else 
+	$subSubFolder:=Substring(String($subSubRecord);1;1)
+End if 
+
+$path:=$path+"4D_Archive"
+
+If (Test path name($path)#0)
+	CREATE FOLDER($path)
+End if 
+
+Case of 
+	: ($recordNumber>=20000)
+		$mainFolder:="20000"
+	: ($recordNumber>=10000)
+		$mainFolder:="10000"
+	Else 
+		$mainFolder:="0"
+End case 
+
+$path:=$path+":"+$mainFolder
+
+If (Test path name($path)#0)
+	CREATE FOLDER($path)
+End if 
+
+$path:=$path+":"+$subFolder+"000"
+
+If (Test path name($path)#0)
+	CREATE FOLDER($path)
+End if 
+
+$path:=$path+":"+$subSubFolder+"00"
+
+If (Test path name($path)#0)
+	CREATE FOLDER($path)
+End if 
+
+$0:=$path+":"+String($recordNumber)

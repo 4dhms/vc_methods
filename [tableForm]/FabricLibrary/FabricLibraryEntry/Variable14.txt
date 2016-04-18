@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (atCost5>1) & (vlItem5>0)
+	ArtNo_Build 
+End if 

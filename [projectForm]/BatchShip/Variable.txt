@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(bChoice1;False)
+OBJECT SET VISIBLE([Orders]OrderNum;False)
+OBJECT SET VISIBLE([Orders]Customer;False)
+OBJECT SET VISIBLE([Orders]KWCnS;False)
+OBJECT SET VISIBLE([Orders]ShipMethod;False)

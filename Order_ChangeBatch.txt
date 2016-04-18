@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("What do you want to batch process:";"Cancel";"Factory";"Uncancel";"Stop")
+Case of 
+	: (ok=1) & (bChoice2=1)
+		Order_FactoryChangeBatch ("Factory")
+	: (ok=1) & (bChoice3=1)
+		Order_FactoryChangeBatch ("Uncancel")
+	: (ok=1)
+		Order_FactoryChangeBatch ("Cancel")
+		
+End case 

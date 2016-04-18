@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([DC];"dc")
+FIRST RECORD([DC])
+For ($i;1;Records in selection([DC]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[DC]CPOrdID)
+	  //QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+	If (Records in selection([CP_OrderXRef])=0)
+		ADD TO SET([DC];"dc")
+	End if 
+	NEXT RECORD([DC])
+End for 
+
+USE SET("dc")
+CLEAR SET("dc")
+
+ALERT("Done")

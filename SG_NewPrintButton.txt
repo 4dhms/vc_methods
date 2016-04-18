@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+vlLastPage:=1
+vlPage:=1
+vlRecCount:=1
+vDesc:=""
+vsPrintingFooter:=""
+
+If (SG_Mandatories )
+	If (Position("Fabric";vtOrderChanges)>0)
+		Fabric_ArraySave 
+	End if 
+	
+	If (Position("Color";vtOrderChanges)>0)
+		Color_Save 
+	End if 
+	
+	If (Position("Components";vtOrderChanges)>0)
+		Comp_Save 
+	End if 
+	
+	vfComponents:=False
+	SAVE RECORD([Samples])
+	
+	CREATE SET([Samples];"SG Set")
+	Center Window (350;100;1;"")
+	DIALOG([Dashboard File];"PrtRecSelctn")
+	CLOSE WINDOW
+	If (OK=1)
+		vfPO:=False
+		C_LONGINT($i)
+		
+		SET PRINT OPTION(Scale option;100)
+		SET PRINT OPTION(Orientation option;1)
+		SET PRINT OPTION(Mac spool file format option;0)
+		
+		If (vPrtSel=1)
+			vlPage:=0
+			$i:=1
+			FIRST RECORD([Samples])
+			For ($i;1;Records in selection([Samples]))
+				<>vlOrderNumber:=-1*[Samples]SampleNumber
+				Order_Print 
+				If ($i<Records in selection([Samples]))
+					PAGE BREAK(>)
+				Else 
+					PAGE BREAK
+				End if 
+				NEXT RECORD([Samples])
+			End for 
+			FIRST RECORD([Samples])
+		Else 
+			vlPage:=0
+			Order_Print 
+		End if 
+		
+		ACCEPT
+		FORM SET OUTPUT([Samples];"LargeList.o")
+		UNLOAD RECORD([ComponentSheets])
+		USE SET("SG Set")
+		CLEAR SET("SG Set")
+	End if 
+	
+End if 

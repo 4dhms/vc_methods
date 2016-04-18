@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE(vxSketch1)
+C_BOOLEAN(vfNewDesign)
+C_LONGINT($get)
+
+Case of 
+	: (Form event=On Load)
+		CONVERT PICTURE([Designs]Sketch;".png")
+		If (Is new record([Designs]))
+			SET WINDOW TITLE("New Design")
+		Else 
+			<>vsDesignNumber:=[Designs]DesignNum
+			$get:=New process("Design_GetRelated";0;"GetRelated")
+		End if 
+		Design_Load 
+	: (Form event=On Unload)
+		ARRAY TEXT(<>asDN;0)
+		ARRAY TEXT(<>asDiv;0)
+		ARRAY TEXT(<>atDescrip;0)
+	: (Form event=On Outside Call)
+		vxSketch:=<>vxSketch
+End case 

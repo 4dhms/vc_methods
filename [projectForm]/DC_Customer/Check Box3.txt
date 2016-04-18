@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbAll=1)
+	cbAdd:=0
+	ARRAY TEXT(asXCustomer;0)
+	QUERY([Lists];[Lists]ListName="DC")
+	SELECTION TO ARRAY([Lists]ListItem;asXCustomer)
+	SORT ARRAY(asXCustomer;>)
+Else 
+	
+End if 

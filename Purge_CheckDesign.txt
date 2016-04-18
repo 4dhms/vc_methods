@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([Designs];"purge")
+FIRST RECORD([Designs])
+For ($i;1;Records in selection([Designs]))
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+	If (Records in selection([Orders])=0)
+		QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum)
+		If (Records in selection([Samples])=0)
+			ADD TO SET([Designs];"purge")
+		End if 
+	End if 
+	NEXT RECORD([Designs])
+End for 
+
+USE SET("purge")
+CLEAR SET("purge")
+
+
+ALERT("Done")

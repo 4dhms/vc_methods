@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($blank)
+C_LONGINT($fetch)
+GET PICTURE FROM LIBRARY("empty.jpg";$blank)
+<>vfCatchFile:=True
+
+If (Application type=0)
+	  //Picture_ReturnLabel ($1;$2;"")
+Else 
+	$fetch:=Execute on server("Picture_ReturnLabel";1064*64;"LabelGet";[Designs]DesignNum;Current machine owner)
+End if 
+
+Repeat 
+Until (Picture size(<>vxSketch)>1800)
+vxSketch:=<>vxSketch
+
+If (Picture size(<>vxSketch)>1800)
+	Center Window (300;300;1;"")
+	DIALOG([Dialogs];"Print.i")
+	CLOSE WINDOW
+Else 
+	vxSketch:=$blank
+End if 

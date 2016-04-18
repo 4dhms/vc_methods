@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asAllCC;0)
+ARRAY TEXT(asSubCC;0)
+C_LONGINT($key)
+$key:=alVendorKeys{asVendors}
+QUERY([Vendors];[Vendors]VendorKey=$key)
+
+QUERY([VendorEmail];[VendorEmail]VendorKey=[Vendors]VendorKey)
+
+SELECTION TO ARRAY([VendorEmail]EmailAddress;asAllCC)
+INSERT IN ARRAY(asAllCC;1;1)
+asAllCC{1}:=[Vendors]PrimaryEmail
+
+If ([Vendors]PrimaryEmail="")
+	WinPrompt ("Vendor info is missing email address.")
+	asVendors:=0
+Else 
+	vsRequestString:=String($key)
+End if 

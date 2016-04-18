@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asDivisions;5)
+<>CloseBox:=True
+Center Window (800;325;0;"")
+FORM SET INPUT([Dialogs];"UsagePrint")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+
+
+<>UsageProc:=0
+

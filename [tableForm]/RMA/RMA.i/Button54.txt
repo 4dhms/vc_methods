@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Not([RMA]ShipBack)) & (cb1=0)
+		WinPrompt ("Does customer need to return item(s).")
+	: (Not([RMA]Credit)) & (cb2=0)
+		WinPrompt ("Credit or replacement?")
+	Else 
+		RMA_Save 
+		ACCEPT
+		UNLOAD RECORD([ReturnStores])
+		vsCustomer:=""
+		ARRAY TEXT(asCustomerBuild;0)
+End case 

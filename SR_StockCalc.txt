@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$nettotal)
+
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[DC]CPOrdID)
+If ($2=1)
+	alQuantity{$1}:=alQuantity{$1}+[DC]Count
+	$netTotal:=Round([DC]Count*[DC]Price;0)
+	alTotalSales{$1}:=alTotalSales{$1}+$netTotal
+	vlUnits:=vlUnits+[DC]Count
+	vlDollars:=vlDollars+$netTotal
+	
+Else 
+	alQuantityB{$1}:=alQuantityB{$1}+[DC]Count
+	$netTotal:=Round([DC]Count*[DC]Price;0)
+	alTotalSalesB{$1}:=alTotalSalesB{$1}+$netTotal
+	vlUnitsX:=vlUnitsX+[DC]Count
+	vlDollarsX:=vlDollarsX+$netTotal
+End if 

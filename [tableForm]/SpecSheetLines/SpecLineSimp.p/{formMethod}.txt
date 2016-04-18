@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test)
+C_LONGINT(vlOrderRouter)
+C_BOOLEAN(vfOutside)
+
+Case of 
+	: (Form event=On Printing Detail)
+		QUERY([ChineseDictionary];[ChineseDictionary]LexKey=[SpecSheetLines]SpecLibKey)
+		$test:=Replace string([SpecSheetLines]Spec2C;" ";"")
+		If (Replace string([SpecSheetLines]Spec1A;" ";"")#$test) & ([SpecSheetLines]Spec2C#"")
+			OBJECT SET FONT STYLE([SpecSheetLines]Spec2C;1)
+			If (vfPDF)
+				OBJECT SET COLOR(*;"xBlockA";-(2+(256*2)))
+			Else 
+				OBJECT SET COLOR(*;"xBlockA";-(14+(256*14)))
+			End if 
+			  //SET COLOR([SpecSheetLines]Spec1C;-(0+(256*15)))
+			OBJECT SET FONT STYLE([SpecSheetLines]Spec1C;1)
+		Else 
+			OBJECT SET COLOR(*;"xBlockA";-(0+(256*0)))
+			  //SET COLOR([SpecSheetLines]Spec1C;-(15+(256*0)))
+			OBJECT SET FONT STYLE([SpecSheetLines]Spec2C;0)
+		End if 
+		If (vfOutside)
+			OBJECT SET VISIBLE([SpecSheetLines]Spec3A;False)
+			OBJECT SET VISIBLE([SpecSheetLines]Spec3C;False)
+			  //OBJECT SET VISIBLE([SpecSheetLines]Spec2A;False)
+			  //OBJECT SET VISIBLE([SpecSheetLines]Spec2C;False)
+		Else 
+			OBJECT SET VISIBLE([SpecSheetLines]Spec3A;asRowHeaders>1)
+			OBJECT SET VISIBLE([SpecSheetLines]Spec3C;asRowHeaders>1)
+			OBJECT SET VISIBLE([SpecSheetLines]Spec2A;asRowHeaders>0)
+			OBJECT SET VISIBLE([SpecSheetLines]Spec2C;asRowHeaders>0)
+		End if 
+		OBJECT SET VISIBLE(*;"xBlockA";asRowHeaders>0)
+		
+		OBJECT SET VISIBLE([ChineseDictionary]ChineseName;([SpecSheetLines]ChineseOverride=False) & (vfPrintChinese))
+		OBJECT SET VISIBLE([SpecSheetLines]ChineseNew;([SpecSheetLines]ChineseOverride=True) & (vfPrintChinese))
+		
+		Case of 
+			: (vlOrderRouter=1)
+				OBJECT SET FONT STYLE(vtPart1;1)
+				OBJECT SET VISIBLE(*;"xVLine";False)
+			: (vlOrderRouter=2)
+				OBJECT SET VISIBLE(*;"xVLine";True)
+			Else 
+				OBJECT SET FONT STYLE(vtPart1;0)
+				OBJECT SET VISIBLE(*;"xVLine";False)
+		End case 
+End case 

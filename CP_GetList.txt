@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($names;0)
+QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPType=<>CPRouter)
+SELECTION TO ARRAY([ColorPrintFamilies]CPFamilyName;$names)
+Case of 
+	: (<>CPRouter=1)
+		ARRAY TO LIST($names;"Colors")
+	: (<>CPRouter=2)
+		ARRAY TO LIST($names;"Prints")
+End case 

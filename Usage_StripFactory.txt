@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (vsFactory#"")
+	$i:=1
+	FIRST RECORD([Designs])
+	CREATE SET([Designs];"fact")
+	For ($i;1;Records in selection([Designs]))
+		QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+		QUERY SELECTION([Orders];[Orders]Factory=vsFactory)
+		QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum)
+		QUERY SELECTION([Samples];[Samples]SamGarFactry=vsFactory)
+		
+		If (Records in selection([Orders])=0) & (Records in selection([Samples])=0)
+			REMOVE FROM SET([Designs];"fact")
+		End if 
+		NEXT RECORD([Designs])
+	End for 
+	USE SET("fact")
+	CLEAR SET("fact")
+End if 

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+$choice:=Pop up menu("Library;Families;Charts")
+
+Case of 
+	: ($choice=1)
+		CP_Numbers 
+	: ($choice=2)
+		m_CPFamily 
+	: ($choice=3)
+		m_PrintCatalog 
+End case 
+

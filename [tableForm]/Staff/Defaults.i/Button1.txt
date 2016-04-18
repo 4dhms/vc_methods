@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Staff]PrintPath#"")
+	QUERY([VendorEmail];[VendorEmail]User=[Staff]UserName)
+	[VendorEmail]PrintPath:=[Staff]PrintPath
+	SAVE RECORD([VendorEmail])
+	UNLOAD RECORD([VendorEmail])
+End if 
+SAVE RECORD([Staff])
+ACCEPT
+

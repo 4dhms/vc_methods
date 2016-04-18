@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($turn)
+C_TIME($start;$stop)
+$start:=Tickcount
+Spec_Close 
+CALL PROCESS(<>vlCustomerInfo)
+If (FORM Get current page=3) | (FORM Get current page=4) & (Not([Orders]Cancelled))
+	If (PO_Mandatory ) & (Order_Update )
+		$turn:=True
+	End if 
+Else 
+	If (Order_Update )
+		$turn:=True
+	End if 
+End if 
+
+If ($turn)
+	PageTurner ("Order";$1;->[Orders];True)
+End if 
+
+$stop:=Tickcount
+If (Current user="Designer") & (Shift down)
+	ALERT(String($stop-$start))
+End if 

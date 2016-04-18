@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atGauge=1)
+	List_Var ("Gauge";->vtGauge)
+Else 
+	vtGauge:=<>atGauge{<>atGauge}
+End if 

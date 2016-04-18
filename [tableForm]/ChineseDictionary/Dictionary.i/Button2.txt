@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this entry?")
+If (ok=1)
+	CREATE SET([ChineseDictionary];"dict")
+	DELETE RECORD([ChineseDictionary])
+	USE SET("dict")
+	CLEAR SET("dict")
+	CANCEL
+End if 

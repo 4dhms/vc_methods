@@ -1,0 +1,40 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global to search for style in hms
+
+
+SAVE RECORD([Orders])
+CREATE SET([Orders];"LastFound")
+CREATE SET([Orders];"DesPreSet")
+If (Records in selection([Orders])=0)
+	ALL RECORDS([Orders])
+Else 
+End if 
+WinFind ("Enter Style Number:")
+
+If (OK=0)
+	CLOSE WINDOW
+	USE SET("DesPreSet")
+	p_SetWindowHMS 
+	CLEAR SET("DesPreSet")
+Else 
+	If (vAddTo=1)
+		QUERY([Orders];[Orders]StyleNumber=vsRequestString)
+		CREATE SET([Orders];"DesignSGSet")
+		UNION("DesPreSet";"DesignSGSet";"NewSGSet")
+		CLOSE WINDOW
+		CLEAR SET("DesSGSet")
+		CLEAR SET("DesPreSet")
+		USE SET("NewSGSet")
+		p_SetWindowHMS 
+		CLEAR SET("NewSGSet")
+	Else 
+		QUERY([Orders];[Orders]StyleNumber=vsRequestString)
+		CLEAR SET("DesPreSet")
+		CLOSE WINDOW
+		p_SetWindowHMS 
+	End if 
+End if 
+ORDER BY([Orders];[Orders]OrderEntryDate;<)
+
+p_InputLayHMS 
+

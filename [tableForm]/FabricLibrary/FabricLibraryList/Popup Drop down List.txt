@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asSort=1)
+		
+	: (asSort=2)
+		ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;>)
+	: (asSort=4)
+		ORDER BY([FabricLibrary];[FabricLibrary]FabricName;>)
+	: (asSort=6)
+		ORDER BY([FabricLibrary];[FabricLibrary]FiberContent;>)
+	: (asSort=8)
+		ORDER BY([FabricLibrary];[FabricLibrary]Supplier;>)
+	: (asSort=3)
+		ORDER BY([FabricLibrary];[FabricLibrary]ArticleNumber;<)
+	: (asSort=5)
+		ORDER BY([FabricLibrary];[FabricLibrary]FabricName;<)
+	: (asSort=7)
+		ORDER BY([FabricLibrary];[FabricLibrary]FiberContent;<)
+	: (asSort=9)
+		ORDER BY([FabricLibrary];[FabricLibrary]Supplier;<)
+End case 

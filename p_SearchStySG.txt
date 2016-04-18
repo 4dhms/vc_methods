@@ -1,0 +1,37 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+  //global to search for style in sample garments
+SAVE RECORD([Samples])
+WinFind ("Enter style:")
+If (vAddTo=1)
+	CREATE SET([Samples];"StyPreSet")
+Else 
+	CREATE EMPTY SET([Samples];"StyPreSet")
+End if 
+
+
+If (ok=1)
+	QUERY([Samples];[Samples]StyleNum=vsRequestString)
+	$i:=1
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		ADD TO SET([Samples];"StyPreSet")
+		NEXT RECORD([Samples])
+	End for 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]StyleNumber=vsRequestString)
+	$i:=1
+	FIRST RECORD([CP_OrderXRef])
+	For ($i;1;Records in selection([CP_OrderXRef]))
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+		QUERY([Samples];[Samples]SampleNumber=Abs([OrdersFabricXRef]OrderNumber))
+		ADD TO SET([Samples];"StyPreSet")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	
+	
+End if 
+USE SET("StyPreSet")
+p_SetWndwSamGar 
+CLEAR SET("StyPreSet")

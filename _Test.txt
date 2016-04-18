@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+
+$run:=Execute on server("_Temp";32*1024;"Run")
+

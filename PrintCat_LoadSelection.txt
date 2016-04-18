@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($sketch)
+C_POINTER($print)
+C_POINTER($use)
+C_LONGINT($i)
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+
+$i:=1
+For ($i;1;15)
+	$sketch:=Get pointer("vxSketch"+String($i))
+	$print:=Get pointer("vtTitle"+String($i))
+	$use:=Get pointer("b"+String($i))
+	If ((vlRouter*15)+$i<=Size of array(asCPNumbers))
+		$print->:=asCPNumbers{$i+(vlRouter*15)}
+		PrintCat_GetPix (20;$print->)
+		$sketch->:=vxSketch20
+		$use->:=1
+	Else 
+		$sketch->:=$empty
+		$print->:=""
+		$use->:=0
+	End if 
+End for 

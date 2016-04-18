@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(<>asSeasonName;True)
+OBJECT SET VISIBLE(<>asSeasonYear;True)
+OBJECT SET VISIBLE(asDivisions;True)
+Case of 
+	: (asSampleTypes=2)
+		OBJECT SET VISIBLE(*;"xCustomer";True)
+		OBJECT SET VISIBLE(*;"xDesign";True)
+		OBJECT SET VISIBLE(vsCustomer;True)
+		OBJECT SET VISIBLE(vsDesignNumber;True)
+		OBJECT SET VISIBLE(cbSort;True)
+		
+	: (asSampleTypes=3) | (asSampleTypes=4)
+		OBJECT SET VISIBLE(*;"xCustomer";True)
+		OBJECT SET VISIBLE(*;"xDesign";True)
+		OBJECT SET VISIBLE(*;"xStyle";True)
+		OBJECT SET VISIBLE(*;"xGroup";True)
+		OBJECT SET VISIBLE(vsCustomer;True)
+		OBJECT SET VISIBLE(vsDesignNumber;True)
+		OBJECT SET VISIBLE(vStyle;True)
+		OBJECT SET VISIBLE(vGroupName;True)
+		OBJECT SET VISIBLE(cbSort;True)
+		OBJECT SET VISIBLE(cbFuzzy;True)
+End case 
+
+If (asSampleTypes>1)
+	OBJECT SET VISIBLE(bFind;True)
+End if 

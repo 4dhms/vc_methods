@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Designs])
+CREATE SET([Designs];"Numbers")
+
+If (Records in selection([Designs])=0)
+	ALL RECORDS([Designs])
+End if 
+vfDone:=False
+
+WinFind ("Enter design number:")
+If (vAddTo=1)
+	QUERY([Designs];[Designs]DesignNum=vsRequestString)
+	ADD TO SET([Designs];"Numbers")
+	CLOSE WINDOW
+	USE SET("Numbers")
+	CLEAR SET("Numbers")
+Else 
+	QUERY([Designs];[Designs]DesignNum=vsRequestString)
+	CLEAR SET("Numbers")
+	CLOSE WINDOW
+End if 
+
+If (Records in set("DesPreSet")>0)
+	CLEAR SET("DesPreSet")
+End if 
+
+p_SetWndDesLib 

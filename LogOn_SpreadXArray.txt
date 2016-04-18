@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($self;$combo1;$combo2;$build)
+
+ARRAY TEXT(asCPNumbers;0)
+ARRAY TEXT(asCPColorName;0)
+
+$i:=1
+For ($i;1;Size of array(alSelfKey))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=alSelfKey{$i})
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self";*)
+	QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 1";*)
+	QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 2")
+	ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+	
+	ARRAY TEXT($cpnum;0)
+	SELECTION TO ARRAY([CP_OrderXRef]CPNumber;$cpnum)
+	$n:=1
+	For ($n;1;Size of array($cpnum))
+		vtColorCode:=""
+		
+		Case of 
+			: ($n=1) & ([Orders]OrderDivision="12-Melissa Paige")
+				vtColorCode:=$cpnum{$n}
+			: ($n=1)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cpnum{1})
+				$self:=[ColorPrintNumber]CPName
+				$combo1:=""
+				$combo2:=""
+			: ($n=2)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cpnum{2})
+				$combo1:=[ColorPrintNumber]CPName
+				$combo2:=""
+			: ($n=3)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cpnum{3})
+				$combo2:=[ColorPrintNumber]CPName
+		End case 
+		
+		Case of 
+			: ($combo1#"") & ($combo2#"")
+				vtColorCode:=ColorCode_Distill ($cpnum{1};$cpnum{2};$cpnum{3})
+			: ($combo1#"")
+				vtColorCode:=ColorCode_Distill ($cpnum{1};$cpnum{2})
+			Else 
+				vtColorCode:=ColorCode_Distill ($cpnum{1})
+		End case 
+	End for 
+	
+	If (Find in array(asCPNumbers;vtColorCode)<1)
+		APPEND TO ARRAY(asCPNumbers;vtColorCode)
+		If ($combo1#"")
+			APPEND TO ARRAY(asCPColorName;$self+"/"+$combo1)
+		Else 
+			APPEND TO ARRAY(asCPColorName;$self)
+		End if 
+	End if 
+End for 
+

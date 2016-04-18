@@ -1,0 +1,37 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE([SpecFactory]ApproveDate;[SpecFactory]ApprovedForProd)
+OBJECT SET VISIBLE([SpecFactory]PatternApproveDate;[SpecFactory]ApprovedPattern)
+  //SET VISIBLE(*;"xSample";(◊lOrderNumber>0) & (Not(vfHistory)))
+  //SET VISIBLE(*;"xSample1";◊lOrderNumber>0)
+
+If ([SpecFactory]ApprovedForProd)
+	ssApproved:=1
+	ssNotApproved:=0
+Else 
+	ssApproved:=0
+	ssNotApproved:=1
+End if 
+
+Case of 
+	: (<>vlOrderNumber>0)
+		vsFlag:="Order"
+		vlOrderNumber:=<>vlOrderNumber
+		If (<>vlSGPO=0)
+			vtPOFlag1:=""
+		Else 
+			vtPOFlag1:=String(Abs(<>vlSGPO))
+		End if 
+	: (<>vlOrderNumber<0)
+		vsFlag:="Sample"
+		vlOrderNumber:=Abs(<>vlOrderNumber)
+	Else 
+		vsFlag:="Sheet"
+		vlOrderNumber:=[SpecFactory]SF_KeyNumber
+End case 
+QUERY([Designs];[Designs]DesignNum=[SpecFactory]DesignNumber)
+QUERY SELECTION([Designs];[Designs]DesignNum#"")
+
+vxSketch:=[Designs]Sketch
+vtDescription:=[Designs]Description
+
+GOTO OBJECT(vsEmpty)

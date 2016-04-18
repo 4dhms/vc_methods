@@ -1,0 +1,59 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($test)
+C_REAL($save;$totsave;$calc)
+
+QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+ORDER BY([CostSheets];[CostSheets]SheetID;<)
+
+afProcess{$1}:=True
+asDesignNumbers{$1}:=[Orders]DesignNumber
+asOrderNumbers{$1}:=String([Orders]OrderNum)
+asStyleNumbers{$1}:=[Orders]StyleNumber
+asFactories{$1}:=[Orders]Factory
+alSDID{$1}:=[Orders]SDID
+
+$test:=[CostSheets]Duty1
+If ($test>0)
+	atCost1{$1}:=String($test;"00.00")
+Else 
+	atCost1{$1}:=""
+End if 
+
+$test:=[CostSheets]FOB
+If ($test>0)
+	atCost3{$1}:=String($test;"#0.00")
+Else 
+	atCost3{$1}:=""
+End if 
+
+If ([Orders]TotalOrderQuantity>0)
+	atCost5{$1}:=String([Orders]TotalOrderQuantity;"###,###,###")
+Else 
+	atCost5{$1}:=""
+End if 
+  //ALERT(atCost5{$1}+"  "+String($test)+"  "+String([Orders]TotalOrderQuantity))
+
+$test:=[Orders]ActlDutyRate
+If ($test>0)
+	atCost7{$1}:=String($test;"#0.00")
+Else 
+	atCost7{$1}:=""
+End if 
+
+  //afApproved{$1}:=[Orders]AuditDate
+
+If ([CostSheets]Duty1=[Orders]ActlDutyRate) | ([Orders]ActlDutyRate=0)
+	atCost2{$1}:=""
+	atCost4{$1}:=""
+	atCost6{$1}:=""
+Else 
+	$calc:=([CostSheets]Duty1-[Orders]ActlDutyRate)/[CostSheets]Duty1
+	$save:=$calc*[CostSheets]FOB
+	$totsave:=$save*[Orders]TotalOrderQuantity
+	
+	atCost2{$1}:=String($calc;"#0.00")
+	atCost4{$1}:=String($save;"#0.00")
+	atCost6{$1}:=String($totsave;"###,##0.00")
+End if 
+

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($blob)
+C_PICTURE($xThumb;$sketch)
+C_TEXT($path)
+
+
+$path:=Substring(Application file;1;Position(":";Application file))+"4D Images:"+String(Int(Num($1)/100))+":"
+$path:=$path+"B"+Replace string(String(Num($1));".";"_")+".jpg"
+
+If (Test path name($path)=1)
+	READ PICTURE FILE($path;$sketch)
+	
+	CREATE THUMBNAIL($sketch;$xThumb;200;200;6)
+	PICTURE TO GIF($xThumb;$blob)
+	WEB SEND BLOB($blob;"image/gif")
+End if 

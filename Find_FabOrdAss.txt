@@ -1,0 +1,47 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vsFindType="FabOrd")
+		LIST TO ARRAY("Find_FabOrd";<>FindFabOrd)
+		CREATE SET([FabricOrders];"FoundSet")
+End case 
+vlWinWd:=200
+vlWinHt:=150
+vlWinType:=1
+vsWinTitle:=""
+
+Center Window 
+DIALOG([Dashboard File];"Find_FabOrd")
+CLOSE WINDOW
+<>asVendorTypes{1}:="Assorted"
+<>asVendorTypes:=1
+
+Case of 
+	: (vsFindType="FabOrd")
+		Case of 
+			: (<>FindFabOrd{<>FindFabOrd}="Article Number")
+				QUERY([FabricOrders];[FabricOrders]ArticleNo=vsFind)
+			: (<>FindFabOrd{<>FindFabOrd}="PO Number")
+				QUERY([FabricOrders];[FabricOrders]PONumber=vsFind)
+			: (<>FindFabOrd{<>FindFabOrd}="Division")
+				QUERY([FabricOrders];[FabricOrders]Division=vsFind)
+			: (<>FindFabOrd{<>FindFabOrd}="Supplier")
+				QUERY([FabricOrders];[FabricOrders]VendorName=vsFind)
+			: (<>FindFabOrd{<>FindFabOrd}="Req Delivery Date")
+				QUERY([FabricOrders];[FabricOrders]ReqDeliveryDate=vsFind)
+			: (<>FindFabOrd{<>FindFabOrd}="Freight Forwarder")
+				QUERY([FabricOrders];[FabricOrders]FreightForwarder=vsFind)
+		End case 
+End case 
+If (vsFindType="FabOrd") | (vsFindType="Editor")
+	If (cbAddtoSelection=1)
+		CREATE SET([FabricOrders];"TempSet")
+		UNION("FoundSet";"TempSet";"FoundSet")
+		USE SET("FoundSet")
+		MODIFY SELECTION([FabricOrders];*)
+		CLEAR SET("FoundSet")
+		CLEAR SET("TempSet")
+	Else 
+		MODIFY SELECTION([FabricOrders];*)
+	End if 
+End if 
+

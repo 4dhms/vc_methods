@@ -1,0 +1,89 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfUploading)
+C_LONGINT($daynumber;$i)
+C_DATE(<>vdReportSent)
+C_DATE(<>vdCreditSent)
+C_BOOLEAN($done;<>done)
+C_TIME($startTime)
+vfPDF:=True
+
+If (Not(<>vfSpoolerRunning))
+	<>vfSpoolerRunning:=True
+	$startTime:=Current time(*)
+	vsPrintingFooter:=""
+	vOrd:=""
+	vlLastPage:=0
+	vlPage:=0
+	vlRecCount:=0
+	
+	Case of 
+		: (Day number(Current date(*))=3)
+			  //Order_PeterSpread 
+			Admin_CleanupPDFs 
+			
+		: (Day number(Current date(*))=7) & (<>vdReportSent#Current date(*)) & (Position("persinger";Current machine)<1)
+			$daynumber:=Day of(Current date(*))
+			
+			<>vtMailFrom:="4Dserver@nubby.com"
+			Credit_Report 
+			
+			PreCarton_Marmax 
+			PreCarton_Steinmart 
+			PreCarton_RossRedux 
+			PreCarton_MissingII 
+			PriceTicket_ChangeReport 
+			Report_DirectShip 
+			Report_OpenOrderLaunch 
+			Order_PeterSpread 
+			Report_XFactoryChange 
+			Report_MissingBreakdown 
+			  //Report_MissingCustPO 
+			
+			<>vdReportSent:=Current date(*)
+		: (Current time(*)>?23:55:00?)
+			Cost_CleanUp 
+			  //Digest_BuildPDF (1)
+			vfUploading:=False
+			If (Day number(Current date(*))>5)
+				  //Digest_BuildPDF (2)
+			End if 
+	End case 
+	
+	QUERY([Spooler];[Spooler]Waiting=True)
+	If (Records in selection([Spooler])>0)
+		FIRST RECORD([Spooler])
+		$i:=1
+		For ($i;1;Records in selection([Spooler]))
+			Case of 
+				: ([Spooler]Genre="Guide")
+					  //do nothing
+				: (Current time(*)-$startTime>?00:00:15?)
+					$done:=True
+				: (Records in selection([Spooler])=0)
+					$done:=True
+					
+				: ([Spooler]Genre="") | ([Spooler]ReturnAddress="")
+					[Spooler]Waiting:=False
+					SAVE RECORD([Spooler])
+				Else 
+					  //If (Not([Spooler]Robert))
+					  //[Spooler]Waiting:=False
+					  //SAVE RECORD([Spooler])
+					  //End if 
+					
+					Case of 
+						: ([Spooler]Genre="FI")
+							Email_BuildFabInv 
+						: ([Spooler]Genre="Spec")
+							Spooler_SendSpec 
+						Else 
+							SP_MailSend 
+					End case 
+			End case 
+			NEXT RECORD([Spooler])
+		End for 
+	End if 
+End if 
+<>vfSpoolerRunning:=False
+
+

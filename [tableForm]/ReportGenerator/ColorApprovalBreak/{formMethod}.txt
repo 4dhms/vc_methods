@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:="Printed "+String(Current date)+"  Page "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		vlRecCount:=alColorCount{Find in array(asShowSelf;[ReportGenerator]BR_SKU)}
+		vlRunningTotal:=alCPQty{Find in array(asShowSelf;[ReportGenerator]BR_SKU)}
+End case 

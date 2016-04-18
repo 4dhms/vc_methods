@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsWebUser)
+C_TEXT(vsWebPassword)
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+vsWebUser:=$value{Find in array($name;"vsWebUser")}
+vsWebSession:=$value{Find in array($name;"vsWebSession")}
+
+If (Find in array($name;"vsCalUser")>0)
+	vsCalUser:=$value{Find in array($name;"vsCalUser")}
+End if 

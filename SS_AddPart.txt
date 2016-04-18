@@ -1,0 +1,93 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$resetLevel;$thisSheetKey;$oldKey)
+C_BOOLEAN($continue)
+
+vlCloneRouter:=0
+vfNewFactory:=False
+vlAddPartStatus:=1
+$thissheetKey:=[SpecFactory]SF_KeyNumber
+SAVE RECORD([SpecFactory])
+
+Case of 
+	: (pOne=0) & (pTwo=0) & (pThree=0)
+		$resetLevel:=0
+	: (pOne=1)
+		$resetLevel:=1
+	: (pTwo=1)
+		$resetLevel:=2
+End case 
+
+Spec_POMArray 
+
+ARRAY TEXT(asSpareParts;0)
+ARRAY LONGINT(alSpareKeys;0)
+ALL RECORDS([SpecTemplate])
+QUERY SELECTION([SpecTemplate];[SpecTemplate]Size=False)
+SELECTION TO ARRAY([SpecTemplate]Template;asSpareParts)
+SELECTION TO ARRAY([SpecTemplate]TempKeyNumber;alSpareKeys)
+
+$i:=1
+
+If (Find in array(asSpareParts;[SpecFactory]Part1)>0)
+	DELETE FROM ARRAY(alSpareKeys;Find in array(asSpareParts;[SpecFactory]Part1);1)
+	DELETE FROM ARRAY(asSpareParts;Find in array(asSpareParts;[SpecFactory]Part1);1)
+End if 
+If (Find in array(asSpareParts;[SpecFactory]Part2)>0)
+	DELETE FROM ARRAY(alSpareKeys;Find in array(asSpareParts;[SpecFactory]Part2);1)
+	DELETE FROM ARRAY(asSpareParts;Find in array(asSpareParts;[SpecFactory]Part2);1)
+End if 
+
+pOne:=0
+pTwo:=0
+
+Center Window (400;450;1984;"")
+DIALOG([Dialogs];"SketchWindow.d")
+CLOSE WINDOW
+
+
+If (ok=1)
+	Case of 
+		: (asSGOrder{asSGOrder}="Old Style")
+			$continue:=False
+		: (vsNewGarmentPart#"")
+			$continue:=True
+			SS_CloneTemplate 
+		: (vDesign1#"")
+			QUERY([SpecFactory];[SpecFactory]OrderNumber=Num(asSGOrder{asSGOrder}))
+			$oldKey:=[SpecFactory]SF_KeyNumber
+			QUERY([SpecFactory];[SpecFactory]SF_KeyNumber=$thisSheetKey)
+			vfCloneHistory:=False
+			$continue:=SS_CloneSpecs ($oldKey;[SpecFactory]SF_KeyNumber)
+			
+	End case 
+	If ($continue)
+		Case of 
+			: (Size of array(alPartNumber)=3)
+				pOne:=0
+				pTwo:=0
+				pThree:=1
+			: (Size of array(alPartNumber)=2)
+				pOne:=0
+				pTwo:=1
+				pThree:=0
+			Else 
+				pOne:=1
+				pTwo:=0
+				pThree:=0
+		End case 
+		SS_Build 
+		SS_GetPart 
+	End if 
+Else 
+	ARRAY TEXT(asSpareParts;0)
+	ARRAY LONGINT(alSpareKeys;0)
+	SS_Build 
+	SS_GetPart 
+End if 
+  //INSERT ELEMENT(alPartNumber;1;1)
+  //alPartNumber{1}:=◊vlSpecPart
+
+SS_BuildPartCB (True)
+vlAddPartStatus:=0
+vDesign1:=""
+

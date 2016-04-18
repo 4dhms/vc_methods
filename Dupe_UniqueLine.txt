@@ -1,0 +1,43 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$oldLineKey)
+
+QUERY([CS_Lines];[CS_Lines]OrderNumber=vlOldOrderNumber)
+QUERY SELECTION([CS_Lines];[CS_Lines]ComponentName#"MTL@")
+
+If (Records in selection([CS_Lines])>0)
+	ARRAY LONGINT($alOtherKeys;Records in selection([CS_Lines]))
+	
+	$i:=1
+	FIRST RECORD([CS_Lines])
+	For ($i;1;Size of array($alOtherKeys))
+		$alOtherKeys{$i}:=Record number([CS_Lines])
+		NEXT RECORD([CS_Lines])
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($alOtherKeys))
+		GOTO RECORD([CS_Lines];$alOtherKeys{$i})
+		$oldLineKey:=[CS_Status]CS_LineKey
+		DUPLICATE RECORD([CS_Lines])
+		[CS_Lines]OrderNumber:=vlDupeOrderNumber
+		[CS_Lines]CS_LineKey:=Sequence number([CS_Lines])
+		SAVE RECORD([CS_Lines])
+		
+		QUERY([CS_Status];[CS_Status]CS_LineKey=$oldLineKey)
+		
+		ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)
+		DUPLICATE RECORD([CS_Status])
+		[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+		  //  [CS_Status]Received:=False
+		  //[CS_Status]Approved:=False
+		  //[CS_Status]Rejected:=False
+		[CS_Status]ActionDate:=Current date(*)
+		[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+		  // Case of 
+		  // : ([CS_Status]ActionStatus="Duplicated") | ([CS_Status]ActionStatus="") | (Posi
+		  //   [CS_Status]ActionStatus:="Duplicated"
+		  //   [CS_Status]ActionStatus:=[CS_Status]ActionStatus+"[d]"
+		  //End case 
+		SAVE RECORD([CS_Status])
+	End for 
+End if 

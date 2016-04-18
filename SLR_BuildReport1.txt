@@ -1,0 +1,219 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$z;$y;$x;$reorders;$p;$singleton;$s)
+C_TEXT($customer)
+C_TEXT($style)
+C_LONGINT($checksum)
+C_BOOLEAN($totals;$detail)
+
+ARRAY TEXT(asTableSpec;0;11)
+ARRAY LONGINT(alTableTot;0;12)
+ARRAY LONGINT(alTablePop;0;Size of array(adDates)+5)
+ARRAY LONGINT(alTableAcctKey;0)
+
+vlCount:=1
+vlTotCount:=1
+vlPrimesort:=0
+vlColorsort:=0
+$singleton:=1
+
+Case of 
+	: (Size of array(asCustomers)=0)
+		  //
+	: (Size of array(asCustomers)=1)
+		QUERY([SLRAcct];[SLRAcct]SLRAcct=asCustomers{1})
+	: (Size of array(asCustomers)=2)
+		QUERY([SLRAcct];[SLRAcct]SLRAcct=asCustomers{1};*)
+		QUERY([SLRAcct]; | ;[SLRAcct]SLRAcct=asCustomers{2})
+	: (Size of array(asCustomers)>2)
+		$i:=1
+		For ($i;1;Size of array(asCustomers))
+			Case of 
+				: ($i=1)
+					QUERY([SLRAcct];[SLRAcct]SLRAcct=asCustomers{1};*)
+				: ($i=Size of array(asCustomers))
+					QUERY([SLRAcct]; | ;[SLRAcct]SLRAcct=asCustomers{$i})
+				Else 
+					QUERY([SLRAcct]; | ;[SLRAcct]SLRAcct=asCustomers{$i};*)
+			End case 
+		End for 
+End case 
+CREATE SET([SLRAcct];"pool")
+
+DISTINCT VALUES([SLRAcct]SLRAcct;$accts)
+$customer:=[SLRAcct]SLRAcct
+$style:=[SLRAcct]SLRStyleNumber
+
+$i:=1
+For ($i;1;Size of array($accts))
+	
+	<>vlCounter:=($i/Size of array($accts))*100
+	CALL PROCESS(<>SendingWin)
+	USE SET("pool")
+	QUERY([SLRAcct];[SLRAcct]SLRAcct=$accts{$i})
+	
+	$n:=1
+	For ($n;1;Size of array(asDivisions))
+		If (afBatchList{$n}=False)
+			QUERY SELECTION([SLRAcct];[SLRAcct]Division#asDivisions{$n})
+		End if 
+	End for 
+	ORDER BY([SLRAcct];[SLRAcct]SLRStyleNumber;>)
+	
+	Case of 
+		: (cbKnit=0) | (cbCutSew=0)
+			$detail:=True
+		: (asSeasonName>1) & (asSeasonYear>1)
+			$detail:=True
+	End case 
+	
+	If ($detail)
+		$p:=1
+		CREATE SET([SLRAcct];"stripper")
+		FIRST RECORD([SLRAcct])
+		For ($p;1;Records in selection([SLRAcct]))
+			QUERY([Orders];[Orders]StyleNumber=[SLRAcct]SLRStyleNumber)
+			Case of 
+				: ([Orders]KWCnS="woven") | ([Orders]KWCnS="knit") & (cbKnit=0)
+					REMOVE FROM SET([SLRAcct];"stripper")
+				: ([Orders]KWCnS="woven") | ([Orders]KWCnS="cutsew") & (cbCutSew=0)
+					REMOVE FROM SET([SLRAcct];"stripper")
+				: ([Orders]SeasonName#asSeasonName{asSeasonName}) | ([Orders]SeasonYear#asSeasonYear{asSeasonYear}) & (asSeasonName>1) & (asSeasonYear>1)
+					REMOVE FROM SET([SLRAcct];"stripper")
+			End case 
+			NEXT RECORD([SLRAcct])
+		End for 
+		USE SET("stripper")
+		CLEAR SET("stripper")
+	End if 
+	
+	CREATE SET([SLRAcct];"stores")
+	
+	ARRAY TEXT($styleno;0)
+	If (Size of array(asStyleNumbers)=0)
+		DISTINCT VALUES([SLRAcct]SLRStyleNumber;$styleno)
+	Else 
+		COPY ARRAY(asStyleNumbers;$styleno)
+	End if 
+	SORT ARRAY($styleno;>)
+	$reorders:=0
+	
+	$s:=1
+	For ($s;1;Size of array($styleno))
+		APPEND TO ARRAY(alTableAcctKey;[SLRAcct]SLRAcctKey)
+		USE SET("stores")
+		QUERY SELECTION([SLRAcct];[SLRAcct]SLRStyleNumber=$styleno{$s})
+		
+		$z:=1
+		CREATE EMPTY SET([SLRColor];"colors")
+		FIRST RECORD([SLRAcct])
+		For ($z;1;Records in selection([SLRAcct]))
+			QUERY([SLRColor];[SLRColor]SLRAcctKey=[SLRAcct]SLRAcctKey)
+			
+			$x:=1
+			FIRST RECORD([SLRColor])
+			For ($x;1;Records in selection([SLRColor]))
+				QUERY([SLRWks];[SLRWks]SLRColorKey=[SLRColor]SLRColorKey)
+				If (Records in selection([SLRWks])>0)
+					ADD TO SET([SLRColor];"colors")
+				End if 
+				NEXT RECORD([SLRColor])
+			End for 
+			NEXT RECORD([SLRAcct])
+		End for 
+		
+		USE SET("colors")
+		
+		ARRAY TEXT($Clist;0)
+		DISTINCT VALUES([SLRColor]SLRColor;$Clist)
+		SORT ARRAY($Clist;>)
+		
+		$totals:=False
+		$y:=1
+		For ($y;1;Size of array($Clist))
+			USE SET("colors")
+			QUERY SELECTION([SLRColor];[SLRColor]SLRColor=$Clist{$y})
+			
+			USE SET("stores")
+			QUERY SELECTION([SLRAcct];[SLRAcct]SLRAcctKey=[SLRColor]SLRAcctKey)
+			
+			$n:=1
+			FIRST RECORD([SLRColor])
+			CREATE SET([SLRColor];"timeline")
+			
+			For ($n;1;Records in selection([SLRColor]))
+				QUERY([SLRWks];[SLRWks]SLRColorKey=[SLRColor]SLRColorKey)
+				QUERY SELECTION([SLRWks];[SLRWks]SLRWkEnd<=adDates{1})
+				$checksum:=Sum([SLRWks]OnHand)+Sum([SLRWks]SalesUnits)+Sum([SLRWks]SalesTot)
+				
+				ORDER BY([SLRWks];[SLRWks]SLRWkEnd;<)
+				QUERY([SLRAcct];[SLRAcct]SLRAcctKey=[SLRColor]SLRAcctKey)
+				vlPrimeSort:=vlPrimeSort+1
+				
+				If ($checksum>0)
+					$totals:=True
+					Case of 
+						: ([SLRAcct]SLRAcct#$customer)
+							SLR_TablePopulate (3)
+							$customer:=[SLRAcct]SLRAcct
+							$style:=[SLRAcct]SLRStyleNumber
+							$singleton:=1
+						: ([SLRAcct]SLRStyleNumber#$style)
+							SLR_TablePopulate (2)
+							$singleton:=1
+							$style:=[SLRAcct]SLRStyleNumber
+						: ($n=1) & (Records in selection([SLRColor])>1)
+							SLR_TablePopulate (1)
+							$singleton:=$singleton+1
+						Else 
+							$singleton:=$singleton+1
+							SLR_TablePopulate (0)
+					End case 
+				Else 
+					REMOVE FROM SET([SLRColor];"timeline")
+				End if 
+				NEXT RECORD([SLRColor])
+			End for 
+			USE SET("timeline")
+			CLEAR SET("timeline")
+			  //USE SET("cleanup")
+			  //CLEAR SET("cleanup")
+			
+			  //color subtotals
+			If (Records in selection([SLRColor])>1)
+				$reorders:=Records in selection([SLRColor])
+				PREVIOUS RECORD([SLRColor])
+				SLR_TablePopulate (-1)
+			End if 
+		End for 
+		
+		Case of 
+			: ($reorders>1)
+				$n:=1
+				  //For ($n;1;$reorders)
+				  //SLR_TablePopulate (-2;$n+9)
+				  //End for 
+				SLR_TablePopulate (-2;999)
+				$reorders:=0
+			: ($totals) & ($singleton>1)  //eliminates redundant subtotals
+				SLR_TablePopulate (-2)
+			: ($totals) & ($singleton<2)  //eliminates redundant subtotals
+				SLR_TablePopulate (2.5)
+		End case 
+		UNLOAD RECORD([Orders])
+	End for 
+	SLR_TablePopulate (-3)
+End for 
+
+If (Size of array(asCustomers)#1)
+	SLR_TablePopulate (-4)
+End if 
+CLEAR SET("colors")
+
+  //SLR_TablePop 
+SLR_SubtotWeek 
+SLR_SubtotCalc 
+SLR_TableSpread 
+  //SLR_LastOnHand 
+
+
+

@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($1)
+C_TEXT(vtNewData)
+
+Case of 
+	: (Table name(Current form table)="Designs")
+		Case of 
+			: ($1=1)
+				vtNewData:="Knit"
+			: ($1=2)
+				vtNewData:="Woven"
+			: ($1=3)
+				vtNewData:="CutSew"
+		End case 
+		[Designs]KWCnS:=vtNewData
+	: (Table name(Current form table)="Orders")
+		[Orders]KWCnS:=[Designs]KWCnS
+		Order_KWCSToggle 
+	Else 
+		[Samples]KWCnS:=[Designs]KWCnS
+		
+End case 
+
+Case of 
+	: (Table name(Current form table)="Designs")
+		Design_MustFlag 
+	: (Table name(Current form table)="Orders")
+		Order_RequiredFlag 
+	Else 
+		Sample_RequiredFlag 
+End case 
+

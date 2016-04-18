@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>vsDesignNumber="")
+	vsFlag:="ENTER DESIGN NUMBER"
+Else 
+	OBJECT SET ENABLED(bValidate;True)
+	OBJECT SET ENABLED(bGet;False)
+	OBJECT SET ENABLED(bNext;False)
+	FORM GOTO PAGE(3)
+End if 

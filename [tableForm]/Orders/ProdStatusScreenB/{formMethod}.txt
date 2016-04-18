@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		qShort:=1
+		rLong:=0
+	: (Form event=On Display Detail)
+		OBJECT SET VISIBLE(*;"xVoid";[Orders]Cancelled)
+		SampFit_RecDate 
+		OBJECT SET VISIBLE(*;"xMona";[Designs]ArchivedPict=True)
+	: (Form event=On Close Box)
+		CANCEL
+End case 

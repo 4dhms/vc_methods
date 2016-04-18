@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (vtOldData#"")
+		[Designs]History:="From: "+Char(34)+vtOldData+Char(34)+" to "+Char(34)+[Designs]Description+Char(34)+Char(13)+[Designs]History
+		[Designs]History:=Current user+" "+String(Current date(*))+" "+String(Current time(*))+Char(13)+[Designs]History
+	End if 
+End if 

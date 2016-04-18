@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;$selfKey)
+C_TEXT($lineLetter)
+Case of 
+	: (Form event=On Double Clicked)
+		If ([Orders]BDHeaderKey=0)
+			WinPrompt ("Select breakdown ratio.")
+		Else 
+			vfMultipleBreaks:=True
+			If (asBDLetter{asBDSelf}#"@Total")
+				If (Macintosh control down) | (Windows Ctrl down)
+					WinChoice ("Are you sure you want to delete "+asBDSelf{asBDSelf}+"?")
+					If (ok=1)
+						$line:=asBDSelf
+						If (alBDKey{$line}>0)
+							QUERY([OrdersBreakdowns];[OrdersBreakdowns]BDKey=alBDKey{$line})
+							DELETE RECORD([OrdersBreakdowns])
+						End if 
+						Order_BDDelete ($line)
+						Order_BDTotals 
+					End if 
+				Else 
+					
+					If (asBDLetter{asBDSelf}#"@Total")
+						$lineLetter:=asBDLetter{asBDSelf}
+						$selfKey:=alBDSelfKeys{asBDSelf}
+						$line:=asBDSelf+1
+						INSERT IN ARRAY(asBDColorCode;$line;1)
+						INSERT IN ARRAY(asBDLetter;$line;1)
+						INSERT IN ARRAY(alBDKey;$line;1)
+						INSERT IN ARRAY(alBDColor;$line;1)
+						INSERT IN ARRAY(alBDSelfKeys;$line;1)
+						INSERT IN ARRAY(asBDSelf;$line;1)
+						INSERT IN ARRAY(asBDCustomers;$line;1)
+						INSERT IN ARRAY(adBDRevDate;$line;1)
+						  //INSERT ELEMENT(asBDNotes;$line;1)
+						INSERT IN ARRAY(alBDStores;$line;1)
+						INSERT IN ARRAY(alBDPackTot;$line;1)
+						INSERT IN ARRAY(alBDPack;$line;1)
+						INSERT IN ARRAY(alBD1;$line;1)
+						INSERT IN ARRAY(alBD2;$line;1)
+						INSERT IN ARRAY(alBD3;$line;1)
+						INSERT IN ARRAY(alBD4;$line;1)
+						INSERT IN ARRAY(alBD5;$line;1)
+						INSERT IN ARRAY(alBD6;$line;1)
+						INSERT IN ARRAY(alBD7;$line;1)
+						INSERT IN ARRAY(alBD8;$line;1)
+						INSERT IN ARRAY(alBD9;$line;1)
+						INSERT IN ARRAY(alBD10;$line;1)
+						asBDLetter{$line}:=$lineLetter
+						alBDSelfKeys{$line}:=$selfKey
+						asBDSelf{$line}:=asBDSelf{$line-1}
+						  //asBDNotes{$line}:=asBDNotes{$line-1}
+						alBDColor{$line}:=alBDColor{$line-1}
+						adBDRevDate{$line}:=Current date(*)
+					End if 
+				End if 
+			End if 
+		End if 
+End case 
+
+LISTBOX SELECT ROW(Breakdown;0;Listbox remove from selection)

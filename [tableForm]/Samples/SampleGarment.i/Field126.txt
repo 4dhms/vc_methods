@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]Combo3Cost>0)
+	[CostSheets]YdCombo3:=0
+	[CostSheets]PriceCombo3:=0
+End if 
+Cost_EntryCalculate 

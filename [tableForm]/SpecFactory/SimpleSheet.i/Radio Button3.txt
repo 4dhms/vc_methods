@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SS_GetPart 
+If (FORM Get current page=2)
+	vlCloneRouter:=3
+	SS_GradeButton 
+	vlCloneRouter:=0
+End if 

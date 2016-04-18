@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($errorcode)
+C_BOOLEAN($done)
+C_TEXT($ipaddress;$subnet)
+
+READ WRITE([Preferences])
+ALL RECORDS([Preferences])
+
+  //<>vfSpooler:=[Preferences]Spooler
+  //<>vtWebServicesIP:=[Preferences]WebServicesIP
+  //<>vtWebServicesPort:=[Preferences]Port
+
+[Preferences]Version:=Application version
+SAVE RECORD([Preferences])
+
+UNLOAD RECORD([Preferences])
+
+ARRAY TEXT(atFiles;0)
+Sys_Platform 
+$errorcode:=IT_MacTCPInit 
+$errorcode:=IT_MyTCPAddr ($ipaddress;$subnet)
+QUERY([Changes];[Changes]FieldName="Server IP")
+If (Records in selection([Changes])=0)
+	CREATE RECORD([Changes])
+	[Changes]FieldName:="Server IP"
+	[Changes]NewChange:=$ipaddress
+	SAVE RECORD([Changes])
+	UNLOAD RECORD([Changes])
+End if 
+
+<>vtWebFolder:=Structure file
+Repeat 
+	<>vtWebFolder:=Delete string(<>vtWebFolder;Length(<>vtWebFolder);1)
+	If (Substring(<>vtWebFolder;Length(<>vtWebFolder);1)=":")
+		$done:=True
+		<>vtWebFolder:=<>vtWebFolder+"Web:"
+	End if 
+Until ($done)
+
+  //List_Update 
+
+  //Dev_EmailStartup 
+Startup_WebSetFolder 
+<>vlStoredServer:=0
+<>vfSpoolerRunning:=False
+<>vfDevelopment:=False
+
+  //Mail_TriggerSP 
+
+If (Test path name("4D:")#0)
+	ALERT("Mount HMSFILESERVER:4D")
+End if 

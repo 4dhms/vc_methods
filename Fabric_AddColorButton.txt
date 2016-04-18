@@ -1,0 +1,149 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$line;$tempKey;$tint;$selfline;cbMultiStyles)
+C_TEXT($type)
+C_TEXT($nextLetter)
+C_BOOLEAN(vfGang)
+ARRAY TEXT($letters;0)
+
+  //Gets next letter
+  //Gets next letter
+If (Find in array(alFabricColor;16711690)>0)
+	WinPrompt ("Save order to delete combos before add more colors.")
+Else 
+	
+	If (Size of array(asOrderType)>0)
+		$i:=1
+		$c:=0
+		
+		For ($i;1;Size of array(asTypeList))
+			If (asTypeList{$i}="Self")
+				APPEND TO ARRAY($letters;asCPLetter{$i})
+			End if 
+		End for 
+		SORT ARRAY($letters;<)
+		
+		If (Size of array($letters)=0)
+			$nextLetter:="A"
+		Else 
+			$nextLetter:=Char(Character code($letters{1})+1)
+		End if 
+		
+		$tempKey:=-1*(Num(String(Current time)))
+		
+		$c:=LISTBOX Get number of rows(fabricList)
+		
+		asTypeList:=0
+		vfNewFabric:=True
+		
+		vtThreadColor:=""
+		  //CP_GetInfo (0)
+		
+		CP_GetInfo ($selfline)
+		If (ok=1) & (vsCPNumber#"")
+			  //If (ok=1)
+			$line:=Size of array(asTypeList)+1
+			$selfline:=$line
+			asTypeList:=$selfline
+			$i:=1
+			For ($i;1;$c)
+				CP_AddArrayLine ($line)
+				
+				If ($i=1)
+					$type:="Self"
+					asTypeList{$line}:="Self"
+					alStyleFab{$line}:=1
+					asCPLetter{$line}:=$nextletter
+				Else 
+					If (asOrderType{$i}="Zipper")
+						$type:="Zipper"
+					Else 
+						$type:="Combo "+String($i-1)
+					End if 
+					asTypeList{$line}:=$type
+					alStyleFab{$line}:=2
+				End if 
+				
+				
+				alSelfKey{$line}:=0
+				adStatusDate{$line}:=Current date(*)
+				alShadeFab{$line}:=16777215
+				
+				alCPXref{$line}:=alxrefkeys{$i}
+				
+				If (cbMultiStyles=1)
+					asCPStyleNum{$line}:=vtMultiStyleNumber
+				End if 
+				
+				$line:=$line+1
+			End for 
+			
+			$line:=$selfline
+			vfGang:=True
+			
+			  //CP_GetInfo ($selfline)
+			  //If (ok=1) & (vsCPNumber#"")
+			If (vsCPType="Self")
+				alCQty{$line}:=vlCPQuantity
+			End if 
+			If (vfGang)
+				vfGang:=False
+				$line:=asTypeList
+			Else 
+				$type:="Self"
+				asTypeList{$line}:="Self"
+				alStyleFab{$line}:=1
+				asCPLetter{$line}:=$nextletter
+			End if 
+			asCPNumbers{$line}:=vsCPNumber
+			asCPColorName{$line}:=vsCPName
+			asMillNumber{$line}:=vtMillNumber
+			If (<>vlOrderNumber>0)
+				asCarton{$line}:=vtCarton
+			Else 
+				asCPStyleNum{$line}:=vtCarton
+			End if 
+			asColorStatus{$line}:=vsCPStatus
+			adStatusDate{$line}:=vdCPStatusDate
+			If (vfCodeOverride)
+				vfCodeOverride:=False
+				afCCoverride{$line}:=True
+			End if 
+			asCC{$line}:=vtColorCode
+			
+			
+			vsCPNumber:=""
+			vsCPType:=""
+			vsCPName:=""
+			vsCPStatus:=""
+			vdCPStatusDate:=!00-00-00!
+			vlCPQuantity:=0
+			vtCarton:=""
+			
+			
+			If (<>vlOrderNumber>0)
+				[Orders]TotalOrderQuantity:=Orders_ArrayQuantity 
+			Else 
+				[Samples]SGQuantity:=Orders_ArrayQuantity 
+				CP_Outstanding 
+			End if 
+			
+			$c:=Size of array(asTypeList)
+			
+			$tint:=14149350
+			For ($i;1;Size of array(alShadeFab))
+				If (alShadeFab{$c}=16711690)
+				Else 
+					alShadeFab{$c}:=$tint
+					
+					If (asTypeList{$c}="Self")
+						$tint:=16777215
+					End if 
+					$c:=$c-1
+				End if 
+			End for 
+			
+		End if 
+	Else 
+		WinPrompt ("Create fabric.")
+	End if 
+End if 

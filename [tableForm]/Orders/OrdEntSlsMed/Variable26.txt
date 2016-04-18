@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Order_Update )
+	<>Close:=True
+	WinChoice ("Are you sure you want to duplicate this production order?")
+	If (ok=1)
+		Spec_Close 
+		
+		OBJECT SET ENABLED(bCancelOrder;False)
+		Order_Dupe 
+	End if 
+End if 
+
+  //WinPrompt ("Under repair")

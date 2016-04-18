@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (cbAll=1)
+	cb3:=0
+	$i:=1
+	For ($i;1;Size of array(afStock))
+		afStock{$i}:=True
+	End for 
+End if 

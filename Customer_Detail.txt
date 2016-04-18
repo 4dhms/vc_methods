@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vtNotes:=$1
+
+Center Window (800;600;1;"")
+DIALOG("NoteLarge")
+CLOSE WINDOW

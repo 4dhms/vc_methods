@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atPages;0)
+
+Case of 
+	: (Table name(Current form table)="FabricOrders")
+		APPEND TO ARRAY(atPages;"Orders")
+		APPEND TO ARRAY(atPages;"History")
+		APPEND TO ARRAY(atPages;"Usage")
+		APPEND TO ARRAY(atPages;"Breakdown")
+		  //APPEND TO ARRAY(atPages;"Actual")
+		APPEND TO ARRAY(atPages;"Ship To")
+		
+	: (Table name(Current form table)="Orders")
+		APPEND TO ARRAY(atPages;"Fab")
+		APPEND TO ARRAY(atPages;"Pix")
+		APPEND TO ARRAY(atPages;"PO")
+		APPEND TO ARRAY(atPages;"UpDt")
+		APPEND TO ARRAY(atPages;"Cmpnts")
+		APPEND TO ARRAY(atPages;"Hist")
+		APPEND TO ARRAY(atPages;"Test")
+		Case of 
+			: (User in group(Current user;"SuperCostsheets")) | (Current user="Sandy Yang") | (Current user="Dusha") & (Not(Shift down))
+				APPEND TO ARRAY(atPages;"Cost I")
+				APPEND TO ARRAY(atPages;"Cost II")
+			: (User in group(Current user;"Spreadsheets")) & (Not(Shift down))
+				APPEND TO ARRAY(atPages;"Cost")
+			: (User in group(Current user;"Costsheets")) & (Not(Shift down))
+				APPEND TO ARRAY(atPages;"Cost")
+		End case 
+		If (User in group(Current user;"DCS"))
+			APPEND TO ARRAY(atPages;"DCS")
+		End if 
+		
+		If (User in group(Current user;"Warehouse"))
+			APPEND TO ARRAY(atPages;"WH")
+		End if 
+		
+	: (Table name(Current form table)="Samples")
+		APPEND TO ARRAY(atPages;"Fab")
+		APPEND TO ARRAY(atPages;"Pix")
+		APPEND TO ARRAY(atPages;"Cmpnts")
+		APPEND TO ARRAY(atPages;"Hist")
+		Case of 
+			: (User in group(Current user;"SuperCostsheets")) | (Current user="Dusha") & (Not(Shift down))
+				APPEND TO ARRAY(atPages;"Cost I")
+				APPEND TO ARRAY(atPages;"Cost II")
+			: (User in group(Current user;"Spreadsheets")) | (User in group(Current user;"Costsheets"))
+				APPEND TO ARRAY(atPages;"Cost")
+		End case 
+		If (User in group(Current user;"DCS"))
+			APPEND TO ARRAY(atPages;"DCS")
+		End if 
+End case 
+
+

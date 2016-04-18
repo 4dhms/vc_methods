@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$right;$top;$bottom)
+FORM SET INPUT([Dialogs];"Invoice.i")
+
+<>CloseBox:=True
+
+$left:=(Screen width/2)-310
+$right:=$left+620
+$top:=(Screen height/2)-250
+$bottom:=$top+480
+Open window($left;$top;$right;$bottom;4;"")
+
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>vlWarehouse:=0

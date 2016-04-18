@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($getList)
+
+<>vlSource:=1
+<>vlDLKey:=[DesignLines]DesignLineKey
+FORM GOTO PAGE(1)
+$getList:=New process("DL_SourceQuery";0;"SourceList")

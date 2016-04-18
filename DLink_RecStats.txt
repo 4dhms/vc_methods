@@ -1,0 +1,92 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$snumber;$r;$o;$outcount;$incount)
+C_POINTER($tn;$dn)
+C_BOOLEAN($rcvd)
+C_TEXT($message;$path)
+C_TIME($docref)
+
+ARRAY TEXT($samples;0)
+ARRAY TEXT($outstanding;0)
+
+QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=[DesignLines]DesignLineKey)
+
+If ([DesignLines]8Up)
+	$n:=8
+Else 
+	$n:=12
+End if 
+
+FIRST RECORD([DesignLinkedPages])
+$c:=1
+For ($c;1;Records in selection([DesignLinkedPages]))
+	$i:=1
+	For ($i;1;$n)
+		$tn:=Field(116;$i+3)
+		$dn:=Field(116;$i+15)
+		
+		If ($tn->=2)
+			If (Find in array($samples;$dn->)<1)
+				APPEND TO ARRAY($samples;$dn->)
+			End if 
+		End if 
+	End for 
+	NEXT RECORD([DesignLinkedPages])
+End for 
+
+$i:=1
+$outcount:=0
+$incount:=0
+For ($i;1;Size of array($samples))
+	$snumber:=-1*Num($samples{$i})
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$snumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	
+	ARRAY LONGINT($selfkeys;0)
+	SELECTION TO ARRAY([CP_OrderXRef]SelfKey;$selfkeys)
+	
+	$n:=1
+	For ($n;1;Size of array($selfkeys))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$selfkeys{$n})
+		
+		  //If (Not([CP_OrderXRef]ReceivedColor)) & ([CP_OrderXRef]CPStatus#"RECD")
+		
+		If ([CP_OrderXRef]CPStatus="RECD")
+			$rcvd:=True
+			$incount:=$incount+1
+		Else 
+			$rcvd:=False
+			$outcount:=$outcount+1
+		End if 
+		If (Not($rcvd))
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			QUERY([Samples];[Samples]SampleNumber=$samples{$i})
+			APPEND TO ARRAY($outstanding;[Samples]StyleNum+"_"+[Samples]DesignNum+"_"+$samples{$i}+"_"+[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName+"_"+[Samples]SamGarFactry)
+		End if 
+	End for 
+End for 
+SORT ARRAY($outstanding;>)
+
+$r:=$incount+$outcount
+$o:=$outcount
+
+$message:="There are "+String($r)+" samples"+Char(13)
+$message:=$message+String($outcount)+" are oustanding."+Char(13)+Char(13)
+$message:=$message+String(Round((($r-$o)/$r)*100;0))+"% Received "+String(Round(($o/$r)*100;0))+"%Waiting"+Char(13)+Char(13)
+$message:=$message+"Do you want a list of outstanding?"
+
+WinChoice ($message)
+If (ok=1)
+	$docref:=Create document("";"xls")
+	If (ok=1)
+		$path:=Document
+		$i:=1
+		SEND PACKET($docref;"Style Number"+Char(9)+"Design Number"+Char(9)+"Sample Number"+Char(9)+"Color/Print"+Char(9)+"Supplier"+Char(13))
+		For ($i;1;Size of array($outstanding))
+			  //ALERT($outstanding{$i})
+			SEND PACKET($docref;Replace string($outstanding{$i};"_";Char(9))+Char(13))
+		End for 
+	End if 
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 
+

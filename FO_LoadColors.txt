@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+CREATE SET([CP_OrderXRef];"color")
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+	FIRST RECORD([CP_OrderXRef])
+	$n:=1
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		ADD TO SET([CP_OrderXRef];"color")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+USE SET("color")
+
+$i:=1
+CREATE EMPTY SET([FabPOLines];"flines")
+
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+	QUERY SELECTION([FabPOLines];[FabPOLines]ColorPrint=[CP_OrderXRef]CPNumber;*)
+	QUERY SELECTION([FabPOLines]; & ;[FabPOLines]FabType=[CP_OrderXRef]CPType)
+	
+	If (Records in selection([FabPOLines])=0)
+		CREATE RECORD([FabPOLines])
+		[FabPOLines]FabOrderKey:=[FabricOrders]FabOrderKey
+		[FabPOLines]ColorPrint:=[CP_OrderXRef]CPNumber
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		[FabPOLines]ColorName:=[ColorPrintNumber]CPName
+		[FabPOLines]LineID:=Sequence number([FabPOLines])
+		QUERY([FabricLibrary];[FabricLibrary]FabricLibKey=[FabricOrders]FabLibKey)
+		[FabPOLines]UnitPrice:=[FabricLibrary]Unit Price
+		[FabPOLines]POUnit:=[FabricLibrary]UnitOfMeasure
+		[FabPOLines]POWidth:=[FabricLibrary]Width
+		[FabPOLines]FabType:=[CP_OrderXRef]CPType
+		SAVE RECORD([FabPOLines])
+	End if 
+	ADD TO SET([FabPOLines];"flines")
+	NEXT RECORD([CP_OrderXRef])
+End for 
+USE SET("flines")
+CLEAR SET("flines")
+CLEAR SET("color")
+

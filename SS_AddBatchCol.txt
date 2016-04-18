@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$newkey)
+
+
+C_TEXT($oldColHead;$newColHead)
+C_TEXT($oldPattern)
+C_DATE($oldRec;$oldSubmit;$newSubmit;$newRec)
+
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+vlColCount:=Records in selection([SpecLineSample])+1
+
+$oldColHead:=[SpecLineSample]ColumnHeader
+$oldRec:=[SpecLineSample]Received
+$oldSubmit:=[SpecLineSample]SubmitDue
+$oldPattern:=[SpecLineSample]PatternSource
+
+$newkey:=[SpecFactory]SF_KeyNumber
+
+CREATE RECORD([SpecLineSample])
+[SpecLineSample]SF_KeyNumber:=$newkey
+[SpecLineSample]ColHead2:=$oldColHead
+[SpecLineSample]ColumnHeader:=[SpecFactory]Colhead
+[SpecLineSample]ColumnNumber:=vlColCount
+[SpecLineSample]SubmitDue:=[SpecFactory]Submit
+[SpecLineSample]Received:=[SpecFactory]Received
+[SpecLineSample]Received2:=$oldRec
+[SpecLineSample]SubmitDue2:=$oldSubmit
+[SpecLineSample]Pattern2:=$oldPattern
+[SpecLineSample]Comments:=[SpecFactory]Note
+[SpecLineSample]PatternSource:=[SpecFactory]PatternSource
+SAVE RECORD([SpecLineSample])
+
+QUERY([SpecFactory];[SpecFactory]OrderNumber=<>vlOrderNumber)
+$newColHead:=[SpecFactory]Colhead
+$newSubmit:=[SpecFactory]Submit
+$newRec:=[SpecFactory]Received
+QUERY([SpecFactory];[SpecFactory]SF_KeyNumber=$newkey)
+[SpecFactory]Colhead:=$newColHead
+[SpecFactory]Submit:=$newSubmit
+  //[SpecFactory]Received:=$newRec
+[SpecFactory]Note:=""
+SAVE RECORD([SpecFactory])
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=$newkey)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+$i:=1
+FIRST RECORD([SpecSheetLines])
+For ($i;1;Records in selection([SpecSheetLines]))
+	CREATE RECORD([SpecLineCols])
+	[SpecLineCols]SpecLineKey:=[SpecSheetLines]SpecLineKey
+	[SpecLineCols]SpecA:=[SpecSheetLines]Spec1A
+	[SpecLineCols]SpecB:=[SpecSheetLines]Spec1B
+	[SpecLineCols]SpecC:=[SpecSheetLines]Spec1C
+	[SpecLineCols]ColumnNumber:=[SpecLineCols]ColumnNumber+1
+	[SpecLineCols]ColumnNumber:=vlColCount
+	SAVE RECORD([SpecLineCols])
+	[SpecSheetLines]Spec3A:=[SpecSheetLines]Spec2A
+	[SpecSheetLines]Spec3C:=[SpecSheetLines]Spec2C
+	[SpecSheetLines]Spec2A:=[SpecSheetLines]Spec1A
+	[SpecSheetLines]Spec2C:=[SpecSheetLines]Spec1C
+	[SpecSheetLines]Spec1B:=""
+	[SpecSheetLines]Spec1C:=""
+	SAVE RECORD([SpecSheetLines])
+	NEXT RECORD([SpecSheetLines])
+End for 
+

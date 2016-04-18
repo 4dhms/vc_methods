@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsRequestString)
+C_BOOLEAN($show;$enter)
+C_LONGINT($i)
+C_POINTER($fieldptr)
+
+If (Form event=On Load)
+	If (Record number([Customers])<0)
+		[Customers]CustomerKey:=Sequence number([Customers])
+		[Customers]CustomerName:=vsRequestString
+	End if 
+	Customer_Confirm 
+	
+	Case of 
+		: (Current user="Designer") & (Shift down)
+			$show:=True
+			$enter:=False
+		: (User in group(Current user;"CustomerInfo"))
+			$show:=False
+			$enter:=True
+		Else 
+			$show:=True
+			$enter:=False
+	End case 
+	
+	OBJECT SET VISIBLE(b1;$show)
+	OBJECT SET VISIBLE(b2;$show)
+	OBJECT SET VISIBLE(b3;$show)
+	OBJECT SET VISIBLE(b4;$show)
+	OBJECT SET VISIBLE(b5;$show)
+	OBJECT SET VISIBLE(b6;$show)
+	OBJECT SET VISIBLE(b7;$show)
+	OBJECT SET VISIBLE(b8;$show)
+	OBJECT SET VISIBLE(b9;$show)
+	OBJECT SET VISIBLE(b10;$show)
+	OBJECT SET VISIBLE(b11;$show)
+	OBJECT SET VISIBLE(b12;$show)
+	OBJECT SET VISIBLE(b13;$show)
+	OBJECT SET VISIBLE(b14;$show)
+	OBJECT SET VISIBLE(b15;$show)
+	OBJECT SET VISIBLE(b16;$show)
+	OBJECT SET VISIBLE(b17;$show)
+	OBJECT SET VISIBLE(b18;$show)
+	OBJECT SET VISIBLE(b19;$show)
+	
+	$i:=1
+	For ($i;1;Get last field number(72))
+		If (Is field number valid(72;$i))
+			$fieldptr:=Field(72;$i)
+			OBJECT SET ENTERABLE($fieldptr->;$enter)
+		End if 
+	End for 
+End if 
+

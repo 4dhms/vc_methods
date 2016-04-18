@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Shift down)
+	ORDER BY([FabricOrders])
+Else 
+	WinChoice ("How do you want to sort?";"Article #";"Vendor";"Date")
+	If (ok=1)
+		If (bChoice2=1)
+			ORDER BY([FabricOrders];[Vendors]VendorName;>)
+		Else 
+			ORDER BY([FabricOrders];[FabricOrders]ArticleNo;>)
+		End if 
+	Else 
+		ORDER BY([FabricOrders];[FabricOrders]FabPODate;>)
+	End if 
+End if 

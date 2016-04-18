@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($week)
+<>pathBreak:=":"
+EMail_GetPreferences 
+
+FORM SET OUTPUT([Digest];"Digest.o")
+
+QUERY([Digest];[Digest]ChangeDate>!00-00-00!)
+QUERY SELECTION([Digest];[Digest]Processed=False)
+
+If ($1=1)
+	QUERY SELECTION([Digest];[Digest]Quantity=False)
+Else 
+	QUERY SELECTION([Digest];[Digest]Quantity=True)
+End if 
+
+If (Records in selection([Digest])>0)
+	
+	ORDER BY([Digest];[Digest]OrderNumber;>;[Digest]ChangeDate;>;[Digest]ChangeTime;>)
+	  //$1 1=Portrait 2=Landscape
+	  //$2 Pointer to table
+	  //$3 True=print selection
+	
+	Case of 
+		: ($1=1)
+			vtTitle:="Shipping Changes ("+String(Current date(*))+")"
+			vtPathName:=PDF_FindFolder +":"+"Shipping Change Digest.pdf"
+		Else 
+			vtTitle:="Quantity Changes ("+String(Current date(*))+")"
+			vtPathName:=PDF_FindFolder +":"+"Quantity Change Digest.pdf"
+	End case 
+	
+	SET CURRENT PRINTER("PDF_Direct")
+	SET PRINT OPTION(Scale option;100)
+	SET PRINT OPTION(Orientation option;1)
+	SET PRINT OPTION(Mac spool file format option;0)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+	
+	PRINT SELECTION([Digest];>)
+	
+	UNLOAD RECORD([Orders])
+	APPLY TO SELECTION([Digest];[Digest]Processed:=True)
+	
+	Digest_Email ($1)
+	
+	$week:=Current date(*)-7
+	QUERY([Digest];[Digest]ChangeDate<$week;*)
+	QUERY([Digest]; & ;[Digest]Processed=True)
+	If ($1=2)
+		QUERY SELECTION([Digest];[Digest]Quantity=True)
+	Else 
+		QUERY SELECTION([Digest];[Digest]Quantity=False)
+	End if 
+	APPLY TO SELECTION([Digest];[Digest]Processed:=False)
+	APPLY TO SELECTION([Digest];[Digest]ChangeDate:=!00-00-00!)
+End if 
+UNLOAD RECORD([Digest])
+

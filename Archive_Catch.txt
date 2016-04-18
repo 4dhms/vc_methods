@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($dot)
+C_TEXT($type)
+C_TEXT($folderPath;$path)
+
+If (<>vfCatchFile)
+	If (<>vlPlatform=3)
+		$folderPath:=Substring(Get 4D folder;1;3)
+	Else 
+		$folderPath:=Get 4D folder
+		$folderPath:=Substring($folderPath;1;Position(":";$folderPath))
+		$folderPath:=$folderPath+"Shipping Documents:"
+	End if 
+	
+	If (Test path name($folderPath)#0)
+		CREATE FOLDER($folderPath)
+	End if 
+	
+	$path:=$folderpath+<>vtFileName
+	
+	BLOB TO DOCUMENT($path;$1)
+	$dot:=Length($path)-3
+	
+	If ($path[[$dot]]=".")
+		$type:=Substring($path;$dot+1;3)
+		
+		SET DOCUMENT TYPE($path;$type)
+		<>vfCatchFile:=False
+		SHOW ON DISK($path)
+	End if 
+End if 

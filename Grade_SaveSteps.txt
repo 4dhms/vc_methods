@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$x;$y;$c)
+C_POINTER($col)
+C_TEXT($header)
+
+$i:=1
+For ($i;1;Size of array(atProcessed))
+	$c:=Position(":";atProcessed{$i})
+	$x:=Num(Substring(atProcessed{$i};1;$c-1))
+	$y:=Num(Substring(atProcessed{$i};$c+1;10))
+	
+	$header:="Header"+String($x+1)
+	$col:=Get pointer("asList"+String($x))
+	
+	QUERY([Steps];[Steps]Range=vtGradeRange;*)
+	QUERY([Steps]; & ;[Steps]POM=asPOM{$y};*)
+	QUERY([Steps]; & ;[Steps]Column=$x;*)
+	QUERY([Steps]; & ;[Steps]Category=vsCategory)
+	
+	If (Records in selection([Steps])=0)
+		CREATE RECORD([Steps])
+		[Steps]POM:=asPOM{$y}
+		[Steps]Column:=$x
+		[Steps]Range:=vtGradeRange
+		[Steps]Category:=vsCategory
+		[Steps]Key:=Sequence number([Steps])
+	End if 
+	[Steps]Step:=$col->{$y}
+	SAVE RECORD([Steps])
+End for 
+UNLOAD RECORD([Steps])
+

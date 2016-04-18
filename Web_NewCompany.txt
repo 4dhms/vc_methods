@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($customer)
+
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+$i:=1
+For ($i;1;Size of array($name))
+	Case of 
+		: ($name{$i}="vtCustomer")
+			vtCustomer:=$value{$i}
+	End case 
+End for 
+$customer:=Replace string(vtCustomer;"_";" ")
+QUERY([Customers];[Customers]CustomerName=$customer)
+
+If (Records in selection([Customers])=0)
+	vtTextField1:=Replace string(vtCustomer;"_";" ")
+	vtTextField2:=Replace string(vsUser;"_";" ")
+	WEB SEND FILE("companyprofile.html")
+Else 
+	vtCustomerAddress:=[Customers]DefaultAddress
+	vtShipTo:=[Customers]ShipTo
+	
+	vtTextField1:=Replace string(vtCustomer;"_";" ")
+	vtTextField2:=Replace string(vsUser;"_";" ")
+	
+	WEB SEND FILE("userprofile.html")
+End if 

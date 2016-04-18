@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($alphaKey)
+C_TEXT($factoryName)
+
+$alphaKey:=Replace string([Speedpost Form]Package number;String(Num([Speedpost Form]Package number));"")
+vlWinWd:=300
+vlWinHt:=220
+vlWinType:=1
+vsWinTitle:=""
+
+
+If ($alphaKey="")
+	$factoryName:=Substring([Speedpost Form]To Factory;1;Position(Char(13);[Speedpost Form]To Factory;*)-1)
+	QUERY([Factories];[Factories]FactoryName=$factoryName)
+Else 
+	QUERY([Factories];[Factories]AlphaKey=$alphaKey)
+End if 
+FORM SET INPUT([Factories];"EnterFactory")
+Center Window 
+MODIFY RECORD([Factories];*)
+CLOSE WINDOW
+
+UNLOAD RECORD([Factories])

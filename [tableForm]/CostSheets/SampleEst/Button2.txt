@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$orderNumber)
+ARRAY LONGINT($samplenumber;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY LONGINT(alRecordNumber;0)
+
+Case of 
+	: (<>asSeasonName<2)
+		WinPrompt ("Select season.")
+	: (<>asSeasonYear<2)
+		WinPrompt ("Select year.")
+	: (asSortOrder<2)
+		WinPrompt ("How do you want to sort?")
+	Else 
+		
+		QUERY([Samples];[Samples]SeasonName=<>asSeasonName{<>asSeasonName};*)
+		QUERY([Samples]; & ;[Samples]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+		
+		SELECTION TO ARRAY([Samples]SampleNumber;$sampleNumber)
+		
+		$i:=1
+		CREATE EMPTY SET([Costing];"Season")
+		
+		For ($i;1;Size of array($sampleNumber))
+			$orderNumber:=-1*$sampleNumber{$i}
+			
+			QUERY([Costing];[Costing]OrderNumber=$orderNumber)
+			ADD TO SET([Costing];"Season")
+		End for 
+		USE SET("Season")
+		RELATE MANY SELECTION([CostSheets]SheetNumber)
+		CLEAR SET("Season")
+		
+		
+		Case of 
+			: (asSortOrder{asSortOrder}="@Style@")
+				ORDER BY([CostSheets];[Costing]StyleNumber;>;[Costing]OrderNumber;<)
+			: (asSortOrder{asSortOrder}="@Design@")
+				ORDER BY([CostSheets];[Costing]DesignNumber;>;[Costing]OrderNumber;<)
+			: (asSortOrder{asSortOrder}="by sea up")
+				ORDER BY([CostSheets];[CostSheets]UnitCostSea;>)
+			: (asSortOrder{asSortOrder}="by sea down")
+				ORDER BY([CostSheets];[CostSheets]UnitCostSea;<)
+			: (asSortOrder{asSortOrder}="by air up")
+				ORDER BY([CostSheets];[CostSheets]UnitCostAir;>)
+			: (asSortOrder{asSortOrder}="by air down")
+				ORDER BY([CostSheets];[CostSheets]UnitCostAir;<)
+		End case 
+		
+		SELECTION TO ARRAY([CostSheets]SheetNumber;alOrders)
+		If (asSortOrder{asSortOrder}="@Style@") | (asSortOrder{asSortOrder}="@Design@")
+			$i:=1
+			FIRST RECORD([CostSheets])
+			
+			For ($i;1;Records in selection([CostSheets]))
+				If ($i>1)
+					If ([CostSheets]SheetNumber#alOrders{$i-1})
+						APPEND TO ARRAY(alRecordNumber;[CostSheets]SheetID)
+					End if 
+				End if 
+				NEXT RECORD([CostSheets])
+			End for 
+			SORT ARRAY(alRecordNumber;>)
+		End if 
+		
+End case 
+

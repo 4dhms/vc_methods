@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Size of array(alCtnKey)=0)
+		  //do nothing
+		ACCEPT
+	: (vlRemaining>0)
+		WinPrompt ("You need to assign another "+String(vlRemaining)+" units.")
+	Else 
+		$i:=1
+		For ($i;1;Size of array(alCtnKey))
+			If (alCtnKey{$i}=0)
+				CREATE RECORD([Cartons])
+				[Cartons]CtnKey:=Sequence number([Cartons])
+				[Cartons]OrderNumber:=[Orders]OrderNum
+			Else 
+				QUERY([Cartons];[Cartons]CtnKey=alCtnKey)
+			End if 
+			[Cartons]CtnBreak:=asCtnBreak{$i}
+			[Cartons]CtnColor:=asCtnColor{$i}
+			[Cartons]CtnColorCode:=asCtnColorCode{$i}
+			[Cartons]CtnIn:=alCtnIn{$i}
+			[Cartons]CtnPack:=asCtnPack{$i}
+			[Cartons]CtnPO:=asCtnPO{$i}
+			[Cartons]CtnCount:=alCtnCount{$i}
+			[Cartons]CtnQty:=alCtnQty{$i}
+			SAVE RECORD([Cartons])
+		End for 
+		
+		ACCEPT
+		UNLOAD RECORD([DC_Spreads])
+End case 
+
+

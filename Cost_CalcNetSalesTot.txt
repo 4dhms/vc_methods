@@ -1,0 +1,21 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($subtot)
+C_LONGINT($qty)
+
+Case of 
+	: (vfTestQuantity) & (vlTestQuantity>0)
+		$qty:=vlTestQuantity
+	Else 
+		$qty:=Cost_Quantity 
+End case 
+
+If (vrTestPrice>0)
+	$subTot:=Round(($qty*vrTestPrice)*((100-[CostSheets]Figurer)/100);2)
+Else 
+	$subTot:=Round(($qty*[CostSheets]Price)*((100-[CostSheets]Figurer)/100);2)
+End if 
+
+[CostSheets]NetTotalSales:=$subTot
+SAVE RECORD([CostSheets])
+
+$0:=$subTot

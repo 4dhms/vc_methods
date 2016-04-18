@@ -1,0 +1,31 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($netSea;$netAir;$netNetSea;$netNetAir)
+C_REAL($netSeaWC;$netAirWC;$netNetSeaWC;$netNetAirWC)
+C_REAL($netAir;$netSea;$netSea;$netNetSea)
+
+$netSea:=[CostSheets]NetTotalSales-([CostSheets]Quantity*vrLDPBoat)
+$netSeaWC:=[CostSheets]NetTotalSales-([CostSheets]Quantity*vrLDP1a)
+
+$netAir:=[CostSheets]NetTotalSales-([CostSheets]Quantity*vrLDPAir)
+$netAirWC:=[CostSheets]NetTotalSales-([CostSheets]Quantity*vrLDP2a)
+
+$netNetSea:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*vrLDPBoat)
+$netNetAir:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*vrLDPAir)
+$netNetSeaWC:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*vrUnit1a)
+$netNetAirWC:=[CostSheets]NetNetTotalSales-([CostSheets]Quantity*vrUnit2a)
+
+[CostSheets]NetTotalProfitSea:=$netSea
+[CostSheets]NetNetTotalProfitSea:=$netNetSea
+[CostSheets]NetTotalProfitAir:=$netAir
+SAVE RECORD([CostSheets])
+[CostSheets]NetNetTotalProfitAir:=$netNetAir
+
+vrNetProfit1:=$netSea
+vrNetProfit2:=$netAir
+vrNetNetProfit1:=$netNetSea
+vrNetNetProfit2:=$netNetAir
+
+vrNetProfit1a:=$netSeaWC
+vrNetProfit2a:=$netAirWC
+vrNetNetProfit1a:=$netNetSeaWC
+vrNetNetProfit2a:=$netNetAirWC

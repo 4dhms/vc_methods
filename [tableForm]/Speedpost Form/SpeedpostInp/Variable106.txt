@@ -1,0 +1,86 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($change;$continue;$done)
+C_TEXT($message)
+
+Case of 
+	: (Record number([Speedpost Form])<0)
+		$change:=False
+		$continue:=True
+	: ([Speedpost Form]Package number#"")
+		$message:="If you don't want to waste this package number, "
+		WinPrompt ($message+" you should cancel and create a new one.")
+		WinChoice ("Are you sure you want to change the package number?";"Change";"Keep";"Cancel")
+		Case of 
+			: (ok=1) & (bChoice2=1)
+				$continue:=True
+				$change:=False
+			: (ok=1)
+				$continue:=True
+				$change:=True
+		End case 
+	Else 
+		$change:=True
+End case 
+
+If (Not($done))
+	
+	If ($continue)
+		ALL RECORDS([Factories])
+		SELECTION TO ARRAY([Factories]AlphaKey;asFactoryAlpha)
+		
+		While (Semaphore("Factories"))
+		End while 
+		
+		FORM SET INPUT([Factories];"EnterFactory")
+		AccessMode (->[Factories];True)
+		
+		If (<>asFactories=1)
+			
+			Center Window (300;200;1;"")
+			ADD RECORD([Factories];*)
+			CLOSE WINDOW
+			
+		Else 
+			QUERY([Factories];[Factories]FactoryName=<>asFactories{<>asFactories})
+			If ([Factories]AlphaKey="")
+				WinPrompt ("WARNING:"+Char(13)+Char(13)+"This factory is missing it's alpha key."+Char(13)+"Click EDIT and enter a unique alpha key.")
+			End if 
+			
+			If (Shift down)
+				vlWinWd:=300
+				vlWinHt:=200
+				vlWinType:=1
+				vsWinTitle:=""
+				
+				
+				Center Window 
+				MODIFY RECORD([Factories];*)
+				CLOSE WINDOW
+			Else 
+				If ($change)
+					QUERY([Recycler];[Recycler]SpeedpostNumber=[Factories]AlphaKey+"@")
+					If (Records in selection([Recycler])>0)
+						[Speedpost Form]Package number:=[Recycler]SpeedpostNumber
+						DELETE RECORD([Recycler])
+					Else 
+						[Speedpost Form]Package number:=[Factories]AlphaKey+String([Factories]NumberKey)
+						[Factories]NumberKey:=[Factories]NumberKey+1
+						SAVE RECORD([Factories])
+					End if 
+				End if 
+				[Speedpost Form]Package number:=[Factories]AlphaKey+String([Factories]NumberKey)
+				[Speedpost Form]NewPost:=True
+				  //<>asFactories:=Find in array(<>asFactories;[Factories]FactoryName)
+				[Speedpost Form]To Factory:=[Factories]FactoryName+Char(13)+[Factories]FactoryAddress
+				
+				Array_Factories 
+				$done:=True
+			End if 
+		End if 
+		
+		CLEAR SEMAPHORE("Factories")
+		UNLOAD RECORD([Factories])
+		
+	End if 
+End if 
+

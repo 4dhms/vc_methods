@@ -1,0 +1,124 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCPNumber;vtNote)
+C_BOOLEAN(vfCopy;$clear)
+C_LONGINT($choice)
+C_POINTER($cell)
+C_POINTER($sketch)
+C_POINTER($note)
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+$sketch:=Get pointer("vxSketch"+String($1))
+vlPageRouter:=$1
+
+Case of 
+	: ($1=1)
+		$cell:=->[PCPage]Print1
+		$note:=->[PCPage]Note1
+	: ($1=2)
+		$cell:=->[PCPage]Print2
+		$note:=->[PCPage]Note2
+	: ($1=3)
+		$cell:=->[PCPage]Print3
+		$note:=->[PCPage]Note3
+	: ($1=4)
+		$cell:=->[PCPage]Print4
+		$note:=->[PCPage]Note4
+	: ($1=5)
+		$cell:=->[PCPage]Print5
+		$note:=->[PCPage]Note5
+	: ($1=6)
+		$cell:=->[PCPage]Print6
+		$note:=->[PCPage]Note6
+	: ($1=7)
+		$cell:=->[PCPage]Print7
+		$note:=->[PCPage]Note7
+	: ($1=8)
+		$cell:=->[PCPage]Print8
+		$note:=->[PCPage]Note8
+	: ($1=9)
+		$cell:=->[PCPage]Print9
+		$note:=->[PCPage]Note9
+	: ($1=10)
+		$cell:=->[PCPage]Print10
+		$note:=->[PCPage]Note10
+End case 
+
+
+
+If (vsCPNumber="")
+	$choice:=Pop up menu("Move;Move to Pasteboard;Delete")
+End if 
+
+Case of 
+	: (vsCPNumber#"")  //paste
+		$sketch->:=vxSketch20
+		$cell->:=vsCPNumber
+		$note->:=vtNote
+		vsCPNumber:=""
+		
+		  //: ($choice=1)  //status
+		  //SAVE RECORD([PCatalog])
+		  //vxSketch:=$sketch->
+		  //vsNewColorNumber:=$cell->
+		  //QUERY([PCHistory];[PCHistory]PCKey=[PCatalog]PCKey)
+		  //QUERY SELECTION([PCHistory];[PCHistory]PrintNumber=$cell->)
+		  //ORDER BY([PCHistory];[PCHistory]Serial;<)
+		  //FORM GOTO PAGE(2)
+		
+	: ($choice=2)  //pasteboard
+		Case of 
+			: ([PCatalog]Paste1="")
+				[PCatalog]Paste1:=$cell->
+				vxSketch11:=$sketch->
+				$clear:=True
+			: ([PCatalog]Paste2="")
+				[PCatalog]Paste2:=$cell->
+				vxSketch12:=$sketch->
+				$clear:=True
+			: ([PCatalog]Paste3="")
+				[PCatalog]Paste3:=$cell->
+				vxSketch13:=$sketch->
+				$clear:=True
+			: ([PCatalog]Paste4="")
+				[PCatalog]Paste4:=$cell->
+				vxSketch14:=$sketch->
+				$clear:=True
+			: ([PCatalog]Paste5="")
+				[PCatalog]Paste5:=$cell->
+				vxSketch15:=$sketch->
+				$clear:=True
+			: ([PCatalog]Paste6="")
+				[PCatalog]Paste6:=$cell->
+				vxSketch16:=$sketch->
+				$clear:=True
+			Else 
+				WinPrompt ("Pasteboard is full")
+		End case 
+		If ($clear)
+			$cell->:=""
+			$sketch->:=$empty
+			$note->:=""
+		End if 
+		
+	: ($choice=3)  //delete
+		WinChoice ("Do you want to update"+Char(13)+"the Color/Print Library?";"Yes";"No")
+		If (ok=1)
+			vsCPNumber:=$cell->
+			CP_NumberUpdateDelete 
+		End if 
+		
+		$sketch->:=$empty
+		$cell->:=""
+		$note->:=""
+		
+	: ($choice=1)  //copy
+		vsCPNumber:=$cell->
+		vxSketch20:=$sketch->
+		vtNote:=$note->
+		$cell->:=""
+		$sketch->:=$empty
+		$note->:=""
+		
+		
+End case 

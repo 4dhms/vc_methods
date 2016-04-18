@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$qty;$dc;$total)
+C_TEXT($html;$name;$color)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	QUERY([ColorConverter];[ColorConverter]CPOrdID=[CP_OrderXRef]CPOrdID)
+	If (Records in selection([ColorConverter])>0)
+		$name:=[ColorConverter]StockName
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		$name:=[ColorPrintNumber]CPName
+	End if 
+	$qty:=[CP_OrderXRef]Quantity
+	QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+	$dc:=Sum([DC]Count)
+	If ($qty-$dc>0)
+		If ($i>1) & ($color#"")
+			$color:=$color+", "
+		End if 
+		$color:=$color+$name+"="+String($qty-$dc)
+		$total:=$total+($qty-$dc)
+	End if 
+	If ($total<1)
+		[DesignLineIncluded]SoldOut:=True
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+$color:=$color+Char(13)+"Total: "+String($total;"###,##0")
+[DesignLineIncluded]Colors:=$color
+

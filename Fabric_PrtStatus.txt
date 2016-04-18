@@ -1,0 +1,72 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$p;$t;$s)
+$p:=1
+
+ORDER BY([FabricOrders])
+PAGE SETUP([FabricOrders];"FabStatusBody")
+
+$t:=Int(Records in selection([FabricOrders])/14)+1
+
+FIRST RECORD([FabricOrders])
+PRINT SETTINGS
+For ($p;1;$t)
+	vsDatePage:=String(Current date(*))+"   "+"Page "+String($p)+" of "+String($t)
+	Case of 
+		: ([FabricOrders]POType=0)
+			vsHead1:="Fabric Order Status"
+			vsHead2:="Fabric Name/Fiber Content"
+			vsHead3:="Lab Dip Approved"
+		: ([FabricOrders]POType=1)
+			vsHead1:="Button Order Status"
+			vsHead2:="Button Name/Description"
+			vsHead3:="Description"
+		: ([FabricOrders]POType=2)
+			vsHead1:="Trim Order Status"
+			vsHead2:="Trim/Fiber Content/Description"
+			vsHead3:="Description"
+	End case 
+	Print form([FabricOrders];"PrtFabStatusHeader")
+	$i:=1
+	For ($i;1;13)
+		If (Not(End selection([FabricOrders])))
+			QUERY([FabricLibrary];[FabricLibrary]FabricLibKey=[FabricOrders]FabLibKey)
+			QUERY([ShipTo];[ShipTo]FabOrderKey=[FabricOrders]FabOrderKey)
+			  //QUERY([Deliveries];[Deliveries]FabOrderKey=[FabricOrders]FabOrderKey)
+			vtShipto:=[ShipTo]ShipTo
+			RELATE MANY([FabricOrders]FabOrderKey)
+			
+			vsRelated:=""
+			$s:=1
+			FIRST RECORD([OrdersFabricXRef])
+			For ($s;1;Records in selection([OrdersFabricXRef]))
+				If ($s>1)
+					vsRelated:=vsRelated+", "
+				End if 
+				vsRelated:=vsRelated+String([OrdersFabricXRef]OrderNumber)
+				NEXT RECORD([OrdersFabricXRef])
+			End for 
+			
+			Case of 
+				: ([FabricOrders]POType=0)
+					vsName:=[FabricLibrary]FabricName
+					vsFiberCont:=[FabricLibrary]FiberContent
+					vtDescription:=String([FabricOrders]FinalDipDate)
+					QUERY([Deliveries];[Deliveries]FabOrderKey=[FabricOrders]FabOrderKey)
+					[FabricOrders]InCount:=Sum([Deliveries]DeliveredAmt)
+					[FabricOrders]OutCount:=[FabricOrders]InCount-[FabricOrders]OrderedCount
+					
+				: ([FabricOrders]POType=1)
+					vsName:=[FabricOrders]ItemName
+					vsFiberCont:=""
+					vtDescription:=[FabricOrders]Description
+				: ([FabricOrders]POType=2)
+					vsName:=[FabricOrders]ItemName
+					vsFiberCont:=[FabricOrders]FiberContent
+					vtDescription:=[FabricOrders]Description
+			End case 
+			Print form([FabricOrders];"FabStatusBody")
+		End if 
+		NEXT RECORD([FabricOrders])
+	End for 
+	PAGE BREAK
+End for 

@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_BOOLEAN($exit)
+
+$exit:=True
+$i:=1
+For ($i;1;Size of array(arPrice))
+	If (arPrice{$i}=0)
+		Case of 
+			: (asCustomers{$i}="+@") | (asCustomers{$i}="=@") | (asCustomers{$i}="-@") | (asCustomers{$i}="[@")
+			: (asCustomers{$i}="") | (asCustomers{$i}="(-@") | (asCustomers{$i}="0") | (asCustomers{$i}="00")
+			: (asCustomers{$i}="specialty stores") | (asCustomers{$i}="@Adjustment@") | (asCustomers{$i}="Additional@")
+			: (asCustomers{$i}="Extra@factory@") | (asCustomers{$i}="fty shortag@")
+			: (asCustomers{$i}="total cut@") | (asCustomers{$i}="Total") | (asCustomers{$i}="OTs")
+				
+			Else 
+				$c:=$i
+				$exit:=False
+		End case 
+	End if 
+End for 
+
+If ($exit)
+	$0:=0
+	vfIncomplete:=False
+Else 
+	$0:=$c
+End if 

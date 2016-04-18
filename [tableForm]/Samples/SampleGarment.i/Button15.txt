@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (SG_Mandatories )
+	SAVE RECORD([Samples])
+	WinChoice ("Are you sure you want to duplicate Sample Garment Order "+String([Samples]SampleNumber)+"?")
+	If (ok=1)
+		Spec_Close 
+		SG_DupeOrder 
+		  //DISABLE BUTTON(bCancelSample)
+	End if 
+End if 

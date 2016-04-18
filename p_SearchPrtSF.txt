@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search for prints/colors in Sample Fabrics
+SAVE RECORD([SampleFabrics])
+vColNum:=Request("Find print:")
+If (OK=1)
+	QUERY([SampleFabrics];[SampleFabrics]Sam Fab Print 1="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 2="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 3="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 4="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 5="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 6="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 7="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 8="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Print 9="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Prt 10="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Prt 11="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Prt 12="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Prt 13="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Prt 14="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Fab Prt 15="@"+vColNum+"@")
+End if 
+p_SetWndwSamF 

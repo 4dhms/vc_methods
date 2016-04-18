@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SS_DeletePart 
+If (Size of array(alPartNumber)>2)
+	OBJECT SET ENABLED(bAdd1;False)
+Else 
+	OBJECT SET ENABLED(bAdd1;True)
+End if 

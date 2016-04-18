@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($stop)
+
+$i:=1
+FIRST RECORD([NeedByLib])
+For ($i;1;Records in selection([NeedByLib]))
+	If (Not($stop))
+		QUERY([Orders];[Orders]Factory=[NeedByLib]Name)
+		If (Records in selection([Orders])=0)
+			WinChoice ([NeedByLib]Name+" is not a valid factory.";"Keep Looking";"Stop")
+			If (ok=0)
+				$stop:=True
+			End if 
+		End if 
+	End if 
+	NEXT RECORD([NeedByLib])
+End for 

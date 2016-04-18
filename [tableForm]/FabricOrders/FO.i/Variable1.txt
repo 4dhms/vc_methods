@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //[FabricOrders]InCount:=vlIn
+  //[FabricOrders]OutCount:=vlOut
+  //[FabricOrders]POExt:=vrPOExt
+
+FabPO_ChangedFieldList (2)
+SAVE RECORD([FabricOrders])
+vtBodyText:="Attached file contains 1 order: "+[FabricOrders]PONumber
+
+If (Not([FabricOrders]POSent))
+	If ([FabricOrders]ReviseNumber=0)
+		WinChoice ("Is this Purchase Order being sent to a factory?")
+	Else 
+		WinChoice ("Is this Revision being sent to a factory?")
+	End if 
+	If (ok=1)
+		[FabricOrders]POSent:=True
+		SAVE RECORD([FabricOrders])
+	End if 
+End if 
+
+FabPO_PrintPrep 
+  //ONE RECORD SELECT([FabricOrders])
+vsHeader:=<>asVendorTypes{<>asVendorTypes}+" Purchase Order No. "+[FabricOrders]PONumber
+Email_Confirm ("FO";"Fabric")
+SET WINDOW TITLE(<>asVendorTypes{<>asVendorTypes}+" Fabric")

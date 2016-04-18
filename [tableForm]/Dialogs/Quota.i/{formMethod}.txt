@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asKWCS;4)
+		ARRAY TEXT(asList1;0)
+		ALL RECORDS([Quota])
+		DISTINCT VALUES([Quota]QuotaType;asList1)
+		SORT ARRAY(asList1;>)
+		INSERT IN ARRAY(asList1;1;2)
+		asList1{1}:="Select Type"
+		asList1{2}:="Add to List"
+		
+		If (<>SalesPrcID>0)
+			OBJECT SET ENABLED(bOk;True)
+		Else 
+			OBJECT SET ENABLED(bOk;False)
+		End if 
+		
+		pOne:=0
+		pTwo:=0
+		pThree:=0
+		asKWCS{1}:="Select"
+		asKWCS{2}:="Knit"
+		asKWCS{3}:="Woven"
+		  //asKWCS{4}:="Other"
+		ARRAY TEXT(asTypeFinder;0)
+		If (<>QuotaRouter=3)
+			OBJECT SET VISIBLE(*;"xGuide";True)
+			  //ENABLE BUTTON(bAdd)
+			pAll:=1
+		Else 
+			OBJECT SET VISIBLE(*;"xGuide";False)
+			  //DISABLE BUTTON(bAdd)
+			
+		End if 
+		
+		If (<>QuotaRouter=3)
+			OBJECT SET TITLE(bOk;"Done")
+		Else 
+			OBJECT SET TITLE(bOk;"Pick")
+		End if 
+		Quota_List 
+		OBJECT SET TITLE(bGo;"Add/Edit")
+		If ([Quota]DutyRate=0)
+			GOTO OBJECT([Quota]QuotaType)Else 
+			GOTO OBJECT([Quota]DutyRate)
+		End if 
+End case 

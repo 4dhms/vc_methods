@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vlPrintedPixels<15)
+	vsPrintingHeader:="Printed on "+String(Current date(*))
+	If (vlPage>1)
+		vsPrintingHeader:=vsPrintingHeader+"  Page "+String(vlPage)
+	End if 
+	vlPage:=vlPage+1
+	
+	Print form([Customers];"Customers.header")
+	vlPrintedPixels:=600
+End if 
+

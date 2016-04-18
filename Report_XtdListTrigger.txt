@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+USE SET("SalesReport")
+QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+
+C_LONGINT($a)
+ARRAY LONGINT(alMakeSheet;0)
+ARRAY LONGINT(alOrders;0)
+
+CREATE SET([Orders];"Mini")
+
+$a:=1
+If ($1="Factory")
+	DISTINCT VALUES([Orders]Factory;asFactories)
+	Report_BDArrayInit (Size of array(asFactories))
+	For ($a;1;Size of array(asFactories))
+		USE SET("Mini")
+		QUERY SELECTION([Orders];[Orders]Factory=asFactories{$a})
+		Report_XtdCost ($a)
+	End for 
+	Report_XtdBDTotals (Size of array(asFactories))
+Else 
+	SELECTION TO ARRAY([Orders]OrderNum;alOrders)
+	Report_BDArrayInit (Size of array(alOrders))
+	For ($a;1;Size of array(alOrders))
+		USE SET("Mini")
+		QUERY SELECTION([Orders];[Orders]OrderNum=alOrders{$a})
+		Report_XtdCost ($a*-1)
+	End for 
+	Report_XtdBDTotals (Size of array(alOrders))
+End if 
+
+CLEAR SET("Mini")
+
+If (Records in set("ThisDivision")>0)
+	CLEAR SET("ThisDivision")
+End if 
+vsSubhead:=asDivisions{asDivisions}
+LISTBOX SELECT ROW(SALESLIST;Size of array(asDivisions)+1)
+
+FORM GOTO PAGE(2)
+

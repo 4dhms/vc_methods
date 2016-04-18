@@ -1,0 +1,116 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;vlMoveCell)
+C_POINTER($thisCell)
+C_POINTER($cell)
+C_TEXT($log)
+
+If ($1=-6)
+Else 
+	$thisCell:=Get pointer("vDesign"+String($1))
+End if 
+
+If (vf8up)
+	$c:=8
+Else 
+	$c:=12
+End if 
+
+Case of 
+	: (vlMoveCell>0) & ($1=-6)
+		  //Trash
+		QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+		If (vlMoveCell<12)
+			QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=[DLPages]PageNumber;*)
+		End if 
+		QUERY SELECTION([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=vlMoveCell)
+		If ([DesignLineIncluded]DesignNumber#"")
+			$log:="D/N: "+[DesignLineIncluded]DesignNumber+" "
+		End if 
+		If ([DesignLineIncluded]StyleNumber#"")
+			$log:=$log+"S/N: "+[DesignLineIncluded]StyleNumber+" "
+		End if 
+		$log:=$log+"moved to Trash by "+Current user+" on "+String(Current date(*))+" at "+String(Current time(*))+"."+Char(13)
+		
+		[DesignLineIncluded]PageNumber:=[DLPages]PageNumber
+		[DesignLineIncluded]ItemNumber:=$1
+		SAVE RECORD([DesignLineIncluded])
+		
+		[DesignLines]History:=$log+[DesignLines]History
+		SAVE RECORD([DesignLines])
+		
+		vlMoveCell:=0
+		
+	: ($thisCell->="") & (vlMoveCell=0)
+		  //empty cell
+	: ($thisCell->#"") & (vlMoveCell>0)
+		vlMoveCell:=0
+		$i:=1
+		For ($i;1;19)
+			OBJECT SET VISIBLE(*;"x"+String($i);False)
+			OBJECT SET VISIBLE(*;"g"+String($i);False)
+		End for 
+		vlMoveCell:=0
+		
+	: (vf8up) & ($1>8) & ($1<13)
+		  //undercover
+	Else 
+		Case of 
+			: (Form event=On Double Clicked)
+				QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey;*)
+				QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=[DLPages]PageNumber;*)
+				QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=$1)
+				
+				FORM SET INPUT([DesignLineIncluded];"Design.win")
+				vlWinWd:=600
+				vlWinHt:=250
+				
+				vlWinType:=4
+				vsWinTitle:=""
+				Center Window 
+				MODIFY RECORD([DesignLineIncluded];*)
+				CLOSE WINDOW
+				
+			Else 
+				Case of 
+					: (vlMoveCell=0)  //select to move
+						$i:=1
+						OBJECT SET VISIBLE(*;"g"+String($1);True)
+						For ($i;1;18)
+							$cell:=Get pointer("vDesign"+String($i))
+							If ($cell->="")
+								If (vf8up) & ($i>8) & ($i<13)
+								Else 
+									OBJECT SET VISIBLE(*;"x"+String($i);True)
+								End if 
+							End if 
+						End for 
+						OBJECT SET VISIBLE(*;"x19";True)
+						vlMoveCell:=$1
+						
+					: ($1<19) & ($thisCell->="")  //drop
+						QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+						QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=vlMoveCell)
+						If (vlMoveCell<13)
+							QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=[DLPages]PageNumber)
+						End if 
+						[DesignLineIncluded]PageNumber:=[DLPages]PageNumber
+						[DesignLineIncluded]ItemNumber:=$1
+						SAVE RECORD([DesignLineIncluded])
+						
+						$i:=1
+						For ($i;1;19)
+							OBJECT SET VISIBLE(*;"x"+String($i);False)
+							OBJECT SET VISIBLE(*;"g"+String($i);False)
+						End for 
+						vlMoveCell:=0
+					Else 
+				End case 
+		End case 
+End case 
+
+If ($1>0) & (vlMoveCell=0) | ($1=-6)
+	DL_BuildPage ([DLPages]PageNumber;False)
+End if 
+
+UNLOAD RECORD([DesignLineIncluded])
+

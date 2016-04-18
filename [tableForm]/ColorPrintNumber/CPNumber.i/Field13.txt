@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test)
+
+$test:=Substring([ColorPrintNumber]CPName;1;3)
+
+If (Form event=On Data Change)
+	If ([ColorPrintNumber]CPType=0)
+		WinChoice ("Enter fabric type:";"Solid";"Print";"Embroidery";"Layout")
+		Case of 
+			: (ok=1) & (bChoice3=1)
+				[ColorPrintNumber]CPType:=3
+			: (ok=1) & (bChoice2=1)
+				[ColorPrintNumber]CPType:=2
+			: (ok=1)
+				[ColorPrintNumber]CPType:=1
+			Else 
+				[ColorPrintNumber]CPType:=4
+		End case 
+	End if 
+	
+	Case of 
+		: ([ColorPrintNumber]CPName="From@")
+			WinPrompt ("Color Name can not begin with "+Char(34)+"From"+Char(34))
+			[ColorPrintNumber]CPName:=""
+			GOTO OBJECT([ColorPrintNumber]CPName)
+		: ($test="@0@") | ($test="@1@") | ($test="@2@") | ($test="@3@") | ($test="@4@") | ($test="@5@") | ($test="@6@") | ($test="@7@") | ($test="@8@") | ($test="@9@")
+			WinPrompt ("Color Name can not begin with numbers.")
+			[ColorPrintNumber]CPName:=""
+			GOTO OBJECT([ColorPrintNumber]CPName)
+	End case 
+End if 

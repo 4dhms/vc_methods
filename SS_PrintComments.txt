@@ -1,0 +1,73 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$n)
+C_TEXT($colHeader;$colLine)
+
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+
+$i:=1
+
+For ($i;1;Records in selection([SpecLineSample])+1)
+	If ($i=1)
+		vtNewText:=[SpecFactory]Note+Char(13)
+		$colHeader:=[SpecFactory]Colhead
+	Else 
+		QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber;*)
+		QUERY([SpecLineSample]; & ;[SpecLineSample]ColumnNumber=vlColNo1-($i-1))
+		vtNewText:=[SpecLineSample]Comments
+		$colHeader:=[SpecLineSample]ColumnHeader
+	End if 
+	
+	If (vtNewText#"") | ($i=1)
+		ARRAY TEXT($commentText;0)
+		$c:=0
+		Repeat 
+			$c:=$c+1
+			INSERT IN ARRAY($commentText;$c;1)
+			$colLine:=SS_GetCommentLine 
+			If ($colLine="") & (Position(Char(13);vtNewText;*)<1)
+				vtNewText:=""
+			Else 
+				$commentText{$c}:=$colLine
+			End if 
+		Until (Length(vtNewText)<1)
+		
+		$n:=1
+		
+		vlremaining:=vlremaining-((Size of array($commentText)+3)*11)
+		If (vlremaining<0) | ($i=1)
+			vlPage:=vlPage+1
+			vsPrintingHeader:="PAGE "+String(vlPage)
+			PAGE BREAK(>)
+			vlremaining:=575
+			PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+			Print form([SpecSheetLines];"HeaderComment.p")
+			vtTitle1:=""
+			vtLine:=""
+			PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+			Print form([SpecSheetLines];"Comments.a")
+			
+		End if 
+		
+		vtLine:=""
+		vtTitle1:="COMMENTS FOR: "+Uppercase($colHeader)
+		PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+		Print form([SpecSheetLines];"Comments.a")
+		vtTitle1:=""
+		
+		For ($n;1;Size of array($commentText))
+			vtLine:=$commentText{$n}
+			PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+			Print form([SpecSheetLines];"Comments.a")
+		End for 
+		vtLine:=""
+		PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+		Print form([SpecSheetLines];"Comments.a")
+		PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+		Print form([SpecSheetLines];"Divider.p")
+		PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+		Print form([SpecSheetLines];"Comments.a")
+	End if 
+	NEXT RECORD([SpecLineSample])
+End for 
+  //PAGE BREAK(>)

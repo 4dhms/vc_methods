@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE(vxSketch;$blank)
+GET PICTURE FROM LIBRARY("empty.jpg";$blank)
+
+If ([ColorPrintNumber]Image)
+	<>vfCatalog:=False
+	Picture_Get ([ColorPrintNumber]CPNumberKey;"CP")
+End if 
+
+If (Find in array(<>asSeasonName;[ColorPrintNumber]SeasonName)>0)
+	<>asSeasonName:=Find in array(<>asSeasonName;[ColorPrintNumber]SeasonName)
+Else 
+	<>asSeasonName:=1
+End if 
+If (Find in array(<>asSeasonYear;[ColorPrintNumber]SeasonYear)>0)
+	<>asSeasonYear:=Find in array(<>asSeasonYear;[ColorPrintNumber]SeasonYear)
+Else 
+	<>asSeasonYear:=1
+End if 
+
+
+OBJECT SET VISIBLE(vxSketch;[ColorPrintNumber]Image=True)
+OBJECT SET VISIBLE(bCode;[ColorPrintNumber]CPType=2)
+
+cbSolid:=0
+cbPrint:=0
+cbEmbroidery:=0
+cbLayout:=0
+cbYarnDye:=0
+cbNovelty:=0
+
+Case of 
+	: ([ColorPrintNumber]CPType=1)
+		cbSolid:=1
+	: ([ColorPrintNumber]CPType=2)
+		cbPrint:=1
+	: ([ColorPrintNumber]CPType=3)
+		cbEmbroidery:=1
+	: ([ColorPrintNumber]CPType=4)
+		cbLayout:=1
+	: ([ColorPrintNumber]CPType=5)
+		cbYarnDye:=1
+	: ([ColorPrintNumber]CPType=6)
+		cbNovelty:=1
+End case 
+

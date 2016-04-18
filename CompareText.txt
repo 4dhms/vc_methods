@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+C_LONGINT($i)
+C_TEXT($rem)
+
+ARRAY TEXT($before;0)
+ARRAY TEXT($after;0)
+
+$rem:=$1
+$done:=False
+
+Repeat 
+	Case of 
+		: (Position(Char(13);$rem)<1)
+			$done:=True
+		: (Shift down)
+			$done:=True
+		Else 
+			APPEND TO ARRAY($before;Substring($rem;1;Position(Char(13);$rem)-1))
+			$rem:=Substring($rem;Position(Char(13);$rem)+1;999)
+	End case 
+Until ($done)
+
+$rem:=$2
+$done:=False
+
+Repeat 
+	Case of 
+		: (Position(Char(13);$rem)<1)
+			$done:=True
+		: (Shift down)
+			$done:=True
+		Else 
+			APPEND TO ARRAY($after;Substring($rem;1;Position(Char(13);$rem)-1))
+			$rem:=Substring($rem;Position(Char(13);$rem)+1;999)
+	End case 
+Until ($done)
+
+
+$i:=1
+ARRAY TEXT($diff;0)
+For ($i;1;Size of array($after))
+	If (Find in array($before;$after{$i})<1) & ($after{$i}#Char(13))
+		APPEND TO ARRAY($diff;$after{$i})
+	End if 
+End for 
+
+  //$i:=1
+  //For ($i;1;Size of array($diff))
+  //ALERT($diff{$i})
+  //End for 
+  //
+

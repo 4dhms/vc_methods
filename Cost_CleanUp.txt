@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$order)
+
+QUERY([Costing];[Costing]StyleNumber="";*)
+QUERY([Costing]; | ;[Costing]DesignNumber="";*)
+QUERY([Costing]; & ;[Costing]SheetNumber#-1)
+
+
+FIRST RECORD([Costing])
+$i:=1
+For ($i;1;Records in selection([Costing]))
+	If ([Costing]OrderNumber<0)
+		$order:=Abs([Costing]OrderNumber)
+		QUERY([Samples];[Samples]SampleNumber=$order)
+		[Costing]DesignNumber:=[Samples]DesignNum
+		[Costing]StyleNumber:=[Samples]StyleNum
+	Else 
+		QUERY([Orders];[Orders]OrderNum=[Costing]OrderNumber)
+		[Costing]DesignNumber:=[Orders]DesignNumber
+		[Costing]StyleNumber:=[Orders]StyleNumber
+	End if 
+	SAVE RECORD([Costing])
+	NEXT RECORD([Costing])
+End for 
+UNLOAD RECORD([Costing])

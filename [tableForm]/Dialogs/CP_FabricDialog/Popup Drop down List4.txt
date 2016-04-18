@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atPartList=1)
+	List_Var ("Part";->vsPart)
+Else 
+	vsPart:=<>atPartList{<>atPartList}
+End if 

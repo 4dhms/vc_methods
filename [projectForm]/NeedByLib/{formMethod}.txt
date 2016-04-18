@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asCustomers;0)
+		ARRAY TEXT(asFactories;0)
+		
+		ARRAY TEXT($testC;0)
+		ARRAY TEXT($listC;0)
+		ARRAY TEXT($testV;0)
+		ARRAY TEXT($listV;0)
+		
+		ALL RECORDS([Orders])
+		DISTINCT VALUES([Orders]Customer;$listC)
+		DISTINCT VALUES([Orders]Factory;$listV)
+		
+		QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+		QUERY SELECTION([NeedByLib];[NeedByLib]Leadtime>0)
+		ORDER BY([NeedByLib];[NeedByLib]Name;>)
+		SELECTION TO ARRAY([NeedByLib]Name;$testC)
+		
+		$i:=1
+		For ($i;1;Size of array($listC))
+			If (Find in array($testC;$listC{$i})<1) & ($listC{$i}#"")
+				APPEND TO ARRAY(asCustomers;$listC{$i})
+			End if 
+		End for 
+		
+		SORT ARRAY(asCustomers;>)
+		asCustomers:=0
+		vsCustomer:=""
+		
+		
+		QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+		ORDER BY([NeedByLib];[NeedByLib]Name;>)
+		SELECTION TO ARRAY([NeedByLib]Name;$testV)
+		
+		$i:=1
+		For ($i;1;Size of array($listV))
+			If (Find in array($testV;$listV{$i})<1) & ($listV{$i}#"")
+				APPEND TO ARRAY(asFactories;$listV{$i})
+			End if 
+		End for 
+		
+		SORT ARRAY(asFactories;>)
+		asFactories:=0
+		vsFactory:=""
+		
+		QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+		ORDER BY([NeedByLib];[NeedByLib]Name;>)
+End case 
+

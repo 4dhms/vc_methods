@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docref)
+C_DATE($range)
+C_BOOLEAN($none;$stop)
+C_TEXT($datestamp;$path)
+$stop:=False
+
+READ ONLY([Orders])
+
+If (Application type=5) | (Current user="Spooler")
+	$range:=Current date(*)-7
+Else 
+	$range:=Date(Request("Starting date:"))
+	If ($range=!00-00-00!)
+		$stop:=True
+		ALERT("Bad date format. Should be: 00/00/00.")
+	End if 
+End if 
+QUERY([Orders];[Orders]Customer="JC Retail";*)
+QUERY([Orders]; | ;[Orders]Customer="J.C. Retail";*)
+QUERY([Orders]; | [Orders]Customer="Wados@";*)
+QUERY([Orders]; & ;[Orders]OrderEntryDate>=$range)
+
+If (Records in selection([Orders])=0)
+	$none:=True
+Else 
+	$none:=False
+	
+	ORDER BY([Orders];[Orders]Customer;>;[Orders]OrderNum;>)
+End if 
+
+If (Application type=5) | (Current user="Spooler")
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":FOB_"+$datestamp+".xls"
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	$docRef:=Create document("";"xls")
+	If (ok=0)
+		$stop:=True
+	End if 
+End if 
+
+If (Not($stop))
+	FIRST RECORD([Orders])
+	$i:=1
+	SEND PACKET($docref;"Customer"+Char(9)+"Style"+Char(9)+"Design"+Char(9)+"Order"+Char(9)+"Who"+Char(9)+"When"+Char(9)+"Units"+Char(9)+"Price"+Char(9)+"Cancel Date"+Char(13))
+	
+	For ($i;1;Records in selection([Orders]))
+		SEND PACKET($docref;[Orders]Customer+Char(9)+[Orders]StyleNumber+Char(9)+[Orders]DesignNumber+Char(9)+String([Orders]OrderNum)+Char(9)+[Orders]Order_Enterer+Char(9)+String([Orders]OrderEntryDate)+Char(9)+String([Orders]TotalOrderQuantity)+Char(9)+String([Orders]Price;"###.00")+Char(9)+String([Orders]CancelDate)+Char(13))
+		NEXT RECORD([Orders])
+	End for 
+	CLOSE DOCUMENT($docref)
+End if 
+
+If (Application type=5) | (Current user="Spooler") & (Not($stop))
+	ARRAY TEXT(asSubCC;2)
+	asSubCC{1}:="peter.goldberger@nubby.com"
+	asSubCC{2}:="phil@persinger.com"
+	
+	If ($none)
+		Mail_SimpleSend ("List";"None";"FOB Purchase Report ("+String(Current date(*))+")";"There are no new JC Retail & Wado's orders this week."+Char(13))
+	Else 
+		Mail_SimpleSend ("List";$path;"FOB Purchase Report ("+String(Current date(*))+")";"Attached are the new JC Retail & Wado's orders for the week."+Char(13))
+	End if 
+End if 
+

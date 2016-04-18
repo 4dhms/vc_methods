@@ -1,0 +1,99 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldPtr1;$fieldPtr3;$fieldPtr4;$fieldPtr5;$fieldPtr6;$fieldPtr7;$fieldPtr8;$fieldPtr9;$fieldPtr10)
+C_LONGINT($i;$color3;$color4)
+
+If (vfPrinting)
+	$i:=1
+	For ($i;1;12)
+		$fieldPtr1:=Get pointer("vtTitle"+String(Abs($i)))
+		$fieldPtr3:=Get pointer("vDesign"+String(Abs($i)))
+		$fieldPtr4:=Get pointer("vStyle"+String(Abs($i)))
+		$fieldPtr5:=Get pointer("vtFabric"+String(Abs($i)))
+		$fieldPtr6:=Get pointer("vtStitch"+String(Abs($i)))
+		$fieldPtr7:=Get pointer("vsPrice"+String(Abs($i)))
+		$fieldPtr8:=Get pointer("vsSize"+String(Abs($i)))
+		$fieldPtr9:=Get pointer("vtColor"+String(Abs($i)))
+		$fieldPtr10:=Get pointer("vsMSRP"+String(Abs($i)))
+		OBJECT SET FONT SIZE($fieldPtr1->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr1->;[DesignLines]TextFont)
+		  //DESIGN NUMBER
+		OBJECT SET FONT SIZE($fieldPtr3->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr3->;[DesignLines]TextFont)
+		If ([DesignLines]Bold_DN)
+			OBJECT SET FONT STYLE($fieldPtr3->;1)
+		Else 
+			OBJECT SET FONT STYLE($fieldPtr3->;0)
+		End if 
+		
+		  //STYLE NUMBER    
+		OBJECT SET FONT SIZE($fieldPtr4->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr4->;[DesignLines]TextFont)
+		If ([DesignLines]Bold_SN)
+			OBJECT SET FONT STYLE($fieldPtr4->;1)
+		Else 
+			OBJECT SET FONT STYLE($fieldPtr4->;0)
+		End if 
+		
+		  //CONTENT
+		OBJECT SET FONT SIZE($fieldPtr5->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr5->;[DesignLines]TextFont)
+		If ([DesignLines]Bold_Content)
+			OBJECT SET FONT STYLE($fieldPtr5->;1)
+		Else 
+			OBJECT SET FONT STYLE($fieldPtr5->;0)
+		End if 
+		If ([DesignLines]Color_Content=0)
+			$color3:=15
+		Else 
+			$color3:=[DesignLines]Color_Content
+		End if 
+		OBJECT SET COLOR($fieldPtr5->;-($color3+(256*0)))
+		
+		  //STITCH
+		OBJECT SET FONT SIZE($fieldPtr6->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr6->;[DesignLines]TextFont)
+		$color4:=15
+		OBJECT SET COLOR($fieldPtr6->;-($color4+(256*0)))
+		
+		OBJECT SET FONT SIZE($fieldPtr7->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr7->;[DesignLines]TextFont)
+		OBJECT SET FONT SIZE($fieldPtr8->;[DesignLines]TextSize-1)
+		OBJECT SET FONT($fieldPtr8->;[DesignLines]TextFont)
+		OBJECT SET FONT SIZE($fieldPtr9->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr9->;[DesignLines]TextFont)
+		OBJECT SET FONT SIZE($fieldPtr10->;[DesignLines]TextSize)
+		OBJECT SET FONT($fieldPtr10->;[DesignLines]TextFont)
+	End for 
+End if 
+
+C_TEXT($font)
+C_LONGINT($size)
+  //If (cbPreview=1)
+  //$font:=[DesignLines]TextFont
+  //$size:=[DesignLines]TextSize
+  //Else 
+$font:="Geneva"
+$size:=9
+  //End if 
+
+OBJECT SET FONT SIZE([DesignLineIncluded]Name;$size)
+OBJECT SET FONT([DesignLineIncluded]Name;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]DesignNumber;$size)
+OBJECT SET FONT([DesignLineIncluded]DesignNumber;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]StyleNumber;$size)
+OBJECT SET FONT([DesignLineIncluded]StyleNumber;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]Fiber;$size)
+OBJECT SET FONT([DesignLineIncluded]Fiber;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]Stitch;$size)
+OBJECT SET FONT([DesignLineIncluded]Stitch;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]Price;$size)
+OBJECT SET FONT([DesignLineIncluded]Price;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]Price;$size)
+OBJECT SET FONT([DesignLineIncluded]Price;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]MSRP;$size)
+OBJECT SET FONT([DesignLineIncluded]MSRP;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]Size;$size)
+OBJECT SET FONT([DesignLineIncluded]Size;$font)
+OBJECT SET FONT SIZE([DesignLineIncluded]Colors;$size)
+OBJECT SET FONT([DesignLineIncluded]Colors;$font)
+

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Vendors];[Vendors]VendorName#"")
+ORDER BY([Vendors];[Vendors]VendorName;>)
+FORM SET OUTPUT([Vendors];"PrtVendorList")
+PAGE SETUP([Vendors];"PrtVendorList")
+Print_Selection (->[Vendors])
+ACCEPT

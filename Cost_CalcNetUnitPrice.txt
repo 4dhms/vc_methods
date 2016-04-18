@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($subtot)
+C_REAL($price;vrTestPrice)
+
+If (vrTestPrice>0)
+	$price:=vrTestPrice
+Else 
+	$price:=[CostSheets]Price
+End if 
+
+If ([CostSheets]Figurer=0)
+	$subtot:=$price
+Else 
+	$subTot:=Round($price*((100-[CostSheets]Figurer)/100);2)
+End if 
+[CostSheets]NetUnitPrice:=$subTot
+SAVE RECORD([CostSheets])
+
+$0:=$subTot

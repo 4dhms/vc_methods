@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (alSortList>0)
+	SAVE RECORD([PCPage])
+	QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+	QUERY SELECTION([PCPage];[PCPage]PageNumber=alSortList{alSortList})
+	PrintCat_PageLoad 
+End if 

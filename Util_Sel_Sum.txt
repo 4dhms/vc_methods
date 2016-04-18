@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($0;$sum;$i)
+C_POINTER($1)
+
+$i:=1
+$sum:=0
+FIRST RECORD($1->)
+
+For ($i;1;Records in selection($1->))
+	$sum:=$sum+$2->
+	NEXT RECORD($1->)
+End for 
+UNLOAD RECORD($1->)
+
+$0:=$sum

@@ -1,0 +1,111 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$unitsubtot;$ordersubtot;$otherordersubtot;$otherunitsubtot)
+C_LONGINT($line)
+C_TEXT($div)
+C_REAL($percent)
+READ ONLY([Orders])
+
+<>vtMessage:="Building report"
+<>vlCounter:=0
+Open window(Screen width-360;50;Screen width-20;Screen height-50;5;"Processing")
+MESSAGE("Searching Design Library ("+asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+")"+Char(13))
+UsageDNSearch 
+CLOSE WINDOW
+
+UsageInitArrays (0)
+If (cb11=1)
+	UsageInitArrays (4)
+	ARRAY TEXT(asDivisions;0)
+	ARRAY TEXT(asDivisions;4)
+	asDivisions{1}:="Knit"
+	asDivisions{2}:="Woven"
+	asDivisions{3}:="Cut & Sew"
+	asDivisions{4}:="Total"
+Else 
+	UsageInitArrays (1)
+	asDivisions{1}:=asChartDivisions{asChartDivisions}
+End if 
+
+EMail_SendingProc 
+
+<>vlCounter:=$i*10
+CALL PROCESS(<>SendingWin)
+
+USE SET(Substring(asChartDivisions{asChartDivisions};1;2))
+
+$n:=1
+FIRST RECORD([Designs])
+
+For ($n;1;Records in selection([Designs]))
+	Case of 
+		: (cb11=0)
+			$line:=1
+		: ([Designs]KWCnS="Knit")
+			$line:=1
+		: ([Designs]KWCnS="Woven")
+			$line:=2
+		: ([Designs]KWCnS="CutSew")
+			$line:=3
+	End case 
+	
+	QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum+"@")
+	
+	alSamples{$line}:=Records in selection([Samples])+alSamples{$line}
+	
+	QUERY SELECTION([Samples];[Samples]Sam Type="@sales sample@")
+	If (Records in selection([Samples])>0)
+		alPrintOrders{$line}:=alPrintOrders{$line}+1
+	End if 
+	
+	
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum+"@")
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	alChartPrints{$line}:=alChartPrints{$line}+1
+	
+	If (Records in selection([Orders])>0)
+		alChartPrintsUsed{$line}:=alChartPrintsUsed{$line}+1
+	End if 
+	NEXT RECORD([Designs])
+End for 
+
+  //$unitsubtot:=$unitsubtot+alChartPrints{$line}
+  //$ordersubtot:=$ordersubtot+alChartPrintsUsed{$line}
+  //$otherordersubtot:=$otherordersubtot+alPrintOrders{$line}
+  //$otherunitsubtot:=$otherunitsubtot+alSamples{$line}
+
+If (cb11=1)
+	alChartPrints{4}:=Sum(alChartPrints)
+	alChartPrintsUsed{4}:=Sum(alChartPrintsUsed)
+	alPrintOrders{4}:=Sum(alPrintOrders)
+	alSamples{4}:=Sum(alSamples)
+End if 
+
+$i:=1
+For ($i;1;Size of array(asDivisions))
+	If (alChartPrintsUsed{$i}=0)
+		alChartPrintsRatio{$i}:=0
+	Else 
+		$percent:=alChartPrintsUsed{$i}/alChartPrints{$i}
+		alChartPrintsRatio{$i}:=Round($percent*100;0)
+		  //alVarPrintsRatio{$i}:=(alChartPrintsUsed{$i}/alPrintOrders{$i})*100
+	End if 
+	
+	If (alPrintOrders{$i}=0)
+		alVarPrintsRatio{$i}:=0
+	Else 
+		alVarPrintsRatio{$i}:=(alChartPrintsUsed{$i}/alPrintOrders{$i})*100
+	End if 
+End for 
+
+  //1:=Size of array(asDivisions)
+  //alChartPrints{1}:=$unitsubtot
+  //alChartPrintsUsed{1}:=$ordersubtot
+  //alPrintOrders{1}:=$otherordersubtot
+  //alSamples{1}:=$otherunitsubtot
+  //
+  //$percent:=alChartPrintsUsed{1}/alChartPrints{1}
+  //alChartPrintsRatio{1}:=Round($percent*100;0)
+  //alVarPrintsRatio{1}:=(alChartPrintsUsed{1}/alPrintOrders{1})*100
+
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)

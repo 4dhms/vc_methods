@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked) | (Form event=On Getting Focus)
+		If (Not(vfOpen)) & (asCustomers{asCustomers}#"Total Cut") & (asCustomers{asCustomers}#"Total") & (asCustomers{asCustomers}#"OTS")
+			If (Form event=On Data Change)
+				vtDCCustomer:=asCustomers{asCustomers}
+			End if 
+			If (<>vlStockProc>0) & (asCustomers{asCustomers}#"")
+				POST KEY(9)
+			Else 
+				
+				OBJECT SET VISIBLE(bAddDC;True)
+				vfOpen:=True
+				vlListRouter:=1
+				Center Window (250;450;1;"")
+				DIALOG("DC_Customer")
+				CLOSE WINDOW
+			End if 
+			POST KEY(9)
+		End if 
+End case 
+

@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($oldBreak)
+C_TEXT($newBreak)
+C_POINTER($size)
+C_LONGINT($process)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+
+
+For ($i;1;Size of array(alBDKey))
+	If (asBDLetter{$i}#"") & (asBDLetter{$i}#"@Total")
+		If (alBDKey{$i}=0)
+			CREATE RECORD([OrdersBreakdowns])
+			
+			[OrdersBreakdowns]BDKey:=Sequence number([OrdersBreakdowns])
+			[OrdersBreakdowns]SelfKey:=alBDSelfKeys{$i}
+			alBDKey{$i}:=[OrdersBreakdowns]BDKey
+		Else 
+			QUERY([OrdersBreakdowns];[OrdersBreakdowns]BDKey=alBDKey{$i})
+		End if 
+		If (Locked([OrdersBreakdowns]))
+			LOCKED BY([OrdersBreakdowns];$process;$user;$session;$processName)
+			WinPrompt (asBDSelf{$i}+" is locked by "+$user+"("+String($process)+").")
+		End if 
+		
+		$n:=1
+		For ($n;1;10)
+			$size:=Field(65;$n+2)
+			If ($size->#0)
+				If ($n>1)
+					$oldBreak:=$oldBreak+"-"
+				End if 
+				$oldBreak:=$oldBreak+String($size->)
+			End if 
+		End for 
+		
+		$n:=1
+		For ($n;1;10)
+			$oldBreak:=""
+			$newBreak:=""
+			$size:=Get pointer("alBD"+String($n))
+			If ($size->{$i}#0)
+				If ($n>1)
+					$newBreak:=$newBreak+"-"
+				End if 
+				$newBreak:=$newBreak+String($size->{$i})
+			End if 
+		End for 
+		
+		If ($oldbreak#$newBreak) & ($oldBreak#"")
+			vtNewData:=$newBreak
+			vtOldData:=asBDSelf{$i}+":"+$oldBreak
+			Rev_LogEvent ("Changed";vtOldData;vtNewData)
+		End if 
+		
+		If ([OrdersBreakdowns]RevDate#adBDRevDate{$i})
+			[OrdersBreakdowns]RevDate:=adBDRevDate{$i}
+		End if 
+		[OrdersBreakdowns]BDSelf:=asBDSelf{$i}
+		[OrdersBreakdowns]Customer:=asBDCustomers{$i}
+		[OrdersBreakdowns]LineKey:=asBDLetter{$i}
+		[OrdersBreakdowns]Packs:=alBDStores{$i}
+		[OrdersBreakdowns]PackBuffer:=alBDStores{$i}
+		[OrdersBreakdowns]BD1:=alBD1{$i}
+		[OrdersBreakdowns]BD2:=alBD2{$i}
+		[OrdersBreakdowns]BD3:=alBD3{$i}
+		[OrdersBreakdowns]BD4:=alBD4{$i}
+		[OrdersBreakdowns]BD5:=alBD5{$i}
+		[OrdersBreakdowns]BD6:=alBD6{$i}
+		[OrdersBreakdowns]BD7:=alBD7{$i}
+		[OrdersBreakdowns]BD8:=alBD8{$i}
+		[OrdersBreakdowns]BD9:=alBD9{$i}
+		[OrdersBreakdowns]BD10:=alBD10{$i}
+		
+		SAVE RECORD([OrdersBreakdowns])
+	End if 
+End for 
+
+UNLOAD RECORD([OrdersBreakdowns])
+

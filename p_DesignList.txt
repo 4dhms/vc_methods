@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //this shows a pop-up listing of designs
+ALL RECORDS([Designs])
+Open window(8;65;373;264;-1988;"")
+FORM SET OUTPUT([Designs];"ListDialogLay")
+DISPLAY SELECTION([Designs])
+CLOSE WINDOW
+<>DesListID:=0

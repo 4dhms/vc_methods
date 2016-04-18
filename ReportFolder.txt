@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+C_LONGINT($i)
+C_BOOLEAN($done)
+
+$path:=Structure file
+$i:=Length($path)
+
+
+
+
+Repeat 
+	  // $i = 12 thats the length of the structure file name
+	If ($path[[$i]]=":")
+		vtPDFPath:=Substring($path;1;$i)
+		$done:=True
+	Else 
+		$i:=$i-1
+	End if 
+Until ($done)
+vtPDFPath:=vtPDFPath+"Web:Reports:"
+If (Test path name(vtPDFPath)#0)
+	CREATE FOLDER(vtPDFPath)
+End if 
+

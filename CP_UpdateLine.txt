@@ -1,0 +1,104 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;$i;$n;$hue)
+C_BOOLEAN($continue;$highlight;$done;vfCodeOverride)
+
+$line:=asTypeList
+
+If (asTypeList{$line}="Self")
+	$i:=$line
+Else 
+	$i:=$line-Num(asTypeList{$line})
+End if 
+$continue:=True
+
+Case of 
+	: (asSolidPrint{1}="Print")
+		  //do nothing this is a print
+	: (vsCPType="Combo 1") & (<>vlOrderNumber>0)
+		
+		Case of 
+			: ($line=2) & ([Orders]ComboTrack=0)
+				If (vsCPNumber=asCPNumbers{$i})
+					[Orders]ComboColorCode:=False
+				Else 
+					[Orders]ComboColorCode:=True
+				End if 
+				  //: ([Orders]ComboColorCode=False)
+				  //If (vsCPNumber#asCPNumbers{$i})
+				  //WinPrompt ("You need to create a new style number for multi-color comps.")
+				  //$continue:=False
+				  //$highlight:=True
+				  //$hue:=16711690
+				  //Else 
+				  //$continue:=True
+				  //$highlight:=True
+				  //$hue:=16777215
+				  //End if 
+				  //: ([Orders]ComboColorCode=True)
+				  //If (vsCPNumber=asCPNumbers{$i})
+				  //WinPrompt ("You need to create a new style number for plain colors.")
+				  //$continue:=False
+				  //$highlight:=True
+				  //$hue:=16711690
+				  //Else 
+				  //$continue:=True
+				  //$highlight:=True
+				  //$hue:=16777215
+				  //End if 
+		End case 
+End case 
+
+If ($highlight)
+	alShadeFab{$i}:=$hue
+	alShadeFab{$line}:=$hue
+	
+	$n:=$line
+	Repeat 
+		$n:=$n-1
+	Until (asTypeList{$n}="Self") | ($n=1)
+	
+	alShadeFab{$n}:=$hue
+	$n:=$n+1
+	If ($n<=Size of array(asTypeList))
+		Repeat 
+			alShadeFab{$n}:=$hue
+			If ($n=Size of array(asTypeList)) | (asTypeList{$n}="Self")
+				$done:=True
+			Else 
+				$n:=$n+1
+			End if 
+		Until ($done)
+	End if 
+End if 
+
+If ($continue)
+	If (asCPNumbers{$line}#vsCPNumber)
+		asCC{$i}:=""
+	End if 
+	
+	asCPNumbers{$line}:=vsCPNumber
+	asCPColorName{$line}:=vsCPName
+	asMillNumber{$line}:=vtMillNumber
+	asMillNumber{$line}:=vtMillNumber
+	atThreadColor{$line}:=vtThreadColor
+	
+	If (<>vlOrderNumber>0)
+		asCarton{$line}:=vtCarton
+	Else 
+		asCPStyleNum{$line}:=vtCarton
+	End if 
+	If (vfCodeOverride)
+		vfCodeOverride:=False
+		asCC{$line}:=Uppercase(vtColorCode)
+		afCCoverride{$line}:=True
+	End if 
+	
+	asColorStatus{$line}:=vsCPStatus
+	adStatusDate{$line}:=vdCPStatusDate
+	
+	
+	If (vsCPType="Self")
+		asCPStyleNum{$line}:=vtMultiStyleNumber
+		alCQty{$line}:=vlCPQuantity
+	End if 
+End if 

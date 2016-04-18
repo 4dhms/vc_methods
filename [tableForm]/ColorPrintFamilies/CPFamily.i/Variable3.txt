@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure?")
+If (ok=1)
+	CREATE SET([ColorPrintFamilies];"Families")
+	REMOVE FROM SET([ColorPrintFamilies];"Families")
+	DELETE RECORD([ColorPrintFamilies])
+	USE SET("Families")
+	CLEAR SET("Families")
+	ACCEPT
+End if 

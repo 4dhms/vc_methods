@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+APPEND TO ARRAY(alPOOrder;[Orders]OrderNum)
+APPEND TO ARRAY(asXStyle;[Orders]StyleNumber)
+APPEND TO ARRAY(asEnterer;[CostSheets]CustomsEntryN)
+APPEND TO ARRAY(adXShip;[CostSheets]CustomsDate)
+Case of 
+	: ([CostSheets]ShipAir)
+		APPEND TO ARRAY(arMCol1;[CostSheets]FreightAIR)
+		APPEND TO ARRAY(arPrice;[CostSheets]UnitCostAirWC)
+		APPEND TO ARRAY(atMNote;"Air")
+	: ([CostSheets]ShipSea)
+		APPEND TO ARRAY(arMCol1;[CostSheets]FreightBOAT)
+		APPEND TO ARRAY(arPrice;[CostSheets]UnitCostSeaWC)
+		APPEND TO ARRAY(atMNote;"Sea")
+	Else 
+		APPEND TO ARRAY(arMCol1;0)
+		APPEND TO ARRAY(arPrice;0)
+		APPEND TO ARRAY(atMNote;"N/A")
+End case 
+APPEND TO ARRAY(arMCol2;[CostSheets]BrokerageChg)
+APPEND TO ARRAY(asSheetNames;[CostSheets]SheetName)
+APPEND TO ARRAY(alCostLineKey;[CostSheets]SheetID)
+
+APPEND TO ARRAY(afBatchList;False)
+APPEND TO ARRAY(arFOB;[CostSheets]FOB)
+APPEND TO ARRAY(alXQty;[CostSheets]ActualUnitsShipped)
+APPEND TO ARRAY(arMCol3;[CostSheets]Quota)
+APPEND TO ARRAY(arMCol4;[CostSheets]Duty1)
+APPEND TO ARRAY(afTrackShip;False)

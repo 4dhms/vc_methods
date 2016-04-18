@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vlPreviewSS:=0
+Order_SpecVar 
+m_SpecsA 

@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsSubhead:="Sample Room Report ("+String(Current date(*))+")"
+		vsDatePage:="PAGE "+String(Printing page)
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE([Samples]DueDate;[Samples]DueDate#!00-00-00!)
+		
+		OBJECT SET VISIBLE(*;"xBG1";[Samples]PattComplete)
+		OBJECT SET VISIBLE(*;"xBG2";[Samples]SewComplete)
+		
+		If ([Samples]PattComplete)
+			OBJECT SET COLOR([Samples]Patt;-(0+(256*15)))
+		Else 
+			OBJECT SET COLOR([Samples]Patt;-(15+(256*0)))
+		End if 
+		
+		If ([Samples]SewComplete)
+			OBJECT SET COLOR([Samples]Stitch;-(0+(256*15)))
+		Else 
+			OBJECT SET COLOR([Samples]Stitch;-(15+(256*0)))
+		End if 
+		
+End case 

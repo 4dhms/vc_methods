@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (c1+c2+c3+c4>0)
+	If (c3=1)
+		c2:=0
+		c1:=0
+		c4:=0
+		c5:=0
+		If (nav1+nav2=0)
+			WinChoice ("Are you sorting up or down?";"Up";"Down")
+			If (ok=1)
+				nav1:=1
+			Else 
+				nav2:=1
+			End if 
+		End if 
+	End if 
+	SLR_Sort (1)
+	SLR_BuildTitle 
+End if 

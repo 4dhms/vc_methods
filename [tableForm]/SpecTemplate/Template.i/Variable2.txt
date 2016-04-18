@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (FORM Get current page=1)
+		ACCEPT
+		QUERY SELECTION([SpecTempBuilder];[SpecTempBuilder]Delete=True)
+		DELETE SELECTION([SpecTempBuilder])
+	: (FORM Get current page=2)
+		$i:=1
+		FIRST RECORD([SpecLibrary])
+		For ($i;1;Records in selection([SpecLibrary]))
+			Spec_ProcessDescrip 
+			NEXT RECORD([SpecLibrary])
+		End for 
+		ACCEPT
+		
+	: (FORM Get current page=3)
+		Spec_SaveOrder 
+		ACCEPT
+	: (FORM Get current page=4)
+		Spec_Reorder 
+		ACCEPT
+	Else 
+		ACCEPT
+End case 
+

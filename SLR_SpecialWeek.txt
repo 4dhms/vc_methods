@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_DATE($special)
+ARRAY DATE(adWkEnd;0)
+
+$special:=(Current date(*)-Day number(Current date(*))+7)
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkEnd<=$special)
+QUERY SELECTION([SLRWkLibrary];[SLRWkLibrary]WkEnd>=!2011-02-12!)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkEnd;<)
+
+$i:=1
+For ($i;1;Records in selection([SLRWkLibrary]))
+	APPEND TO ARRAY(adWkEnd;[SLRWkLibrary]WkEnd)
+	NEXT RECORD([SLRWkLibrary])
+End for 
+adWkEnd:=2

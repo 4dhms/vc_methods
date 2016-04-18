@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test)
+
+WinChoice ("Are you sure you want to delete this design?";"Yes";"No")
+If (ok=1)
+	WinPrompt ("Once you delete this design, it will be gone forever.")
+	$test:=Request("Enter DELETE NOW to continue.")
+	
+	If (ok=1) & ($test="DELETE NOW")
+		vtNote:=Request("Explanation:")
+		Case of 
+			: (ok=1)
+				If (vtNote="")
+					WinPrompt ("You must explain why you are deleting this design number.")
+				Else 
+					CREATE SET([Designs];"DelDesSet")
+					CREATE RECORD([Changes])
+					[Changes]Writer:=Current user
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]NewChange:="Design Number: "+[Designs]DesignNum+" deleted."+Char(13)+"Reason: "+vtNote
+					[Changes]FieldName:="Delete Design"
+					SAVE RECORD([Changes])
+					DELETE RECORD([Designs])
+					USE SET("DelDesSet")
+					CANCEL
+				End if 
+		End case 
+	End if 
+End if 

@@ -1,0 +1,23 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //edits and adds to the Color Print Family library
+C_BOOLEAN($continue)
+SET MENU BAR(16)
+
+If (<>CPRouter>0)
+	$continue:=True
+Else 
+	FORM SET OUTPUT([ColorPrintNumber];"CPNumbers.o")
+	FORM SET INPUT([ColorPrintNumber];"CPNumber.i")
+	<>CloseBox:=True
+	
+	Center Window (780;580;8;"")
+	SET WINDOW TITLE("Color Library")
+	
+	ALL RECORDS([ColorPrintNumber])
+	AccessMode (->[ColorPrintNumber];True)
+	AccessMode (->[ColorPrintFamilies];True)
+	MODIFY SELECTION([ColorPrintNumber];*)
+	CLOSE WINDOW
+	  //UNLOAD RECORD([ColorPrintNumber])
+End if 
+<>CPNumberID:=0

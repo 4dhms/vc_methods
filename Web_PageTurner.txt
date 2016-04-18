@@ -1,0 +1,24 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vlPage:=Num($1)
+vlRecCount:=Num($2)
+
+vlPageCount:=Int(vlRecCount/20)
+If (vlRecCount%20>0)
+	vlPageCount:=vlPageCount+1
+End if 
+
+Case of 
+	: (Records in selection([Orders])=1)
+		vlRepCount:=1
+	: (vlPage>=vlPageCount)
+		vlRepCount:=vlRecCount%20
+	Else 
+		vlRepCount:=20
+End case 
+
+$0:=$1+"_"+$2+"%"+String(vlPageCount)+"#"+String(vlRepCount)
+
+
+
+
+

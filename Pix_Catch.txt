@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfCatchFile)
+
+If (<>vfCatchFile)
+	<>vxSketch:=$1
+	Case of 
+		: (<>SpecProcID>0)
+			CALL PROCESS(<>SpecProcID)
+		: (<>DesProcID>0)
+			CALL PROCESS(<>DesProcID)
+		: (<>vlOrderNumber>0)
+			CALL PROCESS(<>SalesPrcID)
+		Else 
+			CALL PROCESS(<>SamGarPrcID)
+	End case 
+	<>vfCatchFile:=False
+End if 

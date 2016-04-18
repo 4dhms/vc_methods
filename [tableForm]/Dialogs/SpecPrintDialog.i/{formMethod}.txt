@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	cbPrintTrim:=0
+	cbPrintComments:=0
+	cbPrintGrade:=0
+	cbChinese:=1
+	
+	If (vfPrintTrim)
+		cbPrintTrim:=1
+	End if 
+	If (vfPrintGrade)
+		cbPrintGrade:=1
+	End if 
+	If (vfPrintComments)
+		cbPrintComments:=1
+	End if 
+End if 

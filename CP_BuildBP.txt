@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($print)
+C_BOOLEAN($ST;$X)
+
+$print:=[ColorPrintNumber]CPNumber
+If (Position("X";$print)>0)
+	$X:=True
+	$print:=Replace string($print;"X";"")
+Else 
+	$X:=False
+End if 
+
+$print:=Replace string($print;"ST";"")
+
+If ($print="b@")
+	$print:=Substring($print;2;99)
+End if 
+If ($print="P@")
+	$print:=Substring($print;2;99)
+End if 
+
+Case of 
+	: (Not([ColorPrintNumber]BorderPrint)) & (Not([ColorPrintNumber]Placement))
+		[ColorPrintNumber]CPNumber:=$print
+	: ([ColorPrintNumber]BorderPrint) & ([ColorPrintNumber]Placement)
+		[ColorPrintNumber]CPNumber:="bP"+$print
+	: (Not([ColorPrintNumber]BorderPrint)) & ([ColorPrintNumber]Placement)
+		[ColorPrintNumber]CPNumber:="P"+$print
+	: ([ColorPrintNumber]BorderPrint) & (Not([ColorPrintNumber]Placement))
+		[ColorPrintNumber]CPNumber:="b"+$print
+End case 
+
+If (cbStrip=1)
+	[ColorPrintNumber]CPNumber:="ST"+[ColorPrintNumber]CPNumber
+End if 
+If ($X)
+	[ColorPrintNumber]CPNumber:="X"+[ColorPrintNumber]CPNumber
+End if 
+
+SAVE RECORD([ColorPrintNumber])

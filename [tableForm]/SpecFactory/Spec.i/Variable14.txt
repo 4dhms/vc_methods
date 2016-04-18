@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Spec_PixArray 
+If (Size of array(aSketch)>0)
+	Spec_GetPix 
+End if 
+FORM GOTO PAGE(5)

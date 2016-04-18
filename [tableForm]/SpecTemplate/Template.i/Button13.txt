@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Spec_Reorder 
+QUERY([SpecTempBuilder];[SpecTempBuilder]TempKey=[SpecTemplate]TempKeyNumber)
+ORDER BY([SpecTempBuilder];[SpecTempBuilder]SortOrder;>)
+FORM GOTO PAGE(1)

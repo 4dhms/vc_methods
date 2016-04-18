@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+CREATE EMPTY SET([Samples];"All")
+FIRST RECORD([Samples])
+For ($i;1;Records in selection([Samples]))
+	ADD TO SET([Samples];"All")
+	NEXT RECORD([Samples])
+End for 
+HIGHLIGHT RECORDS("All")
+CLEAR SET("All")

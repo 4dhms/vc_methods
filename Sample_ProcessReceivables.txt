@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(afReceived))
+	
+	If (afReceived{$i}=True)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alXrefKeys{$i})
+		
+		Case of 
+			: (asSampleTypes{$i}="Proto")
+				[CP_OrderXRef]CPStatus:="RCVD PROTO"
+				[CP_OrderXRef]CPStatusDate:=adStatusDate{$i}
+			: (asSampleTypes{$i}="Sales")
+				[CP_OrderXRef]CPStatus:="RECD"
+				[CP_OrderXRef]CPStatusDate:=adStatusDate{$i}
+		End case 
+		SAVE RECORD([CP_OrderXRef])
+	End if 
+End for 
+UNLOAD RECORD([CP_OrderXRef])

@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ALL RECORDS([POMList])
+ORDER BY([POMList];[POMList]POMKey;>)
+
+ARRAY TEXT(asPOMType;0)
+SELECTION TO ARRAY([POMList]PartDescrip;asPOMType)
+
+INSERT IN ARRAY(asPOMType;1;1)
+asPOMType{1}:="All POMs"
+asPOMType:=1
+
+UNLOAD RECORD([POMList])

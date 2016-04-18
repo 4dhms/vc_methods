@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Customers];[Customers]CustomerName=<>vsCustomer)
+QUERY([Contacts];[Contacts]CustomerKey=[Customers]CustomerKey)
+ORDER BY([Contacts];[Contacts]Contact;>)
+FORM SET INPUT([Customers];"Entry.i")
+Center Window (800;650;4;"")
+MODIFY RECORD([Customers];*)
+CLOSE WINDOW

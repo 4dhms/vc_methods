@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in selection([Orders])<1)
+	WH_BuildTCsReport 
+End if 
+
+vlCount:=0
+vfReset:=False
+FORM SET OUTPUT([Orders];"TCsReport.p")
+ORDER BY([Orders];[Orders]CancelDate;>;[Orders]Customer;>;[Orders]Factory;>;[Orders]OrderNum;>)
+BREAK LEVEL(2)
+ACCUMULATE([Orders]TotalOrderQuantity;[Orders]CancelDate;[Orders]Factory;[Orders]Customer)
+
+PAGE SETUP([Orders];"NewOrdRep.p")
+Print_Selection (->[Orders])
+FORM SET OUTPUT([Orders];"TCsReport.i")
+
+

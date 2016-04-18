@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vdDate:=!00-00-00!
+vtPart1:=""
+Center Window (250;150;1;"")
+DIALOG("Extension")
+CLOSE WINDOW
+
+If (ok=1)
+	CREATE RECORD([Extensions])
+	[Extensions]OrderNumber:=[Orders]OrderNum
+	[Extensions]ExtNumber:=Records in selection([Extensions])+1
+	[Extensions]ExtDate:=vdDate
+	[Extensions]ExtNote:=vtPart1
+	[Extensions]ChangeDate:=Current date(*)
+	Case of 
+		: (cb11=1)
+			[Extensions]Category:="Ship"
+			[Extensions]OldCancel:=[Orders]Schedule Date
+			[Orders]Schedule Date:=vdDate
+		: (cb12=1)
+			[Extensions]Category:="Cancel"
+			[Extensions]OldCancel:=[Orders]CancelDate
+			[Orders]CancelDate:=vdDate
+	End case 
+	SAVE RECORD([Extensions])
+	QUERY([Extensions];[Extensions]OrderNumber=[Orders]OrderNum)
+	ORDER BY([Extensions];[Extensions]ExtNumber;<)
+	
+	Case of 
+		: ([Extensions]ExtNumber=1)
+			vtExtension:="1 EXTENSION"
+		: ([Extensions]ExtNumber>1)
+			vtExtension:=String([Extensions]ExtNumber)+" EXTENSIONS"
+		Else 
+			vtExtension:="Get Extension"
+	End case 
+	
+End if 
+

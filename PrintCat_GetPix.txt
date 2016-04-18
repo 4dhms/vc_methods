@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($sketch)
+C_TIME($timeout)
+C_BOOLEAN($done)
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$2)
+
+$sketch:=Get pointer("vxSketch"+String($1))
+
+If (Records in selection([ColorPrintNumber])>0) & ([ColorPrintNumber]CPNumberKey>0)
+	
+	Picture_Get ([ColorPrintNumber]CPNumberKey;"CP")
+	$timeout:=Current time(*)
+	
+	Repeat 
+		Case of 
+			: (Shift down)
+				$done:=True
+			: (Not(<>vfCatchFile))
+				$done:=True
+			: (Current time(*)-$timeout>?00:00:05?)
+				$done:=True
+				GET PICTURE FROM LIBRARY("empty.jpg";$sketch->)
+		End case 
+	Until ($done)
+	
+	$sketch->:=<>vxSketch
+Else 
+	GET PICTURE FROM LIBRARY("empty.jpg";$sketch->)
+End if 
+GET PICTURE FROM LIBRARY("empty.jpg";<>vxSketch)

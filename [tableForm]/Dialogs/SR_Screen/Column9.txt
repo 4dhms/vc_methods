@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asSRmonth<7) & (cbBreakout=0)
+		SR_MonthBreak (asSRmonth)
+	: (asSRmonth>8) & (asSRmonth<15) & (cbBreakout=0)
+		SR_MonthBreak (asSRmonth-2)
+		
+	: (asSRmonth<25) & (cbBreakout=1)
+		SR_MonthBreak (Int(asSRmonth/4)+1)
+	: (asSRmonth>32) & (asSRmonth<55)
+		SR_MonthBreak (Int(asSRmonth/4)+3)
+End case 
+

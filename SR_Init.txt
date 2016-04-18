@@ -1,0 +1,131 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfDateRange)
+C_LONGINT($i)
+C_POINTER($orders;$units;$amount;$monthptr;$button)
+
+$i:=1
+For ($i;1;24)
+	$orders:=Get pointer("vlOrders"+String($i))
+	$units:=Get pointer("vlUnits"+String($i))
+	$amount:=Get pointer("vlDollars"+String($i))
+	$monthptr:=Get pointer("vsMonth"+String($i))
+	$button:=Get pointer("b"+String($i))
+	
+	OBJECT SET VISIBLE($orders->;$1)
+	OBJECT SET VISIBLE($units->;$1)
+	OBJECT SET VISIBLE($amount->;$1)
+	If (vfDateRange)
+		OBJECT SET VISIBLE($monthptr->;$1)
+		OBJECT SET VISIBLE($button->;$1)
+	End if 
+End for 
+
+OBJECT SET VISIBLE(vlOrdersSubA;$1)
+OBJECT SET VISIBLE(vlOrdersSubB;$1)
+OBJECT SET VISIBLE(vlUnitsSubA;$1)
+OBJECT SET VISIBLE(vlUnitsSubB;$1)
+OBJECT SET VISIBLE(vlDollarsSubA;$1)
+OBJECT SET VISIBLE(vlDollarsSubB;$1)
+OBJECT SET VISIBLE(vlOrdersSubAx;$1)
+OBJECT SET VISIBLE(vlOrdersSubBx;$1)
+OBJECT SET VISIBLE(vlUnitsSubAx;$1)
+OBJECT SET VISIBLE(vlUnitsSubBx;$1)
+OBJECT SET VISIBLE(vlDollarsSubAx;$1)
+OBJECT SET VISIBLE(vlDollarsSubBx;$1)
+OBJECT SET VISIBLE(vsGrandTotalx;$1)
+OBJECT SET VISIBLE(vsSeasonA;$1)
+OBJECT SET VISIBLE(vsSeasonB;$1)
+  //SET VISIBLE(vsSeason;$1)
+OBJECT SET VISIBLE(vrAvgA;$1)
+OBJECT SET VISIBLE(vrAvgB;$1)
+OBJECT SET VISIBLE(vrAvgAx;$1)
+OBJECT SET VISIBLE(vrAvgBx;$1)
+
+If (vfDateRange)
+	OBJECT SET VISIBLE(vlOrdersGrand;True)
+	OBJECT SET VISIBLE(vlUnitsGrand;True)
+	OBJECT SET VISIBLE(vlDollarsGrand;True)
+	OBJECT SET VISIBLE(vlOrdersGrandx;True)
+	OBJECT SET VISIBLE(vlUnitsGrandx;True)
+	OBJECT SET VISIBLE(vlDollarsGrandx;True)
+	
+	vlOrdersGrand:=0
+	vlUnitsGrand:=0
+	vlDollarsGrand:=0
+	vlOrdersGrandx:=0
+	vlUnitsGrandx:=0
+	vlDollarsGrandx:=0
+Else 
+	OBJECT SET VISIBLE(vlOrdersGrand;$1)
+	OBJECT SET VISIBLE(vlUnitsGrand;$1)
+	OBJECT SET VISIBLE(vlDollarsGrand;$1)
+	OBJECT SET VISIBLE(vlOrdersGrandx;$1)
+	OBJECT SET VISIBLE(vlUnitsGrandx;$1)
+	OBJECT SET VISIBLE(vlDollarsGrandx;$1)
+End if 
+
+Case of 
+	: (FORM Get current page=5)
+		  //don't populate months
+	: (asSeasonA=1)
+		vsMonth1:="January"
+		vsMonth2:="February"
+		vsMonth3:="March"
+		vsMonth4:="April"
+		vsMonth5:="May"
+		vsMonth6:="June"
+		vsMonth7:="July"
+		vsMonth8:="August"
+		vsMonth9:="September"
+		vsMonth10:="October"
+		vsMonth11:="November"
+		vsMonth12:="December"
+		vsSeason1A:="Spring "+String(alYearA{alYearA})
+		vsSeason1B:="Fall "+String(alYearA{alYearA})
+		vsSeason:="Spring/Fall"
+		vsPart1:="Q1"
+		vsPart2:="Q2"
+		vsPart3:="Q3"
+		vsPart4:="Q4"
+		
+		vsSeason2A:=String(alYearA{alYearA}-1)
+		vsSeason2B:=String(alYearA{alYearA}-1)
+		vsSubTextA:="Spring Subtotal"
+		vsSubTextB:="Fall Subtotal"
+		vtTitle:=asDivisions{asDivisions}+"      "+"Spring / Fall "+String(alYearA{alYearA})
+	Else 
+		vsMonth1:="July"
+		vsMonth2:="August"
+		vsMonth3:="September"
+		vsMonth4:="October"
+		vsMonth5:="November"
+		vsMonth6:="December"
+		vsMonth7:="January"
+		vsMonth8:="February"
+		vsMonth9:="March"
+		vsMonth10:="April"
+		vsMonth11:="May"
+		vsMonth12:="June"
+		vsSeason1A:="Fall "+String(alYearA{alYearA})
+		vsSeason1B:="Spring "+String(alYearA{alYearA}+1)
+		vsSeason:="Fall/Spring"
+		vsSeason2A:=String(alYearA{alYearA}-1)
+		vsSeason2B:=String(alYearA{alYearA})
+		vsSubTextA:="Fall Subtotal"
+		vsSubTextB:="Spring Subtotal"
+		vtTitle:=asDivisions{asDivisions}+"      "+"Fall "+String(alYearA{alYearA})+" / Spring "+String(alYearA{alYearA}+1)
+		vsPart1:="Q3"
+		vsPart2:="Q4"
+		vsPart3:="Q1"
+		vsPart4:="Q1"
+End case 
+Case of 
+	: (pOne=1)
+		vtTitle:=vtTitle+"   [Petite]"
+	: (pTwo=1)
+		vtTitle:=vtTitle+"   [Missy]"
+	: (pThree=1)
+		vtTitle:=vtTitle+"   [Large]"
+End case 
+
+SR_InitQ ($1)

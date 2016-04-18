@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsEntryNumber)
+C_TEXT(vsOrderNumber)
+Case of 
+	: (vsOrderNumber#"")
+		WH_BatchAdd 
+	: (vsEntryNumber#"")
+		WH_BatchEntryN 
+End case 
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CostSheets])

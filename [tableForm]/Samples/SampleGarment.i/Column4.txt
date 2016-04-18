@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked) & (Shift down)
+		CP_Image 
+	: (Form event=On Losing Focus)
+		vtOrderChanges:=vtOrderChanges+"_color"
+		
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=asCPNumbers{asCPNumbers})
+		If (Records in selection([ColorPrintNumber])=0)
+			WinPrompt ("No such number.")
+		Else 
+			asCPColorName{asCPNumbers}:=[ColorPrintNumber]CPName
+		End if 
+		UNLOAD RECORD([ColorPrintNumber])
+End case 

@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Printing Detail)
+		
+		Order_PageCountStat 
+		vtNotes:=[CS_Status]Notes
+		QUERY([CS_Tracking];[CS_Tracking]CS_LineKey=[CS_Lines]CS_LineKey)
+		QUERY SELECTION([CS_Tracking];[CS_Tracking]OrderNumber=<>vlOrderNumber;*)
+		QUERY SELECTION([CS_Tracking]; | ;[CS_Tracking]OrderNumber=0)
+		
+		Case of 
+			: (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltDescription#"")
+				vtNotes:=[CS_Tracking]AltDescription+Char(13)+vtNotes
+			: ([CS_Lines]Description#"")  //& (vtFullName#"")
+				vtNotes:=[CS_Lines]Description+Char(13)+vtNotes
+				  // : (vtFullName="")
+				  //  vtFullName:=vtNotes
+				  // vtNotes:=""
+		End case 
+		  // If ([CS_Lines]ComponentName=vDesc) & (vDesc#"")
+		  //    vtFullName:=""
+		  //     SET VISIBLE(*;"xLine";False)
+		  //  Else 
+		Case of 
+			: (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltMini#"")
+				vtFullName:=[CS_Lines]ComponentName+" - "+[CS_Tracking]AltMini
+			: ([CS_Lines]Minidescription="")
+				vtFullName:=[CS_Lines]ComponentName
+			Else 
+				vtFullName:=[CS_Lines]ComponentName+" - "+[CS_Lines]Minidescription
+		End case 
+		  //add source
+		Case of 
+			: (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltSource#"")
+				vtFullName:=vtFullName+"     Source: "+[CS_Tracking]AltSource
+			: ([CS_Lines]Source="") & ([ComponentSheets]FactorySupplied)
+				vtFullName:=vtFullName+"     Source: Factory Supplied"
+			: ([CS_Lines]Source#"")
+				vtFullName:=vtFullName+"     Source: "+[CS_Lines]Source
+		End case 
+		vDesc:=[CS_Lines]ComponentName
+		OBJECT SET VISIBLE(*;"xLine";True)
+		  //  End if 
+		vtFullName:=Replace string(vtFullName;"()";"")+" -- "+[CS_Status]ActionStatus+"  "+String([CS_Status]ActionDate)
+		If (Length(vtNotes)>0)
+			vtFullName:=vtFullName+Char(13)+"          "+vtNotes
+		End if 
+		
+		If ([CS_Lines]OrderNumber=0)
+			OBJECT SET FONT STYLE(vtFullName;0)
+		Else 
+			OBJECT SET FONT STYLE(vtFullName;6)
+		End if 
+		
+End case 

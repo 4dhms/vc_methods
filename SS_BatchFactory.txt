@@ -1,0 +1,22 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($oldOrder)
+$oldOrder:=[SpecFactory]OrderNumber
+
+DUPLICATE RECORD([SpecFactory])
+[SpecFactory]OrderNumber:=$1
+[SpecFactory]SF_KeyNumber:=Sequence number([SpecFactory])
+[SpecFactory]CreationDate:=Current date(*)
+If ($2)
+	[SpecFactory]CloneHistory:="Cloned from "+String(Abs(<>vlOrderNumber))+" and approved by "+Current user
+Else 
+	[SpecFactory]CloneHistory:="Cloned from "+String(Abs(<>vlOrderNumber))+" by "+Current user
+End if 
+[SpecFactory]Submit:=!00-00-00!
+[SpecFactory]Received:=!00-00-00!
+[SpecFactory]Note:=""
+
+
+SAVE RECORD([SpecFactory])
+ADD TO SET([SpecFactory];"ThisSpecSheet")
+$0:=[SpecFactory]SF_KeyNumber
+

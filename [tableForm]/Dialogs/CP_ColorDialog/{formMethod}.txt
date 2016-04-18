@@ -1,0 +1,111 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfPrint;vfNewFabric;vfNewColor;$show)
+C_LONGINT(bChangeColor;bMove)
+
+Case of 
+	: (Form event=On Close Box)
+		vfNewFabric:=False
+	: (Form event=On Load)
+		
+		Case of 
+			: (vfNewFabric) & (Find in array(asTypeList;"Combo 1")>0)
+				OBJECT SET ENABLED(bNext;True)
+			: (asTypeList=Size of array(asTypeList))
+				OBJECT SET ENABLED(bNext;False)
+			: (asTypeList<Size of array(asTypeList)) & (asTypeList{asTypeList+1}="Self")
+				OBJECT SET ENABLED(bNext;False)
+			Else 
+				OBJECT SET ENABLED(bNext;True)
+		End case 
+		
+		If (vsCPType="Zipper")
+			FORM GOTO PAGE(4)
+			GOTO OBJECT(vsCPStatus)
+		Else 
+			If (<>vlOrderNumber<0) & (asTypeList{asTypeList}="Self")
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{asTypeList})
+				UNLOAD RECORD([CP_OrderXRef])
+			End if 
+			
+			If (Current user="Sandie") | (Current user="Designer") & (vsCPType="Self") & (<>vlOrderNumber<0)
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{asTypeList})
+				If ([CP_OrderXRef]ReceivedColor)
+					cbCrec:=1
+					OBJECT SET VISIBLE(cbCrec;True)
+					UNLOAD RECORD([CP_OrderXRef])
+				End if 
+			End if 
+			
+			OBJECT SET VISIBLE(bChangeColor;vsCPNumber#"")
+			OBJECT SET VISIBLE(bMove;vsCPNumber#"")
+			OBJECT SET ENTERABLE(vsCPNumber;vsCPNumber="")
+			OBJECT SET VISIBLE(vtThreadColor;vsCPType="Self")
+			OBJECT SET VISIBLE(*;"xName3";vsCPType="Self")
+			
+			If (vsCPNumber="")
+				vfNewColor:=True
+			Else 
+				vfNewColor:=False
+			End if 
+			
+			vfCodeOverride:=False
+			Case of 
+				: (vsCPType="Zipper")
+					OBJECT SET ENABLED(bRemove;False)
+				: (vsCPType="Self") & (Not(vfNewFabric))
+					OBJECT SET ENABLED(bRemove;True)
+				Else 
+					vfNewFabric:=False
+					OBJECT SET ENABLED(bRemove;False)
+			End case 
+			
+			If (asSolidPrint{Find in array(asOrderType;vsCPType)}="Print")
+				OBJECT SET VISIBLE(bView;True)
+			Else 
+				OBJECT SET VISIBLE(bView;False)
+			End if 
+			
+			OBJECT SET VISIBLE(vlCPQuantity;vsCPType="Self")
+			OBJECT SET VISIBLE(*;"xQuantity";vsCPType="Self")
+			OBJECT SET VISIBLE(vtColorCode;(vsCPType="Self") & (<>vlOrderNumber>0))
+			If (vsCPNumber="")
+				GOTO OBJECT(vsCPNumber)
+			Else 
+				GOTO OBJECT(vsEmpty)
+			End if 
+			
+			OBJECT SET VISIBLE(*;"xRec";(vsCPType="Self") & (<>vlOrderNumber<0))
+			
+			OBJECT SET VISIBLE(*;"xCarton";(<>vlOrderNumber>0) & (vsCPType="Self"))
+			OBJECT SET VISIBLE(*;"vtCarton";(<>vlOrderNumber>0) & (vsCPType="Self"))
+			
+			Case of 
+				: (<>vlOrderNumber<0) & (vsCPType="Self") & (asSolidPrint{Find in array(asOrderType;"Self")}="Print") & ([Samples]MultipleStyles)
+					$show:=True
+				: (<>vlOrderNumber<0) & (vsCPType="Self") & (asSolidPrint{Find in array(asOrderType;"Self")}="Novelty") & ([Samples]MultipleStyles)
+					$show:=True
+				Else 
+					$show:=False
+			End case 
+			
+			OBJECT SET VISIBLE(cbMultiStyles;(<>vlOrderNumber<0) & (vsCPType="Self") & (asSolidPrint{Find in array(asOrderType;"Self")}="Print") & (Not([Samples]MultipleStyles)))
+			OBJECT SET VISIBLE(*;"xStyle";$show)
+			OBJECT SET VISIBLE(*;"xStyle1";$show)
+			OBJECT SET VISIBLE(vtMultiStyleNumber;$show)
+			OBJECT SET VISIBLE(bGet;$show)
+			
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vtThreadColor)
+			QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+			If (Records in selection([ColorPrintNumber])=0)
+				vtColor:=""
+			Else 
+				vtColor:=[ColorPrintNumber]CPName
+			End if 
+			
+			If (afCCoverride{asTypeList})
+				OBJECT SET COLOR(vtColorCode;-(Red+(256*White)))
+			Else 
+				OBJECT SET COLOR(vtColorCode;-(Black+(256*White)))
+			End if 
+		End if 
+End case 

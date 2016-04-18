@@ -1,0 +1,7 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (<>SamGarPrcID=0)
+	<>SamGarPrcID:=New process("p_SamGarOrdEnt";0;"SamGarPro")
+Else 
+	SHOW PROCESS(<>SamGarPrcID)
+	BRING TO FRONT(<>SamGarPrcID)
+End if 

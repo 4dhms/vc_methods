@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbFuzzy)
+C_TEXT(vsCustomer)
+
+Case of 
+	: (vsPOFlag="")
+		WinPrompt ("Enter po number.")
+	Else 
+		CREATE SET([Orders];"Orders")
+		Case of 
+			: (cbFuzzy=1) & (vsCustomer="")
+				QUERY([Orders];[Orders]CustPONumber="@"+vsPOFlag+"@";*)
+				QUERY([Orders]; | ;[Orders]Special_Instructions="@"+vsPOFlag+"@")
+			: (cbFuzzy=1)
+				QUERY([Orders];[Orders]CustPONumber="@"+vsPOFlag+"@";*)
+				QUERY([Orders]; | ;[Orders]Special_Instructions="@"+vsPOFlag+"@";*)
+				QUERY([Orders]; & ;[Orders]Customer=vsCustomer)
+			Else 
+				QUERY([Orders];[Orders]Customer=vsCustomer;*)
+				QUERY([Orders]; & ;[Orders]CustPONumber=vsPOFlag)
+		End case 
+		If (Records in selection([Orders])<1)
+			WinPrompt ("Can't find "+vsPOFlag+" for "+vsCustomer+".")
+			USE SET("Orders")
+		Else 
+			CANCEL
+		End if 
+		CLEAR SET("Orders")
+		
+End case 

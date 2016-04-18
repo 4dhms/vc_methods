@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($unit)
+vlColSlider:=[SpecFactory]SampleCol
+Case of 
+	: (Form event=On Printing Detail)
+		QUERY([SpecSheetLines];[SpecSheetLines]SpecLineKey=[Sizes]SpecLineKey)
+		QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+		OBJECT SET VISIBLE(vsSize0;[SpecLibrary]DescriptionB#"")
+		Case of 
+			: ([SpecSheetLines]OtherDescription#"")
+				vtDescription:=[SpecSheetLines]OtherDescription
+				vsField:=""
+				vsSize0:=""
+			: ([SpecLibrary]DescriptionB="")
+				vtDescription:=[SpecLibrary]DescriptionA
+				vsField:=""
+				vsSize0:=""
+			Else 
+				vtDescription:=[SpecLibrary]DescriptionA+[SpecLibrary]DecriptConnect+[SpecSheetLines]SpecialMeasure+[SpecLibrary]DescriptionB
+				vsSize0:="["+[SpecSheetLines]SpecialMeasure+"]"+Char(34)
+				$unit:=1
+				OBJECT MOVE(vsSize0;([SpecLibrary]CharacterCount*$unit);0)
+		End case 
+		Case of 
+			: (vlColSlider=1)
+				OBJECT SET FONT STYLE([Sizes]Size1;1)
+			: (vlColSlider=2)
+				OBJECT SET FONT STYLE([Sizes]Size2;1)
+			: (vlColSlider=3)
+				OBJECT SET FONT STYLE([Sizes]Size3;1)
+			: (vlColSlider=4)
+				OBJECT SET FONT STYLE([Sizes]Size4;1)
+			: (vlColSlider=5)
+				OBJECT SET FONT STYLE([Sizes]Size5;1)
+			: (vlColSlider=6)
+				OBJECT SET FONT STYLE([Sizes]Size6;1)
+			: (vlColSlider=7)
+				OBJECT SET FONT STYLE([Sizes]Size7;1)
+			: (vlColSlider=8)
+				OBJECT SET FONT STYLE([Sizes]Size8;1)
+			: (vlColSlider=9)
+				OBJECT SET FONT STYLE([Sizes]Size9;1)
+			: (vlColSlider=10)
+				OBJECT SET FONT STYLE([Sizes]Size1;10)
+		End case 
+		vtDescription:=Replace string(vtDescription;Char(13);" ";*)
+		
+End case 

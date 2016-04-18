@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$order;$out)
+
+FIRST RECORD([Samples])
+$i:=1
+For ($i;1;Records in selection([Samples]))
+	If (Shift down)
+		ALERT(String(Records in selection([Samples]))+"  "+String([Samples]SampleNumber))
+	End if 
+	
+	$order:=-1*[Samples]SampleNumber
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order;*)
+	QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]ReceivedColor=False;*)
+	QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Self")
+	
+	If (Records in selection([CP_OrderXRef])=0)
+		[Samples]Outstanding:=0
+	Else 
+		FIRST RECORD([CP_OrderXRef])
+		$n:=1
+		$out:=0
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			$out:=$out+([CP_OrderXRef]Quantity-[CP_OrderXRef]Received)
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		[Samples]Outstanding:=$out
+	End if 
+	SAVE RECORD([Samples])
+	NEXT RECORD([Samples])
+End for 
+
+ALERT("Done")

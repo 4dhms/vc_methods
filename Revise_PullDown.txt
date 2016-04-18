@@ -1,0 +1,133 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($process)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+
+
+Case of 
+	: (asPOv{asPOv}="Original order")
+		If ([Orders]PODate=!00-00-00!)
+			  //do nothing
+		Else 
+			[Orders]RevisionKey:=[Orders]OrderNum
+			Revise_FlagFields (True)
+		End if 
+	: (asPOv{asPOv}="On Hold")
+		vtOldData:=""
+		vtNewData:="Put on hold"
+		<>vlRevisionNumber:=[Orders]RevisionNumber+1
+		WinChoice ("Do you want to put this order on hold?")
+		If (ok=1)
+			[Orders]Hold:=True
+			SAVE RECORD([Orders])
+			ACCEPT
+			Rev_LogEvent ("On Hold")
+			Order_MailHold 
+		End if 
+	: (asPOv{asPOv}="Activate")
+		<>vlRevisionNumber:=[Orders]RevisionNumber+1
+		WinChoice ("Do you want to take this order"+Char(13)+"off hold?")
+		If (ok=1)
+			[Orders]Hold:=False
+			SAVE RECORD([Orders])
+			ACCEPT
+			vtOldData:=""
+			vtNewData:="Taken off hold"
+			  //[Orders]PODate:=Current date(*)
+			Rev_LogEvent ("Off Hold")
+		End if 
+	: (asPOv{asPOv}="UN-cancelled")
+		<>vlRevisionNumber:=[Orders]RevisionNumber+1
+		WinChoice ("Do you want to UNCANCEL this order?")
+		If (ok=1)
+			[Orders]Cancelled:=False
+			[Orders]PriceTicket:=False
+			SAVE RECORD([Orders])
+			ACCEPT
+			Rev_LogEvent ("UN-cancelled")
+		End if 
+	: (asPOv{asPOv}="No Archive")
+		<>vlRevisionNumber:=[Orders]RevisionNumber+1
+		[Orders]ArchiveNot:=True
+		SAVE RECORD([Orders])
+		ACCEPT
+	: (asPOv{asPOv}="Cancelled")
+		<>vlRevisionNumber:=[Orders]RevisionNumber+1
+		WinChoice ("Are you sure you want to CANCEL this order?")
+		If (ok=1)
+			[Orders]Cancelled:=True
+			SAVE RECORD([Orders])
+			Rev_LogEvent ("Cancelled")
+			ACCEPT
+		End if 
+	: (asPOv{asPOv}="Edit")
+		If (Locked([CostSheets]))
+			LOCKED BY([CostSheets];$process;$user;$session;$processName)
+			If ($user#Current user) & ($user#"Designer")
+				WinPrompt ("The cost sheet is locked by "+$user+" in process: "+$processname)
+			End if 
+		End if 
+		
+		If ([Orders]RevisionNumber>1)
+			If (Shift down)
+				WinChoice ("Are you sure you want to wind the revision back from "+String([Orders]RevisionNumber)+"?")
+				If (ok=1)
+					Rev_LogEvent ("Revision rollback")
+					[Orders]POOpen:=True
+					[Orders]RevisionNumber:=[Orders]RevisionNumber-1
+					[Orders]RevisionKey:=[Orders]OrderNum+(0.01*[Orders]RevisionNumber)
+					[Orders]NotPrinted:=True
+					ARRAY TEXT(asPOv;1)
+					asPOv{1}:="Revision "+String([Orders]RevisionNumber)
+					asPOv:=1
+				End if 
+			End if 
+		End if 
+		<>vlRevisionNumber:=[Orders]RevisionNumber
+		vfNewRecord:=True
+		<>Enter:=True
+		Revise_FlagFields (True)
+		
+	: (asPOv{asPOv}="New Revision")
+		<>vlRevisionNumber:=[Orders]RevisionNumber+1
+		vtOldData:="Rev "+String([Orders]RevisionNumber)
+		vtNewData:="Rev "+String([Orders]RevisionNumber+1)
+		Rev_LogEvent ("New Revision")
+		WinChoice ("Are you sure you want to REVISE this order?")
+		If (ok=1)
+			vfNewRecord:=True
+			<>Enter:=True
+			[Orders]FlagChange:=True
+			[Orders]POOpen:=True
+			[Orders]RevisionNumber:=[Orders]RevisionNumber+1
+			[Orders]RevisionKey:=[Orders]OrderNum+(0.01*[Orders]RevisionNumber)
+			[Orders]NotPrinted:=True
+			SAVE RECORD([Orders])
+			
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			APPLY TO SELECTION([OrdersFabricXRef];[OrdersFabricXRef]RevStatus:=0)
+			RELATE MANY([CP_OrderXRef]XrefID)
+			APPLY TO SELECTION([CP_OrderXRef];[CP_OrderXRef]TempSelfKey:=0)
+			
+			QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=<>vlOrderNumber)
+			RELATE MANY SELECTION([CS_Lines]CS_ID)
+			QUERY SELECTION([CS_Lines];[CS_Lines]FlagStatus#0)
+			APPLY TO SELECTION([CS_Lines];[CS_Lines]FlagStatus:=0)
+			UNLOAD RECORD([CS_Lines])
+			
+			
+			ARRAY TEXT(asPOv;1)
+			asPOv{1}:="Revision "+String([Orders]RevisionNumber)
+			asPOv:=1
+			
+			[Orders]Cancelled:=False
+			Revise_FlagFields (<>Enter)
+			  //Revise_Array 
+		End if 
+		  // Rev_LogEvent ("Changed")
+	Else 
+		<>Enter:=False
+		[Orders]RevisionKey:=[Orders]OrderNum+(0.01*(asPOv-1))
+		Revise_FlagFields (False)
+End case 

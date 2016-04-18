@@ -1,0 +1,108 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue;$go)
+C_TEXT($html)
+C_LONGINT($i)
+C_TEXT($row)
+C_REAL($wt;$per;$cost)
+
+Case of 
+	: ([CostSheets]MyFOB)
+		$continue:=False
+	: ([CostSheets]WtYarn#0) | ([CostSheets]YarnCost#0) | ([CostSheets]YdCombo1#0) | ([CostSheets]YdCombo2#0) | ([CostSheets]YdCombo3#0) | ([CostSheets]YdFabric#0)
+		$continue:=True
+	: ([CostSheets]YdFusibles#0) | ([CostSheets]YdLining#0)
+		$continue:=True
+	: ([CostSheets]Combo1Cost#0) | ([CostSheets]Combo2Cost#0) | ([CostSheets]Combo3Cost#0) | ([CostSheets]FabricCost#0) | ([CostSheets]FusiblesCost#0) | ([CostSheets]LiningCost#0)
+		$continue:=True
+	: ([CostSheets]PriceButtons1#0) | ([CostSheets]PriceButtons2#0) | ([CostSheets]PriceCombo1#0) | ([CostSheets]PriceCombo2#0) | ([CostSheets]PriceCombo3#0) | ([CostSheets]PriceFabric#0)
+		$continue:=True
+	: ([CostSheets]PriceFusibles#0) | ([CostSheets]PriceLining#0)
+End case 
+
+If ($continue)
+	$html:=$html+"<table width=477 border=0>"
+	$html:=$html+"<tr>"
+	$html:=$html+"<th width=90 scope=row><div align=left><font color=#000000 size=1 face=Verdana, "+"Arial, Helvetica"+", sans-serif></font></div></th>"
+	$html:=$html+"<td width=100>"+"<div align=left><font color=#000000 size=1 face=Verdana, Arial, Helvetica, sans-"+"serif>"+"</font></div></td>"
+	$html:=$html+"<td width=50>"+"<div align=right><font color=#000000 size=1 face=Verdana, Arial, Helvetica, sans-"+"serif>"+"Wt/Yd</font></div></td>"
+	$html:=$html+"<td width=50>"+"<div align=right><font color=#000000 size=1 face=Verdana, Arial, Helvetica, sans-"+"serif>"+"Per</font>"+"</div></td>"
+	$html:=$html+"<td width=50>"+"<div align=right><font color=#000000 size=1 face=Verdana, Arial, Helvetica, sans-"+"serif>"+"Wt/Yd</font></div></td>"
+	$html:=$html+"</tr>"
+	
+	$i:=1
+	For ($i;1;9)
+		$go:=False
+		Case of 
+			: ($i=1)
+				$row:="Yarn"
+				If ([CostSheets]YarnCost>0)
+					$go:=True
+					$wt:=[CostSheets]WtYarn
+					$per:=[CostSheets]PriceYarn
+					$cost:=[CostSheets]YarnCost
+				End if 
+			: ($i=2)
+				$row:="Self"
+				If ([CostSheets]FabricCost>0)
+					$go:=True
+					$wt:=[CostSheets]YdFabric
+					$per:=[CostSheets]PriceFabric
+					$cost:=[CostSheets]FabricCost
+				End if 
+			: ($i=3)
+				$row:="Combo 1"
+				If ([CostSheets]Combo1Cost>0)
+					$go:=True
+					$wt:=[CostSheets]YdCombo1
+					$per:=[CostSheets]PriceCombo1
+					$cost:=[CostSheets]Combo1Cost
+				End if 
+			: ($i=4)
+				$row:="Combo 2"
+				If ([CostSheets]Combo2Cost>0)
+					$go:=True
+					$wt:=[CostSheets]YdCombo2
+					$per:=[CostSheets]PriceCombo2
+					$cost:=[CostSheets]Combo2Cost
+				End if 
+			: ($i=5)
+				$row:="Combo 3"
+				If ([CostSheets]Combo3Cost>0)
+					$go:=True
+					$wt:=[CostSheets]YdCombo3
+					$per:=[CostSheets]PriceCombo3
+					$cost:=[CostSheets]Combo3Cost
+				End if 
+			: ($i=6)
+				$row:="Lining"
+				If ([CostSheets]LiningCost>0)
+					$go:=True
+					$wt:=[CostSheets]YdLining
+					$per:=[CostSheets]PriceLining
+					$cost:=[CostSheets]LiningCost
+				End if 
+			: ($i=7)
+				$row:="Fusibles"
+				If ([CostSheets]FusiblesCost>0)
+					$go:=True
+					$wt:=[CostSheets]YdFusibles
+					$per:=[CostSheets]PriceFusibles
+					$cost:=[CostSheets]FusiblesCost
+				End if 
+		End case 
+		
+		If ($go)
+			$html:=$html+"<tr>"
+			$html:=$html+"<th scope=row>"+"<div align=right><font color=#000000 size=1 face=Verdana, Arial, Helvetica, sans-"+"s"+"erif>"+"</font></div></th>"
+			$html:=$html+"<td>"+"<div align=left><font color=#000000 size=2 face=Verdana, Arial, Helvetica, sans-"+"serif>"+$row+"</font></div></td>"
+			$html:=$html+"<td>"+"<div align=right><font color=#000000 size=2 face=Verdana, Arial, Helvetica, sans-"+"serif>"+String($wt;"##0.00")+"</font></div></td>"
+			$html:=$html+"<td>"+"<div align=right><font color=#000000 size=2 face=Verdana, Arial, Helvetica, sans-"+"serif>"+String($per;"##0.00")+"</font></div></td>"
+			$html:=$html+"<td>"+"<div align=right><font color=#000000 size=2 face=Verdana, Arial, Helvetica, sans-"+"serif>"+String($cost;"##0.00")+"</font></div></td>"
+			$html:=$html+"</tr>"
+		End if 
+	End for 
+	
+	$html:=$html+"</Table>"
+End if 
+
+$0:=$html

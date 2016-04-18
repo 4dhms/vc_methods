@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Is this an HMS brand?";"HMS";"Other")
+If (ok=1)
+	<>CloseBox:=True
+	Label_BuildScreen 
+	Center Window (350;662;4;"Point and Click")
+	DIALOG("LabelArtNos")
+	CLOSE WINDOW
+Else 
+	List_Window ("Label";->[Orders]Label)
+End if 

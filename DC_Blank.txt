@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Insert blank line for DC "+String($1)+"?";"Yes";"No")
+
+If (ok=1)
+	APPEND TO ARRAY(alDCLine;0)
+	APPEND TO ARRAY(alDCQty;0)
+	APPEND TO ARRAY(alDCNumber;$1)
+	APPEND TO ARRAY(asDCNote;"")
+	APPEND TO ARRAY(asDClinePO;"")
+	APPEND TO ARRAY(asDClineColor;"")
+End if 
+

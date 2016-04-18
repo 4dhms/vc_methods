@@ -1,0 +1,7 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search in spec sheets
+  //
+SAVE RECORD([Specs])
+QUERY([Specs])
+p_SetWndwSpecs 
+

@@ -1,0 +1,89 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($srchDate)
+C_TIME($docRef)
+C_TEXT($path)
+C_LONGINT($i)
+C_TEXT($datestamp)
+
+ARRAY LONGINT(alRepPO;0)
+ARRAY TEXT(asRepStyle;0)
+ARRAY TEXT(asRepFactory;0)
+ARRAY DATE(adRepXFactory;0)
+ARRAY DATE(adRepXNY;0)
+ARRAY TEXT(asRepInfo;0)
+READ ONLY([Orders])
+
+$srchDate:=Current date(*)-(Day number(Current date(*)-2))
+
+QUERY([Orders];[Orders]Customer="@marmax@")
+QUERY SELECTION([Orders];[Orders]CancelDate>=$srchDate)
+
+QUERY SELECTION([Orders];[Orders]DCInfo=False)
+QUERY SELECTION([Orders];[Orders]PC=False)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"")
+
+ORDER BY([Orders];[Orders]CancelDate;>;[Orders]OrderNum;>)
+WinChoice ("Do you want to generate a spreadsheet or look at a screen?"+Char(13)+Char(13)+"(add .xls to spreadsheet file name)";"Screen";"Spreadsheet")
+
+If (ok=1)
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		APPEND TO ARRAY(alRepPO;[Orders]OrderNum)
+		APPEND TO ARRAY(asRepStyle;[Orders]StyleNumber)
+		APPEND TO ARRAY(asRepFactory;[Orders]Factory)
+		APPEND TO ARRAY(adRepXFactory;[Orders]ShipDateFactory)
+		APPEND TO ARRAY(adRepXNY;[Orders]CancelDate)
+		Case of 
+			: (Not([Orders]DCInfo)) & (Not([Orders]PC))
+				APPEND TO ARRAY(asRepInfo;"Missing Both")
+			: (Not([Orders]DCInfo))
+				APPEND TO ARRAY(asRepInfo;"Missing DC")
+			: (Not([Orders]PC))
+				APPEND TO ARRAY(asRepInfo;"Missing PC")
+		End case 
+		NEXT RECORD([Orders])
+	End for 
+	<>CloseBox:=True
+	Center Window (600;600;4;"")
+	DIALOG([Dialogs];"Precarton.i")
+	CLOSE WINDOW
+	
+	
+Else 
+	$datestamp:=Replace string(String($srchDate);"/";"_")
+	
+	$path:=Replace string($path;"Marmax";"Marmax_")
+	$docRef:=Create document("";"xls")
+	
+	SEND PACKET($docRef;"PO"+Char(9))
+	SEND PACKET($docRef;"Style"+Char(9))
+	SEND PACKET($docRef;"Factory"+Char(9))
+	SEND PACKET($docRef;"Customer"+Char(9))
+	SEND PACKET($docRef;"X Factory"+Char(9))
+	SEND PACKET($docRef;"Cancel Date"+Char(9))
+	SEND PACKET($docRef;"DC & Pre-Carton Info"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+		SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+		SEND PACKET($docRef;[Orders]Factory+Char(9))
+		SEND PACKET($docRef;[Orders]Customer+Char(9))
+		SEND PACKET($docRef;String([Orders]ShipDateFactory)+Char(9))
+		SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+		Case of 
+			: (Not([Orders]DCInfo)) & (Not([Orders]PC))
+				SEND PACKET($docRef;"Missing Both"+Char(13))
+			: (Not([Orders]DCInfo))
+				SEND PACKET($docRef;"Missing DC"+Char(13))
+			: (Not([Orders]PC))
+				SEND PACKET($docRef;"Missing PC"+Char(13))
+		End case 
+		NEXT RECORD([Orders])
+	End for 
+	CLOSE DOCUMENT($docRef)
+	
+End if 

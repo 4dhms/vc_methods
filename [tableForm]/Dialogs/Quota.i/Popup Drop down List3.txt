@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($new)
+
+Case of 
+	: (asList1=2)
+		$new:=Request("Add Type")
+		If (ok=1)
+			APPEND TO ARRAY(asList1;$new)
+		End if 
+		
+	: (asList1>1) & (asList1{asList1}#"")
+		[Quota]QuotaType:=asList1{asList1}
+End case 

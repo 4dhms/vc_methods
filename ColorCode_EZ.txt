@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($selfkeys;0)
+C_LONGINT($i)
+C_TEXT($self)
+C_TEXT($combo1)
+C_TEXT($combo2)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=vlSelfKey)
+
+If (<>vtColorCode#"")
+	[CP_OrderXRef]ColorCode:=<>vtColorCode
+	SAVE RECORD([CP_OrderXRef])
+Else 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=vlSelfKey)
+	DISTINCT VALUES([CP_OrderXRef]SelfKey;$selfkeys)
+	CREATE SET([CP_OrderXRef];"self")
+	$i:=1
+	For ($i;1;Size of array($selfkeys))
+		USE SET("self")
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkeys{$i};*)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Self")
+		
+		$self:=[CP_OrderXRef]CPNumber
+		USE SET("self")
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkeys{$i};*)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Combo 1")
+		If (Records in selection([CP_OrderXRef])=0)
+			$combo1:=""
+		Else 
+			$combo1:=[CP_OrderXRef]CPNumber
+		End if 
+		
+		USE SET("self")
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkeys{$i};*)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Combo 2")
+		If (Records in selection([CP_OrderXRef])=0)
+			$combo2:=""
+		Else 
+			$combo2:=[CP_OrderXRef]CPNumber
+		End if 
+		
+		USE SET("self")
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkeys{$i};*)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Self")
+		
+		If ([CP_OrderXRef]ColorCode="") & ($self#"TBA") & ($combo1#"TBA")
+			Case of 
+				: ([CP_OrderXRef]ColorCodeOverride)
+					[CP_OrderXRef]ColorCode:=[CP_OrderXRef]ColorCodeNew
+				: (<>vtColorCode#"")
+					[CP_OrderXRef]ColorCode:=<>vtColorCode
+				: (<>vlCodeCheck=2)
+					ColorCode_Print 
+					[CP_OrderXRef]ColorCode:=vtColorCode
+				: (<>vlCodeCheck=1)
+					[CP_OrderXRef]ColorCode:=[CP_OrderXRef]CPNumber
+				: (Find in array(asOrderType;"Combo 2")>0) & ($combo1#"")
+					[CP_OrderXRef]ColorCode:=ColorCode_Distill ($self;$combo1;$combo2)
+				: (Find in array(asOrderType;"Combo 1")>0) & ($combo1#"")
+					[CP_OrderXRef]ColorCode:=ColorCode_Distill ($self;$combo1)
+				Else 
+					[CP_OrderXRef]ColorCode:=ColorCode_Distill ($self)
+			End case 
+			
+			
+			[CP_OrderXRef]DontShowCode:=Not(ColorCode_Show )
+			SAVE RECORD([CP_OrderXRef])
+		End if 
+	End for 
+End if 
+
+UNLOAD RECORD([ColorPrintNumber])
+

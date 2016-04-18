@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If ([CostSheets]OtherShip="00/00/00") | ([CostSheets]OtherShip="False")
+	[CostSheets]OtherShip:=""
+End if 
+Cost_NYLA 

@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pixelcount)
+vfPrinting:=True
+
+If (vfDigest)
+	SET PRINT OPTION(Orientation option;1)
+Else 
+	SET PRINT OPTION(Orientation option;2)
+End if 
+PRINT SETTINGS
+vlPage:=1
+
+If (ok=1)
+	$pixelcount:=0
+	
+	FIRST RECORD([SLRReporter])
+	$i:=1
+	For ($i;1;Records in selection([SLRReporter]))
+		
+		If ($pixelcount<100)
+			If (Shift down)
+				TRACE
+			End if 
+			PAGE BREAK(>)
+			vsPrintingHeader:=String(vlPage)
+			Case of 
+				: (Not(vfLegal)) & (vlRouter=1)
+					Print form([SLRReporter];"HeaderLetter.p")
+					$pixelcount:=630
+				: (vfLegal) & (vlRouter=1)
+					Print form([SLRReporter];"HeaderLegal.p")
+					$pixelcount:=630
+			End case 
+			vlPage:=vlPage+1
+		End if 
+		
+		
+		SLR_PrintLine 
+		
+		Case of 
+			: (vfDigest) & (vlRouter=1)
+				Print form([SLRReporter];"Acct.digest")
+				$pixelcount:=$pixelcount-41
+			: (vfLegal) & (vlRouter=1)
+				If ([SLRReporter]Header>0)
+					Print form([SLRReporter];"SubheadLegal.p")
+					$pixelcount:=$pixelcount-13
+				End if 
+				
+				Print form([SLRReporter];"Acct.legal")
+				$pixelcount:=$pixelcount-68
+			: (Not(vfLegal)) & (vlRouter=1)
+				Print form([SLRReporter];"Acct.letter")
+				$pixelcount:=$pixelcount-68
+		End case 
+		NEXT RECORD([SLRReporter])
+	End for 
+End if 
+PAGE BREAK
+CLEAR SET("thissession")
+

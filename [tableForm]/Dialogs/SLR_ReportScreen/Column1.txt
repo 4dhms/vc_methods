@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (afBatchList{afBatchList}=True)
+	ARRAY TEXT(asStyleNumbers;0)
+	ARRAY TEXT(asCustomers;0)
+	ARRAY LONGINT(alStyleCount;0)
+	ARRAY TEXT(atStyleNo;0)
+	
+	SLR_Range 
+	vfSort:=False
+	If (asDivisions{afBatchList}="06-Cable & Gauge") | (asDivisions{afBatchList}="03-Cupio")
+		cbKnit:=1
+		cbCutSew:=1
+		OBJECT SET VISIBLE(cbKnit;True)
+		OBJECT SET VISIBLE(cbCutSew;True)
+	End if 
+End if 

@@ -1,0 +1,26 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([DesignLines];"DesignLines.o")
+
+<>CloseBox:=True
+
+If (Screen height<900) & (<>vlPlatform=3) | (Macintosh control down)
+	FORM SET INPUT([DesignLines];"Short.entry")
+	Center Window (750;520;0;"")
+Else 
+	FORM SET INPUT([DesignLines];"DesignLine.entry")
+	Center Window (900;650;8;"")
+End if 
+
+AccessMode (->[DesignLines];True)
+TheFile:=->[DesignLines]
+ALL RECORDS([DesignLines])
+ORDER BY([DesignLines];[DesignLines]DLCreationDate;<)
+  //If (Screen height<900) & (◊vlPlatform=3) | (Shift down) | (Current user="Lorna')"
+  //MODIFY SELECTION([DesignLines])
+  //Else 
+MODIFY SELECTION([DesignLines];*)
+  //End if 
+CLOSE WINDOW
+UNLOAD RECORD([DesignLines])
+<>DLProc:=0
+

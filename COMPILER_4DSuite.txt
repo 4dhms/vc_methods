@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT(bLabels;bGraph)
+C_LONGINT(SPLITTER;SPLITTER1;SPLITTER2;SPLITTER3;SPLITTER4;SPLITTER5;SPLITTER6;SPLITTER7;SPLITTER8;SPLITTER9)
+C_LONGINT(SPLITTER10;SPLITTER11;SPLITTER12;SPLITTER13;SPLITTER14;SPLITTER15;SPLITTER16;SPLITTER17;SPLITTER18;SPLITTER19)
+C_LONGINT(SPLITTer20;SPLITTer21;SPLITTer22;SPLITTer23;SPLITTer24;SPLITTer25;SPLITTer26;SPLITTer27;SPLITTer28;SPLITTer29)
+C_LONGINT(Splitter30;Splitter31;Splitter32;Splitter33;Splitter34;Splitter35;Splitter36;Splitter37;Splitter38;Splitter39)
+C_LONGINT(Splitter40;Splitter41;Splitter42;Splitter43;Splitter44;Splitter45;Splitter46;Splitter47;Splitter48;Splitter49)
+C_LONGINT(Splitter50;Splitter51;Splitter52;Splitter53;Splitter54;Splitter55;Splitter56;Splitter57;Splitter58;Splitter59)
+C_LONGINT(Splitter60;Splitter61;Splitter62;Splitter63;Splitter64;Splitter65;Splitter66;Splitter67;Splitter68;Splitter69)
+C_LONGINT(Splitter70;Splitter71;Splitter72;Splitter73;Splitter74;Splitter75;Splitter76;Splitter77;Splitter78;Splitter79)
+C_LONGINT(Splitter80;Splitter81;Splitter82;Splitter83;Splitter84;Splitter85;Splitter86;Splitter87;Splitter88)

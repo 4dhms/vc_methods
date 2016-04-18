@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL(vrTotalSales1)
+C_BOOLEAN($new;$continue)
+C_TEXT(vtUnitsTot;vtSalesTot;vtOnHand)
+C_LONGINT($i)
+
+If (atFabrication>1)
+	If ([SLRAcct]Classification#atFabrication{atFabrication})
+		[SLRAcct]Classification:=atFabrication{atFabrication}
+		SAVE RECORD([SLRAcct])
+		atFabrication:=1
+	End if 
+End if 
+
+If (asColors>0) & (vsCustomer#"")
+	If (vtUnitsTot="") & (vtSalesTot="") & (vtOnHand="")
+		WinChoice ("Are you sure you want so save a zero week?")
+		If (ok=1)
+			$continue:=True
+		Else 
+			If (atFabrication>1)
+				If ([SLRAcct]Classification#atFabrication{atFabrication})
+					[SLRAcct]Classification:=atFabrication{atFabrication}
+				End if 
+			End if 
+			SAVE RECORD([SLRAcct])
+		End if 
+	Else 
+		$continue:=True
+	End if 
+	
+	If ($continue)
+		OBJECT SET VISIBLE(bMore;True)
+		SLR_Save 
+		SLR_ColorWeeks (True)
+		FIRST RECORD([SLRWks])
+		$new:=True
+		$i:=1
+		For ($i;1;Records in selection([SLRWks]))
+			If ([SLRWks]WkNumber=vlWkNumber)
+				[SLRWks]SLRColorKey:=[SLRColor]SLRColorKey
+				[SLRWks]SLRWkEnd:=vdDate
+				[SLRWks]SLRWkStart:=vdDate-6
+				[SLRWks]WkNumber:=vlWkNumber
+				[SLRWks]SalesUnits:=Num(vtUnitsTot)
+				[SLRWks]SalesTot:=Num(vtSalesTot)
+				[SLRWks]OnHand:=Num(vtOnHand)
+				SAVE RECORD([SLRWks])
+				$new:=False
+			End if 
+			NEXT RECORD([SLRWks])
+		End for 
+		If ($new)
+			CREATE RECORD([SLRWks])
+			[SLRWks]SLRColorKey:=[SLRColor]SLRColorKey
+			[SLRWks]SLRAcctKey:=[SLRColor]SLRAcctKey
+			[SLRWks]SLRWkEnd:=vdDate
+			[SLRWks]SLRWkStart:=vdDate-6
+			[SLRWks]WkNumber:=vlWkNumber
+			[SLRWks]SalesUnits:=Num(vtUnitsTot)
+			[SLRWks]SalesTot:=Num(vtSalesTot)
+			[SLRWks]OnHand:=Num(vtOnHand)
+			SAVE RECORD([SLRWks])
+		End if 
+		
+		vtUnitsTot:=""
+		vtSalesTot:=""
+		vtOnHand:=""
+		
+		If (asColors<Size of array(asColors))
+			asColors:=asColors+1
+			LISTBOX SELECT ROW(afListBox1;asColors)
+			SLR_FIndLines 
+			GOTO OBJECT(vtUnitsTot)
+		Else 
+			asColors:=0
+			REDUCE SELECTION([SLRWks];0)
+		End if 
+	End if 
+	
+End if 

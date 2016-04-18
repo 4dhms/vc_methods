@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($fetch)
+If ($2#"spec")
+	GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+End if 
+GET PICTURE FROM LIBRARY("empty.jpg";<>vxSketch)
+<>vfCatchFile:=True
+
+If (Application type=0)
+	Picture_Return ($1;$2;"")
+Else 
+	$fetch:=Execute on server("Picture_Return";1064*64;"PictureGet";$1;$2;Current machine owner)
+End if 
+
+  //DELAY PROCESS(Current process;90)
+

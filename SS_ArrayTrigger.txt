@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asDesignNumbers>0)
+		OBJECT SET ENABLED(bPreview;True)
+		OBJECT SET ENABLED(bOk;True)
+End case 
+
+If (Shift down)
+	WinPrompt (asDesignNumbers{asDesignNumbers})
+End if 

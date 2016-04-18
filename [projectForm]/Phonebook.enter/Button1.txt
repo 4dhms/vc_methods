@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Staff];[Staff]PBName=vtPart1)
+WinChoice ("Are you sure you want to remove "+[Staff]PBName+"?")
+If (ok=1)
+	DELETE RECORD([Staff])
+	If (asUsers=0)
+		Phonebook_Tab ("A")
+	Else 
+		Phonebook_Tab (asUsers{asUsers})
+	End if 
+	CANCEL
+End if 

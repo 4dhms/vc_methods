@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;vlItem1;vlItem2;vlItem3;vlItem4;vlItem5;vlItem6;vlItem7;vlItem8;vlItem9;vlItem10)
+C_TEXT(vsCustomer)
+C_POINTER($varptr;$title)
+
+OBJECT SET VISIBLE(vlOrderNumber;$1)
+OBJECT SET VISIBLE(vDesign;$1)
+OBJECT SET VISIBLE(vdCancel;$1)
+OBJECT SET VISIBLE(vlTotQty;$1)
+OBJECT SET VISIBLE(vlSubtotal;$1)
+OBJECT SET VISIBLE(vlTotDiff;$1)
+
+If (Not($1))
+	vlOrderNumber:=0
+	$i:=1
+	For ($i;1;10)
+		$varptr:=Get pointer("vlItem"+String($i))
+		$title:=Get pointer("vtColor"+String($i))
+		$varptr->:=0
+		OBJECT SET VISIBLE($varptr->;False)
+		OBJECT SET VISIBLE($title->;False)
+		
+	End for 
+End if 
+

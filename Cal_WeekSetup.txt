@@ -1,0 +1,85 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($monDate;$sunDate)
+C_LONGINT($dayNumber;$i)
+C_TIME($timeKey)
+C_POINTER($dayPtr)
+C_TEXT($buildDay)
+
+WinChoice ("Do you want to see all appointments or just yours?";"All";asUsers{asUsers})
+If (ok=1)
+	vsUser:="All"
+Else 
+	vsUser:=asUsers{asUsers}
+End if 
+$dayNumber:=Day number(vdCalToday)
+$monDate:=vdCalToday-($dayNumber-2)
+$sunDate:=$monDate+6
+vdPaperwork:=$monDate
+QUERY([Appts];[Appts]ApptDate>=$monDate;*)
+QUERY([Appts]; & ;[Appts]ApptDate<=$sunDate)
+
+If (asDivisions>1)
+	QUERY SELECTION([Appts];[Appts]Division=asDivisions{asDivisions})
+End if 
+
+If (bChoice2=1)
+	$i:=1
+	FIRST RECORD([Appts])
+	CREATE SET([Attendees];"Peeps")
+	For ($i;1;Records in selection([Appts]))
+		RELATE MANY([Attendees]ApptKey)
+		QUERY SELECTION([Attendees];[Attendees]Attendee=asUsers{asUsers})
+		If (Records in selection([Attendees])=0)
+			REMOVE FROM SET([Attendees];"Peeps")
+		End if 
+		NEXT RECORD([Attendees])
+	End for 
+	USE SET("Peeps")
+	CLEAR SET("Peeps")
+End if 
+ORDER BY([Appts];[Appts]ApptDate;>;[Appts]ApptStart;>)
+
+$i:=1
+FIRST RECORD([Appts])
+$timeKey:=Current time(*)
+
+For ($i;1;Records in selection([Appts]))
+	QUERY([Week];[Week]TimeKey=$timeKey;*)
+	QUERY([Week]; & ;[Week]Hour=[Appts]ApptStart)
+	
+	If (Records in selection([Week])=0)
+		QUERY([Week];[Week]TimeKey=?00:00:00?)
+		If (Records in selection([Week])=0)
+			CREATE RECORD([Week])
+		End if 
+	End if 
+	[Week]TimeKey:=$timeKey
+	[Week]WeekDate:=$monDate
+	[Week]Hour:=[Appts]ApptStart
+	Case of 
+		: ([Appts]ApptDate-$monDate=0)
+			$dayPtr:=->[Week]Monday
+		: ([Appts]ApptDate-$monDate=1)
+			$dayPtr:=->[Week]Tuesday
+		: ([Appts]ApptDate-$monDate=2)
+			$dayPtr:=->[Week]Wednesday
+		: ([Appts]ApptDate-$monDate=3)
+			$dayPtr:=->[Week]Thursday
+		: ([Appts]ApptDate-$monDate=4)
+			$dayPtr:=->[Week]Friday
+		Else 
+			$dayPtr:=->[Week]Saturday
+	End case 
+	
+	$buildDay:=[Appts]ApptWith+Char(13)
+	$buildDay:=$buildDay+[Appts]ApptGroup+Char(13)+Char(13)
+	$buildDay:=Replace string($buildDay;Char(13)+Char(13)+Char(13);Char(13)+Char(13);*)
+	$dayPtr->:=$dayPtr->+$buildDay
+	SAVE RECORD([Week])
+	NEXT RECORD([Appts])
+End for 
+
+QUERY([Week];[Week]TimeKey=$timeKey)
+ORDER BY([Week];[Week]WeekDate;>;[Week]Hour;>)
+vdStart:=$monDate
+SET WINDOW TITLE("Week of "+String($monDate))

@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"ReportDateRate")
+vfShortQuery:=False
+
+Center Window (200;200;1;"")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+
+If (ok=1)
+	If (cbDivision=1)
+		vlRouter:=1
+		vsDivision:="Division"
+	Else 
+		vlRouter:=2
+		vsDivision:="Factory"
+	End if 
+	Report_SalesDivNew 
+End if 
+
+RESUME PROCESS(<>SalesPrcID)
+<>ReportsID:=0
+

@@ -1,0 +1,56 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderNumber;$i)
+
+If (vsQOrderNumber="") & (vsQStyle="") & (vsQDesign="")
+	WinPrompt ("There is no search criteria.")
+Else 
+	If (vAddto=1)
+		CREATE SET([Samples];"Base")
+	End if 
+	
+	Case of 
+		: (vsQStyle#"")
+			QUERY([Samples];[Samples]StyleNum=vsQStyle)
+			  //QUERY SELECTION([Samples];[Samples]Void=False)
+			CREATE SET([Samples];"StyPreSet")
+			
+			QUERY([CP_OrderXRef];[CP_OrderXRef]StyleNumber=vsQStyle)
+			$i:=1
+			FIRST RECORD([CP_OrderXRef])
+			For ($i;1;Records in selection([CP_OrderXRef]))
+				QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+				QUERY([Samples];[Samples]SampleNumber=Abs([OrdersFabricXRef]OrderNumber))
+				ADD TO SET([Samples];"StyPreSet")
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			
+			USE SET("StyPreSet")
+			CLEAR SET("StyPreSet")
+			
+		: (vsQOrderNumber#"")
+			$orderNumber:=Num(vsQOrderNumber)
+			QUERY([Samples];[Samples]SampleNumber=$orderNumber)
+			  //QUERY SELECTION([Samples];[Samples]Void=False)
+		: (vsQDesign#"")
+			QUERY([Samples];[Samples]DesignNum=vsQDesign)
+	End case 
+	  //QUERY SELECTION([Samples];[Samples]Void=False)
+	
+	If (vAddto=1)
+		CREATE SET([Samples];"Added")
+		CREATE EMPTY SET([Samples];"New")
+		UNION("Base";"Added";"New")
+		USE SET("New")
+		CLEAR SET("New")
+		CLEAR SET("Added")
+		CLEAR SET("Base")
+	End if 
+End if 
+p_SetWndwSamGar 
+vsQOrderNumber:=""
+vsQStyle:=""
+vsQDesign:=""
+vtQFactory:=""
+vdQCancel:=!00-00-00!
+
+

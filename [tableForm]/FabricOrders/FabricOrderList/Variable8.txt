@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vsQOrderNumber#"")
+		QUERY([FabricOrders];[FabricOrders]PONumber=vsQOrderNumber)
+	: (vtQArticle#"")
+		QUERY([FabricOrders];[FabricOrders]ArticleNo=vtQArticle)
+	: (vtQFactory#"")
+		QUERY([FabricOrders];[FabricOrders]VendorName=vtQFactory+"@")
+End case 
+ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)

@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE(vxSketch20)
+
+ARRAY PICTURE(ASketch;0)
+ARRAY BOOLEAN(afPrint;0)
+ARRAY TEXT(asCPNumbers;0)
+
+SELECTION TO ARRAY([ColorPrintNumber]CPNumber;asCPNumbers)
+
+vlRouter:=0
+PrintCat_LoadSelection 
+
+FORM GOTO PAGE(2)

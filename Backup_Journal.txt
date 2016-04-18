@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfUploadComplete)
+C_BOOLEAN(vfUploading)
+
+vlCounter:=0
+vfUploadComplete:=False
+vfUploading:=False
+
+Repeat 
+	If (Not(vfUploading))
+		vfUploadComplete:=Backup_FindLog 
+		vlCounter:=vlCounter+1
+	End if 
+	
+	Case of 
+		: (vfUploadComplete)
+			
+		: (vlCounter>20)
+			vfUploadComplete:=True
+		Else 
+			DELAY PROCESS(Current process;3600*1)
+	End case 
+	
+Until (vfUploadComplete)
+
+

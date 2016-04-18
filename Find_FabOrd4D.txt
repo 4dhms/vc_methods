@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([FabricOrders])
+  //ACCEPT
+QUERY([FabricOrders])
+If (OK=1)
+	SET WINDOW TITLE("Fabric Orders: "+String(Records in selection([FabricOrders]))+" of "+String(Records in table([FabricOrders])))
+End if 
+SET WINDOW TITLE("Fabric Orders: "+String(Records in selection([FabricOrders]))+" of "+String(Records in table([FabricOrders])))

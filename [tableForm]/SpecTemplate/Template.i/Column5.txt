@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+Spec_SaveOrder 
+
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+
+QUERY([SpecLibrary];[SpecLibrary]PartKey=alItemNumber{alItemNumber})
+ORDER BY([SpecLibrary];[SpecLibrary]SortOrder;>)
+SELECTION TO ARRAY([SpecLibrary]SpecEnglish;asList2)
+
+QUERY([SpecLibrary];[SpecLibrary]PartKey=0)
+ORDER BY([SpecLibrary];[SpecLibrary]SpecEnglish;>)
+
+SELECTION TO ARRAY([SpecLibrary]SpecEnglish;asList1)
+$n:=Size of array(asList1)
+For ($i;1;Size of array(asList1))
+	If (Find in array(asList2;asList1{$n})>0)
+		DELETE FROM ARRAY(asList1;$n;1)
+	End if 
+	$n:=$n-1
+End for 
+vlRowCount:=alItemNumber{alItemNumber}

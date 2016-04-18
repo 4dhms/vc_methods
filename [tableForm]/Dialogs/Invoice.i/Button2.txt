@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Inv_Done )
+	vsFind:=""
+	vrInvAmt:=0
+	vlInvQty:=0
+	vlOrderNumber:=0
+	ARRAY TEXT(asPrevDate;0)
+	ARRAY TEXT(asPrevQty;0)
+	ARRAY LONGINT(alInvOrder;0)
+	ARRAY TEXT(asPrevAmt;0)
+	ARRAY TEXT(asStyleWC;0)
+	ARRAY LONGINT(alOrders;0)
+	ARRAY TEXT(asCustomers;0)
+	ARRAY DATE(ADNYCANCELWC;0)
+	ARRAY LONGINT(alQuantity;0)
+	ARRAY REAL(arPrice;0)
+	ARRAY LONGINT(alUnshipped;0)
+	ARRAY LONGINT(alOrders;0)
+	REDUCE SELECTION([Invoices];0)
+	REDUCE SELECTION([Designs];0)
+	GOTO OBJECT(vsFind)
+End if 

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alSelfKey;0)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey>0)
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+SELECTION TO ARRAY([CP_OrderXRef]SelfKey;alSelfKey)
+ARRAY LONGINT(alShadeFab;0)
+ARRAY LONGINT(alShadeFab;Size of array(alSelfKey))
+
+vlOrderRouter:=-2
+FORM SET INPUT([Orders];"SizeBreakDown.i")
+Center Window (800;600;1984;"")
+MODIFY RECORD([Orders];*)
+CLOSE WINDOW

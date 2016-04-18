@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+
+$path:=Select folder
+
+[Staff]PrintPath:=$path

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+FIRST RECORD([PCPage])
+For ($i;1;Records in selection([PCPage]))
+	CP_NumbersUpdate 
+	NEXT RECORD([PCPage])
+End for 

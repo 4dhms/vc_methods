@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+GET HIGHLIGHTED RECORDS([RMA];"print")
+
+If (Records in set("print")<1)
+	WinPrompt ("There are no RMAs selected.")
+Else 
+	WinPrompt ("When you print multiple RMAs do not send automatic emails there is no automatic email to Susan.")
+	
+	USE SET("print")
+	CREATE EMPTY SET([Returns];"returns")
+	ORDER BY([RMA];[RMA]RMAkey;>)
+	vtAddToList:=""
+	vtShowList:=""
+	
+	$i:=1
+	FIRST RECORD([RMA])
+	QUERY([ReturnStores];[ReturnStores]StoreID=[RMA]StoreID)
+	
+	vtCustomerAddress:=[ReturnStores]StoreName+Char(13)+[ReturnStores]StoreAddress
+	
+	For ($i;1;Records in selection([RMA]))
+		vtAddToList:=vtAddToList+String([RMA]RMAkey)
+		vtShowList:=vtShowList+String([RMA]RMAkey)
+		If ([RMA]ReferenceNumber#"")
+			vtShowList:=vtShowList+" ("+[RMA]ReferenceNumber+")"
+		End if 
+		If ($i<Records in selection([RMA]))
+			vtAddtoList:=vtAddToList+", "
+			vtShowList:=vtShowList+", "
+		End if 
+		
+		QUERY([Returns];[Returns]RMAkey=[RMA]RMAkey)
+		$n:=1
+		FIRST RECORD([Returns])
+		For ($n;1;Records in selection([Returns]))
+			ADD TO SET([Returns];"returns")
+			NEXT RECORD([Returns])
+		End for 
+		NEXT RECORD([RMA])
+	End for 
+	USE SET("returns")
+	CLEAR SET("returns")
+	
+	FORM SET OUTPUT([Returns];"MultipleReturns.print")
+	PRINT SELECTION([Returns])
+	USE SET("print")
+	CLEAR SET("print")
+End if 

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($position)
+
+If (Form event=On Load)
+	ARRAY TEXT(asList17;0)
+	
+	ALL RECORDS([Steps])
+	DISTINCT VALUES([Steps]POM;asList17)
+	SORT ARRAY(asList17;>)
+	
+	$position:=Substring([SpecSheetLines]OtherDescription;1;5)+"@"
+	LISTBOX SELECT ROW(afListBox1;Find in array(asList17;$position))
+	OBJECT SET SCROLL POSITION(afListBox1;Find in array(asList17;$position)+15)
+End if 

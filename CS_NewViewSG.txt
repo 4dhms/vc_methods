@@ -1,0 +1,4 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(*;"xCSHead1";Not([Samples]ComponentSheet))
+OBJECT SET VISIBLE([Samples]Trim SG;Not([Samples]ComponentSheet))
+OBJECT SET VISIBLE(*;"xCSFlag";[Samples]ComponentSheet)

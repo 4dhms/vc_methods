@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($x;$y;$z)
+Case of 
+	: (Form event=On Getting Focus)
+		GET MOUSE(vlX;vlY;vlZ)
+		vfIncomplete:=True
+		
+	: (Form event=On Losing Focus)
+		If (arPrice{arPrice}=0)
+			vsRequestString:=""
+			Repeat 
+				WinChoice ("You need to enter a price for"+Char(13)+asCustomers{asCustomers}+".";"Price")
+				If (ok=1)
+					arPrice{arPrice}:=Num(vsRequeststring)
+				End if 
+			Until (Num(vsRequestString)>0) | (Shift down)
+		End if 
+		vfIncomplete:=False
+	: (Form event=On Data Change)
+		Order_DCIncomplete 
+End case 

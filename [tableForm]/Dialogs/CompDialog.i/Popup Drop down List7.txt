@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asCompStatus>0)
+	vsCSStatus:=<>asCompStatus{<>asCompStatus}
+	vdCSDate:=Current date(*)
+End if 
+
+

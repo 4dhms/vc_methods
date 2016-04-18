@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	DELETE FROM ARRAY(asCPNumbers;asCPNumbers;1)
+	DELETE FROM ARRAY(asCPColorName;asCPColorName;1)
+	DELETE FROM ARRAY(atDType;atDType;1)
+	DELETE FROM ARRAY(alColorKey;atDType;1)
+	DELETE FROM ARRAY(asSource;asSource;1)
+End if 

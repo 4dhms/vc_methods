@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$total)
+C_TEXT($path)
+$total:=0
+
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	$i:=1
+	FIRST RECORD([Orders])
+	
+	SEND PACKET($docref;"Order Number"+Char(9)+"Style Number"+Char(9)+"Design Number"+Char(9)+"Sample Status"+Char(9)+"After Approval"+Char(9)+"Factory"+Char(9)+"Customer"+Char(9)+"Division"+Char(9)+"Salesperson"+Char(9)+"Ship Date Factory"+Char(9)+"Start Date"+Char(9)+"NY Ship Date"+Char(9)+"Quantity"+Char(9)+"Price Ticket"+Char(13))
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		SampFit_RecDate 
+		vsSampRec:=Replace string(vsSampRec;Char(13);";";*)
+		SEND PACKET($docref;String([Orders]OrderNum)+Char(9)+[Orders]StyleNumber+Char(9)+[Orders]DesignNumber+Char(9)+vsSampRec+Char(9)+[Orders]AfterApproval+Char(9)+[Orders]Factory+Char(9)+[Orders]Customer+Char(9))
+		SEND PACKET($docref;[Orders]OrderDivision+Char(9)+[Orders]Salesperson+Char(9)+String([Orders]ShipDateFactory)+Char(9)+String([Orders]StartDate)+Char(9)+String([Orders]CancelDate)+Char(9)+String([Orders]TotalOrderQuantity)+Char(9))
+		If ([Orders]PriceTicket)
+			SEND PACKET($docref;"Sent")
+		End if 
+		SEND PACKET($docref;Char(13))
+		
+		$total:=$total+[Orders]TotalOrderQuantity
+		NEXT RECORD([Orders])
+	End for 
+	SEND PACKET($docref;Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+String($total)+Char(13))
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 

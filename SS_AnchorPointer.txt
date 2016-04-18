@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Getting Focus)
+	vlField:=Num(OBJECT Get name)-100
+End if 

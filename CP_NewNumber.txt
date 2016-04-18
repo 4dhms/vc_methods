@@ -1,0 +1,137 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asCPFamilies;0)
+C_TEXT($type;$test)
+C_LONGINT($choice;pTwo)
+C_BOOLEAN($ST;$continue;$placement;$done;$borderprint;$rented)
+
+$choice:=Pop up menu("Solid;Print;Embroid;Layout;Yarn Dye Stripe;Novelty")
+If ($choice>0)
+	$continue:=True
+	Case of 
+		: ($choice=1)
+			<>CPRouter:=1
+		: ($choice=2)
+			<>CPRouter:=2
+		: ($choice=3)
+			<>CPRouter:=3
+		: ($choice=4)
+			<>CPRouter:=4
+		: ($choice=5)
+			<>CPRouter:=5
+		: ($choice=6)
+			<>CPRouter:=6
+	End case 
+	If ($continue)
+		  //builds request window
+		QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPType=<>CPRouter)
+		ORDER BY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyName;>)
+		SELECTION TO ARRAY([ColorPrintFamilies]CPFamilyName;asCPFamilies)
+		Case of 
+			: (<>CPRouter=1)
+				$type:="Solid"
+				WinFindList ("Select Solid Family:";1)
+				vlRouter:=1
+				If (ok=1)
+					$continue:=True
+				Else 
+					$continue:=False
+				End if 
+			: (<>CPRouter=2)
+				$type:="Print"
+				WinFindList ("Select Print Family:";2)
+				If (cbPrint=1)
+					$borderprint:=True
+				Else 
+					$borderprint:=False
+				End if 
+				If (cbStrip=1)
+					$ST:=True
+				Else 
+					$ST:=False
+				End if 
+				If (cbTrim=1)
+					$placement:=True
+				Else 
+					$placement:=False
+				End if 
+				If (pTwo=1)
+					$rented:=True
+				Else 
+					$rented:=False
+				End if 
+				vlRouter:=2
+				If (ok=1)
+					$continue:=True
+				Else 
+					$continue:=False
+				End if 
+			: (<>CPRouter=3)
+				$type:="Embroidery"
+				vsRequestString:="Embroidery"
+				  // WinFindList ("Select Embroidery Family:";1)
+				vlRouter:=3
+			: (<>CPRouter=4)
+				$type:="Layout"
+				vsRequestString:="Layout"
+				  //  WinFindList ("Select Layout Family:";1)
+				vlRouter:=4
+			: (<>CPRouter=5)
+				$type:="Yarn Dye Stripe"
+				vsRequestString:="Layout"
+				  //  WinFindList ("Select Layout Family:";1)
+				vlRouter:=5
+			: (<>CPRouter=6)
+				$type:="Novelty"
+				vsRequestString:="Novelty"
+				  //  WinFindList ("Select Layout Family:";1)
+				vlRouter:=6
+		End case 
+		
+		$done:=False
+		Repeat 
+			If (Current user="Designer") & (Shift down)
+				vsNewColorNumber:=Request("Recreate Color/Print Number:")
+			Else 
+				vsNewColorNumber:=PO_GetNumber ($type)
+			End if 
+			If ($placement)
+				vsNewColorNumber:="P"+vsNewColorNumber
+			End if 
+			If ($borderprint)
+				vsNewColorNumber:="b"+vsNewColorNumber
+			End if 
+			If ($ST)
+				vsNewColorNumber:="ST"+vsNewColorNumber
+			End if 
+			
+			If (pTwo=1) & (<>CPRouter=2)
+				vsNewColorNumber:="X"+vsNewColorNumber
+			End if 
+			
+			Case of 
+				: (<>CPRouter=1)
+					$test:=vsNewColorNumber
+				: (<>CPRouter=2)
+					$test:=vsNewColorNumber+"-@"
+				Else 
+					$test:=vsNewColorNumber+"@"
+			End case 
+			
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$test)
+			Case of 
+				: (Records in selection([ColorPrintNumber])=0)
+					$done:=True
+				: (Shift down)
+					$done:=True
+			End case 
+			
+		Until ($done)
+		
+	End if 
+	
+	If ($continue)
+		CREATE SET([ColorPrintNumber];"Prints")
+		FORM SET INPUT([ColorPrintNumber];"CPNumber.i")
+		ADD RECORD([ColorPrintNumber];*)
+	End if 
+End if 

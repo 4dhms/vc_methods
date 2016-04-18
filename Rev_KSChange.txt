@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($revKey)
+C_LONGINT($quantity;vlKeyNumber)
+C_TEXT(vsFabColor)
+
+If (Position("quantity";$1)>0)
+	$quantity:=Num($1)
+End if 
+
+If ($2#$3)
+	Case of 
+		: (Position("usage";$1)>0)
+			$4->:=Num($3)
+		: (Position("actual";$1)>0)
+			$4->:=Num($3)
+		: (Position("Color code override";$1)>0)
+			If ($3#"")
+				$4->:=$3
+			End if 
+		: (Position("received";$1)>0)
+			$4->:=Num($3)
+		: (Position("quantity";$1)>0)
+			$4->:=Num($3)
+		: (Position("date";$1)>0)
+			$4->:=Date($3)
+		Else 
+			$4->:=$3
+	End case 
+	
+	SAVE RECORD($5->)
+	
+	$revKey:=<>vlOrderNumber+(<>vlRevisionNumber/100)
+	CREATE RECORD([Changes])
+	[Changes]RevisionNumber:=<>vlRevisionNumber
+	[Changes]RevisionKey:=$revKey
+	[Changes]OrderNumber:=<>vlOrderNumber
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]Writer:=Current user
+	[Changes]ChangeKey:=Sequence number([Changes])
+	[Changes]FieldName:=$1
+	
+	[Changes]OldData:=$2
+	[Changes]NewChange:=$3
+	[Changes]RecordKey:=vlKeyNumber
+	
+	Case of 
+		: (<>vlOrderNumber>0) & (<>vlRevisionNumber=0)
+			[Changes]FabPrint:=vsFabColor+" (NR)"
+		: (<>vlOrderNumber<0) & (<>vlRevisionNumber=0)
+			[Changes]FabPrint:=vsFabColor+" (NR)"
+		Else 
+			[Changes]FabPrint:=vsFabColor
+	End case 
+	
+	
+	If ($2="")
+		[Changes]Tag:="Added"
+	Else 
+		[Changes]Tag:="Changed"
+		
+	End if 
+	SAVE RECORD([Changes])
+	
+End if 

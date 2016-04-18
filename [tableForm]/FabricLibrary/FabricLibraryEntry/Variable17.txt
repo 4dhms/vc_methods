@@ -1,0 +1,2 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SET WINDOW TITLE("Fabric Library: "+String(Records in selection([FabricLibrary])-1)+" of "+String(Records in table([FabricLibrary])-1))

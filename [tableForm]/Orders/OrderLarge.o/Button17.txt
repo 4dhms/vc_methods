@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$qty;$orders;$n)
+C_TEXT($division)
+C_TEXT($divisioncheck)
+
+$division:=Request("Division")+"@"
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]Division=$division;*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonName="Summer";*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonYear="2011";*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPType=2;*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPNumber="@-1")
+$divisioncheck:=[ColorPrintNumber]Division
+
+ALERT("Prints "+String(Records in selection([ColorPrintNumber]))+"  "+$divisioncheck)
+
+$orders:=0
+$qty:=0
+$c:=0
+$i:=1
+FIRST RECORD([ColorPrintNumber])
+CREATE EMPTY SET([Orders];"print")
+
+For ($i;1;Records in selection([ColorPrintNumber]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+	
+	If (Records in selection([CP_OrderXRef])>0)
+		
+		$c:=$c+1
+		$n:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+			If ([Orders]OrderDivision=$divisioncheck)
+				ADD TO SET([Orders];"print")
+				
+				$qty:=$qty+[CP_OrderXRef]Quantity
+			End if 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+	End if 
+	NEXT RECORD([ColorPrintNumber])
+End for 
+USE SET("print")
+$orders:=Records in set("print")
+CLEAR SET("print")
+SET WINDOW TITLE(String(Records in selection([Orders])))
+
+ALERT("Used "+String($c)+"  Orders "+String($orders)+"  Units "+String($qty))

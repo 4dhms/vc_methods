@@ -1,0 +1,64 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($stop;$make)
+SAVE RECORD([CostSheets])
+
+QUERY([Costing];[Costing]OrderNumber=-1)
+If (Records in selection([Costing])=0)
+	CREATE RECORD([Costing])
+	[Costing]SheetNumber:=-1
+	[Costing]OrderNumber:=0
+	[Costing]CreationDate:=Current date(*)
+	SAVE RECORD([Costing])
+End if 
+
+CREATE SET([CostSheets];"ThisSheet")
+
+WinFind ("Name this Favorite:";4)
+If (ok=1)
+	ONE RECORD SELECT([CostSheets])
+	QUERY([CostSheets];[CostSheets]SheetName=vsRequestString;*)
+	QUERY([CostSheets]; & ;[CostSheets]SheetNumber=-1)
+	
+	If (Records in selection([CostSheets])>0)
+		WinChoice ("This favorite already exists."+Char(13)+"Do you want to overwrite it?";"No";"Yes")
+		If (ok=1)
+			$stop:=True
+		End if 
+	Else 
+		$make:=True
+	End if 
+	If (Not($stop))
+		If ($make)
+			USE SET("ThisSheet")
+			DUPLICATE RECORD([CostSheets])
+		End if 
+		[CostSheets]SheetName:=vsRequestString
+		[CostSheets]SheetNumber:=-1
+		[CostSheets]SheetID:=Sequence number([CostSheets])
+		[CostSheets]CustomsEntryN:=""
+		[CostSheets]Details:=""
+		[CostSheets]FOBConfirmed:=False
+		[CostSheets]UnitCostAirWC:=0
+		[CostSheets]CustomsDate:=!00-00-00!
+		[CostSheets]Quota1Confirm:=False
+		[CostSheets]Quota2Confirm:=False
+		[CostSheets]IECompany:=""
+		[CostSheets]IEUnitPrice:=0
+		[CostSheets]FOB2Confirmed:=False
+		[CostSheets]QuotaInvoice:=""
+		[CostSheets]QuotaSupplier:=""
+		[CostSheets]QuotaPayDate:=!00-00-00!
+		[CostSheets]ActualUnitsShipped:=0
+		cbCostNY:=0
+		cbCostLA:=0
+		[CostSheets]FreightAIR:=0
+		[CostSheets]FreightBOAT:=0
+		[CostSheets]ShipSea:=False
+		[CostSheets]ShipAir:=True
+		[CostSheets]Quantity:=0
+		[CostSheets]PriceTerms:=""
+		SAVE RECORD([CostSheets])
+	End if 
+End if 
+ACCEPT
+CLEAR SET("ThisSheet")

@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsDatePage:=String(Current date(*))+"  PAGE "+String(Printing page)
+	: (Form event=On Printing Detail)
+		QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+		SampFit_RecDate 
+		RELATE MANY([Orders]OrderNum)
+		vtFabric1:=[OrdersFabricXRef]FabricName
+		NEXT RECORD([OrdersFabricXRef])
+		vtFabric2:=[OrdersFabricXRef]FabricName
+		
+		OBJECT SET VISIBLE(vdSubmitDate;True)
+		
+		
+		OBJECT SET VISIBLE([Specs]PattrnReadyDate;[Specs]PattrnReadyDate#!00-00-00!)
+		OBJECT SET VISIBLE([Specs]SmplReceived;[Specs]SmplReceived#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]ShipDateFactory;[Orders]ShipDateFactory#!00-00-00!)
+		  //This cleans up old data in recycled field
+		If ([Specs]Comments="00/00/00")
+			[Specs]Comments:=""
+		End if 
+End case 

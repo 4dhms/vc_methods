@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfPreview;vfNewFabric)
+C_LONGINT($c)
+
+If (Form event=On Load)
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+	If ([FabricLibrary]SecondaryFabric#"")
+		OBJECT SET VISIBLE(*;"xCompound";True)
+	End if 
+	UNLOAD RECORD([FabricLibrary])
+	
+	If (Find in array(asSorP;"Zipper")>0)
+		DELETE FROM ARRAY(asSorP;Find in array(asSorP;"Zipper");1)
+	End if 
+	
+	$c:=Find in array(asSorP;"Trim")
+	Case of 
+		: ($c<1) & (vsCPType="Combo@")
+			APPEND TO ARRAY(asSorP;"Trim")
+		: ($c>0) & (vsCPType="Self")
+			DELETE FROM ARRAY(asSorP;Find in array(asSorP;"Trim"))
+	End case 
+	If (Find in array(asSorP;"Novelty")<0)
+		APPEND TO ARRAY(asSorP;"Novelty")
+	End if 
+	If (Find in array(asSorP;"Zipper")<0) & (vfNewFabric)
+		APPEND TO ARRAY(asSorP;"Zipper")
+	End if 
+	
+	
+	If (Not(vfNewFabric)) & (vsCPType#"Self")
+		OBJECT SET ENABLED(bRemove;True)
+	Else 
+		OBJECT SET ENABLED(bRemove;False)
+	End if 
+	OBJECT SET VISIBLE(<>atPartList;vsCPType#"Self")
+	  //SET VISIBLE(vsPart;vsCPType#"Self")
+	OBJECT SET VISIBLE(*;"xGarment";vsCPType#"Self")
+	Case of 
+		: (vsCPType="Zipper")
+			
+		: (<>vlOrderNumber>0)
+			OBJECT SET ENTERABLE(vtFabric;([Orders]OrderEntryDate<!2011-05-26!) | (vsCPType="Combo@"))
+			OBJECT SET ENTERABLE(vsFiber;([Orders]OrderEntryDate<!2011-05-26!) | (vsCPType="Combo@"))
+			OBJECT SET VISIBLE(<>atFabricList;([Orders]OrderEntryDate<!2011-05-26!) | (vsCPType="Combo@"))
+			OBJECT SET VISIBLE(<>atFiberList;([Orders]OrderEntryDate<!2011-05-26!) | (vsCPType="Combo@"))
+			Case of 
+				: (Current user="Sandy Yang")
+					OBJECT SET ENTERABLE(vrActual;True)
+				: (User in group(Current user;"SuperCostSheets"))
+					OBJECT SET ENTERABLE(vrActual;True)
+				Else 
+					OBJECT SET ENTERABLE(vrActual;False)
+			End case 
+		Else 
+			OBJECT SET ENTERABLE(vtFabric;([Samples]SampleOrderDate<!2011-05-26!) | (vsCPType="Combo@") | (vsArt="TBD@"))
+			OBJECT SET ENTERABLE(vsFiber;([Samples]SampleOrderDate<!2011-05-26!) | (vsCPType="Combo@") | (vsArt="TBD@"))
+			OBJECT SET VISIBLE(<>atFabricList;([Samples]SampleOrderDate<!2011-05-26!) | (vsCPType="Combo@") | (vsArt="TBD@"))
+			OBJECT SET VISIBLE(<>atFiberList;([Samples]SampleOrderDate<!2011-05-26!) | (vsCPType="Combo@") | (vsArt="TBD@"))
+	End case 
+	
+	If (<>vlOrderNumber<0)
+		OBJECT SET VISIBLE(*;"xActual";False)
+		OBJECT SET VISIBLE(*;"xYds2";False)
+		OBJECT SET VISIBLE(vrActual;False)
+		OBJECT SET VISIBLE(*;"xProj";False)
+		OBJECT SET VISIBLE(*;"xUsage";True)
+	Else 
+		OBJECT SET VISIBLE(*;"xProj";True)
+		OBJECT SET VISIBLE(*;"xUsage";False)
+		
+	End if 
+	
+	
+	Case of 
+		: (vsCPType="Zipper")
+			FORM GOTO PAGE(3)
+		: (vfPreview)
+			OBJECT SET VISIBLE(bList;vsArt="HMS@")
+			FORM GOTO PAGE(2)
+	End case 
+End if 

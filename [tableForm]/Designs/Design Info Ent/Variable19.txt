@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Suzanne Corra") | (Current user="Sue") | (Current user="Dusha") | (Current user="Lai Mun") | (Current user="Spenser") | (Current user="August") | (Current user="Designer")
+	vtOldData:=[Designs]Description
+	OBJECT SET ENTERABLE([Designs]Description;True)
+	GOTO OBJECT([Designs]Description)
+	
+Else 
+	ALERT("To change design description after an order has been created, contact Dusha, Michelle Li, Spenser or August.")
+End if 

@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($test)
+
+QUERY([CP_Customers];[CP_Customers]Division="")
+
+CONFIRM(String(Records in selection([CP_Customers])))
+If (ok=1)
+	DELETE SELECTION([CP_Customers])
+End if 
+
+ARRAY TEXT($cpnumber;0)
+ARRAY TEXT($keep;0)
+
+ALL RECORDS([CP_Customers])
+DISTINCT VALUES([CP_Customers]CPNumber;$cpnumber)
+
+$i:=1
+CREATE EMPTY SET([CP_Customers];"lose")
+For ($i;1;Size of array($cpnumber))
+	QUERY([CP_Customers];[CP_Customers]CPNumber=$cpnumber{$i})
+	If (Records in selection([CP_Customers])>1)
+		FIRST RECORD([CP_Customers])
+		$n:=1
+		For ($n;1;Records in selection([CP_Customers]))
+			
+			$test:=[CP_Customers]CPNumber+"_"+[CP_Customers]Division+"_"+[CP_Customers]SeasonName+"_"+[CP_Customers]SeasonYear
+			
+			If (Find in array($keep;$test)>0)
+				ADD TO SET([CP_Customers];"lose")
+			Else 
+				APPEND TO ARRAY($keep;$test)
+			End if 
+			NEXT RECORD([CP_Customers])
+		End for 
+	End if 
+	
+End for 
+
+USE SET("lose")
+CLEAR SET("lost")
+
+

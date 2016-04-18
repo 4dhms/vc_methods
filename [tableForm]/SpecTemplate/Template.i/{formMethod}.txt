@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		Template_OnLoad 
+	: (Form event=On Unload)
+		  //◊vlCostRouter:=0
+		If (Records in set("ThisTemplate")>0)
+			CLEAR SET("ThisTemplate")
+		End if 
+		ARRAY TEXT(<>asGradeCat;0)
+End case 

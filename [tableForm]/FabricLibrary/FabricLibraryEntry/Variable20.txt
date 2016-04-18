@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([FabricLibrary]ArticleNumber="HMS@") | ([FabricLibrary]HMSANmaster)
+	FORM GOTO PAGE(4)
+Else 
+	FORM GOTO PAGE(1)
+End if 

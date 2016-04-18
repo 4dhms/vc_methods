@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+
+Case of 
+	: ([Designs]DesEntryDate>!2016-02-17!) & ([Designs]PofE="") & (Not([Designs]Dupe))
+		WinPrompt ("You must enter a Point of Origin.")
+	: (vfNewDesign) & ([Designs]KWCnS="")
+		WinPrompt ("You must enter knit, woven or cut and sew.")
+	: ([Designs]SeasonName="False") | ([Designs]SeasonName="") & ([Designs]Season="")
+		WinPrompt ("You must enter a season.")
+	: ([Designs]SeasonYear="False") | ([Designs]SeasonYear="") & ([Designs]Season="")
+		WinPrompt ("You must enter a season year.")
+		
+	: ([Designs]DivisionCodeN="")
+		$continue:=False
+		WinPrompt ("You need a divsion code.")
+	: (Not(vfNewDesign))
+		$continue:=True
+	: ([Designs]Patt Srce="")
+		GOTO OBJECT([Designs]Patt Srce)
+		$continue:=False
+		WinPrompt ("Enter Pattern Source")
+	Else 
+		$continue:=True
+End case 
+
+If ($continue)
+	$0:=True
+	  //If ($validate)
+	  //If (Records in selection([Specs])<1)
+	  //vsDesignNumber:=[Designs]Design Num
+	  //CREATE RECORD([Specs])
+	  //[Specs]Design Num:=vsDesignNumber
+	  //SAVE RECORD([Specs])
+	  //MODIFY RECORD([Specs])
+	  //End if 
+Else 
+	$0:=False
+End if 

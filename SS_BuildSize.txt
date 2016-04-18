@@ -1,0 +1,111 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$subKey)
+
+$subKey:=[SpecFactory]SF_KeyNumber*-1
+QUERY([Sizes];[Sizes]SF_KeyNumber=$subKey)
+
+If (Records in selection([Sizes])=0)
+	CREATE RECORD([Sizes])
+	[Sizes]SpecLineKey:=[SpecSheetLines]SpecLineKey
+	[Sizes]SF_KeyNumber:=$subKey
+	
+	If ([SpecFactory]Size#"")
+		QUERY([SpecGradeCats];[SpecGradeCats]ACol1=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol2=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol3=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol4=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol5=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol6=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol7=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol8=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol9=[SpecFactory]Size;*)
+		QUERY([SpecGradeCats]; | ;[SpecGradeCats]ACol10=[SpecFactory]Size)
+		If (Records in selection([SpecGradeCats])=1)
+			[Sizes]Size1:=[SpecGradeCats]ACol1
+			[Sizes]Size2:=[SpecGradeCats]ACol2
+			[Sizes]Size3:=[SpecGradeCats]ACol3
+			[Sizes]Size4:=[SpecGradeCats]ACol4
+			[Sizes]Size5:=[SpecGradeCats]ACol5
+			[Sizes]Size6:=[SpecGradeCats]ACol6
+			[Sizes]Size7:=[SpecGradeCats]ACol7
+			[Sizes]Size8:=[SpecGradeCats]ACol8
+			[Sizes]Size9:=[SpecGradeCats]ACol9
+			[Sizes]Size10:=[SpecGradeCats]ACol10
+			[Sizes]Size11:=[SpecGradeCats]ACol11
+			[Sizes]Size12:=[SpecGradeCats]ACol12
+			SAVE RECORD([Sizes])
+		End if 
+		Case of 
+			: ([SpecGradeCats]ACol1=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=1
+			: ([SpecGradeCats]ACol2=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=2
+			: ([SpecGradeCats]ACol3=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=3
+			: ([SpecGradeCats]ACol4=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=4
+			: ([SpecGradeCats]ACol5=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=5
+			: ([SpecGradeCats]ACol6=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=6
+			: ([SpecGradeCats]ACol7=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=7
+			: ([SpecGradeCats]ACol8=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=8
+			: ([SpecGradeCats]ACol9=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=9
+			: ([SpecGradeCats]ACol10=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=10
+			: ([SpecGradeCats]ACol11=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=11
+			: ([SpecGradeCats]ACol12=[SpecFactory]Size)
+				[SpecFactory]SampleCol:=12
+		End case 
+	End if 
+End if 
+QUERY([Sizes];[Sizes]SF_KeyNumber=$subkey)
+
+vsSize1:=[Sizes]Size1
+vsSize2:=[Sizes]Size2
+vsSize3:=[Sizes]Size3
+vsSize4:=[Sizes]Size4
+vsSize5:=[Sizes]Size5
+vsSize6:=[Sizes]Size6
+vsSize7:=[Sizes]Size7
+vsSize8:=[Sizes]Size8
+vsSize9:=[Sizes]Size9
+vsSize10:=[Sizes]Size10
+vsSize11:=[Sizes]Size11
+vsSize12:=[Sizes]Size12
+
+SS_ClearArray 
+SS_AllLines 
+FIRST RECORD([SpecSheetLines])
+  //
+CREATE EMPTY SET([Sizes];"SizeSet")
+
+For ($i;1;Records in selection([SpecSheetLines]))
+	QUERY([Sizes];[Sizes]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY SELECTION([Sizes];[Sizes]SpecLineKey=[SpecSheetLines]SpecLineKey)
+	If (Not([SpecSheetLines]DeletedLine))
+		If (Records in selection([Sizes])=0)
+			CREATE RECORD([Sizes])
+			[Sizes]SpecLineKey:=[SpecSheetLines]SpecLineKey
+			[Sizes]SF_KeyNumber:=[SpecFactory]SF_KeyNumber
+			[Sizes]SortOrder:=(10000*[SpecSheetLines]PartNumber)+[SpecSheetLines]SortOrder
+			[Sizes]Tolerance:=[SpecSheetLines]Tolerance
+			SAVE RECORD([Sizes])
+			ADD TO SET([Sizes];"SizeSet")
+		Else 
+			[Sizes]SortOrder:=(10000*[SpecSheetLines]PartNumber)+[SpecSheetLines]SortOrder
+			ADD TO SET([Sizes];"SizeSet")
+			SAVE RECORD([Sizes])
+		End if 
+	End if 
+	NEXT RECORD([SpecSheetLines])
+End for 
+
+USE SET("SizeSet")
+ORDER BY([Sizes];[Sizes]SortOrder;>)
+CLEAR SET("SizeSet")
+vlColSlider:=[SpecFactory]SampleCol

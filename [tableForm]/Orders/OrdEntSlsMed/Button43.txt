@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($path)
+If ([Orders]DesignNumber#"")
+	If (<>vlPlatform=3)
+		$choice:=Pop up menu("Larger View;Edit Design;Get Sketch;Move to Sketch Folder;Close Menu")
+	Else 
+		$choice:=Pop up menu("Larger View;Edit Design;Get Sketch;Move to Desktop;Close Menu")
+	End if 
+	
+	Case of 
+		: ($choice=1) | ($choice=2)
+			FORM SET INPUT([Designs];"Design Info Ent")
+			MODIFY RECORD([Designs];*)
+			
+		: ($choice=3)
+			QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+			If (Records in selection([Designs])=1)
+				Sketch_Get 
+			Else 
+				ALERT("There isn't a related design entered yet in design library.")
+			End if 
+		: ($choice=4)
+			Case of 
+				: (Application type=4) & (<>vlPlatform=3)
+					If (Test path name("C:\\Sketch Folder")#0)
+						CREATE FOLDER("C:\\Sketch Folder")
+					End if 
+					$path:="C:\\Sketch Folder\\"
+					
+				Else 
+					$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+			End case 
+			
+			If (Table(Current form table)=27)
+				$path:=$path+[ColorPrintNumber]CPNumber+".jpg"
+			Else 
+				$path:=$path+[Designs]DesignNum+".jpg"
+			End if 
+			
+			vtPathName:=$path
+			WRITE PICTURE FILE(vtPathName;[Designs]Sketch;"JPEG")
+	End case 
+Else 
+	WinPrompt ("Enter design number.")
+End if 

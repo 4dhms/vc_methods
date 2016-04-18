@@ -1,0 +1,177 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start1;$end1;$start2;$end2;$next1;$next2)
+C_LONGINT($year;$month;$p;$c;$mono)
+C_POINTER($orders;$units;$amount;$monthptr;$button)
+C_LONGINT($i;$s;$n;$netSales)
+C_BOOLEAN($process)
+
+vlOrdersGrand:=0
+vlUnitsGrand:=0
+vlDollarsGrand:=0
+vlOrdersGrandx:=0
+vlUnitsGrandx:=0
+vlDollarsGrandx:=0
+
+READ ONLY([Orders])
+
+ARRAY DATE($qStart1;0)
+ARRAY DATE($qStart2;0)
+
+$year:=Num(<>asStartYear{<>asStartYear})
+
+$start1:=Date("!"+String(<>asStartMonth)+"/1/"+String($year)+"!")
+$start2:=Date("!"+String(<>asStartMonth)+"/1/"+String($year-1)+"!")
+
+If (<>asStartMonth><>asEndMonth)
+	$year:=$year+1
+End if 
+
+$end1:=Date("!"+String(<>asEndMonth)+"/1/"+String($year))
+$end2:=Date("!"+String(<>asEndMonth)+"/1/"+String($year-1))
+
+$month:=Month of($start1)
+$year:=Year of($start1)
+
+Repeat 
+	$next1:=Date("!"+String($month)+"/1/"+String($year)+"!")
+	$next2:=Date("!"+String($month)+"/1/"+String($year-1)+"!")
+	
+	APPEND TO ARRAY($qStart1;$next1)
+	APPEND TO ARRAY($qStart2;$next2)
+	
+	If ($month=12)
+		$month:=1
+		$year:=$year+1
+	Else 
+		$month:=$month+1
+	End if 
+	
+Until ($next1>$end1) | (Shift down)
+
+vdDayOne:=$start1
+vlLeadLine:=<>asStartMonth
+
+QUERY([Orders];[Orders]CancelDate>=$qStart2{1};*)
+QUERY([Orders]; & ;[Orders]CancelDate<$qStart1{Size of array($qStart1)})
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"cancelled")
+QUERY SELECTION([Orders];[Orders]OrderDivision#"")
+
+SR_IsolateQuery 
+
+$i:=1
+$p:=Size of array($qStart1)
+$c:=$p*2
+$mono:=<>asStartMonth
+
+For ($i;1;24)
+	Case of 
+		: ($i<$p)
+			$process:=True
+		: ($i>12) & ($i<($p+12))
+			$process:=True
+		Else 
+			$process:=False
+	End case 
+	
+	$orders:=Get pointer("vlOrders"+String($i))
+	$units:=Get pointer("vlUnits"+String($i))
+	$amount:=Get pointer("vlDollars"+String($i))
+	$monthptr:=Get pointer("vsMonth"+String($i))
+	$button:=Get pointer("b"+String($i))
+	
+	If (Not($process))
+		OBJECT SET VISIBLE($orders->;False)
+		OBJECT SET VISIBLE($units->;False)
+		OBJECT SET VISIBLE($amount->;False)
+		OBJECT SET VISIBLE($monthptr->;False)
+		OBJECT SET VISIBLE($button->;False)
+	Else 
+		OBJECT SET VISIBLE($orders->;True)
+		OBJECT SET VISIBLE($units->;True)
+		OBJECT SET VISIBLE($amount->;True)
+		OBJECT SET VISIBLE($monthptr->;True)
+		OBJECT SET VISIBLE($button->;True)
+		
+		<>vlCounter:=Int(($i/$c)*100)
+		CALL PROCESS(<>SendingWin)
+		USE SET("Master")
+		
+		
+		If ($i<12)
+			$s:=$i
+			QUERY SELECTION([Orders];[Orders]CancelDate>=$qStart2{$i};*)
+			QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$qStart2{$i+1})
+		Else 
+			$s:=12+$i
+			QUERY SELECTION([Orders];[Orders]CancelDate>=$qStart1{$i-12};*)
+			QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$qStart1{($i-12)+1})
+		End if 
+		
+		
+		Case of 
+			: ($mono=1)
+				$monthptr->:="January"
+			: ($mono=2)
+				$monthptr->:="February"
+			: ($mono=3)
+				$monthptr->:="March"
+			: ($mono=4)
+				$monthptr->:="April"
+			: ($mono=5)
+				$monthptr->:="May"
+			: ($mono=6)
+				$monthptr->:="June"
+			: ($mono=7)
+				$monthptr->:="July"
+			: ($mono=8)
+				$monthptr->:="August"
+			: ($mono=9)
+				$monthptr->:="September"
+			: ($mono=10)
+				$monthptr->:="October"
+			: ($mono=11)
+				$monthptr->:="November"
+			: ($mono=12)
+				$monthptr->:="December"
+		End case 
+		If ($mono=12)
+			$mono:=1
+		Else 
+			$mono:=$mono+1
+		End if 
+		
+		$orders->:=0
+		$units->:=0
+		$amount->:=0
+		
+		$n:=1
+		FIRST RECORD([Orders])
+		$orders->:=Records in selection([Orders])
+		For ($n;1;Records in selection([Orders]))
+			$units->:=$units->+[Orders]TotalOrderQuantity
+			$netSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+			$amount->:=$amount->+$netSales
+			NEXT RECORD([Orders])
+		End for 
+		If ($i>12)
+			vlOrdersGrand:=vlOrdersGrand+$orders->
+			vlUnitsGrand:=vlUnitsGrand+$units->
+			vlDollarsGrand:=vlDollarsGrand+$amount->
+		Else 
+			vlOrdersGrandx:=vlOrdersGrandx+$orders->
+			vlUnitsGrandx:=vlUnitsGrandx+$units->
+			vlDollarsGrandx:=vlDollarsGrandx+$amount->
+		End if 
+		
+	End if 
+End for 
+
+vrAvgA:=vlDollarsSubA/vlUnitsSubA
+vrAvgB:=vlDollarsSubB/vlUnitsSubB
+vrAvgAx:=vlDollarsSubAx/vlUnitsSubAx
+vrAvgBx:=vlDollarsSubBx/vlUnitsSubBx
+
+  //SR_Init (True)
+

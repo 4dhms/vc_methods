@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	If (vtType2="")
+		OBJECT SET COLOR(*;"xGray1";-(15+(256*0)))
+	Else 
+		OBJECT SET COLOR(*;"xGray1";-(15+(256*12)))
+	End if 
+	If (vtType4="")
+		OBJECT SET COLOR(*;"xGray2";-(15+(256*0)))
+	Else 
+		OBJECT SET COLOR(*;"xGray2";-(15+(256*12)))
+	End if 
+	If (vtType6="")
+		OBJECT SET COLOR(*;"xGray3";-(15+(256*0)))
+	Else 
+		OBJECT SET COLOR(*;"xGray3";-(15+(256*12)))
+	End if 
+	OBJECT SET VISIBLE(*;"xCustomer";<>vtCustomerStyle#"")
+	OBJECT SET VISIBLE(<>vtCustomerStyle;<>vtCustomerStyle#"")
+	
+End if 

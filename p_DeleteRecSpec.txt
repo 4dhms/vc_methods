@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Records in set("UserSet")>1)
+		WinPrompt ("Select a single record.")
+	: (Records in set("UserSet")<1)
+		WinPrompt ("Select a record.")
+	Else 
+		CREATE SET([Specs];"Specs")
+		p_SetWndwSpecs 
+		USE SET("UserSet")
+		CONFIRM("Are you absolutely sure?")
+		Case of 
+			: (OK=1)
+				REMOVE FROM SET([Specs];"Specs")
+				CREATE RECORD([Changes])
+				[Changes]Writer:=Current user
+				[Changes]RevDate:=Current date(*)
+				[Changes]RevTime:=Current time(*)
+				[Changes]NewChange:="Spec Number: "+[Specs]Design Num+" deleted"
+				[Changes]FieldName:="Delete Design"
+				SAVE RECORD([Changes])
+				DELETE RECORD([Specs])
+				p_SetWndwSpecs 
+			: (OK=0)
+				p_SetWndwSpecs 
+		End case 
+		
+		  //Else 
+		  // ALERT("Please highlight a record first.")
+		  //End if 
+		USE SET("Specs")
+		CLEAR SET("Specs")
+End case 

@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+
+Case of 
+	: ($1="Burlington Coat@")
+		$show:=True
+	: ($1="Simons@")
+		$show:=True
+	: ($1="Steinmart@")
+		$show:=True
+	: ($1="Marmaxx@")
+		$show:=True
+	: ($1="Ross@")
+		$show:=True
+	: ($1="Cato@")
+		$show:=True
+	: ($1="Versona@")
+		$show:=True
+	: ($1="Winners@")
+		$show:=True
+	: ($1="CM")
+		$show:=True
+	: ($1="TJX UK@")
+		$show:=True
+	: ($1="TK Maxx@")
+		$show:=True
+	: ($1="Ricki's@")
+		$show:=True
+	: ($1="Wados@")
+		$show:=True
+	: ($1="EME@")
+		$show:=True
+	: ($1="Tabi@")
+		$show:=True
+	: ($1="Trade Secret@")
+		$show:=True
+	: ($1="Boston Proper@")
+		$show:=True
+	: ($1="Dress Barn@")
+		$show:=True
+	: ($1="Chadwick@")
+		$show:=True
+	Else 
+		$show:=False
+End case 
+$0:=$show

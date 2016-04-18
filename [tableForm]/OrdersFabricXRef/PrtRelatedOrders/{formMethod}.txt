@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderNumber)
+
+If (Form event=On Printing Detail)
+	If ([OrdersFabricXRef]OrderNumber<0)
+		$orderNumber:=[OrdersFabricXRef]OrderNumber*-1
+		QUERY([Samples];[Samples]SampleNumber=$orderNumber)
+		vOrd:="SG"+String(Abs([OrdersFabricXRef]OrderNumber))
+		vlSubtotal:=[Samples]SGQuantity
+		vStyle:=[Samples]StyleNum
+		vDesign:=[Samples]DesignNum
+		vtVendor:=[Samples]SamGarFactry
+		OBJECT SET VISIBLE(vdShipDateFact;False)
+		OBJECT SET VISIBLE(*;"xShip";False)
+		UNLOAD RECORD([Samples])
+	Else 
+		QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+		vOrd:="PO"+String(Abs([OrdersFabricXRef]OrderNumber))
+		vlSubtotal:=[Orders]TotalOrderQuantity
+		vStyle:=[Orders]StyleNumber
+		vDesign:=[Orders]DesignNumber
+		vtVendor:=[Orders]Factory
+		OBJECT SET VISIBLE(vdShipDateFact;True)
+		OBJECT SET VISIBLE(*;"xShip";True)
+		vdShipDateFact:=[Orders]ShipDateFactory
+		UNLOAD RECORD([Orders])
+	End if 
+End if 

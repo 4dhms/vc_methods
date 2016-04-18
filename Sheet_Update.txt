@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Cost_EntryCalculate 
+SAVE RECORD([CostSheets])
+SAVE RECORD([Costing])
+If ([CostSheets]QuotaCat1#"")
+	QUERY([Quota];[Quota]Category=[CostSheets]QuotaCat1)
+	vsHead1:=[Quota]Description
+Else 
+	vsHead1:=""
+End if 
+If ([CostSheets]QuotaCat2#"")
+	QUERY([Quota];[Quota]Category=[CostSheets]QuotaCat2)
+	vsHead2:=[Quota]Description
+Else 
+	vsHead2:=""
+End if 
+
+Case of 
+	: (Size of array(asSheetNames)>0) & (<>vlOrderNumber>0)
+		If (Not([CostSheets]ShipAir)) & (Not([CostSheets]ShipSea)) & (Not([CostSheets]ShipFOB)) & (Not([CostSheets]ShipLDP)) & (asSheetNames{asSheetNames}="Actual@") & ([CostSheets]OtherShip#"@FOB@")
+			WinPrompt ("You need to select SEA, AIR or LDP.")
+			$0:=False
+		Else 
+			Cost_UpdateReport 
+			Cost_ExitRecord 
+			$0:=True
+		End if 
+	: (<>vlOrderNumber<0)
+		Cost_UpdateReport 
+		Cost_ExitRecord 
+		$0:=True
+End case 

@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($netAir;$netSea;$netNetAir;$netNetSea)
+C_REAL($netAirWC;$netSeaWC;$netNetAirWC;$netNetSeaWC)
+
+If ([CostSheets]NetTotalSales>0)
+	$netSea:=Round((([CostSheets]NetUnitPrice-vrLDPBoat)/[CostSheets]NetUnitPrice)*100;2)
+	$netAir:=Round((([CostSheets]NetUnitPrice-vrLDPAir)/[CostSheets]NetUnitPrice)*100;2)
+	$netSeaWC:=Round((([CostSheets]NetUnitPrice-vrLDP1a)/[CostSheets]NetUnitPrice)*100;2)
+	$netAirWC:=Round((([CostSheets]NetUnitPrice-vrLDP2a)/[CostSheets]NetUnitPrice)*100;2)
+Else 
+	$netSea:=0
+	$netAir:=0
+	$netSeaWC:=0
+	$netAirWC:=0
+End if 
+
+If ([CostSheets]NetNetTotalSales>0)
+	$netNetSea:=Round((([CostSheets]NetNetUnitPrice-vrLDPBoat)/[CostSheets]NetNetUnitPrice)*100;2)
+	$netNetAir:=Round((([CostSheets]NetNetUnitPrice-vrLDPAir)/[CostSheets]NetNetUnitPrice)*100;2)
+	$netNetSeaWC:=Round((([CostSheets]NetNetUnitPrice-vrLDP1a)/[CostSheets]NetNetUnitPrice)*100;2)
+	$netNetAirWC:=Round((([CostSheets]NetNetUnitPrice-vrLDP2a)/[CostSheets]NetNetUnitPrice)*100;2)
+End if 
+
+vrNetPercent1:=$netSea
+vrNetPercent2:=$netAir
+vrNetNetPercent1:=$netNetSea
+vrNetNetPercent2:=$netNetAir
+
+vrNetPercent1a:=$netSeaWC
+vrNetPercent2a:=$netAirWC
+vrNetNetPercent1a:=$netNetSeaWC
+vrNetNetPercent2a:=$netNetAirWC

@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(asBDLetter))
+	Case of 
+		: (alBDColor{$i}=16711690)
+			alBDColor{$i}:=14149350
+			alBD1{$i}:=alBD1{vlLeadLine}
+			alBD2{$i}:=alBD2{vlLeadLine}
+			alBD3{$i}:=alBD3{vlLeadLine}
+			alBD4{$i}:=alBD4{vlLeadLine}
+			alBD5{$i}:=alBD5{vlLeadLine}
+			alBD6{$i}:=alBD6{vlLeadLine}
+			alBD7{$i}:=alBD7{vlLeadLine}
+			alBD8{$i}:=alBD8{vlLeadLine}
+			alBD9{$i}:=alBD9{vlLeadLine}
+			alBD10{$i}:=alBD10{vlLeadLine}
+		: (alBDColor{$i}=16776969)
+			alBDColor{$i}:=14149350
+	End case 
+End for 
+OBJECT SET VISIBLE(bUpdate;False)
+OBJECT SET VISIBLE(bAll;False)
+Order_BDTotals 
+

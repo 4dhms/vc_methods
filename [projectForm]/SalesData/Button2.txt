@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+atFabrication:=1
+vsStyleNumber:=""
+vtTitle:=""
+OBJECT SET VISIBLE(vxSketch;False)
+REDUCE SELECTION([SLRWks];0)
+ARRAY TEXT(asColors;0)
+UNLOAD RECORD([SLRAcct])
+GOTO OBJECT(vsStyleNumber)

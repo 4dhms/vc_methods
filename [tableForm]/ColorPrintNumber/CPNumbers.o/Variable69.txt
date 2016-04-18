@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in set("CPs")>0)
+	CLEAR SET("CPs")
+End if 
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPType=asFind-1)
+ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPNumberKey;<)

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Display Detail)
+	If ([DesignLines]ShowOver)
+		OBJECT SET VISIBLE([DesignLineIncluded]Colors;True)
+		OBJECT SET VISIBLE(*;"xSoldOut";False)
+	Else 
+		OBJECT SET VISIBLE([DesignLineIncluded]Colors;Not([DesignLineIncluded]SoldOut))
+		OBJECT SET VISIBLE(*;"xSoldOut";[DesignLineIncluded]Colors="SOLD OUT")
+	End if 
+End if 

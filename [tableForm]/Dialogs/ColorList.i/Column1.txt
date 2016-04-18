@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+
+If (Form event=On Double Clicked) & (asBDSelf>0)
+	$line:=asBDSelf
+	APPEND TO ARRAY(asBDPort;asBDLetter{asBDLetter})
+	DELETE FROM ARRAY(asBDSelf;$line;1)
+	DELETE FROM ARRAY(asBDLetter;$line;1)
+End if 

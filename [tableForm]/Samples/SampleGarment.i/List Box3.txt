@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Double Clicked) & (User in group(Current user;"DCS"))
+		QUERY([DCS];[DCS]ItemKey=alRecordKey{asList11})
+		DCS_AddLine 
+End case 

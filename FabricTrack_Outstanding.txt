@@ -1,0 +1,83 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($s;$totstart;$totend;$column;$i;$subtot;$n)
+C_TEXT($color)
+C_POINTER($thisCol)
+
+
+USE SET("outstanding")
+CLEAR SET("outstanding")
+
+If (Records in selection([FabPOLines])>0)
+	ARRAY LONGINT($pokey;0)
+	ORDER BY([FabPOLines];[FabPOLines]FabOrderKey;>)
+	
+	$s:=$1+1
+	FabricTrack_ArrayInsert ($s;3)
+	asMOrder{$s}:="Outstanding"
+	$totstart:=$s
+	$i:=1
+	FIRST RECORD([FabPOLines])
+	For ($i;1;Records in selection([FabPOLines]))
+		APPEND TO ARRAY($pokey;[FabPOLines]FabOrderKey)
+		$s:=$s+1
+		RELATE ONE([FabPOLines]FabOrderKey)
+		FabricTrack_ArrayInsert ($s;3)
+		asMOrder{$s}:=[FabricOrders]PONumber
+		
+		RELATE ONE([FabPOLines]FabOrderKey)
+		$color:=Replace string([FabPOLines]ColorPrint;"#";"")
+		If (Position(" ";$color)>0)
+			$color:=Substring($color;1;Position(" ";$color)-1)
+		End if 
+		
+		Case of 
+			: ($color="White")
+				$column:=Find in array(asColors;"8628")
+			: ($color="Black")
+				$column:=Find in array(asColors;"8619")
+			Else 
+				$column:=Find in array(asColors;$color)
+		End case 
+		
+		If ($column<1)
+			$color:="@"+$color+"@"
+			QUERY([ColorPrintNumber];[ColorPrintNumber]MillNumber=$color)
+			$color:=[ColorPrintNumber]CPNumber
+			$column:=Find in array(asColors;[ColorPrintNumber]CPNumber)
+		End if 
+		
+		If ($column>0)
+			$thiscol:=Get pointer("arMcol"+String($column))
+			$thiscol->{$s}:=[FabPOLines]Quantity-[FabPOLines]Delivered
+		Else 
+			$color:=Replace string([FabPOLines]ColorPrint;"#";"")
+			If (Position(" ";$color)>0)
+				$color:=Substring($color;1;Position(" ";$color)-1)
+			End if 
+			
+			atMNote{$s}:="w/o "+$color
+			alFabricColor{$s}:=16711690
+		End if 
+		NEXT RECORD([FabPOLines])
+	End for 
+	
+End if 
+
+$s:=$s+1
+FabricTrack_ArrayInsert ($s;3)
+asFactories{$s}:="Total Waiting"
+$totend:=$s
+$s:=$s+1
+
+  //totals waiting
+$i:=1
+For ($i;1;Size of array(asColors))
+	$thisCol:=Get pointer("arMCol"+String($i))
+	$n:=1
+	$subtot:=0
+	For ($n;1;$totend-$totstart)
+		$subtot:=$thisCol->{$totstart+$n}+$subtot
+	End for 
+	$thisCol->{$totend}:=$subtot
+End for 
+

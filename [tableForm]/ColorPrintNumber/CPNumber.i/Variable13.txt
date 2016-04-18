@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+
+If (Records in selection([CP_OrderXRef])>0)
+	WinPrompt ([ColorPrintNumber]CPNumber+" has been used on "+String(Records in selection([CP_OrderXRef]))+" order(s).")
+Else 
+	WinChoice ("Are you sure you want to delete "+[ColorPrintNumber]CPNumber+"?")
+	If (ok=1)
+		WinChoice ("Are you really really sure?";"No";"Yes")
+		If (ok=0)
+			CREATE SET([ColorPrintNumber];"print")
+			CREATE RECORD([Changes])
+			[Changes]NewChange:=[ColorPrintNumber]CPNumber+" deleted"
+			[Changes]Tag:="Delete Print"
+			[Changes]RevDate:=Current date(*)
+			[Changes]RevTime:=Current time(*)
+			[Changes]Writer:=Current user
+			[Changes]ChangeKey:=Sequence number([Changes])
+			SAVE RECORD([Changes])
+			DELETE RECORD([ColorPrintNumber])
+			USE SET("print")
+			CLEAR SET("print")
+			CANCEL
+		End if 
+	End if 
+End if 
+

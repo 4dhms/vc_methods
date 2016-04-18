@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($vendors;0)
+SELECTION TO ARRAY([Orders]Factory;$vendors)
+vtVendor:=$vendors{1}
+
+WinChoice ("Are you sure you want to email"+Char(13)+"this Status Report?")
+If (ok=1)
+	vfProdStatus:=True
+	vfPDF:=True
+	EMail_Pointers ("Status")
+	vtBodyText:="Attached is the current status report."
+	Spooler_AddMail ("Status")
+End if 
+

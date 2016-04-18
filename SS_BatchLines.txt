@@ -1,0 +1,37 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$oldLineKey;$newLineKey)
+ARRAY LONGINT($recordNumber;0)
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=$1)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+Util_RecordNumberArray (Table(->[SpecSheetLines]))
+COPY ARRAY(alRecordNumber;$recordNumber)
+
+$i:=1
+For ($i;1;Size of array($recordNumber))
+	GOTO RECORD([SpecSheetLines];$recordNumber{$i})
+	
+	$oldLineKey:=[SpecSheetLines]SpecLineKey
+	DUPLICATE RECORD([SpecSheetLines])
+	[SpecSheetLines]SF_KeyNumber:=$2
+	[SpecSheetLines]SpecLineKey:=Sequence number([SpecSheetLines])
+	SAVE RECORD([SpecSheetLines])
+	$newLineKey:=[SpecSheetLines]SpecLineKey
+	
+	QUERY([Sizes];[Sizes]SpecLineKey=$oldLineKey)
+	
+	If (Records in selection([Sizes])>0)
+		DUPLICATE RECORD([Sizes])
+		[Sizes]SpecLineKey:=$newLineKey
+		If ([Sizes]SF_KeyNumber<0)
+			[Sizes]SF_KeyNumber:=$2*-1
+		Else 
+			[Sizes]SF_KeyNumber:=$2
+		End if 
+		SAVE RECORD([Sizes])
+	End if 
+End for 
+UNLOAD RECORD([Sizes])
+UNLOAD RECORD([SpecFactory])
+UNLOAD RECORD([SpecSheetLines])
+

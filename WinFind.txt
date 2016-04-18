@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vsSubhead:=$1
+Case of 
+	: (Count parameters>1)
+		vlRouter:=$2
+	Else 
+		vlRouter:=1
+End case 
+
+
+WinCentOnCenter (250;120;1)
+DIALOG([Dialogs];"FindUniversal")
+CLOSE WINDOW

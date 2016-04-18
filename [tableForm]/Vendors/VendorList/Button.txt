@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Shift down)
+		QUERY([Vendors])
+	: (vtVendor#"")
+		QUERY([Vendors];[Vendors]VendorName=vtVendor)
+		If (Records in selection([Vendors])=0)
+			QUERY([Vendors];[Vendors]VendorName=vtVendor+"@")
+		End if 
+End case 
+

@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfMoving)
+
+If (vlY>257) & (vlX>505)
+	vlY:=vlY+20
+	vfMoving:=True
+	POST CLICK(vlX;vlY)
+End if 

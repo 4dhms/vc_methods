@@ -1,0 +1,96 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtFullName)
+C_TEXT($address)
+C_TEXT(vsFForwarder)
+C_TEXT(vsTerms)
+C_TEXT(vsVia)
+C_TEXT(vtFax)
+C_TEXT(vtPhone)
+C_LONGINT($i)
+C_REAL($subExt)
+C_REAL($qtyTot)
+
+
+
+QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+SELECTION TO ARRAY([FabPOLines]Quantity;$qty;[FabPOLines]LineExt;$ext)
+$i:=1
+For ($i;1;Size of array($qty))
+	$subExt:=$subExt+$ext{$i}
+	$qtyTot:=$qtyTot+$qty{$i}
+End for 
+
+Fabric_Order_SortSubforms 
+
+Case of 
+	: ([FabricOrders]POType=0)
+		vsHead1:="Fabric Name:"
+		vsHead2:="Fiber Content"
+		vsHead3:="Article Number"
+		vsName:=[FabricOrders]ItemName
+		vsFiberCont:=[FabricOrders]FiberContent
+		vsHeader:="Fabric Purchase Order No. "+[FabricOrders]PONumber
+	: ([FabricOrders]POType=1)
+		vsHead1:="Item Name:"
+		vsHead2:=""
+		vsHead3:=""
+		vsName:=[FabricOrders]ItemName
+		vsFiberCont:=""
+		vsHeader:="Button Purchase Order No. "+[FabricOrders]PONumber
+	: ([FabricOrders]POType=2)
+		vsHead1:="Item Name:"
+		vsHead2:="Fiber Content"
+		vsHead3:=""
+		vsName:=[FabricOrders]ItemName
+		vsFiberCont:=[FabricOrders]FiberContent
+		vsHeader:="Trim Purchase Order No. "+[FabricOrders]PONumber
+End case 
+RELATE MANY([FabricOrders]FabOrderKey)
+QUERY([FabricLibrary];[FabricLibrary]FabricLibKey=[FabricOrders]FabLibKey)
+QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+  //---------->Error handling, missing Vendor key
+If ([FabricOrders]VendorKey=0)
+	QUERY([Vendors];[Vendors]VendorName=[FabricOrders]VendorName)
+	[FabricOrders]VendorKey:=[Vendors]VendorKey
+	SAVE RECORD([Vendors])
+End if 
+QUERY([Vendors];[Vendors]VendorKey=[FabricOrders]VendorKey)
+
+If ([Vendors]Address2="")
+	$address:=[Vendors]Address1
+Else 
+	$address:=[Vendors]Address1+Char(13)+[Vendors]Address2
+End if 
+If ([Vendors]VendorName=[FabricOrders]VendorName) | ([FabricOrders]VendorName="")
+	vtFullName:=[Vendors]VendorName+Char(13)+$address+Char(13)+[Vendors]City+", "+[Vendors]State+"  "+[Vendors]Zone+Char(13)+[Vendors]Country
+Else 
+	vtFullName:=[FabricOrders]VendorName
+End if 
+
+vdDate:=[FabricOrders]FabPODate
+vdDeliver:=[FabricOrders]ShippedDate
+vsWriter:=[FabricOrders]OrderWriter
+vsFForwarder:=[FabricOrders]FreightForwarder
+vsVia:=[FabricOrders]ShipVia
+vsTerms:=[FabricOrders]Terms
+vtFax:=[Vendors]Fax
+vtPhone:=[Vendors]Phone
+vdWhenDate:=[FabricOrders]ReqDeliveryDate
+vdEstDate:=[FabricOrders]DeliveryEst
+vtPoNote:=[FabricOrders]Description
+If (Not([FabricOrders]DontPrintNote))
+	vtPoNote:=vtPoNote+Char(13)+Char(13)+[FabricOrders]PONote
+End if 
+
+If (Not([FabricOrders]DontPrintNote2))
+	vtPoNote:=vtPoNote+Char(13)+Char(13)+[FabricOrders]HiddenNotes
+End if 
+
+Case of 
+	: ([FabricOrders]Void)
+		vsPOFlag:="CANCELLED"
+	: ([FabricOrders]ReviseNumber>0)
+		vsPOFlag:="Revision "+String([FabricOrders]ReviseNumber)
+	Else 
+		vsPOFlag:=""
+End case 

@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+C_POINTER($szptr)
+
+ARRAY TEXT(asClearSize;0)
+APPEND TO ARRAY(asClearSize;"Clear")
+$n:=1
+For ($n;1;12)
+	$szptr:=Get pointer("vsSize"+String($n))
+	If ($szptr->#"")
+		APPEND TO ARRAY(asClearSize;$szptr->)
+	End if 
+End for 
+asClearSize:=1
+OBJECT SET VISIBLE(asClearSize;True)

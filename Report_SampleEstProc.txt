@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSampleEstReport)
+
+If (Not(User in group(Current user;"SpreadSheets")))
+	WinPrompt ("Current not available.")
+Else 
+	If (<>vlSampleEstReport=0)
+		<>vlSampleEstReport:=New process("Report_SampleEst";0;"SampleEst")
+	Else 
+		SHOW PROCESS(<>vlSampleEstReport)
+		  //HIDE PROCESS(◊vlSampleEstReport)
+		BRING TO FRONT(<>vlSampleEstReport)
+	End if 
+End if 

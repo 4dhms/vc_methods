@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asCustomers=0)
+		WinPrompt ("Click in list to select customer to change.")
+	: (vsCustomer="")
+		WinPrompt ("Type in change.")
+	: (asCustomers>0) & (vsCustomer#"")
+		QUERY([CustomerList];[CustomerList]Customer=asCustomers{asCustomers})
+		If (Records in selection([CustomerList])=1)
+			[CustomerList]Customer:=vsCustomer
+			SAVE RECORD([CustomerList])
+			asCustomers{asCustomers}:=vsCustomer
+			vtCustomer:=""
+		Else 
+			WinPrompt ("There is a problem making this change.")
+		End if 
+End case 

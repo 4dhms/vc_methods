@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Samples]SampleDivision="")
+	[Samples]SampleDivision:=[Designs]DivisionCodeN
+End if 
+OBJECT SET VISIBLE([Designs]DivisionCodeN;Not([Samples]DivisionOverride))
+OBJECT SET VISIBLE([Samples]SampleDivision;([Samples]DivisionOverride))

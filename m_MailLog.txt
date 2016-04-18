@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Fabric Library entry
+
+Case of 
+	: (<>MailLog=0)
+		<>MailLog:=New process("Mail_SentLog";0;"MailLog")
+	Else 
+		SHOW PROCESS(<>MailLog)
+		BRING TO FRONT(<>MailLog)
+End case 

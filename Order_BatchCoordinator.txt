@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($coord)
+
+If (Records in selection([Orders])>100)
+	WinPrompt ("You can not batch more than 100 orders.")
+	
+Else 
+	If (Order_Update )
+		$coord:=[Orders]Coordinator
+		WinChoice ("Are you sure you want to update "+String(Records in selection([Orders]))+" orders with "+$coord+"?")
+		If (ok=1)
+			
+			ACCEPT
+			
+			$i:=1
+			FIRST RECORD([Orders])
+			For ($i;1;Records in selection([Orders]))
+				
+				CREATE RECORD([Changes])
+				[Changes]RevisionNumber:=[Orders]RevisionNumber
+				[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+				[Changes]OrderNumber:=[Orders]OrderNum
+				[Changes]RevDate:=Current date(*)
+				[Changes]RevTime:=Current time(*)
+				[Changes]Writer:=Current user
+				[Changes]ChangeKey:=Sequence number([Changes])
+				[Changes]TableNum:=2
+				  //[Changes]FieldNum:=$fieldnum
+				[Changes]FieldName:="Coordinator"
+				[Changes]Tag:="Batch Coordinator change"
+				[Changes]OldData:=[Orders]Coordinator
+				[Changes]NewChange:=$coord
+				SAVE RECORD([Changes])
+				
+				[Orders]Coordinator:=$coord
+				SAVE RECORD([Orders])
+				NEXT RECORD([Orders])
+			End for 
+		End if 
+	End if 
+End if 

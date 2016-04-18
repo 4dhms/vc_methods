@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asColors<Size of array(asColors))
+	asColors:=asColors+1
+	SLR_ColorShift 
+End if 

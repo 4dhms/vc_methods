@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asMini;0)
+
+Case of 
+	: (vsCSName="Lining")
+		COPY ARRAY(<>atLining;asMini)
+	: (vsCSName="Lining Color")
+		COPY ARRAY(<>atLiningColor;asMini)
+	: (vsCSName="Thread Color")
+		COPY ARRAY(<>atThreadColor;asMini)
+	: (vsCSName="Zipper@")
+		COPY ARRAY(<>atZipper;asMini)
+	: (vsCSName="Shoulder Pads")
+		COPY ARRAY(<>atShoulderPad;asMini)
+	: (vsCSName="Button@")
+		COPY ARRAY(<>atButton;asMini)
+	: (vsCSName="Buckles")
+		COPY ARRAY(<>atBuckles;asMini)
+	: (vsCSName="Snaps")
+		COPY ARRAY(<>atSnaps;asMini)
+	: (vsCSName="Hooks & Eyes")
+		COPY ARRAY(<>atHookEyes;asMini)
+	: (vsCSName="Bead Components")
+		COPY ARRAY(<>atBeadComponent;asMini)
+	Else 
+		COPY ARRAY(<>asCompType;asMini)
+End case 
+
+INSERT IN ARRAY(asMini;1;1)
+asMini{1}:="Add/edit list"
+
+OBJECT SET VISIBLE(asMini;True)

@@ -1,0 +1,139 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+C_TEXT($orderFlag)
+
+If (vlOrderNumber>0)
+	$orderFlag:="Order No."
+Else 
+	$orderFlag:="Sample No."
+End if 
+vsOrderNumber:=String(Abs(vlOrderNumber))
+vsPrice:=String([CostSheets]Price;"$###.00")
+
+Web_ChangeArray 
+
+  //LINE 1
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<IMG SRC=<!--4dvar vtGetPicture--> width=200 height=200 align=left>"
+$HTML:=$HTML+"<table width=644 border=0 cellpadding=2 cellspacing=4 bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td width=76 align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">"+$orderFlag+"</FONT></td>"
+$HTML:=$HTML+"<td width=125>"
+$HTML:=$HTML+"<FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+"<!--4DVAR vsOrderNumber-->"
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td width=97 align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Quantity</FONT>"
+$HTML:=$HTML+"</td>"
+$HTML:=$HTML+"<td width=310><FONT SIZE=2 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR [CostSheets]Quantity-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+  //LINE 2
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td width=76 align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">PO Date</FONT></td>"
+$HTML:=$HTML+"<td width=125><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR vsPODate-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td width=97>"
+$HTML:=$HTML+"<div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Price</FONT></div></td>"
+$HTML:=$HTML+"<td width=310><FONT SIZE=2 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR vsPrice-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+  //LINE 3
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td width=76 align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Costsheet</FONT></td>"
+$HTML:=$HTML+"<td width=125><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR [Costsheets]SheetDate-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td width=97>"
+$HTML:=$HTML+"<div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Discount</FONT></div></td>"
+$HTML:=$HTML+"<td width=310><FONT SIZE=2 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR vsDisc-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+  //LINE 4
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td width=76 align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Writer</FONT></td>"
+$HTML:=$HTML+"<td width=125><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR [CostSheets]Writer-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td width=97>"
+$HTML:=$HTML+"<div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Special Disc.</FONT></div></td>"
+$HTML:=$HTML+"<td width=310><FONT SIZE=2 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR vsSpecDisc-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+  //LINE 5
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td width=76 align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Design No,</FONT></td>"
+$HTML:=$HTML+"<td width=125><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--4DVAR [Costing]DesignNumber-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td width=97>"
+$HTML:=$HTML+"<div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Terms</FONT></div></td>"
+$HTML:=$HTML+"<td width=310><FONT SIZE=2 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR [CostSheets]PriceTerms-->"+vtSpecB
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+  //LINE 6
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Style No.</FONT></td>"
+$HTML:=$HTML+"<td><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR [Costing]StyleNumber-->"
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td><div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Factory</FONT></div></td>"
+$HTML:=$HTML+"<td><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR [Costing]Factory-->"
+$HTML:=$HTML+"</FONT></td>"
+
+  //LINE 7
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Customer</FONT></td>"
+$HTML:=$HTML+"<td><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR [Costing]Customer-->"
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td><div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Net Unit Price</FONT></div></td>"
+$HTML:=$HTML+"<td><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+"<!--#4DVAR vsNetUnitPrice--></FONT></td>"
+$HTML:=$HTML+"</tr>"
+
+  //LINE 8
+
+$HTML:=$HTML+"<tr bgcolor=#FFFFFF>"
+$HTML:=$HTML+"<td align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">NY Cancel Date</FONT></td>"
+$HTML:=$HTML+"<td><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR vsStartCancel-->"
+$HTML:=$HTML+"</FONT></td>"
+$HTML:=$HTML+"<td><div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Net Net</FONT></div></td>"
+$HTML:=$HTML+"<td><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+vtSpecA+vtSpecA+""+vtSpecB
+$HTML:=$HTML+"<!--#4DVAR vsNetNetUnitPrice--></FONT></td>"
+$HTML:=$HTML+"</tr>"
+$HTML:=$HTML+"</Table>"
+
+  //```````````````````
+$HTML:=$HTML+"<table width=851 border=0>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td width=121><div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Description</FONT></div></t"+"d>"
+$HTML:=$HTML+"<td width=298><font color=#000000 size=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$HTML:=$HTML+"<!--#4DVAR vtDescription---></FONT></td>"
+$HTML:=$HTML+"<td width=102><div align=right><font color=#663333 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Pattern Source</FONT></div></td>"
+$HTML:=$HTML+"<td width=312><FONT SIZE=2>"
+$HTML:=$HTML+vtSpecA+"<!--#4DVAR vsPatternSource--->"+vtSpecB+"</FONT></td>"
+$HTML:=$HTML+"</tr>"
+$HTML:=$HTML+"</Table>"
+  //`````````````````
+$0:=$HTML

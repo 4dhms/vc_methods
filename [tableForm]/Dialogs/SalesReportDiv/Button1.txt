@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($path)
+C_LONGINT($i)
+
+WinChoice ("Do you want to print or create a spreadsheet?";"Print";"Spreadsheet")
+If (ok=1)
+	FORM SET OUTPUT([Dialogs];"SaleReportSummary.p")
+	PAGE SETUP([Dialogs];"SaleReportSummary.p")
+	Print_Record (->[Dialogs])
+Else 
+	$docref:=Create document("";"xls")
+	If (ok=1)
+		$path:=Document
+		SEND PACKET($docref;"PRODUCTION/"+Char(13)+"SALES REPORT"+Char(13)+"Summary "+vtFullName+Char(13)+Char(13))
+		SEND PACKET($docref;"Division"+Char(9)+"Quantity"+Char(9)+"Net Sales"+Char(9)+"Net Profit"+Char(9)+"Special Discount"+Char(9))
+		SEND PACKET($docref;"Net Net Sales"+Char(9)+"Net Net Profit"+Char(9)+"Average Net MU"+Char(9)+"Average Net Net MU"+Char(13))
+		$i:=1
+		For ($i;1;Size of array(asDivisions))
+			SEND PACKET($docref;asDivisions{$i}+Char(9)+String(alQuantity{$i})+Char(9)+String(arNetSales{$i})+Char(9)+String(arNetProfit{$i})+Char(9))
+			SEND PACKET($docref;String(arSpecialDiscount{$i})+Char(9)+String(arNetNetSales{$i})+Char(9)+String(arNetNetProfit{$i})+Char(9))
+			SEND PACKET($docref;String(arAvgNetMarkup{$i};"##.0")+"%"+Char(9)+String(arAvgNetNetMarkup{$i};"##.0")+"%"+Char(13))
+		End for 
+		CLOSE DOCUMENT($docref)
+		SHOW ON DISK($path)
+	End if 
+End if 

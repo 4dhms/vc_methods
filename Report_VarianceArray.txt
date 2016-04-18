@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$netsales;$invqty;$diff;$diffsales;$diffPC;$diffsalesPC)
+C_REAL($rptnetsales)
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	
+	QUERY([Invoices];[Invoices]OrderNumber=[Orders]OrderNum)
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	$NetSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+	
+	$InvQty:=Sum([Invoices]InvoiceQuantity)
+	$Diff:=[Orders]TotalOrderQuantity-vlInvQty
+	If ($Diff=0)
+		$DiffPC:=0
+	Else 
+		$DiffPC:=100-Round(($Diff/[Orders]TotalOrderQuantity)*100;0)
+	End if 
+	$DiffPC:=Round((vlDiff/[Orders]TotalOrderQuantity)*100;0)
+	$RptNetSales:=Sum([Invoices]InvoiceAmount)
+	$DiffSales:=Round($NetSales-$RptNetSales;2)
+	If ($DiffSales=0)
+		$DiffSalesPC:=0
+	Else 
+		$DiffSalesPC:=100-Round(($DiffSales/$NetSales)*100;0)
+	End if 
+	
+	APPEND TO ARRAY(alOrderVar;[Orders]OrderNum)
+	APPEND TO ARRAY(arMCol1;$InvQty)
+	APPEND TO ARRAY(arMCol2;$Diff)
+	APPEND TO ARRAY(arMCol3;$NetSales)
+	APPEND TO ARRAY(arMCol4;$RptNetSales)
+	APPEND TO ARRAY(arMCol5;$DiffSales)
+	NEXT RECORD([Orders])
+End for 

@@ -1,0 +1,31 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+READ WRITE([Preferences])
+ALL RECORDS([Preferences])
+
+
+<>vfSpooler:=[Preferences]Spooler
+<>vtWebServicesIP:=[Preferences]WebServicesIP
+<>vtWebServicesPort:=[Preferences]Port
+vtServerVersion:=[Preferences]Version
+
+UNLOAD RECORD([Preferences])
+
+  //If (Application type#5)
+  //If (◊vlPlatform<3)
+  //$path:=PDF_FindFolder 
+  //DOCUMENT LIST($path;$files)
+  //
+  //$c:=Size of array($files)
+  //If (◊vlPlatform=3)
+  //$drive:=" C: drive."
+  //Else 
+  //$drive:=" hard drive."
+  //End if 
+  //
+  //If ($c>100)
+  //WinPrompt ("There are "+String($c)+" files in the"+Char(13)+"4D_PDFs Folder on your"+$drive+" This folder should be cleaned out periodically.")
+  //End if 
+  //End if 
+  //End if 
+
+

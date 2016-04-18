@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asSpareParts;0)
+		ARRAY TEXT(asPart;0)
+		vsArticle:=""
+		vsSize:=""
+		vsMeasure:=""
+		  //Spec_POMArray 
+		Template_TypeArray 
+	: (Form event=On Unload)
+		ARRAY TEXT(asSpareParts;0)
+End case 

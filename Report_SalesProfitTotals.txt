@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+C_REAL($netmu;$netnetmu)
+
+$c:=Size of array(asDivisions)+1
+
+Report_ArrayInit ($c)
+ARRAY LONGINT(alStyle;$c)
+
+alStyle{$c}:=1
+asDivisions{$c}:="Totals"
+alQuantity{$c}:=Util_Array_Sum (->alQuantity)
+alGrossSales{$c}:=Util_Array_Sum (->alGrossSales)
+alDiscAmt{$c}:=Util_Array_Sum (->alDiscAmt)
+alCost{$c}:=Util_Array_Sum (->alCost)
+arNetSales{$c}:=Util_Array_Sum (->arNetSales)
+arNetProfit{$c}:=Util_Array_Sum (->arNetProfit)
+arSpecialDiscount{$c}:=Util_Array_Sum (->arSpecialDiscount)
+arNetNetSales{$c}:=Util_Array_Sum (->arNetNetSales)
+arNetNetProfit{$c}:=Util_Array_Sum (->arNetNetProfit)
+
+
+$netMU:=Round(((arNetSales{$c}-vlGrandTotCost)/arNetSales{$c})*100;1)
+$netNetMU:=Round(((arNetNetSales{$c}-vlGrandTotCost)/arNetNetSales{$c})*100;1)
+
+arAvgNetMarkup{$c}:=$netMU
+arAvgNetNetMarkup{$c}:=$netNetMU

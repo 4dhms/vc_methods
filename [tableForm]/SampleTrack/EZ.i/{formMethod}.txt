@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	Case of 
+		: (Is new record([SampleTrack]))
+			[SampleTrack]DateOut:=Current date(*)
+			[SampleTrack]EZ:=True
+			[SampleTrack]TrackId:=Sequence number([SampleTrack])
+			[SampleTrack]SentBy:=Current user
+		: (cbHistory=0)
+			WinChoice ("Do you want to receive this garment?")
+			If (ok=1)
+				[SampleTrack]DateIn:=Current date(*)
+				[SampleTrack]ReceivedBy:=Current user
+				SAVE RECORD([SampleTrack])
+				ACCEPT
+				QUERY([SampleTrack];[SampleTrack]EZ=True)
+				QUERY SELECTION([SampleTrack];[SampleTrack]DateIn=!00-00-00!)
+				ORDER BY([Samples];[SampleTrack]DateOut;>)
+			End if 
+	End case 
+	OBJECT SET VISIBLE([SampleTrack]ReceivedBy;cbHistory=1)
+	OBJECT SET VISIBLE([SampleTrack]DateIn;cbHistory=1)
+	OBJECT SET VISIBLE(*;"xText1";cbHistory=1)
+	OBJECT SET VISIBLE(*;"xText2";cbHistory=1)
+End if 

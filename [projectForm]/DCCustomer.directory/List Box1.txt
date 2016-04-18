@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($customer)
+
+$customer:=asXCustomer{asXCustomer}
+OBJECT SET VISIBLE(afListBox2;False)
+OBJECT SET VISIBLE(*;"xClick";False)
+
+If (asXCustomer>0) & (atCustomerSpec>0) & (asXCustomer<1000)
+	WinChoice ("Merge "+Char(34)+$customer+Char(34)+" into "+Char(34)+atCustomerSpec{atCustomerSpec}+Char(34)+"?")
+	If (ok=1)
+		WinChoice ("Warning: this action will change all DC entries from "+Char(34)+$customer+Char(34)+" to "+Char(34)+atCustomerSpec{atCustomerSpec}+Char(34)+".";"Stop";"Continue")
+		If (ok=0)
+			WinChoice (Char(34)+$customer+Char(34)+" will be removed from the customer library.";"Stop";"Continue")
+			
+			If (ok=0)
+				QUERY([Lists];[Lists]ListName="DC";*)
+				QUERY([Lists]; & ;[Lists]ListCode=$customer)
+				If (Records in selection([Lists])=0)
+					CREATE RECORD([Lists])
+				End if 
+				[Lists]ListName:="XDC"
+				[Lists]ListItem:=$customer
+				[Lists]ListCode:=atCustomerSpec{atCustomerSpec}
+				[Lists]Division:="Combined: "+Current user+"  "+String(Current date(*))+"  "+String(Current time(*))+[Lists]Division
+				SAVE RECORD([Lists])
+				UNLOAD RECORD([Lists])
+				
+				QUERY([DC];[DC]ReportCustomer=$customer)
+				APPLY TO SELECTION([DC];[DC]ReportCustomer:=atCustomerSpec{atCustomerSpec})
+				
+				DELETE FROM ARRAY(asXCustomer;Find in array(asXCustomer;$customer);1)
+				DELETE FROM ARRAY(atCustomerSpec;Find in array(atCustomerSpec;$customer);1)
+				
+				SORT ARRAY(asXCustomer;>)
+				SORT ARRAY(atCustomerSpec;>)
+				LISTBOX SELECT ROW(afListBox1;1000)
+				LISTBOX SELECT ROW(afListBox3;1000)
+			End if 
+		End if 
+	End if 
+End if 

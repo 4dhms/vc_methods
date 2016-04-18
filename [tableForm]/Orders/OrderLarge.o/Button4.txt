@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vsOperand="<")
+		vsOperand:="="
+	: (vsOperand="=")
+		vsOperand:=">"
+	Else 
+		vsOperand:="<"
+End case 

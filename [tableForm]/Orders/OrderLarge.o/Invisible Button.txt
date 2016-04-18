@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Orders];[Orders]OrderDivision="05-Cupio@")
+FIRST RECORD([Orders])
+CREATE EMPTY SET([Orders];"libel")
+
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	If ([Designs]LabelPict)
+		ADD TO SET([Orders];"libel")
+	End if 
+	NEXT RECORD([Orders])
+End for 
+
+USE SET("libel")
+CLEAR SET("libel")
+

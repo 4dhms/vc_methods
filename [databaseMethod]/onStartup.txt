@@ -1,0 +1,149 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($errorcode;$i)
+C_TEXT($ipaddress)
+C_TEXT($subnet)
+C_TEXT($version)
+
+  //If (Current machine owner="Phil Persinger") & (Current user#"Designer")
+  //ALERT("This is a test version. Nothing you do will be saved. Quit now.")
+  //End if 
+
+
+Startup_Prefs 
+Sys_IsUpgrade 
+
+$version:=Application version
+
+Case of 
+	: (Current user="Spooler")
+		Startup_Init 
+		$errorcode:=IT_MacTCPInit 
+		$errorcode:=IT_MyTCPAddr ($ipaddress;$subnet)
+		
+	: (Current user="Designer") & (Shift down)
+		  //backdoor
+		  //: ($version#vtServerVersion) & (Application type=4)
+		  //ALERT("Wrong version. Use 4D v"+Substring(vtServerVersion;1;2)+"."+Substring(vtServerVersion;3;1)+Char(13)+"You are running 4D v"+Substring($version;1;2)+"."+Substring($version;3;1))
+		  //QUIT 4D
+	Else 
+		
+		
+		<>vfDevelopment:=False
+		<>vfSupersheet:=False
+		Sys_Platform 
+		Startup_Prefs 
+		
+		$errorcode:=IT_MacTCPInit 
+		$errorcode:=IT_MyTCPAddr ($ipaddress;$subnet)
+		
+		If (Current user="designer")
+			
+		End if 
+		
+		  //ALERT("Breakdown, Calendar, email Fabric Report")
+		
+		
+		Case of 
+			: (Current user="Designer") & (Shift down)
+				  //backdoor
+				CONFIRM("Dashboard?")
+				If (ok=1)
+					<>DashbID:=0
+					m_Dashboard 
+				End if 
+				
+			: (Current user="Unused@")
+				ALERT("Invalid user name")
+				QUIT 4D
+			Else 
+				
+				SET DEFAULT CENTURY(20)
+				If (Not(Is compiled mode))
+					Startup_Init 
+				End if 
+				
+				<>vfSpoolerRunning:=False
+				
+				  //initialize PDF Direct Plug In
+				If (<>vlPlatform<3)
+					<>pathBreak:=":"
+				Else 
+					<>pathBreak:="\\"
+				End if 
+				
+				  //$errorcode:=PD_Register("Philip Persinger";"TDJRSYC072803NJU";
+				  //"VTMVOXB072803NJU")
+				
+				Startup_Init 
+				
+				SET WINDOW TITLE("HMS")
+				  //SECRET NUMBERS
+				<>vfSupersheet:=False
+				If (User in group(Current user;"SuperCostSheets"))
+					If (Current user="Spenser") | (Current user="Zoe") | (Current user="Lai Mun") | (Current user="Designer") | (Current user="Robert")
+						<>vfSupersheet:=False
+					Else 
+						<>vfSupersheet:=True
+					End if 
+				End if 
+				
+				Closed:=False
+				Startup_YearList 
+				List_FabricArrays 
+				
+				If (Current user="Spooler")
+				Else 
+					m_Dashboard 
+				End if 
+				
+				Email_CheckUserAddress 
+				
+		End case 
+		
+		  //Sys_CheckVersion 
+		  //C_LONGINT($p;$s;$run)
+		  //C_TEXT($os)
+		  //
+		  //PLATFORM PROPERTIES($p;$s)
+		  //If ($s\256=16)
+		  //$os:="10."+String(($s\16)%16)
+		  //If ($os="10.9") | ($os="10.10")
+		  //$run:=New process("Util_Pinger";0*1024;"Ping")
+		  //End if 
+		  //End if 
+		
+		
+		Startup_Win 
+		
+		Case of 
+			: (Current user="Designer")
+				  //ARRAY TEXT($comps;0)
+				  //COMPONENT LIST($comps)
+				  //$i:=1
+				  //For ($i;1;Size of array($comps))
+				  //ALERT($comps{$i})
+				  //End for 
+				  //CONFIRM("FB Order No Show. Special report")
+				  //If (ok=1)
+				  //TRACE
+				  //End if 
+			Else 
+		End case 
+		<>vfHMSTest:=False
+		  //$message:="In order to improve connectivity we are testing a new configuration."+Char(13)+Char(13)
+		  //$message:=$message+"Please note:"+Char(13)+"AFTER 60 MINUTES OF INACTIVITY YOU WILL BE LOGGED OFF OF 4D."
+		  //
+		  //ALERT($message)
+End case 
+  //// Open User Dashboard On Start Up
+If (Current user="Designer")
+	C_LONGINT($vc_found_l)
+	ARRAY TEXT($vc_components_at;0)
+	COMPONENT LIST($vc_components_at)
+	$vc_found_l:=Find in array($vc_components_at;"VC_Framework")
+	If ($vc_found_l>0)
+		EXECUTE METHOD("VC_STARTUP")
+	End if 
+End if 
+
+

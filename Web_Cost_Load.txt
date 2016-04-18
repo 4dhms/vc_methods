@@ -1,0 +1,132 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsNetTotalSales1:=""
+vsNetNetTotalSales1:=""
+vsNetPercent1:=""
+vsNetNetPercent1:=""
+vsLDPSea:=""
+vsUnit1:=""
+vsTotalCost1:=""
+vsNetProfit1:=""
+vsNetNetProfit1:=""
+vsNetPercent1:=""
+vsNetNetPercent1:=""
+
+vsNetTotalSales1a:=""
+vsNetNetTotalSales1a:=""
+vsNetPercent1a:=""
+vsNetNetPercent1a:=""
+vsLDPSeaA:=""
+vsUnit1a:=""
+vsNetProfit1a:=""
+vsNetNetProfit1a:=""
+vsNetPercent1a:=""
+vsTotalCost1a:=""
+vsNetNetPercent1a:=""
+
+vsNetTotalSales2:=""
+vsNetNetTotalSales2:=""
+vsNetPercent2:=""
+vsNetNetPercent2:=""
+vsLDPAir:=""
+vsUnit2:=""
+vsTotalCost2:=""
+vsNetProfit2:=""
+vsNetNetProfit2:=""
+vsNetPercent2:=""
+vsNetNetPercent2:=""
+
+vsNetTotalSales2a:=""
+vsNetNetTotalSales2a:=""
+vsNetPercent2a:=""
+vsNetNetPercent2a:=""
+vsLDPAirA:=""
+vsUnit2a:=""
+vsNetProfit2a:=""
+vsNetNetProfit2a:=""
+vsNetPercent2a:=""
+vsTotalCost2a:=""
+vsNetNetPercent2a:=""
+
+
+If ([CostSheets]ShipSea) | ([CostSheets]ShipSea=[CostSheets]ShipAir)
+	If (User in group(vsWebUser;"SuperCostsheets"))
+		
+		vsNetTotalSales1:=String([CostSheets]NetTotalSales;"#,###,##0.00")
+		vsNetNetTotalSales1:=String([CostSheets]NetNetTotalSales;"#,###,##0.00")
+		vsNetPercent1:=String(vrNetPercent1;"##.#")+"%"
+		vsNetNetPercent1:=String(vrNetPercent1;"##.#")+"%"
+		vsLDPSea:=String(vrLDPBoat;"##0.00")
+		vsUnit1:=String(vrLDPBoat;"##0.00")
+		vsTotalCost1:=String(vrTotal1;"#,###,##0.00")
+		vsNetProfit1:=String(vrNetProfit1;"#,###,##0.00")
+		vsNetNetProfit1:=String(vrNetNetProfit1;"#,###,##0.00")
+		vsNetPercent1:=String(vrNetPercent1;"##0.0%")
+		vsNetNetPercent1:=String(vrNetNetPercent1;"##0.0%")
+		
+		vsNetPercent1a:=String(vrNetPercent1a;"##.#")+"%"
+		vsNetNetPercent1a:=String(vrNetPercent1a;"##.#")+"%"
+		vsLDPSeaA:=String(vrLDP1a;"##0.00")
+		vsUnit1a:=String(vrLDP1a;"##0.00")
+		vsTotalCost1a:=String(vrTotal1a;"#,###,##0.00")
+		vsNetProfit1a:=String(vrNetProfit1a;"#,###,##0.00")
+		vsNetNetProfit1a:=String(vrNetNetProfit1a;"#,###,##0.00")
+		vsNetPercent1a:=String(vrNetPercent1a;"##0.0%")
+		vsNetNetPercent1a:=String(vrNetNetPercent1a;"##0.0%")
+		
+	Else 
+		vsNetTotalSales1:=String([CostSheets]NetTotalSales;"#,###,##0.00")
+		vsNetNetTotalSales1:=String([CostSheets]NetNetTotalSales;"#,###,##0.00")
+		vsNetPercent1:=String(vrNetPercent1a;"##.#")+"%"
+		vsNetNetPercent1:=String(vrNetPercent1a;"##.#")+"%"
+		vsLDPSea:=String(vrLDP1a;"##0.00")
+		vsUnit1:=String(vrLDP1a;"##0.00")
+		vsTotalCost1:=String(vrTotal1a;"#,###,##0.00")
+		vsNetProfit1:=String(vrNetProfit1a;"#,###,##0.00")
+		vsNetNetProfit1:=String(vrNetNetProfit1a;"#,###,##0.00")
+		vsNetPercent1:=String(vrNetPercent1a;"##0.0%")
+		vsNetNetPercent1:=String(vrNetNetPercent1a;"##0.0%")
+	End if 
+End if 
+
+If ([CostSheets]ShipAir) | ([CostSheets]ShipSea=[CostSheets]ShipAir)
+	If (User in group(vsWebUser;"SuperCostsheets"))
+		vsNetTotalSales2:=String([CostSheets]NetTotalSales;"#,###,##0.00")
+		vsNetNetTotalSales2:=String([CostSheets]NetNetTotalSales;"#,###,##0.00")
+		vsNetPercent2:=String(vrNetPercent2;"##.#")+"%"
+		vsNetNetPercent2:=String(vrNetPercent2;"##.#")+"%"
+		vsLDPAir:=String(vrLDPAir;"##0.00")
+		vsUnit2:=String(vrLDPAir;"##0.00")
+		vsTotalCost2:=String(vrTotal2;"#,###,##0.00")
+		vsNetProfit2:=String(vrNetProfit2;"#,###,##0.00")
+		vsNetNetProfit2:=String(vrNetNetProfit2;"#,###,##0.00")
+		vsNetPercent2:=String(vrNetPercent2;"##0.0%")
+		vsNetNetPercent2:=String(vrNetNetPercent2;"##0.0%")
+		
+		vsNetTotalSales2a:=String([CostSheets]NetTotalSales;"#,###,##0.00")
+		vsNetNetTotalSales2a:=String([CostSheets]NetNetTotalSales;"#,###,##0.00")
+		vsNetPercent2a:=String(vrNetPercent2a;"##.#")+"%"
+		vsNetNetPercent2a:=String(vrNetPercent2a;"##.#")+"%"
+		vsLDPAirA:=String(vrLDP2a;"##0.00")
+		vsUnit2a:=String(vrLDP2a;"##0.00")
+		vsTotalCost2a:=String(vrTotal2a;"#,###,##0.00")
+		vsNetProfit2a:=String(vrNetProfit2a;"#,###,##0.00")
+		vsNetNetProfit2a:=String(vrNetNetProfit2a;"#,###,##0.00")
+		vsNetPercent2a:=String(vrNetPercent2a;"##0.0%")
+		vsNetNetPercent2a:=String(vrNetNetPercent2a;"##0.0%")
+		
+	Else 
+		vsNetTotalSales2:=String([CostSheets]NetTotalSales;"#,###,##0.00")
+		vsNetNetTotalSales2:=String([CostSheets]NetNetTotalSales;"#,###,##0.00")
+		vsNetPercent2:=String(vrNetPercent2a;"##.#")+"%"
+		vsNetNetPercent2:=String(vrNetPercent2a;"##.#")+"%"
+		vsLDPAir:=String(vrLDP2a;"##0.00")
+		vsUnit2:=String(vrLDP2a;"##0.00")
+		vsTotalCost2:=String(vrTotal2a;"#,###,##0.00")
+		vsNetProfit2:=String(vrNetProfit2a;"#,###,##0.00")
+		vsNetNetProfit2:=String(vrNetNetProfit2a;"#,###,##0.00")
+		vsNetPercent2:=String(vrNetPercent2a;"##0.0%")
+		vsNetNetPercent2:=String(vrNetNetPercent2a;"##0.0%")
+	End if 
+	
+End if 
+

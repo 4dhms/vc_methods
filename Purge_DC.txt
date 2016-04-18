@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$lowball)
+
+QUERY([Orders];[Orders]OrderNum>31300)
+ORDER BY([Orders];[Orders]OrderNum;>)
+
+$lowball:=[Orders]OrderNum
+
+QUERY([DC];[DC]OrderNumber<$lowball)
+
+$i:=1
+CREATE SET([DC];"dc")
+FIRST RECORD([DC])
+For ($i;1;Records in selection([DC]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[DC]CPOrdID)
+	QUERY([Orders];[Orders]OrderNum=[DC]OrderNumber)
+	If (Records in selection([Orders])>0)
+		REMOVE FROM SET([DC];"dc")
+	End if 
+	NEXT RECORD([DC])
+End for 
+
+USE SET("dc")
+CLEAR SET("dc")

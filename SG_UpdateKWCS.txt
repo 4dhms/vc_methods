@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Samples]DesignNum#"")
+	QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+	[Samples]KWCnS:=[Designs]KWCnS
+	
+	cbKnit:=0
+	cbWoven:=0
+	cbCutSew:=0
+	Case of 
+		: ([Samples]KWCnS="Knit")
+			cbKnit:=1
+		: ([Samples]KWCnS="Woven")
+			cbWoven:=1
+		: ([Samples]KWCnS="CutSew")
+			cbCutSew:=1
+	End case 
+End if 

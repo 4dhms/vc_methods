@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Nav1:=0
+Nav2:=1
+Nav3:=0
+vsOrderNumber:=""
+vStyle:=""
+vDesign:=""
+vsFactory:=""
+vdCancel:=!00-00-00!
+vAddto:=0
+COMPILER_WS_Arrays 

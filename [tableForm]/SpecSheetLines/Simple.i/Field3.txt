@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Mouse Enter)
+		GET MOUSE(vlX;vlY;vlZ)
+	: (Form event=On Data Change)
+		SS_SaveCell (alSpecNumber{asRowHeaders}-1;"C";Self->)
+		Spec_TrackChange ([SpecLineSample]ColHead2;->[SpecSheetLines]Spec3C;"NY")
+End case 

@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vfNew) & (<>vlOrderNumber>0) & (cbSG=cbOrder)
+		WinChoice ("Are you adding to the"+Char(13)+"Sample Garment Component Sheet or just to"+Char(13)+"HMS Order "+String(<>vlOrderNumber)+"?";"Sample";"Production")
+		If (ok=1)
+			vfSample:=True
+			ACCEPT
+		Else 
+			vfSample:=False
+			
+			ACCEPT
+		End if 
+	: (<>vlOrderNumber<0)
+		vfSample:=True
+		ACCEPT
+	Else 
+		
+		Case of 
+			: (vfNew) | (alCompDeleted{asCompName}=16777170)
+				If (cbSG=1)
+					vfSample:=True
+				Else 
+					vfSample:=False
+				End if 
+				ACCEPT
+			: (vlColorKey=13500370)
+				vfSample:=False
+				ACCEPT
+				
+			Else 
+				WinChoice ("Are you changing this component on the sample garment or just this order?";"Order Only";"Sample")
+				If (ok=1)
+					vfSample:=False
+					ACCEPT
+				Else 
+					WinChoice ("Note: if you change the sample garment component sheet it will change on ALL orde"+"rs.";"Change Sample";"Cancel")
+					If (ok=1)
+						vfSample:=True
+						ACCEPT
+					Else 
+						CANCEL
+					End if 
+				End if 
+		End case 
+End case 

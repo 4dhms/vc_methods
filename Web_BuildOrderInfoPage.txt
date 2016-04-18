@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($revKey)
+
+ARRAY LONGINT(alFieldNumber;0)
+ARRAY LONGINT(alFieldChange;0)
+$revKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+vlTableNum:=2
+
+QUERY([Changes];[Changes]RevisionKey=$revKey)
+QUERY SELECTION([Changes];[Changes]TableNum=2)
+QUERY SELECTION([Changes];[Changes]RevisionNumber>0)
+
+SELECTION TO ARRAY([Changes]FieldNum;alFieldNumber)
+
+Web_InfoVars 
+
+vtGetPicture:="/4DCGI/DESIGN_"+[Orders]DesignNumber
+  // SEND HTML FILE("orderinfo.html")
+WEB SEND FILE("orderpo.html")

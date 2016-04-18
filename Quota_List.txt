@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($default)
+$default:=False
+
+Case of 
+	: (pOne=1)
+		vsFlag:="Woven"
+		QUERY([Quota];[Quota]KW="W")
+	: (pTwo=1)
+		vsFlag:="Knit, Cut & Sew"
+		QUERY([Quota];[Quota]KW="K")
+	: (pThree=1)
+		ALL RECORDS([Quota])
+	Else 
+		pFour:=1
+		Quota_DefaultList 
+		$default:=True
+End case 
+
+ARRAY TEXT(asDutyType;0)
+ARRAY BOOLEAN(afSpecial;0)
+ARRAY TEXT(asHTSCode;0)
+ARRAY REAL(arDutyRates;0)
+ARRAY TEXT(<>asCategory;0)
+ARRAY TEXT(asNames;0)
+If ($default)
+	ORDER BY([Quota];[Quota]SortOrder;>)
+Else 
+	ORDER BY([Quota];[Quota]KW;<;[Quota]QuotaType;>;[Quota]Category;>)
+End if 
+
+SELECTION TO ARRAY([Quota]QuotaType;asDutyType;[Quota]Special;afSpecial)
+SELECTION TO ARRAY([Quota]HTSCode;asHTSCode;[Quota]Category;<>asCategory;[Quota]Description;asNames;[Quota]DutyRate;arDutyRates;[Quota]KW;asKW)
+
+ARRAY LONGINT(alDutyStyle;Size of array(asDutyType))
+ARRAY LONGINT(alDutyColor;Size of array(asDutyType))
+
+$i:=1
+For ($i;1;Size of array(asDutyType))
+	If (asKW{$i}="W")
+		asDutyType{$i}:=asDutyType{$i}+" (woven)"
+	Else 
+		asDutyType{$i}:=asDutyType{$i}+" (knit)"
+	End if 
+	If (afSpecial{$i}=True)
+		afSpecial{$i}:=True
+	End if 
+End for 
+
+
+Quota_Colors 
+
+LISTBOX SELECT ROW(categories;Size of array(asDutyType)+1)
+ARRAY TEXT(asTypeFinder;0)
+$i:=1
+For ($i;1;Size of array(asDutyType))
+	If (Find in array(asTypeFinder;asDutyType{$i})<1)
+		APPEND TO ARRAY(asTypeFinder;asDutyType{$i})
+	End if 
+End for 
+SORT ARRAY(asTypeFinder;>)
+INSERT IN ARRAY(asTypeFinder;1;1)
+asTypeFinder{1}:="Select type"
+
+asTypeFinder:=1
+UNLOAD RECORD([Quota])
+

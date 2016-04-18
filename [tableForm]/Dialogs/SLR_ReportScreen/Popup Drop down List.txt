@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$i;$c)
+C_TEXT($stylecore)
+
+APPEND TO ARRAY(asCustomers;asDCCustomer{asDCCustomer})
+
+SORT ARRAY(asCustomers;>)
+  //SLR_StyleArray 
+REDUCE SELECTION([SLRReporter];0)
+OBJECT SET ENABLED(bPrint;False)
+
+cbGroup:=0
+nav1:=0
+nav2:=0
+c1:=0
+c2:=0
+c3:=0
+c4:=0
+
+QUERY([SLRAcct];[SLRAcct]SLRAcct=asDCCustomer{asDCCustomer})
+
+$n:=1
+For ($n;1;Size of array(asDivisions))
+	If (afBatchList{$n}=False)
+		QUERY SELECTION([SLRAcct];[SLRAcct]Division#asDivisions{$n})
+	End if 
+End for 
+
+DISTINCT VALUES([SLRAcct]SLRStyleNumber;asXStyleNumbers)
+SORT ARRAY(asXStyleNumbers;>)
+
+If (vfByStyle)
+	$i:=1
+	For ($i;1;Size of array(asXStyleNumbers))
+		$stylecore:=StripToNumber (asXStyleNumbers{$i})
+		QUERY([SLRColor];[SLRAcct]SLRAcct=asDCCustomer{asDCCustomer};*)
+		QUERY([SLRColor]; & ;[SLRAcct]SLRStyleNumber="@"+$stylecore+"@")
+		
+		$c:=Find in array(atStyleNo;$stylecore)
+		
+		If (Length($stylecore)>4)
+			If ($c<1)
+				APPEND TO ARRAY(asStyleNumbers;$stylecore)
+				APPEND TO ARRAY(atStyleNo;$stylecore)
+				APPEND TO ARRAY(alStyleCount;1)
+			Else 
+				alStyleCount{$c}:=alStyleCount{$c}+1
+			End if 
+		End if 
+	End for 
+	SORT ARRAY(asStyleNumbers;>)
+	
+Else 
+	OBJECT SET VISIBLE(asXStyleNumbers;True)
+	OBJECT SET VISIBLE(*;"xStyle";True)
+	GOTO OBJECT(vtSLRsn)
+End if 
+
+DELETE FROM ARRAY(asDCCustomer;asDCCustomer;1)
+
+OBJECT SET VISIBLE(asStyleNumbers;True)
+
+
+

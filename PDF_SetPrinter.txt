@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //$1 1=Portrait 2=Landscape
+  //$2 Pointer to table
+  //$3 True=print selection
+
+C_LONGINT($scale)
+C_LONGINT($orientation)
+
+If ($1=-1) | ($1=-2)
+	vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+	SET CURRENT PRINTER("PDF_Direct")
+End if 
+
+Case of 
+	: (Abs($1)=1)
+		$orientation:=1
+	Else 
+		$orientation:=2
+End case 
+
+Case of 
+	: ($1=99) | ($1=1)
+		$scale:=100
+	Else 
+		$scale:=95
+End case 
+
+SET PRINT OPTION(Scale option;$scale)
+SET PRINT OPTION(Orientation option;$orientation)
+SET PRINT OPTION(Mac spool file format option;0)
+If (vfPDF)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+End if 
+
+Case of 
+	: ($1=99)
+		SS_PrintSheet 
+	: ($1<0)
+		PRINT SELECTION($2->;>)
+	: ($3)
+		PRINT SELECTION($2->)
+	Else 
+		PRINT RECORD($2->)
+End case 
+

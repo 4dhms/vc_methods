@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_REAL($consumed)
+ARRAY LONGINT($selected;0)
+
+If (Find in array(afAllShip;True)>0)
+	$i:=1
+	For ($i;1;Size of array(afAllShip))
+		If (afAllShip{$i})
+			APPEND TO ARRAY($selected;alPOrder{$i})
+		End if 
+	End for 
+	
+	$i:=1
+	
+	For ($i;1;Size of array($selected))
+		$consumed:=0
+		$n:=Find in array(alPOrder;$selected{$i})
+		QUERY([Orders];[Orders]OrderNum=alPOrder{$n})
+		If ([Orders]YardsReq>0)
+			$consumed:=[Orders]YardsReq
+		Else 
+			QUERY([Costing];[Costing]OrderNumber=alPOrder{$n})
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			QUERY SELECTION([CostSheets];[CostSheets]YdFabric>0)
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			$consumed:=[CostSheets]YdFabric
+			If ($consumed>0)
+				[Orders]YardsReq:=$consumed
+				SAVE RECORD([Orders])
+			End if 
+		End if 
+		
+		If ($consumed=0)
+			WinPrompt (String(alPOrder{$n})+" does not have a consumption amount entered.")
+		Else 
+			APPEND TO ARRAY(alSOrder;alPOrder{$n})
+			APPEND TO ARRAY(asSStyle;asPStyle{$n})
+			APPEND TO ARRAY(asSDesign;asPDesign{$n})
+			APPEND TO ARRAY(adSCancel;adPCancel{$n})
+			APPEND TO ARRAY(asSArticle;asPArticle{$n})
+			APPEND TO ARRAY(arConsumption;$consumed)
+			APPEND TO ARRAY(asSPo;asPPo{$n})
+			
+			DELETE FROM ARRAY(alPOrder;$n;1)
+			DELETE FROM ARRAY(asPStyle;$n;1)
+			DELETE FROM ARRAY(asPDesign;$n;1)
+			DELETE FROM ARRAY(asPArticle;$n;1)
+			DELETE FROM ARRAY(adPCancel;$n;1)
+			DELETE FROM ARRAY(asPPo;$n;1)
+		End if 
+	End for 
+	
+	LISTBOX SORT COLUMNS(afTrackShip;1;>)
+	LISTBOX SELECT ROW(afAllShip;Size of array(alPOrder)+1)
+Else 
+	WinPrompt ("No orders are selected to be added.")
+End if 

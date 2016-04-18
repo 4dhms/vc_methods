@@ -1,0 +1,14 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($fob)
+
+
+If (Not([CostSheets]MyFOB))
+	$fob:=[CostSheets]CMT+[CostSheets]YarnCost+[CostSheets]FabricCost+[CostSheets]Combo1Cost+[CostSheets]Combo2Cost+[CostSheets]Combo3Cost
+	$fob:=$fob+[CostSheets]LiningCost+[CostSheets]FusiblesCost
+	$fob:=$fob+[CostSheets]Misc
+Else 
+	$fob:=[CostSheets]FOB
+End if 
+
+[CostSheets]FOB:=$fob
+SAVE RECORD([CostSheets])

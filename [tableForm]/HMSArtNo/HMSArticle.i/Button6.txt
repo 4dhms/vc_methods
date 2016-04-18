@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+atCost1:=1
+atCost2:=1
+atCost3:=1
+atCost4:=1
+atCost5:=1
+OBJECT SET VISIBLE(atCost2;False)
+OBJECT SET VISIBLE(atCost3;False)
+OBJECT SET VISIBLE(atCost4;False)
+OBJECT SET VISIBLE(atCost5;False)
+vsFiber:=""
+vlItem1:=0
+vlItem2:=0
+vlItem3:=0
+vlItem4:=0
+vlItem5:=0
+OBJECT SET VISIBLE(*;"xPerc2";False)
+OBJECT SET VISIBLE(*;"xPerc3";False)
+OBJECT SET VISIBLE(*;"xPerc4";False)
+OBJECT SET VISIBLE(*;"xPerc5";False)
+OBJECT SET VISIBLE(vlItem2;False)
+OBJECT SET VISIBLE(vlItem3;False)
+OBJECT SET VISIBLE(vlItem4;False)
+OBJECT SET VISIBLE(vlItem5;False)
+vsFlag:=""

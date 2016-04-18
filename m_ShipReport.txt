@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		WinPrompt ("This report is unavailable at this time.")
+	: (<>vlShipReport>0)
+		SHOW PROCESS(<>vlShipReport)
+		BRING TO FRONT(<>vlShipReport)
+	: (<>vlShipReport=0)
+		<>vlShipReport:=New process("Report_Shipped";0;"Shipped")
+	Else 
+		SHOW PROCESS(<>vlShipReport)
+		HIDE PROCESS(<>vlShipReport)
+		BRING TO FRONT(<>vlShipReport)
+End case 

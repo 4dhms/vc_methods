@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([Attendees];"Test")
+FIRST RECORD([Attendees])
+For ($i;1;Records in selection([Attendees]))
+	QUERY([Appts];[Appts]ApptKey=[Attendees]ApptKey)
+	If (Records in selection([Appts])>0)
+		ADD TO SET([Attendees];"test")
+	End if 
+	NEXT RECORD([Attendees])
+End for 
+
+If (Records in set("test")>0)
+	USE SET("test")
+	CLEAR SET("test")
+	ALERT("Not clear")
+Else 
+	ALERT("Good")
+End if 
+

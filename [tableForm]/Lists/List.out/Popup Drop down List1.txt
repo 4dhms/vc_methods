@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+USE SET("MasterList")
+
+Case of 
+	: (atListContents<2)
+	: (atListContents{atListContents}="Woven Fabric")
+		QUERY SELECTION([Lists];[Lists]ListName="Fabric";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="Woven")
+	: (atListContents{atListContents}="Woven Fiber")
+		QUERY SELECTION([Lists];[Lists]ListName="Fiber";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="Woven")
+	: (atListContents{atListContents}="Woven Treatment")
+		QUERY SELECTION([Lists];[Lists]ListName="Treatment";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="Woven")
+	: (atListContents{atListContents}="Knit Fabric")
+		QUERY SELECTION([Lists];[Lists]ListName="Fabric";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="Knit")
+	: (atListContents{atListContents}="Knit")
+		QUERY SELECTION([Lists];[Lists]ListName="Fiber";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="Knit")
+	: (atListContents{atListContents}="Knit Treatment")
+		QUERY SELECTION([Lists];[Lists]ListName="Treatment";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="Knit")
+	: (atListContents{atListContents}="Cut & Sew Fabric")
+		QUERY SELECTION([Lists];[Lists]ListName="Fabric";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="CutSew")
+	: (atListContents{atListContents}="Cut & Sew")
+		QUERY SELECTION([Lists];[Lists]ListName="Fiber";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="CutSew")
+	: (atListContents{atListContents}="Cut & Sew Treatment")
+		QUERY SELECTION([Lists];[Lists]ListName="Treatment";*)
+		QUERY SELECTION([Lists]; & ;[Lists]KWCS="CutSew")
+End case 
+
+If (pOne=1)
+	ORDER BY([Lists];[Lists]ArticleNumber;>;[Lists]ListItem;>)
+Else 
+	ORDER BY([Lists];[Lists]ListItem;>;[Lists]ArticleNumber;>)
+End if 
+SET WINDOW TITLE(String(Records in selection([Lists]))+" list items")

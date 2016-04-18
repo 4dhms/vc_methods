@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+If (asPart>0)
+	QUERY([SpecLibrary];[SpecLibrary]SpecEnglish=asPart{asPart})
+	If (Records in selection([SpecLibrary])>0)
+		[SpecSheetLines]SpecLibKey:=[SpecLibrary]SpecLibKey
+		[SpecSheetLines]OtherDescription:=""
+		SAVE RECORD([SpecSheetLines])
+	End if 
+End if 

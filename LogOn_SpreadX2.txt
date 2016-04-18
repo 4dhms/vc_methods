@@ -1,0 +1,115 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$p)
+C_TIME(vhDocref)
+C_DATE($range)
+C_TEXT($t;$colorprint;$cat;$rem;$key;$season)
+C_TEXT($type;$path;$path2;$5t;$price;$description)
+
+$t:=Char(34)+","+Char(34)
+$5t:=$t+$t+$t+$t+$t
+
+vhDocref:=Create document("";"csv")
+If (ok=1)
+	$path:=Document
+	
+	LogOn_SpreadX2Header 
+	
+	
+	$i:=1
+	For ($i;1;Size of array(asStyleNumbers))
+		If (asXSizeRange{$i}#"TBD")
+			
+			QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+			Case of 
+				: ([Orders]SizeCategory="Missy")
+					$cat:="MS"
+				: ([Orders]SizeCategory="Petite")
+					$cat:="PT"
+				: ([Orders]SizeCategory="Large")
+					$cat:="LG"
+				Else 
+					$cat:=""
+			End case 
+			QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+			$description:=Replace string([Designs]Description;Char(13);" ")
+			$description:=Replace string($description;Char(10);" ")
+			ARRAY LONGINT($orders;0)
+			SELECTION TO ARRAY([Orders]OrderNum;$orders)
+			
+			
+			ARRAY LONGINT(alSelfKey;0)
+			$n:=1
+			For ($n;1;Size of array($orders))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$n})
+				ARRAY LONGINT($self;0)
+				DISTINCT VALUES([CP_OrderXRef]SelfKey;$self)
+				
+				$p:=1
+				For ($p;1;Size of array($self))
+					APPEND TO ARRAY(alSelfKey;$self{$p})
+				End for 
+			End for 
+			SORT ARRAY(alSelfKey;>)
+			
+			LogOn_SpreadXArray 
+			
+			$season:=Uppercase(Substring(asSeasonName{$i};1;2))+Substring(asSeasonName{$i};Position("20";asSeasonName{$i})+2;2)
+			
+			  //A-K
+			SEND PACKET(vhDocref;Char(34)+asStyleNumbers{$i}+$t+"STYLE"+$t+"A"+$t+"EA"+$t+"1"+$t+"1"+$t+Uppercase($description)+$t+"CHINA"+$t+Substring(asDivisions{$i};1;2)+$t+"W"+$t+$season+$t)
+			
+			SEND PACKET(vhDocref;asGroups{$i}+$t+$t+$cat+$t+$t+String(arSalePrice{$i};"###.00")+$t+$t+asStyleNumbers{$i}+$t+$t+"*"+$t+$t)
+			
+			$s:=1
+			For ($s;1;7)
+				If ($s<=Size of array(asCPNumbers))
+					SEND PACKET(vhDocref;$season)
+				End if 
+				SEND PACKET(vhDocref;$t)
+			End for 
+			
+			
+			$s:=1
+			For ($s;1;7)
+				If ($s<=Size of array(asCPNumbers))
+					SEND PACKET(vhDocref;"A")
+				End if 
+				SEND PACKET(vhDocref;$t)
+			End for 
+			
+			$s:=1
+			For ($s;1;7)
+				If ($s<=Size of array(asCPNumbers))
+					SEND PACKET(vhDocref;Uppercase(asCPNumbers{$s}))
+				End if 
+				SEND PACKET(vhDocref;$t)
+			End for 
+			
+			$s:=1
+			For ($s;1;7)
+				If ($s<=Size of array(asCPNumbers))
+					SEND PACKET(vhDocref;"NA")
+				End if 
+				SEND PACKET(vhDocref;$t)
+			End for 
+			
+			$s:=1
+			For ($s;1;7)
+				If ($s<=Size of array(asCPNumbers))
+					SEND PACKET(vhDocref;Uppercase(asCPColorName{$s}))
+				End if 
+				SEND PACKET(vhDocref;$t)
+			End for 
+			
+			
+			SEND PACKET(vhDocref;$5t+$5t+$5t+$5t+$5t+$5t+$5t+$5t+asXSizeRange{$i}+Char(34)+Char(13))
+		End if 
+	End for 
+	CLOSE DOCUMENT(vhDocref)
+	  //$path2:=Replace string($path;".txt";".cvs")
+	  //COPY DOCUMENT($path;$path2)
+	SHOW ON DISK($path)
+	
+End if 
+
+

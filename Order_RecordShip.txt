@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($shipinfo)
+
+Case of 
+	: (vsMethod="Air")
+		[Orders]ShipAir:=True
+		$shipInfo:="Air to "
+		cbAir:=1
+	: (vsMethod="Sea")
+		cbSea:=1
+		$shipinfo:="Sea to "
+		[Orders]ShipSea:=True
+	: (vsMethod="LDP")
+		cbLDP:=1
+		[Orders]ShipLDP:=True
+		$shipinfo:="LDP at "
+	: (vsMethod="FOB")
+		cbLDP:=1
+		[Orders]ShipFOB:=True
+		$shipinfo:="FOB to "
+End case 
+
+Case of 
+	: (vsDestination="NY")
+		cbNY:=1
+		[Orders]ShipInfo:=$shipinfo+vsDestination
+	: (vsDestination="LA")
+		cbLA:=1
+		[Orders]ShipInfo:=$shipinfo+vsDestination
+	: (vsDestination="Other")
+		cbOther:=1
+		OBJECT SET VISIBLE([Orders]OtherShip;True)
+		[Orders]ShipInfo:=$shipinfo+vsShipTo
+		[Orders]OtherShip:=vsShipTo
+End case 
+

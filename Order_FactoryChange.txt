@@ -1,0 +1,21 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Getting Focus)
+		vtOldData:=[Orders]Factory
+	: (Form event=On Data Change)
+		Revise_OrderChange ($1)
+		vtNewData:=[Orders]Factory
+		Rev_LogEvent ("Changed";vtOldData;vtNewData)
+		QUERY([SpecFactory];[SpecFactory]Factory=[Orders]Factory)
+		If ([SpecFactory]Factory#[Orders]Factory)
+			WinChoice ("Do you want to clean off the revisions and make this the original order?")
+			If (ok=1)
+				[Orders]RevisionNumber:=0
+			End if 
+			  //   WinConfirm ("Do you want to change the Factory on the Specsheet?")
+			  // If (ok=1)
+			  //  [SpecFactory]Factory:=[Orders]Factory
+			  //   SAVE RECORD([SpecFactory])
+			  //  End if 
+		End if 
+End case 

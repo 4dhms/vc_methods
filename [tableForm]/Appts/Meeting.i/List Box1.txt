@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsShipto)
+
+Case of 
+	: (Form event=On Drop)
+		CREATE RECORD([Attendees])
+		[Attendees]ApptKey:=[Appts]ApptKey
+		[Attendees]Attendee:=asAllUsers{asAllUsers}
+		SAVE RECORD([Attendees])
+		INSERT IN ARRAY(asMeeting;1;1)
+		asMeeting{1}:=asAllUsers{asAllUsers}
+		SORT ARRAY(asMeeting;>)
+		asMeeting:=Find in array(asMeeting;asAllUsers{asAllUsers})
+		vsShipTo:=asAllUsers{asAllUsers}
+		DELETE FROM ARRAY(asAllUsers;asAllUsers;1)
+		
+	: (Form event=On Double Clicked)
+		If (asMeeting>0)
+			INSERT IN ARRAY(asAllUsers;1;1)
+			asAllUsers{1}:=asMeeting{asMeeting}
+			SORT ARRAY(asAllUsers;>)
+			
+			CREATE SET([Attendees];"Group")
+			QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey)
+			QUERY SELECTION([Attendees];[Attendees]Attendee=asMeeting{asMeeting})
+			DELETE RECORD([Attendees])
+			USE SET("Group")
+			CLEAR SET("Group")
+			DELETE FROM ARRAY(asMeeting;asMeeting;1)
+		End if 
+End case 
+
+asAllUsers:=0
+asMeeting:=0

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CS_Lines]CS_Sort=0)
+	[CS_Lines]CS_Sort:=Records in selection([CS_Lines])+1
+	SAVE RECORD([CS_Lines])
+Else 
+	Trim_Change (Self->;5)
+End if 
+
+

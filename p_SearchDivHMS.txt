@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($q1;$q2)
+  //global procedure to search for division code number in hms
+WinFindList ("Enter Division Code Number:";3)
+If (OK=1)
+	$c:=Position("-";vsRequestString)
+	If ($c=3)
+		$q1:=Substring(vsRequestString;1;3)+"@"
+		$q2:=vsRequestString[[1]]+"-@"
+	Else 
+		$q1:=Substring(vsRequestString;1;2)+"@"
+		$q2:="0"+vsRequestString[[1]]+"-@"
+	End if 
+	QUERY([Orders];[Designs]DivisionCodeN=$q1;*)
+	QUERY([Orders]; | ;[Designs]DivisionCodeN=$q2;*)
+	QUERY([Orders]; & ;[Orders]DivisionOverride=False)
+	CREATE SET([Orders];"Regular")
+	
+	QUERY([Orders];[Orders]OrderDivision=$q1;*)
+	QUERY([Orders]; | ;[Orders]OrderDivision=$q2;*)
+	QUERY([Orders]; & ;[Orders]DivisionOverride=True)
+	FIRST RECORD([Orders])
+	$i:=1
+	For ($i;1;Records in selection([Orders]))
+		ADD TO SET([Orders];"Regular")
+		NEXT RECORD([Orders])
+	End for 
+	
+	USE SET("Regular")
+	CLEAR SET("Regular")
+	
+End if 
+
+p_InputLayHMS 
+p_SetWindowHMS 
+
+ORDER BY([Orders];[Orders]OrderEntryDate;<)
+

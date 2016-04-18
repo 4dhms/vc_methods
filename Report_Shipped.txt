@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([CostSheets];"Shipping.rep")
+
+Array_BuildDates 
+REDUCE SELECTION([CostSheets];0)
+SET WINDOW TITLE("Variance Report")
+
+Center Window (870;550;4;"";"WincBox")
+MODIFY SELECTION([CostSheets];*)
+
+CLOSE WINDOW
+<>vlShipReport:=0

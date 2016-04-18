@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>CloseBox:=True
+Center Window (740;565;5;"")
+
+Case of 
+	: (cbBlock=1)
+		DIALOG([DesignLinkedPages];"PrintColors")
+	: ([DesignLines]8Up)
+		DIALOG([DesignLinkedPages];"Print8")
+	Else 
+		DIALOG([DesignLinkedPages];"Print12")
+End case 
+
+CLOSE WINDOW

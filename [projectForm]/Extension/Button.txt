@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (cb11=cb12)
+		WinPrompt ("Select date for extension.")
+	: (vdDate=!00-00-00!)
+		WinPrompt ("Bad date format.")
+		
+	Else 
+		ACCEPT
+End case 

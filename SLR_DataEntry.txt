@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atFabrication;0)
+
+APPEND TO ARRAY(atFabrication;"Categories")
+APPEND TO ARRAY(atFabrication;"Short Dress")
+APPEND TO ARRAY(atFabrication;"Maxi Dress")
+APPEND TO ARRAY(atFabrication;"Sweater Cardigan")
+APPEND TO ARRAY(atFabrication;"Knit Cardigan")
+APPEND TO ARRAY(atFabrication;"Blouse (non-tunic)")
+APPEND TO ARRAY(atFabrication;"Sweater Pull Over")
+APPEND TO ARRAY(atFabrication;"Knit Pull Over")
+APPEND TO ARRAY(atFabrication;"Sweater Tunic")
+APPEND TO ARRAY(atFabrication;"Knit Tunic")
+APPEND TO ARRAY(atFabrication;"Woven Tunic")
+atFabrication:=1
+
+SLR_WeekArray 
+Center Window (625;600;0;"")
+DIALOG("SalesData")
+CLOSE WINDOW
+<>vlSLRENter:=0
+

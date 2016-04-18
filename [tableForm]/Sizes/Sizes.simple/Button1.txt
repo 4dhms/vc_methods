@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+POST KEY(9)
+POST KEY(97;Command key mask)
+

@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]OrderNum=$1)
+
+<>vfMTL:=False
+vPercent:=0
+vNetUnitPrc:=0
+vTotalProf:=0
+vrTotalSales1:=0
+vtOldData:=""
+vtNewData:=""
+vTotalCost:=0
+ARRAY TEXT(<>asCopyGrade;0)
+
+Closed:=False
+SET MENU BAR(2)
+Grade_CatArray 
+Grade_CatArray 
+Order_LayoutRouter 
+p_SetWindowHMS 
+
+ARRAY TEXT(asQuikfind;0)
+
+If (Screen height<650)
+	MODIFY RECORD([Orders])
+Else 
+	MODIFY RECORD([Orders];*)
+End if 
+CLOSE WINDOW
+
+<>vlPreview:=0
+

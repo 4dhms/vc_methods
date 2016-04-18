@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //Sales Entry procedure
+  //
+  //CALL PROCESS(◊SamGarPrcID)
+
+Case of 
+	: (<>CompStat>0)
+		SHOW PROCESS(<>CompStat)
+		HIDE PROCESS(<>SalesPrcID)
+		BRING TO FRONT(<>CompStat)
+	: (<>CompStat=0)
+		<>CompStat:=New process("CS_ApprovalStatus";0;"Sales Entry")
+	Else 
+		SHOW PROCESS(<>CompStat)
+		HIDE PROCESS(<>SalesPrcID)
+		BRING TO FRONT(<>CompStat)
+End case 

@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asDesignNumbers;0)
+C_BOOLEAN($continue)
+
+If (Is new record([Orders]))
+	WinChoice ("Creating a Costsheet will automatically save this order now.";"Continue";"Don't Save")
+	If (ok=1)
+		$continue:=True
+	Else 
+	End if 
+Else 
+	$continue:=True
+End if 
+
+If ($continue)
+	<>vsFactory:=[Orders]Factory
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	
+	If ([Costing]Factory#<>vsFactory)
+		[Costing]Factory:=<>vsFactory
+		SAVE RECORD([Costing])
+	End if 
+	
+	<>vfAir:=[Orders]ShipAir
+	<>vfSea:=[Orders]ShipSea
+	<>vfLDP:=[Orders]ShipLDP
+	<>vlPrice:=[Orders]Price
+	<>vsTerms:=[Orders]Price Terms
+	<>vsDesignNumber:=[Orders]DesignNumber
+	<>vsStyleNumber:=[Orders]StyleNumber
+	<>vtCustomerStyle:=[Orders]CustomerStyle
+	<>vlQuantity:=[Orders]TotalOrderQuantity
+	<>vsCustomer:=[Orders]Customer
+	
+	
+	REDUCE SELECTION([ComponentSheets];0)
+	
+	SG_PO 
+	CS_GetSheet 
+	If (Records in selection([ComponentSheets])>0)
+		<>vlCSId:=[ComponentSheets]CS_ID
+	Else 
+		<>vlCSId:=0
+	End if 
+	UNLOAD RECORD([ComponentSheets])
+	  // If (Table name(Current form table)="Orders")
+	
+	Cost_EntryScreen 
+End if 

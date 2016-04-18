@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in selection([SLRReporter])>0)
+	vlRange:=3
+	OBJECT SET VISIBLE(*;"Rebuild";True)
+End if 

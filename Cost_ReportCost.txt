@@ -1,0 +1,148 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+C_LONGINT($quantityTot)
+C_LONGINT($netSales;$netprofit;$netnetSales;$netnetprofit)
+C_LONGINT($netSalesTot;$netprofitTot;$netnetSalesTot;$netnetprofitTot)
+C_REAL($netorderprice)
+C_BOOLEAN($makeline)
+
+$n:=1
+FIRST RECORD([Orders])
+CREATE EMPTY SET([CostSheets];"Costs")
+
+For ($n;1;Records in selection([Orders]))
+	If (Shift down)
+		CANCEL
+	Else 
+		$netorderprice:=Round([Orders]Price*((100-[Orders]NetDiscount)/100);2)
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		If (Records in selection([Costing])>0)
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			CREATE SET([CostSheets];"Sheet")
+			QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual A")
+			If (Records in selection([CostSheets])=0)
+				USE SET("Sheet")
+				QUERY SELECTION([CostSheets];[CostSheets]SheetName="Confirm@")
+				If (Records in selection([CostSheets])=0)
+					USE SET("Sheet")
+				End if 
+			End if 
+			
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			$quantityTot:=$quantityTot+[Orders]TotalOrderQuantity
+			Cost_CalcNetNetUnit 
+			If (Records in selection([CostSheets])>0)
+				If ([CostSheets]Price#[Orders]Price) | ([CostSheets]Figurer#[Orders]NetDiscount)
+					[CostSheets]Price:=[Orders]Price
+					[CostSheets]Figurer:=[Orders]NetDiscount
+					[CostSheets]NetUnitPrice:=Round([CostSheets]Price*((100-[CostSheets]Figurer)/100);2)
+					SAVE RECORD([CostSheets])
+				End if 
+				$netSales:=[CostSheets]NetUnitPrice*[Orders]TotalOrderQuantity
+				$netnetSales:=[CostSheets]NetNetUnitPrice*[Orders]TotalOrderQuantity
+			Else 
+				$netSales:=Round([Orders]Price*((100-[Orders]NetDiscount)/100);2)*[Orders]TotalOrderQuantity
+				$netnetSales:=$netSales
+			End if 
+			  //If ([Orders]OrderDivision="5@") & ($netnetSales>$netSales)
+			  //End if 
+			$netSalesTot:=$netSalesTot+$netSales
+			$netnetSalesTot:=$netnetSalesTot+$netnetSales
+			
+			
+			Case of 
+				: ([CostSheets]ShipAir) & (User in group(Current user;"SuperCostsheets") & (<>vfSupersheet))
+					$netProfit:=$netSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostAirWC)
+					$netProfitTot:=$netProfitTot+$netProfit
+					$netnetProfit:=$netnetSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostAirWC)
+					$netnetProfitTot:=$netnetProfitTot+$netnetProfit
+				: (User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet)
+					$netProfit:=$netSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostSeaWC)
+					$netProfitTot:=$netProfitTot+$netProfit
+					$netnetProfit:=$netnetSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostSeaWC)
+					$netnetProfitTot:=$netnetProfitTot+$netnetProfit
+				: ([CostSheets]ShipAir)
+					$netProfit:=$netSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostAir)
+					$netProfitTot:=$netProfitTot+$netProfit
+					$netnetProfit:=$netnetSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostAir)
+					$netnetProfitTot:=$netnetProfitTot+$netnetProfit
+				Else 
+					$netProfit:=$netSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostSea)
+					$netProfitTot:=$netProfitTot+$netProfit
+					$netnetProfit:=$netnetSales-([Orders]TotalOrderQuantity*[CostSheets]UnitCostSea)
+					$netnetProfitTot:=$netnetProfitTot+$netnetProfit
+			End case 
+		Else 
+			  //$quantityTot:=$quantityTot+[Orders]TotalOrderQuantity
+			  //$netSales:=[Orders]Price*[Orders]TotalOrderQuantity
+			  //$netSalesTot:=$netSalesTot+$netSales
+			  //$netnetSalesTot:=$netnetSalesTot+$netSales
+			If (vtFootNote#"")
+				vtFootnote:=vtFootnote+", "
+			End if 
+			INSERT IN ARRAY(alMakesheet;1;1)
+			alMakeSheet{1}:=$netSales
+		End if 
+	End if 
+	  //If ($1=6)
+	  //SEND PACKET(vhDocRef;String([Orders]OrderNum)+Char(9)+String([Orders]TotalOrderQuantity)+Char(9)+String($netsalestot)+Char(13))
+	  //End if 
+	NEXT RECORD([Orders])
+	
+End for 
+If (vtFootNote#"")
+	vtFootnote:="No costsheets for: "+vtFootNote+" for a total of "+String($netSales;"$###,###")
+End if 
+
+If ($2#3)  //old system
+	Case of 
+		: ($2=2)
+			If (asBDDivisions{$1}="Total")
+				alBDQuantity{$1}:=vlReportQuantBD
+				arBDNetSales{$1}:=vrRptNetSalesBD
+				arBDNetProfit{$1}:=vrRptNetProfitBD
+				arBDNetNetSales{$1}:=vrRptNetNetSalesBD
+				arBDNetNetProfit{$1}:=vrRptNetNetProfitBD
+			Else 
+				vlReportQuantBD:=vlReportQuantBD+$quantityTot
+				vrRptNetSalesBD:=vrRptNetSalesBD+$netSalesTot
+				vrRptNetProfitBD:=vrRptNetProfitBD+$netProfitTot
+				vrRptNetNetSalesBD:=vrRptNetNetSalesBD+$netnetSalesTot
+				vrRptNetNetProfitBD:=vrRptNetNetProfitBD+$netNetProfitTot
+			End if 
+		: ($2=1)
+			If (asDivisions{$1}="Total")
+				alQuantity{$1}:=vlReportQuant
+				arNetSales{$1}:=vrRptNetSales
+				arNetProfit{$1}:=vrRptNetProfit
+				arNetNetSales{$1}:=vrRptNetNetSales
+				arNetNetProfit{$1}:=vrRptNetNetProfit
+			Else 
+				vlReportQuant:=vlReportQuant+$quantityTot
+				vrRptNetSales:=vrRptNetSales+$netSalesTot
+				vrRptNetProfit:=vrRptNetProfit+$netProfitTot
+				vrRptNetNetSales:=vrRptNetNetSales+$netnetSalesTot
+				vrRptNetNetProfit:=vrRptNetNetProfit+$netNetProfitTot
+			End if 
+	End case 
+	vrRptSpecDiscBD:=vrRptNetSalesBD-vrRptNetNetSalesBD
+End if 
+
+Case of 
+	: ($2=2) | ($2=3)
+		If (asBDDivisions{$1}#"Total")
+			$makeline:=True
+		Else 
+			$makeline:=False
+		End if 
+	: ($2=1)
+		If (asDivisions{$1}#"Total")
+			$makeline:=True
+		Else 
+			$makeline:=False
+		End if 
+End case 
+
+If ($makeline)
+	Report_ArrayAdd ($1;$2;$quantityTot;$netsalesTot;$netProfitTot;$netnetSalesTot;$netnetProfitTot)
+End if 

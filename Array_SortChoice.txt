@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asField;0)
+APPEND TO ARRAY(asField;"Start Cancel Date")
+APPEND TO ARRAY(asField;"Order Number")
+APPEND TO ARRAY(asField;"Design Number")
+APPEND TO ARRAY(asField;"Style Number")
+APPEND TO ARRAY(asField;"Factory")
+APPEND TO ARRAY(asField;"Customer")
+APPEND TO ARRAY(asField;"Customer PO")
+APPEND TO ARRAY(asField;"Division")
+APPEND TO ARRAY(asField;"X Factory Date")
+APPEND TO ARRAY(asField;"Schedule Date")

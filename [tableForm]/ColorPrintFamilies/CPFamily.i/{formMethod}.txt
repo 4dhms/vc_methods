@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	FORM GOTO PAGE(vlRouter)
+	If ([ColorPrintFamilies]CPFamilyKey=0)
+		[ColorPrintFamilies]CPFamilyKey:=Sequence number([ColorPrintFamilies])
+		[ColorPrintFamilies]CPType:=vlRouter
+	End if 
+End if 

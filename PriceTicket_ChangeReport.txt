@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docRef)
+C_TEXT($path)
+C_LONGINT($i)
+C_TEXT($datestamp)
+ARRAY TEXT(asSubCC;0)
+
+QUERY([Digest];[Digest]Processed=False)
+QUERY SELECTION([Digest];[Digest]Changer="customer change";*)
+QUERY SELECTION([Digest]; | ;[Digest]Changer="factory change")
+
+If (Records in selection([Digest])>0)
+	  //If (Application type=5) | (Current user="Spooler")
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":FtyCustChg_"+$datestamp+".xls"
+	$docRef:=Create document($path;"xls")
+	  //Else 
+	  //If (◊vlPlatform<3)
+	  //WinPrompt ("Hint: include the extenion .xls to the file name.")
+	  //End if 
+	  //$docRef:=Create document("";"xls")
+	  //End if 
+	
+	SEND PACKET($docRef;"PO"+Char(9))
+	SEND PACKET($docRef;"Style"+Char(9))
+	SEND PACKET($docRef;"Customer"+Char(9))
+	SEND PACKET($docRef;"Change"+Char(9))
+	SEND PACKET($docRef;"Date"+Char(13))
+	
+	$i:=1
+	ORDER BY([Digest];[Digest]ChangeDate;>;[Digest]OrderNumber;>)
+	FIRST RECORD([Digest])
+	For ($i;1;Records in selection([Digest]))
+		SEND PACKET($docRef;String([Digest]OrderNumber)+Char(9))
+		SEND PACKET($docRef;[Digest]StyleNumber+Char(9))
+		SEND PACKET($docRef;[Digest]Factory+Char(9))
+		SEND PACKET($docRef;[Digest]ChangeMessage+Char(9))
+		SEND PACKET($docRef;String([Digest]ChangeDate)+Char(13))
+		
+		[Digest]ChangeDate:=!00-00-00!
+		[Digest]ChangeMessage:=""
+		[Digest]Changer:=""
+		[Digest]DesignNumber:=""
+		[Digest]Factory:=""
+		[Digest]OrderNumber:=0
+		[Digest]Processed:=True
+		SAVE RECORD([Digest])
+		NEXT RECORD([Digest])
+	End for 
+	CLOSE DOCUMENT($docRef)
+	
+	UNLOAD RECORD([Digest])
+	
+	If (Application type=5) | (Current user="Spooler") | (Shift down)
+		ARRAY TEXT(asSubCC;5)
+		asSubCC{1}:="tcli@nubby.com"
+		asSubCC{2}:="claudia@nubby.com"
+		asSubCC{3}:="davids@nubby.com"
+		asSubCC{4}:="arsenio@nubby.com"
+		asSubCC{5}:="phil@persinger.com"
+		
+		Mail_SimpleSend ("List";$path;"Factory/Customer Change Report ("+String(Current date(*))+")";"Attached is the report of orders with price tickets that have changed factories and/or customers.")
+	End if 
+	
+End if 
+
+

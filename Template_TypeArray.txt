@@ -1,0 +1,14 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE SET([SpecLibrary];"Spex")
+
+ARRAY TEXT(asSpareParts;0)
+ARRAY LONGINT(alSpareKeys;0)
+ALL RECORDS([ChineseDictionary])
+
+ORDER BY([ChineseDictionary];[ChineseDictionary]EnglishName;>)
+
+
+SELECTION TO ARRAY([ChineseDictionary]EnglishName;asSpareParts;[ChineseDictionary]LexKey;alSpareKeys)
+
+USE SET("Spex")
+CLEAR SET("Spex")

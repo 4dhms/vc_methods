@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"ReportPriceTicket")
+Center Window (192;260;4;"";"WincBox")
+
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>vlPriceTicket:=0

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vsStyleNumber#"")
+	WinChoice ("Are you sure you want to delete "+vsStyleNumber+"?")
+	If (ok=1)
+		QUERY([UPCCodes];[UPCCodes]StyleNumber=vsStyleNumber)
+		WinChoice ("Delete "+String(Records in selection([UPCCodes]))+"?";"No";"Yes")
+		If (ok=0)
+			DELETE SELECTION([UPCCodes])
+		End if 
+	End if 
+End if 
+

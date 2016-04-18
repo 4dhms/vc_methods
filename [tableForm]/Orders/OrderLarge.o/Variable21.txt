@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_DATE($start;$end)
+C_LONGINT($i)
+C_TEXT($path)
+
+$start:=Date(Request("Enter start date:"))
+If (ok=1)
+	$end:=Date(Request("Enter end date:"))
+	If (ok=1)
+		CONFIRM("Report from "+String($start)+" to "+String($end)+"?")
+		If (ok=1)
+			QUERY([Orders];[Orders]OrderEntryDate>=$start;*)
+			QUERY([Orders]; & ;[Orders]OrderEntryDate<=$end)
+			CONFIRM("Do you want to strip out canceled orders?")
+			If (ok=1)
+				QUERY SELECTION([Orders];[Orders]Cancelled=False)
+			End if 
+			ORDER BY([Orders];[Orders]OrderNum;>)
+			  //ALERT(String(Records in selection([Orders])))
+			
+			$docref:=Create document("";"xls")
+			$path:=Document
+			
+			If (ok=1)
+				SEND PACKET($docref;"PO#"+Char(9)+"Style#"+Char(9)+"Design#"+Char(9)+"Customer"+Char(9)+"Factory"+Char(9)+"Qty"+Char(9))
+				SEND PACKET($docref;"PO Date"+Char(9)+"X Factory"+Char(9)+"Actual Ship"+Char(9)+"NY Cancel"+Char(9)+"Division"+Char(9))
+				SEND PACKET($docref;"Enterer"+Char(9)+"Salesperson"+Char(9)+"Coordinator"+Char(13))
+				
+				$i:=1
+				FIRST RECORD([Orders])
+				For ($i;1;Records in selection([Orders]))
+					SEND PACKET($docref;String([Orders]OrderNum)+Char(9)+[Orders]StyleNumber+Char(9)+[Orders]DesignNumber+Char(9)+[Orders]Customer+Char(9))
+					SEND PACKET($docref;[Orders]Factory+Char(9)+String([Orders]TotalOrderQuantity)+Char(9))
+					SEND PACKET($docref;String([Orders]PODate)+Char(9)+String([Orders]ShipDateFactory)+Char(9)+String([Orders]ActualDeliveryDate)+Char(9)+String([Orders]CancelDate)+Char(9)+[Orders]OrderDivision+Char(9))
+					SEND PACKET($docref;[Orders]Order_Enterer+Char(9)+[Orders]Salesperson+Char(9)+[Orders]Coordinator+Char(13))
+					NEXT RECORD([Orders])
+				End for 
+				CLOSE DOCUMENT($docref)
+				SHOW ON DISK($path)
+			End if 
+		End if 
+	End if 
+End if 
+

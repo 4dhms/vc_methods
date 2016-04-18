@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (User in group(Current user;"SuperCostSheets")) & (Current user#"Robert")
+	
+	
+	<>vfSupersheet:=True
+	OBJECT SET VISIBLE(*;"xStop";True)
+	vsCurrentTab:=""
+	
+	Tabber_Setup 
+End if 

@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //C_LONGINT($alertWindow)
+  //◊tAlert:=$1
+  //
+  //C_LONGINT($left;◊vlTop;◊vlRight;$bottom)
+  //GET WINDOW RECT($left;◊vlTop;◊vlRight;$bottom)
+  //
+  //$alertWindow:=New process("WinAlertSmallProc";0;"Alert")
+
+WinPrompt ($1)

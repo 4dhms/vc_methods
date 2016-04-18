@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_POINTER($sizeField)
+C_POINTER($head)
+
+ARRAY TEXT(asColHeader;0)
+
+QUERY([BreakDownLibrary];[BreakDownLibrary]BDKey=[Orders]BDHeaderKey)
+$i:=1
+$n:=3
+
+For ($i;1;10)
+	$sizeField:=Field(62;$n)
+	If ($sizeField->#"")
+		APPEND TO ARRAY(asColHeader;Uppercase($sizeField->))
+	End if 
+	$n:=$n+1
+End for 
+
+$i:=1
+For ($i;1;10)
+	$head:=Get pointer("vsSize"+String($i))
+	If ($i>Size of array(asColHeader))
+		$head->:=""
+	Else 
+		$head->:=asColHeader{$i}
+	End if 
+End for 
+

@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+C_TEXT($pre)
+
+If (Locked([NumberGenerator]))
+	WinPrompt ("Someone is creating a new number, waiti a moment and try again.")
+Else 
+	C_TEXT($serialNumber)
+	
+	Case of 
+		: (asDivisions<2)
+			WinPrompt ("Missing division")
+		: (<>asCategory<2) & (Size of array(<>asCategory)>1)
+			WinPrompt ("Missing category")
+		: (vlDesignNumberCount>1)
+			
+		Else 
+			$c:=Position("-";asDivisions{asDivisions})-1
+			$pre:=Substring(asDivisions{asDivisions};1;$c)
+			
+			Case of 
+				: ($pre="10")
+					$pre:="00"
+				: ($pre[[1]]="0")
+					$pre:=$pre[[2]]
+				: ($pre="11")
+					$pre:="E"
+			End case 
+			
+			$serialNumber:=PO_GetNumber ("Design"+$pre)
+			$serialNumber:=Substring(String(Num($serialNumber)+100000);2;5)
+			Case of 
+				: ($pre="12")
+					vsDesignNumber:="12-"+$serialNumber
+				: ($pre="00")
+					vsDesignNumber:="0"+Substring(<>asCategory{<>asCategory};1;1)+$serialNumber
+				Else 
+					vsDesignNumber:=$pre+Substring(<>asCategory{<>asCategory};1;1)+$serialNumber
+			End case 
+			
+			FORM GOTO PAGE(2)
+	End case 
+End if 

@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ALL RECORDS([PCatalog])
+ORDER BY([PCatalog];[PCatalog]CreationDate;<)
+FORM SET INPUT([PCatalog];"Catalog.i")
+FORM SET OUTPUT([PCatalog];"Catalog.o")
+
+FIRST RECORD([PCatalog])
+$i:=1
+For ($i;1;Records in selection([PCatalog]))
+	Case of 
+		: ([PCatalog]SeasonName="Spring")
+			[PCatalog]SortOrder:=2
+		: ([PCatalog]SeasonName="Spring@")
+			[PCatalog]SortOrder:=3
+		: ([PCatalog]SeasonName="Summer")
+			[PCatalog]SortOrder:=4
+		: ([PCatalog]SeasonName="Transition")
+			[PCatalog]SortOrder:=5
+		: ([PCatalog]SeasonName="Fall")
+			[PCatalog]SortOrder:=6
+		: ([PCatalog]SeasonName="Holiday")
+			[PCatalog]SortOrder:=7
+		: ([PCatalog]SeasonName="Resort")
+			[PCatalog]SortOrder:=1
+		Else 
+			[PCatalog]SortOrder:=8
+	End case 
+	SAVE RECORD([PCatalog])
+	NEXT RECORD([PCatalog])
+End for 
+ORDER BY([PCatalog];[PCatalog]SeasonYear;<;[PCatalog]SortOrder;<)
+Center Window (850;650;8;"";"WincBox")
+MODIFY SELECTION([PCatalog];*)
+CLOSE WINDOW
+
+<>vlPrintCat:=0

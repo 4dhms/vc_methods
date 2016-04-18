@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vtDCpo="")
+		WinPrompt ("Enter PO Number")
+	: (vlDCcount=0)
+		WinPrompt ("How many sets?")
+	: (vlCtnCount=0)
+		WinPrompt ("How many cartons?")
+	Else 
+		ACCEPT
+End case 

@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlEZTrack)
+
+Case of 
+	: (<>vlEZTrack>0)
+		SHOW PROCESS(<>vlEZTrack)
+		BRING TO FRONT(<>vlEZTrack)
+	: (<>vlEZTrack=0)
+		<>vlEZTrack:=New process("Sample_EZTrack";0;"EZTrack")
+	Else 
+		SHOW PROCESS(<>vlEZTrack)
+		BRING TO FRONT(<>vlEZTrack)
+End case 

@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($factory)
+
+SAVE RECORD([Vendors])
+If (vlCPRouter>0)
+	$factory:=[Vendors]VendorName
+	ARRAY TEXT(<>asFactories;0)
+	ALL RECORDS([Vendors])
+	DISTINCT VALUES([Vendors]VendorName;<>asFactories)
+	SORT ARRAY(<>asFactories;>)
+	<>asFactories:=Find in array(<>asFactories;$factory)
+End if 
+ACCEPT

@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($color;$background;$fontstyle;$substyle)
+
+If (Form event=On Printing Detail)
+	Case of 
+		: ([SLRReporter]Header=2)
+			OBJECT SET COLOR(*;"xBG";-(15+(256*15)))
+			$color:=0
+			$background:=15
+			$fontstyle:=1
+		: ([SLRReporter]Header=1)
+			OBJECT SET COLOR(*;"xBG";-(12+(256*12)))
+			$color:=15
+			$background:=12
+			$fontstyle:=1
+		: ([SLRReporter]Header=-2)
+			OBJECT SET COLOR(*;"xBG";-(Grey+(256*Grey)))
+			$color:=15
+			$background:=Grey
+			$fontstyle:=1
+		Else 
+			OBJECT SET COLOR(*;"xBG";-(0+(256*0)))
+			$color:=15
+			$background:=0
+			$fontstyle:=1
+	End case 
+	
+	Case of 
+		: (vfDigest) & (zNo=1)
+			vsSubhead:=""
+		: ([SLRReporter]Header=-1)
+			If (zYes=1)
+				$substyle:=5
+			End if 
+			vsSubHead:="Subtotal"
+		: ([SLRReporter]Header=-2)
+			$substyle:=5
+			vsSubHead:=""
+		Else 
+			$substyle:=0
+			vsSubHead:=""
+	End case 
+	
+	OBJECT SET VISIBLE(*;"xBG";([SLRReporter]Header>0) | ([SLRReporter]Header=-2))
+	OBJECT SET VISIBLE(*;"xBG1";[SLRReporter]Header=-1)
+	
+	OBJECT SET COLOR(vsStyleNumber;-($color+(256*$background)))
+	OBJECT SET COLOR([SLRReporter]WkNumber1;-($color+(256*$background)))
+	OBJECT SET COLOR([SLRReporter]WkNumber2;-($color+(256*$background)))
+	OBJECT SET COLOR([SLRReporter]WkNumber3;-($color+(256*$background)))
+	OBJECT SET COLOR([SLRReporter]WkNumber4;-($color+(256*$background)))
+	OBJECT SET COLOR([SLRReporter]WkNumber5;-($color+(256*$background)))
+	OBJECT SET COLOR([SLRReporter]WkNumber6;-($color+(256*$background)))
+	
+	OBJECT SET FONT STYLE([SLRReporter]WkNumber1;$fontstyle)
+	OBJECT SET FONT STYLE([SLRReporter]WkNumber2;$fontstyle)
+	OBJECT SET FONT STYLE([SLRReporter]WkNumber3;$fontstyle)
+	OBJECT SET FONT STYLE([SLRReporter]WkNumber4;$fontstyle)
+	OBJECT SET FONT STYLE([SLRReporter]WkNumber5;$fontstyle)
+	OBJECT SET FONT STYLE([SLRReporter]WkNumber6;$fontstyle)
+End if 

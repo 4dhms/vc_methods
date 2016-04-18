@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtTextField1:=""
+vtTextField2:=""
+vtTextField3:=""
+vtTextField4:=""
+vtTextField5:=""
+vtTextField6:=""
+vtTextField7:=""
+vtTextField8:=""
+vtTextField9:=""
+vtTextField10:=""

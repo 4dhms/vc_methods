@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]NeedBy#!00-00-00!)
+CONFIRM("Zero out "+String(Records in selection([Orders]))+"?")
+If (ok=1)
+	APPLY TO SELECTION([Orders];[Orders]NeedBy:=!00-00-00!)
+End if 
+ALERT("Done")

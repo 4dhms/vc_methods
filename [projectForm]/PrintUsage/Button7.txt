@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //If (nav2=1)
+  //PrintUsage_Comprehensive 
+  //Else 
+PrintUsage_Build 
+  //End if 
+
+
+
+
+

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Mouse Leave)
+	Case of 
+		: (vtSubject="Status Report Notes")
+			[Orders]ProdComments:=<>vtNotes
+	End case 
+	SAVE RECORD([Orders])
+	
+	ACCEPT
+End if 

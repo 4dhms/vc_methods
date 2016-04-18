@@ -1,0 +1,190 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsVia)
+C_TEXT($message;$othership)
+C_LONGINT($i;$router)
+C_DATE($shipdatefactory)
+C_TEXT($invoice)
+
+If (Sheet_Update )
+	$shipdatefactory:=[CostSheets]ShippedDate
+	If (Records in selection([Orders])>100)
+		WinPrompt ("You can not batch process more than 100 orders at the same time.")
+	Else 
+		Case of 
+			: ([CostSheets]ShipSea)
+				vsVia:="Sea to "
+			: ([CostSheets]ShipAir)
+				vsVia:="Air to "
+			: ([CostSheets]ShipLDP)
+				vsVia:="LDP at "
+			: ([CostSheets]ShipFOB)
+				vsVia:="FOB to "
+		End case 
+		vsInvoice:=[CostSheets]PayInvoice
+		vsVia:=vsVia+[CostSheets]OtherShip
+		$othership:=[CostSheets]OtherShip
+		$invoice:=[CostSheets]PayInvoice
+		vdDeliver:=[CostSheets]ShippedDate
+		$othership:=Replace string(vsVia;"Sea to ";"")
+		$othership:=Replace string($othership;"Air to ";"")
+		$othership:=Replace string($othership;"LDP at ";"")
+		$othership:=Replace string($othership;"FOB to ";"")
+		
+		
+		WinChoice ("What do you want to update:";"Ship Info";"Ship Date";"Invoice";"All")
+		Case of 
+			: (ok=1) & (bChoice3=1)
+				$router:=3
+				$message:="Are you sure you want to batch process the INVOICE on these "+String(Records in selection([Orders]))+" orders?"+Char(13)
+			: (ok=1) & (bChoice2=1)
+				$router:=2
+				$message:="Are you sure you want to batch process the SHIPPING DATE on these "+String(Records in selection([Orders]))+" orders?"+Char(13)
+			: (ok=1)
+				$router:=1
+				$message:="Are you sure you want to batch process the SHIPPING INFO on these "+String(Records in selection([Orders]))+" orders?"+Char(13)
+			Else 
+				$router:=4
+				$message:="Are you sure you want to batch process the SHIPPING INFO, SHIPPING DATE "+"and INVOICE on these "+String(Records in selection([Orders]))+" orders?"+Char(13)
+		End case 
+		
+		
+		If ($router=1) | ($router=4)
+			$message:=$message+vsVia+Char(13)
+		End if 
+		If ($router=2) | ($router=4)
+			$message:=$message+"Ship: "+String(vdDeliver)+Char(13)
+			If ([CostSheets]PayInvoice#"")
+				$message:=$message+"Invoice: "+vsInvoice
+			End if 
+		End if 
+		WinChoice ($message)
+		
+		If (ok=1)
+			SAVE RECORD([Orders])
+			ACCEPT
+			
+			FIRST RECORD([Orders])
+			
+			$i:=1
+			For ($i;1;Records in selection([Orders]))
+				QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+				QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+				ORDER BY([CostSheets];[CostSheets]SheetID;<)
+				
+				
+				If ($router=2) | ($router=4)
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Ship date"
+					[Changes]Tag:="Batch Ship change"
+					[Changes]OldData:=String([CostSheets]ShippedDate)
+					[Changes]NewChange:=String(vdDeliver)
+					SAVE RECORD([Changes])
+					
+					[CostSheets]ShippedDate:=vdDeliver
+					SAVE RECORD([CostSheets])
+				End if 
+				
+				If ($router=1) | ($router=4)
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Ship via"
+					[Changes]Tag:="Batch Via change"
+					[Changes]OldData:=[Orders]ShipInfo
+					[Changes]NewChange:=vsVia
+					SAVE RECORD([Changes])
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Ship date"
+					[Changes]Tag:="Batch Ship change"
+					[Changes]OldData:=String([Orders]ShipDateFactory)
+					[Changes]NewChange:=String($shipdatefactory)
+					SAVE RECORD([Changes])
+					
+					Case of 
+						: (vsVia="Sea@")
+							[CostSheets]ShipAir:=False
+							[CostSheets]ShipLDP:=False
+							[CostSheets]ShipSea:=True
+							[CostSheets]ShipFOB:=False
+						: (vsVia="Air@")
+							[CostSheets]ShipAir:=True
+							[CostSheets]ShipLDP:=False
+							[CostSheets]ShipSea:=False
+							[CostSheets]ShipFOB:=False
+						: (vsVia="LDP@")
+							[CostSheets]ShipAir:=False
+							[CostSheets]ShipLDP:=True
+							[CostSheets]ShipSea:=False
+							[CostSheets]ShipFOB:=False
+						: (vsVia="FOB@")
+							[CostSheets]ShipAir:=False
+							[CostSheets]ShipLDP:=False
+							[CostSheets]ShipSea:=False
+							[CostSheets]ShipFOB:=True
+					End case 
+					[CostSheets]OtherShip:=$othership
+					SAVE RECORD([CostSheets])
+				End if 
+				
+				
+				If ($router=3) | ($router=4)
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Invoice"
+					[Changes]Tag:="Batch Invoice change"
+					[Changes]OldData:=[CostSheets]PayInvoice
+					[Changes]NewChange:=vsInvoice
+					SAVE RECORD([Changes])
+					
+					[CostSheets]PayInvoice:=vsInvoice
+					[CostSheets]ShippedDate:=vdDeliver
+					SAVE RECORD([CostSheets])
+				End if 
+				
+				If ($router=2) | ($router=4)
+					[CostSheets]ShippedDate:=vdDeliver
+					SAVE RECORD([CostSheets])
+				End if 
+				
+				
+				NEXT RECORD([Orders])
+			End for 
+			
+			<>vlCostRouter:=10
+			CALL PROCESS(<>SalesPrcID)
+		End if 
+	End if 
+End if 

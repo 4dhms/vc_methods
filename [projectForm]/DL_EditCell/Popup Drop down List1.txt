@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsEntryNumber:=atQueryText{atQueryText}
+vsEntryNumber:=Substring(vsEntryNumber;Position("/";vsEntryNumber)+1;10)
+
+Case of 
+	: (asSampleTypes=5)
+		asSampleTypes:=3
+	: (asSampleTypes=6)
+		asSampleTypes:=4
+End case 
+DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)

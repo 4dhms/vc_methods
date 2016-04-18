@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Display Detail) | (Form event=On Load)
+		If ([SpecGradeCats]ACol11="0")
+			[SpecGradeCats]ACol11:=""
+		End if 
+		If ([SpecGradeCats]ACol12="0")
+			[SpecGradeCats]ACol12:=""
+		End if 
+End case 
+

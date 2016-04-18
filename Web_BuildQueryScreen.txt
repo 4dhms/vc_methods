@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtTable)
+C_TEXT($blankDate)
+
+vsColHead1:="Field"
+vsColHead2:="Comparison"
+vsColHead3:="Value"
+vsFactory:=Current user
+
+$blankDate:="00/00/"+String(Year of(Current date(*)))
+Web_PullDownArrays ($1)
+
+vsValue1:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal1 VALUE="+Char(34)+Char(34)+" SIZE=40>"
+vsValue2:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal2 VALUE="+Char(34)+Char(34)+" SIZE=40>"
+vsValue3:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal3 VALUE="+Char(34)+Char(34)+" SIZE=40>"
+vsValue4:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal4 VALUE="+Char(34)+Char(34)+" SIZE=40>"
+  //vsValue5:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal5 VALUE="+Char(34)+Char(34)+" SIZE=20>"
+vsValue6:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal6 VALUE="+Char(34)+Char(34)+" SIZE=40>"
+vsValue7:=Char(1)+"<INPUT TYPE=text NAME=w_ProdVal7 VALUE="+Char(34)+Char(34)+" SIZE=40>"
+  //End if 
+  //ALERT(vsValue1)
+Web_UserField 
+vtFactoryField:=Char(1)+"<input name=vtFactoryField type=hidden value="+vsFactory+">"
+
+If (Position("order";$1)>0)
+	WEB SEND FILE("prodStatFind.html")
+Else 
+	WEB SEND FILE("sampleStatFind.html")
+End if 

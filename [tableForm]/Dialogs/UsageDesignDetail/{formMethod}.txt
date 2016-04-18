@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		If (cb11=1)
+			vtTitle:="Design Usage ("+asChartDivisions{asChartDivisions}+"  "+asDivisions{asDivisions}+", "+asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+")  "+String(Records in selection([Designs]))+" designs"
+		Else 
+			vtTitle:="Design Usage ("+asDivisions{asDivisions}+", "+asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+")  "+String(Records in selection([Designs]))+" designs"
+		End if 
+End case 

@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_POINTER($dc)
+C_POINTER($button)
+ARRAY TEXT(asDCPO;0)
+ARRAY TEXT(asDCPO;10)
+ARRAY TEXT(asDCdept;0)
+ARRAY TEXT(asDCdept;10)
+vlDCShow:=0
+vtDCNote:=""
+vtDCpo:=""
+vlCtnCount:=0
+
+vfContinue:=True
+Order_SaveBDPrep 
+  //isolate multiple lines
+$i:=1
+$c:=1
+vtDCdept:=""
+
+For ($i;1;Size of array(asBDSelf))
+	If (Find in array(alBDColor;14149350)>0)
+		Case of 
+			: (alBDColor{$c}=16777215)
+				Order_BDDelete ($c)
+			: (asBDSelf{$c}="Grand@")
+				Order_BDDelete ($c)
+			Else 
+				$c:=$c+1
+		End case 
+	Else 
+		Case of 
+			: (alBDColor{$c}=14149350)
+				Order_BDDelete ($c)
+			: (asBDSelf{$c}="Grand@")
+				Order_BDDelete ($c)
+			Else 
+				$c:=$c+1
+		End case 
+	End if 
+End for 
+
+ALL RECORDS([DC_Locations])
+ORDER BY([DC_Locations];[DC_Locations]DCPOprefix;>)
+
+
+ARRAY LONGINT(alDCkeys;0)
+FIRST RECORD([DC_Locations])
+$i:=1
+For ($i;1;Records in selection([DC_Locations]))
+	APPEND TO ARRAY(alDCkeys;[DC_Locations]DCKey)
+	$dc:=Get pointer("vtField"+String($i))
+	$dc->:=Replace string([DC_Locations]DCName+Char(13)+[DC_Locations]DCNumber;"Distribution Center";"DC")
+	NEXT RECORD([DC_Locations])
+End for 
+
+$i:=1
+For ($i;1;10)
+	QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([DC_Spreads];[DC_Spreads]DCKey=alDCkeys{$i})
+	If (Records in selection([DC_Spreads])>0)
+		QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=[DC_Spreads]DCSheetKey)
+		$button:=Get pointer("b"+String($i))
+		OBJECT SET VISIBLE($button->;True)
+		$button:=Get pointer("b"+String($i+20))
+		OBJECT SET VISIBLE($button->;True)
+		OBJECT SET VISIBLE(*;"m"+String($i);True)
+		OBJECT SET VISIBLE(*;"bl"+String($i);True)
+		OBJECT SET VISIBLE(*;"xm"+String($i);True)
+		OBJECT SET VISIBLE(*;"v"+String($i);True)
+		asDCpo{$i}:=[DC_Spreads]CustPO
+	End if 
+End for 
+
+DC_BuildListBox 
+DC_Ctn_Arrays 
+Ctn_Total 
+If (Size of array(asCtnColor)>0) | (Size of array(asDClineColor)>0)
+	BD_UpdateColorChange 
+End if 
+FORM GOTO PAGE(4)

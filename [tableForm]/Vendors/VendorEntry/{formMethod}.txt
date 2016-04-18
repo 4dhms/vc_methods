@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (Form event=On Load)
+	  //OBJECT SET VISIBLE(bRemove;<>vlHMSarProc>0)
+	vfRemove:=False
+	
+	If ([Vendors]VendorKey<1)
+		[Vendors]VendorKey:=Sequence number([Vendors])
+	End if 
+	
+	FIRST RECORD([VendorEmail])
+	$i:=1
+	For ($i;1;Records in selection([VendorEmail]))
+		Case of 
+			: (Position("..";[VendorEmail]EmailAddress)>0)
+				[VendorEmail]EmailAddress:=Replace string([VendorEmail]EmailAddress;"..";".")
+		End case 
+		NEXT RECORD([VendorEmail])
+	End for 
+End if 

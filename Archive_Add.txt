@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([CostSheets];[CostSheets]PayInvoice=vsPart1)
+
+FIRST RECORD([CostSheets])
+
+$i:=1
+For ($i;1;Records in selection([CostSheets]))
+	RELATE ONE([CostSheets]SheetNumber;[Costing]SheetNumber)
+	
+	CREATE RECORD([ShipInvoices])
+	[ShipInvoices]ArchiveKey:=[ShipArchive]ArchiveKey
+	[ShipInvoices]InvNumber:=[CostSheets]PayInvoice
+	[ShipInvoices]PO:=[Costing]OrderNumber
+	[ShipInvoices]SheetName:=[CostSheets]SheetName
+	SAVE RECORD([ShipInvoices])
+	APPEND TO ARRAY(asList1;[CostSheets]PayInvoice)
+	APPEND TO ARRAY(alOrders;[Costing]OrderNumber)
+	APPEND TO ARRAY(asSheetNames;[CostSheets]SheetName)
+	NEXT RECORD([CostSheets])
+End for 
+
+vsPart1:=""
+GOTO OBJECT(vsPart1)

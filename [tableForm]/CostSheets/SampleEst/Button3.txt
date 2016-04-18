@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //OUTPUT FORM([CostSheets];"SampleEst.print")
+  //
+  //PAGE SETUP([CostSheets];"SampleEst.print")
+  //Print_Selection (->[CostSheets])
+  //
+  //OUTPUT FORM([CostSheets];"SampleEst")
+  //
+
+
+WinPrompt ("Print is unavailable at this time.")

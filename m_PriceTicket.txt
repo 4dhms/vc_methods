@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlPriceTicket)
+
+Case of 
+	: (<>vlPriceTicket>0)
+		SHOW PROCESS(<>vlPriceTicket)
+		BRING TO FRONT(<>vlPriceTicket)
+	: (<>vlPriceTicket=0)
+		<>vlPriceTicket:=New process("Report_PriceTicket";0;"Price Ticket")
+	Else 
+		SHOW PROCESS(<>vlPriceTicket)
+		HIDE PROCESS(<>vlPriceTicket)
+		BRING TO FRONT(<>vlPriceTicket)
+End case 

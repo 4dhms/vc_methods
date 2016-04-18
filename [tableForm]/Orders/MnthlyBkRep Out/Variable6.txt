@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_LONGINT($i;$quantity;$totalSales)
+C_REAL($average)
+$totalSales:=0
+$quantity:=0
+
+FIRST RECORD([Orders])
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	$totalSales:=$totalSales+Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+	$quantity:=$quantity+[Orders]TotalOrderQuantity
+	NEXT RECORD([Orders])
+End for 
+$average:=Round($totalSales/$quantity;2)
+
+$message:="Price average = "+String($average;"$##0.00")
+$message:=$message+Char(13)+"Quantity = "+String($quantity;"###,###,###,##0")
+$message:=$message+Char(13)+"Total Sales = "+String(Round($totalSales;0);"$##,###,###,##0")
+FIRST RECORD([Orders])
+
+WinPrompt ($message)

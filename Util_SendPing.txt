@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($start;$now)
+
+$start:=Current time(*)
+
+Repeat 
+	QUERY([Changes];[Changes]FieldName=Current user)
+	If (Records in selection([Changes])=0)
+		CREATE RECORD([Changes])
+		[Changes]FieldName:=Current user
+	End if 
+	[Changes]NewChange:=String(Current time(*)-$start)
+	SAVE RECORD([Changes])
+	UNLOAD RECORD([Changes])
+	DELAY PROCESS(Current process;3600)
+Until (Shift down)

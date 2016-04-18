@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($searchcolor)
+
+If (vfNew)
+	vfNew:=False
+	CREATE RECORD([SLRAcct])
+	[SLRAcct]SLRAcct:=vsCustomer
+	[SLRAcct]SLRAcctKey:=Sequence number([SLRAcct])
+	[SLRAcct]WeekOne:=vdWeekOne
+	[SLRAcct]SLRStyleNumber:=vsStyleNumber
+	[SLRAcct]Division:=vsDivision
+	SAVE RECORD([SLRAcct])
+	OBJECT SET ENABLED(bMore;True)
+End if 
+
+  //$color:=Substring(asColors{asColors};1;Position("/";asColors{asColors}))+"@"
+  //
+If (Size of array(asColors)=1) | ($1)
+	QUERY([SLRColor];[SLRColor]SLRAcctKey=[SLRAcct]SLRAcctKey)
+	$searchcolor:=Substring(asColors{asColors};1;39)+"@"
+	
+	QUERY SELECTION([SLRColor];[SLRColor]SLRColor=$searchcolor)
+	
+	If (Records in selection([SLRColor])=0)
+		CREATE RECORD([SLRColor])
+		[SLRColor]SLRAcctKey:=[SLRAcct]SLRAcctKey
+		[SLRColor]SLRColorKey:=Sequence number([SLRColor])
+		[SLRColor]SLRColor:=asColors{asColors}
+		[SLRColor]Reorder:=[SLRAcct]Reorder
+		SAVE RECORD([SLRColor])
+	End if 
+	  //asColors:=1
+End if 
+
+
+
+

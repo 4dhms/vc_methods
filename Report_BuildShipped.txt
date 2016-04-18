@@ -1,0 +1,148 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY REAL(arPrice;0)
+C_DATE(vdStart;vdEnd;$shipAdjustUp;$previousStart;$previousEnd)
+C_LONGINT($i)
+C_BOOLEAN(<>vfPreview)
+C_LONGINT($i)
+C_REAL($totalCost;$totalAir;$totalBoat)
+C_LONGINT($totalUnits;$unitsAir;$unitsBoat)
+
+vlTotQty:=0
+vlTotInvQty:=0
+vlTotNetSales:=0
+vlTotActual:=0
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+If (<>asStartMonth=1)
+	$previousStart:=Date("12/1/"+String(Num(<>asStartYear{<>asStartYear})-1))
+	$previousEnd:=Date("12/31/"+String(Num(<>asStartYear{<>asStartYear})-1))
+Else 
+	$previousStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+String(Num(<>asStartYear{<>asStartYear})-1))
+	$previousEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+String(Num(<>asStartYear{<>asStartYear})-1))
+End if 
+
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	: (pOne=pTwo)
+		WinPrompt ("Chose reporting method.")
+	Else 
+		QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+		QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd;*)
+		QUERY([Orders]; & ;[Orders]Cancelled=False)
+		RELATE MANY SELECTION([Costing]OrderNumber)
+		RELATE MANY SELECTION([CostSheets]SheetNumber)
+		QUERY SELECTION([CostSheets];[CostSheets]ActualUnitsShipped>0)
+		QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual@")
+		
+		CREATE SET([CostSheets];"Full")
+		Case of 
+			: (pOne=1)
+				CREATE SET([CostSheets];"Report")
+				
+				QUERY SELECTION([CostSheets];[CostSheets]FreightAIR>0;*)
+				QUERY SELECTION([CostSheets]; | ;[CostSheets]FreightBOAT>0)
+				
+				ARRAY REAL($aircost;0)
+				ARRAY REAL($boatcost;0)
+				ARRAY LONGINT($units;0)
+				SELECTION TO ARRAY([CostSheets]FreightAIR;$aircost;[CostSheets]FreightBOAT;$boatcost;[CostSheets]ActualUnitsShipped;$units)
+				$i:=1
+				$totalCost:=0
+				$totalAir:=0
+				$totalBoat:=0
+				$totalUnits:=0
+				$unitsAir:=0
+				$unitsBoat:=0
+				
+				For ($i;1;Size of array($units))
+					If ($aircost{$i}>0)
+						$totalCost:=Round($totalCost+($aircost{$i}*$units{$i});2)
+						$totalAir:=Round($totalAir+($aircost{$i}*$units{$i});2)
+						$unitsAir:=$unitsAir+$units{$i}
+					Else 
+						$totalCost:=Round($totalCost+($boatcost{$i}*$units{$i});2)
+						$totalBoat:=Round($totalBoat+($boatcost{$i}*$units{$i});2)
+						$unitsBoat:=$unitsBoat+$units{$i}
+					End if 
+					$totalUnits:=$totalUnits+$units{$i}
+				End for 
+				
+				vtFootNote:="Avg shipping per unit: $"+String(Round(($totalCost/$totalUnits);2);"0.00")
+				vtFootNote:=vtFootNote+"  Boat: $"+String(Round(($totalBoat/$unitsBoat);2);"0.00")
+				vtFootNote:=vtFootNote+"  Air: $"+String(Round(($totalAir/$unitsAir);2);"0.00")
+				vtFootNote:=vtFootnote+Char(13)+String($unitsBoat;"###,###,###")+" units by Boat, "+String($unitsAir;"###,###,###")+" units by Air"
+				
+				
+				USE SET("Report")
+			: (pTwo=1)
+				USE SET("Full")
+				$shipAdjustUp:=vdEnd-30
+				QUERY SELECTION([CostSheets];[CostSheets]ShippedDate<=$shipAdjustUp)
+				QUERY SELECTION([CostSheets];[CostSheets]OtherShip="NY")
+				QUERY SELECTION([CostSheets];[CostSheets]ShipSea=True)
+				CREATE SET([CostSheets];"NY")
+				
+				USE SET("Full")
+				$shipAdjustUp:=vdEnd-20
+				QUERY SELECTION([CostSheets];[CostSheets]ShippedDate<=$shipAdjustUp)
+				QUERY SELECTION([CostSheets];[CostSheets]OtherShip="LA")
+				QUERY SELECTION([CostSheets];[CostSheets]ShipSea=True)
+				CREATE SET([CostSheets];"LA")
+				
+				USE SET("Full")
+				$shipAdjustUp:=vdEnd-7
+				QUERY SELECTION([CostSheets];[CostSheets]ShippedDate<=$shipAdjustUp)
+				QUERY SELECTION([CostSheets];[CostSheets]ShipAir=True)
+				CREATE SET([CostSheets];"Air")
+				
+				USE SET("Full")
+				$shipAdjustUp:=vdEnd-5
+				QUERY SELECTION([CostSheets];[CostSheets]ShippedDate<=$shipAdjustUp)
+				QUERY SELECTION([CostSheets];[CostSheets]ShipSea=True)
+				QUERY SELECTION([CostSheets];[CostSheets]OtherShip#"LA";*)
+				QUERY SELECTION([CostSheets]; & ;[CostSheets]OtherShip#"NY")
+				CREATE SET([CostSheets];"Report")
+				
+				UNION("NY";"LA";"Report")
+				UNION("Air";"Report";"Report")
+				CLEAR SET("NY")
+				CLEAR SET("LA")
+				CLEAR SET("Air")
+				USE SET("Report")
+				vtFootnote:=""
+		End case 
+		CLEAR SET("Report")
+		ORDER BY([CostSheets];[Costing]NYCancelDate;>;[Costing]StyleNumber;>;[Costing]OrderNumber;>;[CostSheets]SheetName;>)
+		
+		vlProjNetSales:=0
+		vlTotQty:=0
+		vlTotNetSales:=0
+		vlTotCount:=0
+		$i:=1
+		
+		FIRST RECORD([CostSheets])
+		For ($i;1;Records in selection([CostSheets]))
+			vlTotQty:=vlTotQty+[CostSheets]ActualUnitsShipped
+			vlTotNetSales:=vlTotNetSales+([CostSheets]ActualUnitsShipped*[CostSheets]NetUnitPrice)
+			If ([CostSheets]SheetName="Actual A")
+				RELATE ONE([CostSheets]SheetNumber)
+				RELATE ONE([Costing]OrderNumber)
+				vlTotCount:=vlTotCount+[Orders]TotalOrderQuantity
+				vlProjNetSales:=vlProjNetSales+([Orders]TotalOrderQuantity*[CostSheets]NetUnitPrice)
+			End if 
+			NEXT RECORD([CostSheets])
+		End for 
+		FIRST RECORD([CostSheets])
+		
+		
+		SET WINDOW TITLE(String(Records in selection([CostSheets]))+" Shipments")
+		OBJECT SET ENABLED(bPrint;True)
+End case 
+
+

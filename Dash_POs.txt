@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+$choice:=Pop up menu("Trim Library;Button PO;Trim PO")
+
+Case of 
+	: ($choice=1)
+		m_TrimLib 
+	: ($choice=2)
+		Order_Button 
+	: ($choice=3)
+		Order_Trim 
+End case 
+

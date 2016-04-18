@@ -1,0 +1,91 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtSpecNotes)
+C_BOOLEAN(vfTrim)
+C_LONGINT(vlAddPartStatus)
+
+Case of 
+	: (Form event=On Unload)
+		OBJECT SET ENABLED(bOK;True)
+		ARRAY TEXT(asSpareParts;0)
+		
+	: (Form event=On Load)
+		If ([SpecFactory]ApprovedForProd)
+			ssApproved:=1
+		Else 
+			ssApproved:=0
+		End if 
+		OBJECT SET VISIBLE(bGet;Record number([SpecFactory])<0)
+		
+		vsArticle:=""
+		vsColHead1:=""
+		vlDupeOrderNumber:=0
+		vsSize:=""
+		If (<>vsDesignNumber="")
+			REDUCE SELECTION([Designs];0)
+		Else 
+			QUERY([Designs];[Designs]DesignNum=<>vsDesignNumber)
+		End if 
+		vxSketch:=[Designs]Sketch
+		
+		<>vlPreviewSS:=0
+		
+		Case of 
+			: (<>vlOrderNumber=0)
+				vsFlag:="Sheet No."
+				If ([SpecFactory]SF_KeyNumber=0)
+					vsOrderNumber:=String(Sequence number([SpecFactory]))
+				Else 
+					vsOrderNumber:=String([SpecFactory]SF_KeyNumber)
+				End if 
+				FORM GOTO PAGE(2)
+			: (<>vlOrderNumber>0)
+				vsFlag:="HMS Order"
+				vsOrderNumber:=String(<>vlOrderNumber)
+			Else 
+				vsFlag:="Sample Order"
+				vsOrderNumber:=String(Abs(<>vlOrderNumber))
+				
+		End case 
+		
+		If (<>ComponentSheet)
+			FORM GOTO PAGE(4)
+		Else 
+			OBJECT SET ENABLED(bPreview;False)
+			
+			Case of 
+				: (<>vsKnitWoven="Knit")
+					cbKnit:=1
+				: (<>vsKnitWoven="Woven")
+					cbWoven:=1
+				Else 
+					cbCutSew:=1
+			End case 
+			
+			Case of 
+				: (vfTrim)
+					ALERT("HERE")
+					FORM GOTO PAGE(4)
+				: (Size of array(asSpareParts)>0)
+					OBJECT SET VISIBLE(vsArticle;False)
+					vsSubhead:="Part Templates"
+					cbDefault:=1
+					FORM GOTO PAGE(3)
+				: (Size of array(asDesignNumbers)>0)
+					FORM GOTO PAGE(2)
+				Else 
+					SS_GetTemplate 
+			End case 
+			If (vfNewFactory)
+				vdSubmit1:=!00-00-00!
+			Else 
+				vdSubmit1:=Current date(*)+7
+			End if 
+			OBJECT SET VISIBLE(*;"xSize";vfNewFactory)
+			OBJECT SET VISIBLE(vsSize;vfNewFactory)
+			OBJECT SET VISIBLE(*;"xPattern";vfNewFactory)
+			OBJECT SET VISIBLE(<>vsSource;vfNewFactory)
+			OBJECT SET VISIBLE(*;"xFactory";vfNewFactory)
+			OBJECT SET VISIBLE(<>vsFactory;vfNewFactory)
+		End if 
+End case 
+

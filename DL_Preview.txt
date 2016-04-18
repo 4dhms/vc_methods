@@ -1,0 +1,56 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+  //corrects for missing page one
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+If (Records in selection([DLPages])>0)
+	QUERY SELECTION([DLPages];[DLPages]PageNumber=1)
+	If (Records in selection([DLPages])=0)
+		CREATE RECORD([DLPages])
+		[DLPages]NewPageNumber:=1
+		[DLPages]PageNumber:=1
+		[DLPages]PageTitle:="Restored Page 1"
+		[DLPages]DLItemKey:=[DesignLines]DesignLineKey
+		SAVE RECORD([DLPages])
+	End if 
+End if 
+
+  //cleans up new page failures
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+QUERY SELECTION([DLPages];[DLPages]NewPageNumber=0)
+
+  //DL_CleanUpDoublets 
+
+If (Records in selection([DLPages])>0)
+	$i:=1
+	FIRST RECORD([DLPages])
+	For ($i;1;Records in selection([DLPages]))
+		[DLPages]NewPageNumber:=[DLPages]PageNumber
+		SAVE RECORD([DLPages])
+		NEXT RECORD([DLPages])
+	End for 
+End if 
+
+Case of 
+	: ([DesignLines]BuildStatus=0)
+		DL_PreviewBuild 
+	: ([DesignLines]BuildStatus=2)
+		[DesignLines]BuildStatus:=1
+		SAVE RECORD([DesignLines])
+		QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+		
+		vlLastPage:=Records in selection([DLPages])+1
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=0)
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]LineKey;>)
+		DL_BuildAllPages ("";"Added Items")
+End case 
+
+DL_BuildPageArray 
+DL_BuildPage (1;True)
+
+FORM SET INPUT([DLPages];"PageEditor")
+If (Screen height<900)
+	MODIFY RECORD([DLPages])
+Else 
+	MODIFY RECORD([DLPages];*)
+End if 

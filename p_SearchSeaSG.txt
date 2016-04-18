@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global to search for season in sample garments
+SAVE RECORD([Samples])
+CREATE SET([Samples];"DesPreSet")
+If (Records in selection([Samples])=0)
+	ALL RECORDS([Samples])
+Else 
+End if 
+WinFindList ("Enter season:";7)
+
+If (OK=0)
+	CLOSE WINDOW
+	USE SET("DesPreSet")
+	p_SetWndwSamGar 
+	CLEAR SET("DesPreSet")
+Else 
+	CLOSE WINDOW
+	QUERY([Samples];[Samples]SeasonName=<>asSeasonName{<>asSeasonName};*)
+	QUERY([Samples]; & ;[Samples]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+	If (Current user="Sandie") | (Current user="Designer")
+		WinChoice ("Search by 05-Cupio?")
+		If (ok=1)
+			QUERY SELECTION([Samples];[Samples]SampleDivision="05@")
+		End if 
+		p_SetWndwSamGar 
+	End if 
+End if 

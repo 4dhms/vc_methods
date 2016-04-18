@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atAllListContents;0)
+ARRAY TEXT(atAllListArt;0)
+
+QUERY([Lists];[Lists]ListName="Fiber")
+If ($1#"all")
+	QUERY SELECTION([Lists];[Lists]KWCS=$1)
+End if 
+ORDER BY([Lists];[Lists]ArticleNumber;>)
+
+SELECTION TO ARRAY([Lists]ListItem;atAllListContents)
+SELECTION TO ARRAY([Lists]ArticleNumber;atAllListArt)

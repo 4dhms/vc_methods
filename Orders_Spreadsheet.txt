@@ -1,0 +1,69 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$count;$samplenumber)
+C_TEXT($path)
+C_TIME($docref)
+ARRAY LONGINT($orders;0)
+
+$docref:=Create document("";"xls")
+$count:=0
+
+If (ok=1)
+	$path:=Document
+	SELECTION TO ARRAY([Orders]OrderNum;$orders)
+	
+	$i:=1
+	For ($i;1;Size of array($orders))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i})
+		If (Records in selection([CP_OrderXRef])>$count)
+			$count:=Records in selection([CP_OrderXRef])
+		End if 
+	End for 
+	
+	SEND PACKET($docref;"PO"+Char(9)+"Style"+Char(9)+"Design"+Char(9)+"Coordinator"+Char(9)+"Factory"+Char(9)+"PO Date"+Char(9)+"Entered"+Char(9))
+	SEND PACKET($docref;"Division"+Char(9)+"Season"+Char(9)+"Cancel Date"+Char(9)+"Total Qty"+Char(9)+"Customer"+Char(9))
+	SEND PACKET($docref;"Label Source"+Char(9)+"Pattern Source"+Char(9)+"Label"+Char(9)+"Cutting Ticket"+Char(9)+"Price Ticket"+Char(9))
+	SEND PACKET($docref;"Sample"+Char(9)+"Supplier"+Char(9)+"Size Range"+Char(9)+"Shipping"+Char(9))
+	SEND PACKET($docref;"After Approval"+Char(9)+"Fabric"+Char(9)+"Fiber"+Char(9))
+	$n:=1
+	For ($n;1;$count)
+		SEND PACKET($docref;"Color/Print "+String($n)+Char(9)+"Qty"+Char(9))
+	End for 
+	SEND PACKET($docref;Char(13))
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		$samplenumber:=Num([Orders]SGPO)
+		QUERY([Samples];[Samples]SampleNumber=$samplenumber)
+		
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]LineKey;>)
+		
+		
+		SEND PACKET($docref;String([Orders]OrderNum)+Char(9)+[Orders]StyleNumber+Char(9)+[Orders]DesignNumber+Char(9)+[Orders]Coordinator+Char(9)+[Orders]Factory+Char(9)+String([Orders]PODate)+Char(9)+[Orders]Order_Enterer+Char(9))
+		SEND PACKET($docref;[Orders]OrderDivision+Char(9)+[Orders]SeasonName+" "+[Orders]SeasonYear+Char(9)+String([Orders]CancelDate)+Char(9)+String([Orders]TotalOrderQuantity)+Char(9)+[Orders]Customer+Char(9))
+		SEND PACKET($docref;[Orders]LabelSource+Char(9)+[Orders]Patt Source+Char(9)+[Orders]Label+Char(9)+[Orders]Cutting Ticket+Char(9)+[Orders]Price Tckt+Char(9))
+		SEND PACKET($docref;[Orders]SGPO+Char(9)+[Samples]SamGarFactry+Char(9))
+		SEND PACKET($docref;[Orders]BrkdnCutRatio+Char(9)+[Orders]ShipMethod+Char(9))
+		SEND PACKET($docref;[Orders]AfterApproval+Char(9)+[OrdersFabricXRef]FabricName+Char(9)+[OrdersFabricXRef]FiberContent+Char(9))
+		
+		FIRST RECORD([CP_OrderXRef])
+		$n:=1
+		For ($n;1;$count)
+			If (Records in selection([CP_OrderXRef])<$n)
+				SEND PACKET($docref;Char(9)+Char(9))
+			Else 
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				SEND PACKET($docref;[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName+Char(9)+String([CP_OrderXRef]Quantity)+Char(9))
+			End if 
+		End for 
+		SEND PACKET($docref;Char(13))
+		NEXT RECORD([Orders])
+	End for 
+	
+	
+	
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 

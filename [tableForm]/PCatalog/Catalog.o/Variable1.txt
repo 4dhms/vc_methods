@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([PCatalog];"cat")
+ADD RECORD([PCatalog];*)
+ADD TO SET([PCatalog];"cat")
+USE SET("cat")
+CLEAR SET("cat")

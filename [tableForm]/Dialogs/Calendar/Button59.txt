@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList1;0)
+If (asCustomers>0)
+	INSERT IN ARRAY(asList1;1;1)
+	asList1{1}:=asCustomers{asCustomers}
+End if 
+SET MENU BAR(20)
+FORM GOTO PAGE(4)

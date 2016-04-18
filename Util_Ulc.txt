@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($0;$1;$fix)
+C_LONGINT($i)
+
+If ($1="")
+	$fix:=""
+Else 
+	$fix:=Uppercase($1[[1]])+Lowercase(Substring($1;2;99))
+End if 
+
+If (Length($fix)>1)
+	$i:=1
+	For ($i;1;Length($fix))
+		Case of 
+			: ($fix[[$i]]="/") & ($i<Length($fix))
+				$fix[[$i+1]]:=Uppercase($fix[[$i+1]])
+			: ($fix[[$i]]=" ") & ($i<Length($fix))
+				$fix[[$i+1]]:=Uppercase($fix[[$i+1]])
+		End case 
+	End for 
+End if 
+
+$0:=$fix

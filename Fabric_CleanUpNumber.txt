@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+If (Records in selection([FabPOLines])>0)
+	FIRST RECORD([FabPOLines])
+	$i:=1
+	For ($i;1;Records in selection([FabPOLines]))
+		QUERY([Deliveries];[Deliveries]LineID=[FabPOLines]LineID)
+		Case of 
+			: (Records in selection([Deliveries])=1)
+				[FabPOLines]BatchStatus:="1 shipmt"
+				SAVE RECORD([FabPOLines])
+			: (Records in selection([Deliveries])>1)
+				[FabPOLines]BatchStatus:=String(Records in selection([Deliveries]))+" shipmts"
+				SAVE RECORD([FabPOLines])
+		End case 
+		UNLOAD RECORD([Deliveries])
+		
+		If (Length([FabPOLines]ColorPrint)>0)
+			If ([FabPOLines]ColorPrint[[1]]="#")
+				[FabPOLines]ColorPrint:=Substring([FabPOLines]ColorPrint;2;10)
+				SAVE RECORD([FabPOLines])
+			End if 
+			$c:=Position(" ";[FabPOLines]ColorPrint)
+			
+			If ($c>1) & ([FabPOLines]ColorPrint#"@combo@")
+				If (Position(" ";Substring([FabPOLines]ColorName;$c+1;999))>0)
+					[FabPOLines]ColorName:=Substring([FabPOLines]ColorPrint;$c+1;80)
+					[FabPOLines]ColorPrint:=Substring([FabPOLines]ColorPrint;1;$c-1)
+				Else 
+					[FabPOLines]Description:=[FabPOLines]Description+"//"+[FabPOLines]ColorName
+					[FabPOLines]ColorName:=Substring([FabPOLines]ColorPrint;$c+1;40)
+					[FabPOLines]ColorPrint:=Substring([FabPOLines]ColorPrint;1;$c-1)
+					SAVE RECORD([FabPOLines])
+				End if 
+			End if 
+		End if 
+		NEXT RECORD([FabPOLines])
+	End for 
+End if 

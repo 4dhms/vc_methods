@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (<>vlPlatform#3)
+	<>vtWebSetPath:=Substring((Get 4D folder);1;Position(":";Get 4D folder))+"WebSets:"
+	
+	If (Application type=5)
+		If (Test path name(<>vtWebSetPath)#0)
+			CREATE FOLDER(<>vtWebSetPath)
+		End if 
+	End if 
+End if 

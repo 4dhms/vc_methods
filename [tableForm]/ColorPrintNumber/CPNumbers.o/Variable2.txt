@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([ColorPrintNumber])
+SET WINDOW TITLE("Color Library: "+String(Records in selection([ColorPrintNumber]))+" of "+String(Records in table([ColorPrintNumber])))

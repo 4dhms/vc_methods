@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($folderpath;$subfolder;$path)
+C_PICTURE($pict)
+
+$folderpath:=Substring(Application file;1;Position(":";Application file))+"4D Sketches:"
+$subfolder:=$folderpath+Substring($1;1;2)+":"
+If (Test path name($subfolder)#0)
+	$subfolder:=$folderpath+Substring($1;1;5)+":"
+End if 
+
+$path:=$subfolder+$1+".jpg"
+
+If (Test path name($path)#1)
+	GET PICTURE FROM LIBRARY("NotFound";$pict)
+Else 
+	READ PICTURE FILE($path;$pict)
+End if 
+
+QUERY([Designs];[Designs]DesignNum=$1)
+[Designs]Sketch:=$pict
+[Designs]ArchivedPict:=False
+SAVE RECORD([Designs])
+UNLOAD RECORD([Designs])
+

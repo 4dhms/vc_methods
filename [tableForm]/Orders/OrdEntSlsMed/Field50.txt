@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]FOB=0)
+	[CostSheets]FOB2:=0
+Else 
+	Cost_EntryCalculate 
+End if 

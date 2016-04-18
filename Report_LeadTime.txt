@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docRef)
+C_TEXT($packet)
+C_TEXT($rev;$path)
+
+$docRef:=Create document("";"TEXT")
+If (ok=1)
+	$path:=Document
+	
+	$packet:="Order Number"+Char(9)
+	$packet:=$packet+"Style Number"+Char(9)
+	$packet:=$packet+"Design Number"+Char(9)
+	$packet:=$packet+"Factory"+Char(9)
+	$packet:=$packet+"PO Date"+Char(9)
+	$packet:=$packet+"XFactory"+Char(9)
+	$packet:=$packet+"Lead"+Char(9)
+	$packet:=$packet+"Actual"+Char(9)
+	$packet:=$packet+"Actual to XFactory"+Char(9)
+	$packet:=$packet+"NY Cancel"+Char(9)
+	$packet:=$packet+"Customer"+Char(9)
+	$packet:=$packet+"Quantity"+Char(9)
+	$packet:=$packet+"Enterer"+Char(13)
+	
+	SEND PACKET($docRef;$packet)
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	
+	For ($i;1;Records in selection([Orders]))
+		If (Not([Orders]Cancelled))
+			Case of 
+				: ([Orders]RevisionNumber>0)
+					$rev:="Revision "+String([Orders]RevisionNumber)
+				Else 
+					$rev:=""
+			End case 
+			
+			
+			$packet:=String([Orders]OrderNum)+Char(9)
+			$packet:=$packet+[Orders]StyleNumber+Char(9)
+			$packet:=$packet+[Orders]DesignNumber+Char(9)
+			$packet:=$packet+[Orders]Factory+Char(9)
+			$packet:=$packet+String([Orders]PODate)+Char(9)
+			$packet:=$packet+String([Orders]ShipDateFactory)+Char(9)
+			If ([Orders]ShipDateFactory=!00-00-00!)
+				$packet:=$packet+Char(9)
+			Else 
+				$packet:=$packet+String([Orders]ShipDateFactory-[Orders]PODate)+Char(9)
+			End if 
+			$packet:=$packet+String([Orders]ActualDeliveryDate)+Char(9)
+			If ([Orders]ActualDeliveryDate#!00-00-00!) & ([Orders]ShipDateFactory#!00-00-00!)
+				$packet:=$packet+String([Orders]ActualDeliveryDate-[Orders]ShipDateFactory)+Char(9)
+			Else 
+				$packet:=$packet+Char(9)
+			End if 
+			$packet:=$packet+String([Orders]CancelDate)+Char(9)
+			$packet:=$packet+[Orders]Customer+Char(9)
+			$packet:=$packet+String([Orders]TotalOrderQuantity)+Char(9)
+			$packet:=$packet+[Orders]Order_Enterer+Char(13)
+			SEND PACKET($docRef;$packet)
+			NEXT RECORD([Orders])
+		End if 
+	End for 
+	CLOSE DOCUMENT($docRef)
+	SHOW ON DISK($path)
+End if 

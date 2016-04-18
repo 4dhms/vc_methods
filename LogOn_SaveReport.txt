@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_BLOB($reportBLOB)
+  //C_LONGINT(cb11;cb12;cbDay1)
+
+ARRAY LONGINT(alSaveSpec;0)
+
+APPEND TO ARRAY(alSaveSpec;<>asStartMonth)
+APPEND TO ARRAY(alSaveSpec;<>asStartDay)
+APPEND TO ARRAY(alSaveSpec;<>asStartYear)
+APPEND TO ARRAY(alSaveSpec;<>asEndMonth)
+APPEND TO ARRAY(alSaveSpec;<>asEndDay)
+APPEND TO ARRAY(alSaveSpec;<>asEndYear)
+APPEND TO ARRAY(alSaveSpec;cb11)
+APPEND TO ARRAY(alSaveSpec;cb12)
+APPEND TO ARRAY(alSaveSpec;cbDay1)
+
+
+SET BLOB SIZE($reportBLOB;0)
+
+$docref:=Create document("")
+
+If (ok=1)
+	CLOSE DOCUMENT($docref)
+	VARIABLE TO BLOB(afProcess;$reportBLOB;*)
+	VARIABLE TO BLOB(alCount;$reportBLOB;*)
+	VARIABLE TO BLOB(asStyleNumbers;$reportBLOB;*)
+	VARIABLE TO BLOB(asDivisions;$reportBLOB;*)
+	VARIABLE TO BLOB(asSeasonName;$reportBLOB;*)
+	VARIABLE TO BLOB(asGroups;$reportBLOB;*)
+	VARIABLE TO BLOB(asXSizeRange;$reportBLOB;*)
+	VARIABLE TO BLOB(asProcessDate;$reportBLOB;*)
+	VARIABLE TO BLOB(asSort;$reportBLOB;*)
+	VARIABLE TO BLOB(asColors;$reportBLOB;*)
+	VARIABLE TO BLOB(arSalePrice;$reportBLOB;*)
+	VARIABLE TO BLOB(atChange;$reportBLOB;*)
+	VARIABLE TO BLOB(adActionDate;$reportBLOB;*)
+	VARIABLE TO BLOB(asColorCodes;$reportBLOB;*)
+	VARIABLE TO BLOB(asUsers;$reportBLOB;*)
+	VARIABLE TO BLOB(atChange;$reportBLOB;*)
+	VARIABLE TO BLOB(alSaveSpec;$reportBLOB;*)
+	
+	BLOB TO DOCUMENT(Document;$reportBLOB)
+End if 
+

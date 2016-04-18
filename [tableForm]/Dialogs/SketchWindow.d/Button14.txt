@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($show)
+
+If (asSGOrder{asSGOrder}="Design Library")
+	$show:=New process("SS_PreviewDesign";0;"Preview";asDesignNumbers{asDesignNumbers})
+Else 
+	$show:=New process("SS_PreviewComp";0;"Preview";Num(asSGOrder{asSGOrder}))
+End if 
+

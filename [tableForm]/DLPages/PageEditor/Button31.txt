@@ -1,0 +1,85 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice;$i;$n;$c)
+C_POINTER($design)
+ARRAY LONGINT($clipboard;0)
+
+If (vlMoveCell>0)
+	DL_CellTrigger (-6)
+	GET PICTURE FROM LIBRARY(885;vxTrash)
+	$i:=1
+	For ($i;1;19)
+		OBJECT SET VISIBLE(*;"x"+String($i);False)
+		OBJECT SET VISIBLE(*;"g"+String($i);False)
+	End for 
+Else 
+	
+	$choice:=Pop up menu("Empty Trash;Restore;Cancel")
+	
+	
+	Case of 
+		: ($choice<3)
+			QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey;*)
+			QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=-6)
+			If (Records in selection([DesignLineIncluded])=0)
+				WinPrompt ("Trash is empty.")
+			Else 
+				$c:=0
+				$i:=1
+				For ($i;1;6)
+					$design:=Get pointer("vDesign"+String($i+12))
+					If ($design->="")
+						APPEND TO ARRAY($clipboard;$i+12)
+					End if 
+				End for 
+				
+				
+				If ($choice=2)  //restore
+					GET PICTURE FROM LIBRARY(884;vxTrash)
+					
+					If (Size of array($clipboard)>=Records in selection([DesignLineIncluded]))
+						FIRST RECORD([DesignLineIncluded])
+						$n:=1
+						
+						For ($n;1;Records in selection([DesignLineIncluded]))
+							[DesignLineIncluded]ItemNumber:=$clipboard{$n}
+							SAVE RECORD([DesignLineIncluded])
+							NEXT RECORD([DesignLineIncluded])
+						End for 
+						DL_BuildPage (asPages;True)
+						
+					Else 
+						
+						APPEND TO ARRAY(alHistKey;Size of array(alHistKey)+1)
+						APPEND TO ARRAY(asPages;"Restored")
+						APPEND TO ARRAY(afDelete;False)
+						APPEND TO ARRAY(afSpecial;True)
+						APPEND TO ARRAY(afPrint;True)
+						asPages:=Size of array(asPages)
+						
+						CREATE RECORD([DLPages])
+						[DLPages]DLItemKey:=[DesignLines]DesignLineKey
+						[DLPages]PageNumber:=Size of array(asPages)
+						SAVE RECORD([DLPages])
+						C_LONGINT($i)
+						FIRST RECORD([DesignLineIncluded])
+						For ($i;1;Records in selection([DesignLineIncluded]))
+							If ($i<13)
+								[DesignLineIncluded]PageNumber:=[DLPages]PageNumber
+								[DesignLineIncluded]ItemNumber:=$i
+								SAVE RECORD([DesignLineIncluded])
+								NEXT RECORD([DesignLineIncluded])
+							End if 
+						End for 
+						If ($i>12)
+							WinPrompt ("There are still more items in the trash.")
+						End if 
+						DL_BuildPage (asPages;True)
+						LISTBOX SELECT ROW(afDLPages;Size of array(asPages))
+					End if 
+				Else   //delete
+					GET PICTURE FROM LIBRARY(884;vxTrash)
+					DELETE SELECTION([DesignLineIncluded])
+				End if 
+			End if 
+	End case 
+End if 

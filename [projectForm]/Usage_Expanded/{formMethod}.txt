@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	Fabric_UsageArray 
+	
+	If (vtArticleNumber#"")
+		Fabric_UsageBulk 
+	End if 
+End if 

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($0)
+If (Find in array(alFieldNumber;$1)>0) & ([Orders]RevisionNumber>0)
+	$0:=Char(1)+"<td class=style4>"
+Else 
+	$0:=Char(1)+"<td class=style2>"
+End if 

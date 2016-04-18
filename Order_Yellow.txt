@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+C_TEXT($test)
+
+$test:="Revision "+String([Orders]RevisionNumber)
+
+If ([Orders]RevisionNumber>0) & (Position($test;[Orders]RevHistory)<1)
+	$show:=True
+Else 
+	$show:=False
+End if 
+
+OBJECT SET VISIBLE(*;"xFlag";$show)

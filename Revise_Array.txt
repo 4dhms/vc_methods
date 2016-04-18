@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>vlOrderNumber>0)
+		Case of 
+			: ([Orders]Hold)
+				ARRAY TEXT(asPOv;2)
+				asPOv{1}:="On Hold"
+				asPOv{2}:="Activate"
+				
+			: ([Orders]Cancelled)
+				ARRAY TEXT(asPOv;3)
+				asPOv{1}:="Cancelled"
+				asPOv{2}:="UN-cancelled"
+				asPOv{3}:="No Archive"
+				
+			Else 
+				ARRAY TEXT(asPOv;5)
+				If ([Orders]RevisionNumber=0)
+					asPOv{1}:="Original order"
+				Else 
+					asPOv{1}:="Revise "+String([Orders]RevisionNumber)
+				End if 
+				
+				asPOv{2}:="New Revision"
+				asPOv{3}:="Edit"
+				asPOv{4}:="On Hold"
+				asPOv{5}:="Cancelled"
+		End case 
+	Else 
+		If ([Samples]Void)
+			ARRAY TEXT(asPOv;2)
+			asPOv{1}:="Cancelled"
+			asPOv{2}:="UN-cancelled"
+		Else 
+			ARRAY TEXT(asPOv;4)
+			If ([Samples]RevisionNumber=0)
+				asPOv{1}:="Original order"
+			Else 
+				asPOv{1}:="Revise "+String([Samples]RevisionNumber)
+			End if 
+			
+			asPOv{2}:="New Revision"
+			asPOv{3}:="Edit"
+			asPOv{4}:="Cancelled"
+		End if 
+End case 
+
+asPOv:=1

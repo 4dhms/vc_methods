@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($show)
+C_TEXT($findstring)
+
+If (asSGOrder{asSGOrder}="Old Style")
+	$findstring:="DN"+asDesignNumbers{asDesignNumbers}
+Else 
+	$findstring:=String(Num(asSGOrder{asSGOrder}))
+End if 
+
+$show:=New process("SS_Preview";0;"Preview";$findstring)
+

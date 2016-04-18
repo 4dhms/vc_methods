@@ -1,0 +1,79 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i)
+C_POINTER($col1;$col2;$col3;$col4;$col5;$col6;$col7)
+C_TEXT($range)
+C_TEXT($date1)
+C_TEXT($date2)
+
+If (asSeasonA{asSeasonA}="Spring")
+	$range:="Spring/Fall "+String(alYearA{alYearA})
+Else 
+	$range:="Fall/Spring "+String(alYearA{alYearA})
+End if 
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	
+	SEND PACKET($docref;asDivisions{asDivisions}+Char(9)+$range+Char(13)+Char(13))
+	SEND PACKET($docref;Char(9)+"Month"+Char(9)+"Orders"+Char(9)+"Units"+Char(9)+"Dollars"+Char(9))
+	SEND PACKET($docref;Char(9)+"Orders"+Char(9)+"Units"+Char(9)+"Dollars"+Char(13))
+	
+	$i:=1
+	For ($i;1;6)
+		$col1:=Get pointer("vsMonth"+String($i))
+		$col2:=Get pointer("vlOrders"+String(12+$i))
+		$col3:=Get pointer("vlUnits"+String(12+$i))
+		$col4:=Get pointer("vlDollars"+String(12+$i))
+		$col5:=Get pointer("vlOrders"+String($i))
+		$col6:=Get pointer("vlUnits"+String($i))
+		$col7:=Get pointer("vlDollars"+String($i))
+		
+		If ($i=1)
+			$date1:=vsSeason1A
+			$date2:=vsSeason2A
+		Else 
+			$date1:=""
+			$date2:=""
+		End if 
+		
+		SEND PACKET($docref;$date1+Char(9)+$col1->+Char(9)+String($col2->;"###,###,###")+Char(9)+String($col3->;"###,###,###")+Char(9)+String($col4->;"###,###,###")+Char(9))
+		SEND PACKET($docref;$date2+Char(9)+String($col5->;"###,###,###")+Char(9)+String($col6->;"###,###,###")+Char(9)+String($col7->;"###,###,###")+Char(13))
+	End for 
+	
+	SEND PACKET($docref;Char(9)+vsSeason1A+Char(9)+String(vlOrdersSubA;"###,###,###")+Char(9)+String(vlUnitsSubA;"###,###,###")+Char(9)+String(vlDollarsSubA;"###,###,###")+Char(9))
+	SEND PACKET($docref;Char(9)+String(vlOrdersSubAx;"###,###,###")+Char(9)+String(vlUnitsSubAx;"###,###,###")+Char(9)+String(vlDollarsSubAx;"###,###,###")+Char(13))
+	SEND PACKET($docref;Char(9)+"Avg. Price "+String(vrAvgA;"##.00")+Char(9)+Char(9)+Char(9)+Char(9)+String(vrAvgB;"##.00")+Char(13)+Char(13))
+	
+	
+	$i:=1
+	For ($i;1;6)
+		$col1:=Get pointer("vsMonth"+String(6+$i))
+		$col2:=Get pointer("vlOrders"+String(18+$i))
+		$col3:=Get pointer("vlUnits"+String(18+$i))
+		$col4:=Get pointer("vlDollars"+String(18+$i))
+		$col5:=Get pointer("vlOrders"+String(6+$i))
+		$col6:=Get pointer("vlUnits"+String(6+$i))
+		$col7:=Get pointer("vlDollars"+String(6+$i))
+		
+		If ($i=1)
+			$date1:=vsSeason1B
+			$date2:=vsSeason2B
+		Else 
+			$date1:=""
+			$date2:=""
+		End if 
+		
+		SEND PACKET($docref;$date1+Char(9)+$col1->+Char(9)+String($col2->;"###,###,###")+Char(9)+String($col3->;"###,###,###")+Char(9)+String($col4->;"###,###,###")+Char(9))
+		SEND PACKET($docref;$date2+Char(9)+String($col5->;"###,###,###")+Char(9)+String($col6->;"###,###,###")+Char(9)+String($col7->;"###,###,###")+Char(13))
+	End for 
+	
+	SEND PACKET($docref;Char(9)+vsSeason1B+Char(9)+String(vlOrdersSubB;"###,###,###")+Char(9)+String(vlUnitsSubB;"###,###,###")+Char(9)+String(vlDollarsSubB;"###,###,###")+Char(9))
+	SEND PACKET($docref;Char(9)+String(vlOrdersSubBx;"###,###,###")+Char(9)+String(vlUnitsSubBx;"###,###,###")+Char(9)+String(vlDollarsSubBx;"###,###,###")+Char(13))
+	SEND PACKET($docref;Char(9)+"Avg. Price "+String(vrAvgB;"##.00")+Char(9)+Char(9)+Char(9)+Char(9)+String(vrAvgBx;"##.00")+Char(13)+Char(13))
+	
+	SEND PACKET($docref;Char(9)+"Year Total"+Char(9)+String(vlOrdersGrand;"###,###,###")+Char(9)+String(vlUnitsGrand;"###,###,###")+Char(9)+String(vlDollarsGrand;"###,###,###")+Char(9))
+	SEND PACKET($docref;Char(9)+String(vlOrdersGrandx;"###,###,###")+Char(9)+String(vlUnitsGrandx;"###,###,###")+Char(9)+String(vlDollarsGrandx;"###,###,###")+Char(13))
+	
+	CLOSE DOCUMENT($docref)
+End if 

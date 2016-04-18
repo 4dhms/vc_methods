@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([CostSheets];"CS")
+FIRST RECORD([CostSheets])
+For ($i;1;Records in selection([CostSheets]))
+	QUERY([Costing];[Costing]SheetNumber=[CostSheets]SheetNumber)
+	If (Records in selection([Costing])=0)
+		ADD TO SET([CostSheets];"CS")
+	End if 
+	NEXT RECORD([CostSheets])
+End for 
+
+USE SET("CS")
+CLEAR SET("CS")
+
+ALERT("Done")

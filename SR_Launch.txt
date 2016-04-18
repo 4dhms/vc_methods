@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($report)
+
+$report:=New process("SR_Window";0;"SusansReport")

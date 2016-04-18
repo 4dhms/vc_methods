@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$order)
+C_TEXT($test)
+ARRAY TEXT(asFactories;0)
+
+If (vsArticle#"")
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=vsArticle)
+	Case of 
+		: (cb1=1) & (cb2=1)
+			  //complete
+		: (cb1=1)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber<0)
+		: (cb2=1)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber>0)
+	End case 
+	
+	$i:=1
+	FIRST RECORD([OrdersFabricXRef])
+	For ($i;1;Records in selection([OrdersFabricXRef]))
+		If ([OrdersFabricXRef]OrderNumber<0)
+			$order:=Abs([OrdersFabricXRef]OrderNumber)
+			QUERY([Samples];[Samples]SampleNumber=$order)
+			$test:=[Samples]SamGarFactry
+		Else 
+			QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+			$test:=[Orders]Factory
+		End if 
+		
+		If (Find in array(asFactories;$test)<1)
+			APPEND TO ARRAY(asFactories;$test)
+		End if 
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+End if 
+
+SORT ARRAY(asFactories;>)
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([Samples])
+

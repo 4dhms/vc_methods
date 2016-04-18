@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($blob)
+C_PICTURE($xThumb)
+
+
+QUERY([Designs];[Designs]DesignNum=$1)
+
+CREATE THUMBNAIL([Designs]Sketch;$xThumb;200;200;6)
+PICTURE TO GIF($xThumb;$blob)
+WEB SEND BLOB($blob;"image/gif")

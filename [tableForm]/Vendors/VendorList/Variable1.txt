@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Vendors];"VendorEntry")
+SET WINDOW TITLE("New Supplier")
+CREATE SET([Vendors];"Vendors")
+CREATE RECORD([Vendors])
+SAVE RECORD([Vendors])
+MODIFY RECORD([Vendors];*)
+ADD TO SET([Vendors];"Vendors")
+USE SET("Vendors")
+CLEAR SET("Vendors")

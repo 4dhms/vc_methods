@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+Case of 
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(*;"Oval1";True)
+		vlCounter:=1
+		SET TIMER(5)
+	: (Form event=On Timer)
+		  //vlCounter:=Random
+		vlCounter:=vlCounter+1
+		If (<>CloseDialog)
+			CANCEL
+		End if 
+	: (Form event=On Outside Call)
+		vlProgress:=<>vlCounter
+		If (<>CloseDialog)
+			CANCEL
+		End if 
+End case 

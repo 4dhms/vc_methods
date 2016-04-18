@@ -1,0 +1,100 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_POINTER($week)
+C_BOOLEAN($continue)
+
+Case of 
+	: (vfByStyle)
+		$i:=1
+		
+		$continue:=True
+	: (Size of array(asCustomers)=0)
+		WinChoice ("Are you sure you want to report on all accounts? This is take a while.";"No";"Yes")
+		If (ok=1)
+			$continue:=False
+		Else 
+			$continue:=True
+		End if 
+	Else 
+		$continue:=True
+End case 
+
+If ($continue)
+	nav1:=0
+	nav2:=0
+	c1:=0
+	c2:=0
+	c3:=0
+	c4:=0
+	SLR_Range 
+	vtTitle:=""
+	
+	  //QUERY SELECTION([SLRWks];[SLRWks]SLRColorKey=1871)
+	
+	QUERY([SLRReporter];[SLRReporter]User=Current user)
+	ARRAY TEXT($user;Records in selection([SLRReporter]))
+	ARRAY TO SELECTION($user;[SLRReporter]User)
+	
+	Case of 
+		: (asDivisions=0) & (Size of array(asCustomers)=0) & (Not(vfByStyle))
+			WinPrompt ("Select a division.")
+		: (nav1=1) | (nav2=1) & (c1+c2+c3=0)
+			WinPrompt ("Select sort cirteria.")
+			
+		Else 
+			
+			If (FORM Get current page=2)
+				vfStyle:=True
+			Else 
+				vfStyle:=False
+			End if 
+			
+			<>vtMessage:="Building report"
+			<>vlCounter:=0
+			EMail_SendingProc 
+			
+			If (nav1+nav2>0)
+				vfSort:=True
+			Else 
+				vfSort:=False
+			End if 
+			OBJECT SET VISIBLE(*;"Rebuild";False)
+			OBJECT SET VISIBLE(*;"Rebuild1";False)
+			OBJECT SET VISIBLE(*;"Rebuild2";False)
+			
+			SLR_ReportQuery 
+			<>CloseDialog:=True
+			CALL PROCESS(<>SendingWin)
+			OBJECT SET ENABLED(bPrint;True)
+			OBJECT SET VISIBLE(nav1;True)
+			OBJECT SET VISIBLE(nav2;True)
+			OBJECT SET VISIBLE(c1;True)
+			OBJECT SET VISIBLE(c2;True)
+			OBJECT SET VISIBLE(c3;True)
+			OBJECT SET VISIBLE(c4;True)
+			OBJECT SET VISIBLE(cbGroup;True)
+			OBJECT SET ENABLED(bPrint;True)
+	End case 
+	USE SET("range")
+	
+	$c:=Size of array(adDates)
+	If ($c>6)
+		$c:=6
+	End if 
+	
+	$i:=1
+	For ($i;1;Size of array(adDates))
+		$week:=Get pointer("vtPart"+String($i))
+		$week->:=String(adDates{$i})
+	End for 
+	
+	  //vtPart2:=String(adDates{2})
+	  //vtPart3:=String(adDates{3})
+	  //vtPart4:=String(adDates{4})
+	  //vtPart5:=String(adDates{5})
+	  //vtPart6:=String(adDates{6})
+	
+	
+End if 
+
+

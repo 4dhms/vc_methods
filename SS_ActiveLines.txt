@@ -1,0 +1,10 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+If (Records in set("AllLines")=0)
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+	CREATE SET([SpecSheetLines];"AllLines")
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+	CREATE SET([SpecSheetLines];"ActiveLines")
+Else 
+	USE SET("ActiveLines")
+End if 

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (nav1=2)
+		GetHistoryFabric 
+		atPages:=Find in array(atPages;"History")
+		FORM GOTO PAGE(2)
+	: (nav1=3)
+		If ([FabricOrders]POType=0)
+			Fabric_Usage 
+			FORM GOTO PAGE(3)
+		Else 
+			WinPrompt ("Usage unavailable.")
+			atPages:=1
+			FORM GOTO PAGE(1)
+		End if 
+	: (nav1=4)
+		QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+		If ([FabricOrders]POType=0)
+			Fabric_CleanUpNumber 
+		End if 
+		FORM GOTO PAGE([FabricOrders]POType+4)
+	Else 
+		FabPO_FM_Entry 
+		FORM GOTO PAGE(1)
+End case 

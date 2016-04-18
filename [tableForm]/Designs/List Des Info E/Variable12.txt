@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //
+
+CREATE SET([Designs];"DesLibSet")
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	FORM SET OUTPUT([Designs];"prtDesInfEntry")
+	PAGE SETUP([Designs];"prtDesInfEntry")
+	Print_Selection (->[Designs])
+	FORM SET OUTPUT([Designs];"List Des Info E")
+Else 
+	ALERT("Please highlight a record(s) first.")
+End if 
+USE SET("DesLibSet")
+CLEAR SET("DesLibSet")

@@ -1,0 +1,346 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($specialorders;0)
+
+ARRAY TEXT($cpNumbers;0)
+ARRAY TEXT($colors;0)
+ARRAY LONGINT($hmsPO;0)
+ARRAY TEXT($stylenumbers;0)
+
+ARRAY LONGINT($units;0)
+ARRAY TEXT($consumption;0)
+ARRAY LONGINT($totals;0)
+
+ARRAY LONGINT($PRunits;0)
+ARRAY TEXT($PRconsumption;0)
+ARRAY LONGINT($PRtotals;0)
+
+ARRAY LONGINT($colorKey;0)
+ARRAY TEXT($fabPO;0)
+ARRAY LONGINT($ship;0)
+ARRAY TEXT($dupetest;0)
+  //ARRAY LONGINT($order;0)
+ARRAY DATE($podate;0)
+ARRAY DATE($fbdate;0)
+ARRAY LONGINT($received;0)
+C_BOOLEAN($break;$combo)
+C_LONGINT($i;$n;$subtot;$PRsubtot;$PRused;$used;$line;$p;$c;$q;$quantity)
+C_REAL($PRordered;$PRshipped)
+C_REAL($ordered;$shipped)
+C_LONGINT($color)
+C_TEXT($dupecalc;$truc;$cpstrip)
+
+  //$ordered:=0
+$shipped:=0
+
+If ([FabricOrders]POType=0)
+	If (vfExpand)
+		Case of 
+			: (Records in set("print")>0) & (Records in set("solid")>0)
+				WinChoice ("Do you want to track solids or prints?";"Prints";"Solids")
+				If (ok=1)
+					USE SET("print")
+				Else 
+					USE SET("solid")
+				End if 
+			: (Records in set("print")>0)
+				USE SET("print")
+			Else 
+				USE SET("solid")
+		End case 
+	Else 
+		
+		  //clean up empties
+		QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+		Fabric_KeyCleanup 
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]FabOrderKey=[FabricOrders]FabOrderKey)
+		CREATE SET([CP_OrderXRef];"cp")
+		  //cleans out orphans
+		$q:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($q;1;Records in selection([CP_OrderXRef]))
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID;*)
+			QUERY([OrdersFabricXRef]; & ;[OrdersFabricXRef]OrderNumber=[CP_OrderXRef]OrderNumber)
+			If (Records in selection([OrdersFabricXRef])=0)
+				REMOVE FROM SET([CP_OrderXRef];"cp")
+			End if 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		USE SET("cp")
+		
+		SELECTION TO ARRAY([CP_OrderXRef]OrderNumber;$specialorders)
+		
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+		QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="Combo@")
+		
+		$n:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($n;1;Records in selection([OrdersFabricXRef]))
+			If (Find in array($specialorders;[OrdersFabricXRef]OrderNumber)<1)
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				CREATE SET([CP_OrderXRef];"Temp")
+				UNION("Temp";"cp";"cp")
+				NEXT RECORD([OrdersFabricXRef])
+			End if 
+		End for 
+		USE SET("cp")
+		CLEAR SET("cp")
+	End if 
+	
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+	ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPNumber;>)
+	
+	$i:=1
+	ARRAY LONGINT($cpID;0)
+	SELECTION TO ARRAY([CP_OrderXRef]ID;$cpID)
+	
+	For ($i;1;Size of array($cpID))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]ID=$cpID{$i})
+		
+		If ([CP_OrderXRef]CPType="Self")
+			$quantity:=[CP_OrderXRef]Quantity
+		Else 
+			CREATE SET([CP_OrderXRef];"temp")
+			QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[CP_OrderXRef]SelfKey)
+			$quantity:=[CP_OrderXRef]Quantity
+			USE SET("temp")
+			CLEAR SET("temp")
+		End if 
+		
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+		  //QUERY([FabricOrders];[FabricOrders]FabOrderKey=[OrdersFabricXRef]FabricOrderKey)
+		
+		If ([CP_OrderXRef]FabOrderKey>0)
+			QUERY([FabPOLines];[FabPOLines]FabOrderKey=[CP_OrderXRef]FabOrderKey)
+			QUERY SELECTION([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+		Else 
+			QUERY([FabPOLines];[FabPOLines]FabOrderKey=[OrdersFabricXRef]FabricOrderKey)
+		End if 
+		
+		If (Position(" ";[CP_OrderXRef]CPNumber)>0)
+			$truc:=Substring([CP_OrderXRef]CPNumber;1;Position(" ";[CP_OrderXRef]CPNumber)-1)
+		Else 
+			$truc:=[CP_OrderXRef]CPNumber
+		End if 
+		
+		QUERY SELECTION([FabPOLines];[FabPOLines]ColorPrint=$truc)
+		$cpstrip:=Replace string([CP_OrderXRef]CPNumber;"- ";"-")
+		$cpstrip:=Replace string($cpstrip;" -";"-")
+		
+		$dupecalc:=String([CP_OrderXRef]OrderNumber)+"_"+$cpstrip+"_"+[CP_OrderXRef]CPType
+		
+		If (Records in selection([FabPOLines])>0)
+			$c:=Find in array($dupetest;$dupecalc)
+			
+			If ($c>0)
+				  //$PRunits{$c}:=$PRunits{$c}+$quantity
+				  //$PRused:=Round($PRunits{$c}*Num($PRconsumption{$c});0)
+				  //$PRtotals{$c}:=$PRused
+				
+				$units{$c}:=$units{$c}+$quantity
+				$used:=Round($units{$c}*Num($consumption{$c});0)
+				$totals{$c}:=$used
+				
+			Else 
+				APPEND TO ARRAY($dupetest;$dupecalc)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				
+				APPEND TO ARRAY($cpNumbers;$cpstrip)
+				
+				
+				If ([CP_OrderXRef]CPType="Combo@")
+					APPEND TO ARRAY($colors;"["+Replace string([CP_OrderXRef]CPType;"ombo ";"")+"] "+$cpstrip+" "+[ColorPrintNumber]CPName)
+				Else 
+					APPEND TO ARRAY($colors;"[S] "+$cpstrip+" "+[ColorPrintNumber]CPName)
+				End if 
+				APPEND TO ARRAY($hmspo;[CP_OrderXRef]OrderNumber)
+				
+				  //COMBO
+				If ([CP_OrderXRef]CPType="Combo@")
+					$combo:=True
+					QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[CP_OrderXRef]SelfKey)
+				Else 
+					$combo:=False
+				End if 
+				
+				QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+				
+				APPEND TO ARRAY($stylenumbers;[Orders]StyleNumber)
+				APPEND TO ARRAY($units;[CP_OrderXRef]Quantity)
+				APPEND TO ARRAY($podate;[Orders]PODate)
+				QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+				QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+				ORDER BY([CostSheets];[CostSheets]SheetID;<)
+				
+				  //if([OrdersFabricXRef]Usage>0) & (Not($combo))
+				APPEND TO ARRAY($PRconsumption;String([OrdersFabricXRef]Usage))
+				  //End if 
+				
+				Case of 
+					: ($combo) & ([CostSheets]YdCombo1>0)
+						APPEND TO ARRAY($consumption;String([CostSheets]YdCombo1))
+					: ($combo) & ([OrdersFabricXRef]Usage>0)
+						APPEND TO ARRAY($consumption;String([OrdersFabricXRef]Usage))
+					: ($combo) & ([OrdersFabricXRef]Usage>0)
+						APPEND TO ARRAY($consumption;String([OrdersFabricXRef]Usage))
+					: ([CostSheets]YdFabric>0) & (Not($combo))
+						APPEND TO ARRAY($consumption;String([CostSheets]YdFabric))
+					Else 
+						APPEND TO ARRAY($consumption;"TBD")
+				End case 
+				
+				APPEND TO ARRAY($fabPO;[FabricOrders]PONumber)
+				APPEND TO ARRAY($fbdate;[FabricOrders]FabPODate)
+				  //ALERT([CP_OrderXRef]CPNumber+"  "+String($i)+"  "+String(Size of array($fabPO))+"  "+String(Size of array($colors)))
+				
+				If (Find in array($received;[FabPOLines]LineID)>0)
+					  // already processed
+					APPEND TO ARRAY($ship;0)
+				Else 
+					APPEND TO ARRAY($ship;[FabPOLines]Delivered)
+					APPEND TO ARRAY($received;[FabPOLines]LineID)
+				End if 
+				  //APPEND TO ARRAY($order;0)
+				APPEND TO ARRAY($colorkey;0)
+				
+				$used:=Round([CP_OrderXRef]Quantity*Num($consumption{Size of array($consumption)});0)
+				If ($used<1) & ([CP_OrderXRef]Quantity*Num($consumption{Size of array($consumption)})>0.1)
+					$used:=1
+				End if 
+				$PRused:=Round([CP_OrderXRef]Quantity*Num($PRconsumption{Size of array($PRconsumption)});0)
+				If ($PRused<1) & ([CP_OrderXRef]Quantity*Num($PRconsumption{Size of array($PRconsumption)})>0.1)
+					$PRused:=1
+				End if 
+				
+				APPEND TO ARRAY($PRtotals;$PRused)
+				APPEND TO ARRAY($totals;$used)
+			End if 
+		End if 
+	End for 
+	
+	Fabric_UsageArray 
+	
+	$i:=1
+	For ($i;1;Size of array($cpNumbers))
+		
+		APPEND TO ARRAY(vpcpPtr->;$cpNumbers{$i})
+		APPEND TO ARRAY(vpcolorPtr->;$colors{$i})
+		APPEND TO ARRAY(vphmsPOPtr->;$hmsPO{$i})
+		APPEND TO ARRAY(vpstylePtr->;$stylenumbers{$i})
+		APPEND TO ARRAY(vpunitsPtr->;$units{$i})
+		
+		APPEND TO ARRAY(vpconsum1Ptr->;$PRconsumption{$i})  //$consumption{$i})
+		APPEND TO ARRAY(vpconsum2Ptr->;$consumption{$i})
+		APPEND TO ARRAY(vptotals1Ptr->;$PRtotals{$i})
+		APPEND TO ARRAY(vptotals2Ptr->;$totals{$i})
+		APPEND TO ARRAY(vpcolorKeyPtr->;$colorKey{$i})
+		APPEND TO ARRAY(asXFabPO;$fabPO{$i})
+		APPEND TO ARRAY(asPOdate;String($podate{$i}))
+		APPEND TO ARRAY(asFBdate;String($fbdate{$i}))
+		  //Case of 
+		  //: ($i=1)
+		APPEND TO ARRAY(alXShip;$ship{$i})
+		  //: (asXFabPO{$i-1}=asXFabPO{$i})
+		  //APPEND TO ARRAY(alXShip;0)
+		  //Else 
+		  //APPEND TO ARRAY(alXShip;$ship{$i})
+		  //End case 
+		
+		Case of 
+			: (Size of array($cpNumbers)=$i) & ($i=1)
+				$shipped:=$shipped+$ship{$i}
+				  //$ordered:=$ordered+$order{$i}
+				$break:=True
+			: (Size of array($cpNumbers)=$i) & ($cpNumbers{$i}#$cpNumbers{$i-1})
+				$shipped:=$shipped+$ship{$i}
+				  //$ordered:=$ordered+$order{$i}
+				$break:=True
+			: (Size of array($cpNumbers)=$i)
+				$break:=True
+			: ($cpNumbers{$i}#$cpNumbers{$i+1}) & ($cpNumbers{$i}#$cpNumbers{$i-1})
+				$shipped:=$shipped+$ship{$i}
+				  //$ordered:=$ordered+$order{$i}
+				$break:=True
+			: ($i=1) & ($cpNumbers{1}#$cpNumbers{2})
+				$break:=True
+				$shipped:=$shipped+$ship{$i}
+				  //$ordered:=$ordered+$order{$i}
+				$break:=True
+			: ($cpNumbers{$i}#$cpNumbers{$i-1}) & ($cpNumbers{$i}#$cpNumbers{$i+1})
+				$break:=True
+			: ($cpNumbers{$i}#$cpNumbers{$i+1})
+				$break:=True
+			Else 
+				$shipped:=$shipped+$ship{$i}
+				  //$ordered:=$ordered+$order{$i}
+				$subtot:=$subtot+$totals{$i}
+				$PRsubtot:=$PRsubtot+$PRtotals{$i}
+				$break:=False
+		End case 
+		  //pulls ordered
+		
+		QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+		QUERY SELECTION([FabPOLines];[FabPOLines]ColorPrint=$cpNumbers{$i})  //+"@")
+		$p:=1
+		$ordered:=0
+		
+		FIRST RECORD([FabPOLines])
+		For ($p;1;Records in selection([FabPOLines]))
+			$ordered:=$ordered+[FabPOLines]Quantity
+			NEXT RECORD([FabPOLines])
+		End for 
+		
+		If ($break)
+			$subtot:=$subtot+$totals{$i}
+			$PRsubtot:=$PRsubtot+$PRtotals{$i}
+			
+			$line:=Size of array(vpcpPtr->)+1
+			
+			Fabric_UsageArrayInsert ($line;4)
+			
+			vpstylePtr->{$line}:="Used:"
+			vptotals1Ptr->{$line}:=$PRsubtot
+			vptotals2Ptr->{$line}:=$subtot
+			$subtot:=0
+			$PRsubtot:=0
+			$line:=$line+1
+			
+			vpstylePtr->{$line}:="Ordered:"
+			vptotals1Ptr->{$line}:=$ordered
+			vptotals2Ptr->{$line}:=$ordered
+			$ordered:=0
+			$line:=$line+1
+			
+			vpstylePtr->{$line}:="Received:"
+			vptotals2Ptr->{$line}:=Round($shipped;0)
+			$shipped:=0
+			$line:=$line+1
+			
+			vpstylePtr->{$line}:="Over/Under:"
+			If (vptotals2Ptr->{$line-1}>0)
+				vptotals2Ptr->{$line}:=Round(vptotals2Ptr->{$line-1}-vptotals2Ptr->{$line-3};0)
+			Else 
+				vptotals2Ptr->{$line}:=Round(vptotals2Ptr->{$line-2}-vptotals2Ptr->{$line-3};0)
+			End if 
+		End if 
+	End for 
+	
+	ARRAY LONGINT(vpcolorKeyPtr->;Size of array(vpcpPtr->))
+	$color:=16777215
+	
+	$ordered:=0
+	$shipped:=0
+	
+	$i:=1
+	For ($i;1;Size of array(vpcolorKeyPtr->))
+		
+		If (vpunitsPtr->{$i}<0) & (vpstylePtr->{$i}="Over/Under@")
+			$color:=16759225
+		Else 
+			$color:=16777215
+		End if 
+		vpcolorKeyPtr->{$i}:=$color
+	End for 
+End if 
+

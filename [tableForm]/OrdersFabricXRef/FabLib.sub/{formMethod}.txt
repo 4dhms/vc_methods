@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($sample)
+
+Case of 
+	: (Form event=On Display Detail)
+		If ([OrdersFabricXRef]OrderNumber<0)
+			$sample:=Abs([OrdersFabricXRef]OrderNumber)
+			vsOrderNumber:="SG"+String($sample)
+			QUERY([Samples];[Samples]SampleNumber=$sample)
+			vStyle:=[Samples]StyleNum
+			vDesign:=[Samples]DesignNum
+			UNLOAD RECORD([Samples])
+		Else 
+			vsOrderNumber:=String([OrdersFabricXRef]OrderNumber)
+			QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+			vStyle:=[Orders]StyleNumber
+			vDesign:=[Orders]DesignNumber
+			UNLOAD RECORD([Orders])
+		End if 
+End case 

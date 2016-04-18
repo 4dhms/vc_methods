@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vPrjGPQty)
+C_REAL(vToSalSum)
+C_LONGINT(vUntsSldSum)
+C_REAL(vActSalSum)
+C_REAL(vProfSum)
+C_REAL(vProfAvg)
+C_REAL(vPerAvg)
+
+
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asDivisions;0)
+		LIST TO ARRAY("Division Code No";asDivisions)
+		APPEND TO ARRAY(asDivisions;"All")
+		asDivisions:=Size of array(asDivisions)
+		
+		SeasonArrays 
+		<>asSeasonName:=1
+		<>asSeasonYear:=1
+		Array_BuildDates 
+		Report_LoadArrays 
+		vsCustomer:=""
+		pOne:=0
+		pTwo:=0
+		pThree:=0
+		pFour:=1
+		cb11:=1
+		cb12:=0
+		
+		
+	: (Form event=On Display Detail)
+		GP_LineCalc 
+End case 

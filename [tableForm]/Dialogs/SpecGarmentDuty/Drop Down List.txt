@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([SpecialDuty];[SpecialDuty]SDName=asSpecialGarment{asSpecialGarment})
+vrDutyRate:=[SpecialDuty]SDuty
+vtNote:=[SpecialDuty]SDNote
+
+$i:=1
+For ($i;1;Size of array(afProcess))
+	If (afProcess{$i}=True)
+		atCost7{$i}:=String(vrDutyRate;"##.00")
+		alSDID{$i}:=[SpecialDuty]SDID
+	End if 
+End for 

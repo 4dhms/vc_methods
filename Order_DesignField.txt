@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vsDesignNumber:=[Orders]DesignNumber
+<>vsStyleNumber:=[Orders]StyleNumber
+vlFieldNum:=Field(->[Orders]DesignNumber)
+
+Case of 
+	: (Form event=On Getting Focus)
+		If (Not(<>vfWarning)) & ([Orders]StyleNumber="")
+			WinPrompt ("If you enter the Style Number first, Design Number and default Customer will copy"+" from the Style Number Book.")
+			<>vfWarning:=True
+		End if 
+		
+	: (Form event=On Data Change)
+		OBJECT SET ENABLED(bComponent;True)
+		  //Order_NYSupply 
+		
+		<>vsDesignNumber:=[Orders]DesignNumber
+		<>vlOrderNumber:=[Orders]OrderNum
+		
+		QUERY([Designs];[Designs]DesignNum=<>vsDesignNumber)
+		Order_KWCSToggle 
+		
+		vtDescription:=[Designs]Description
+		If (Records in selection([Designs])<1)
+			WinPrompt ("That design number does not exist. Try again.")
+			
+			If (ok=1)
+				[Orders]DesignNumber:=""
+				<>vsDesignNumber:=""
+				GOTO OBJECT([Orders]DesignNumber)
+			End if 
+		Else 
+		End if 
+		
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+		If (Records in selection([SpecFactory])>0) & ([SpecFactory]DesignNumber#[Orders]DesignNumber)
+			[SpecFactory]DesignNumber:=[Orders]DesignNumber
+			SAVE RECORD([SpecFactory])
+		End if 
+		UNLOAD RECORD([SpecFactory])
+		QUERY([CS_Lines];[CS_Lines]OrderNumber=[Orders]OrderNum)
+		QUERY SELECTION([CS_Lines];[CS_Lines]CS_ID=0;*)
+		QUERY SELECTION([CS_Lines]; & ;[CS_Lines]SpecSheet=True)
+		FIRST RECORD([CS_Lines])
+		If (Records in selection([CS_Lines])>0) & ([CS_Lines]DesignNumber#[Orders]DesignNumber)
+			APPLY TO SELECTION([CS_Lines];[CS_Lines]DesignNumber:=[Orders]DesignNumber)
+		End if 
+		UNLOAD RECORD([CS_Lines])
+		
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=<>vlOrderNumber)
+		[SpecFactory]DesignNumber:=[Orders]DesignNumber
+		SAVE RECORD([SpecFactory])
+End case 
+

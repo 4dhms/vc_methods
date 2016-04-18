@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	zYes:=1
+	Mail_UpdateLog ("")
+End if 

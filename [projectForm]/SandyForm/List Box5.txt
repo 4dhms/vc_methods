@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	History_GetDetail 
+End if 
+LISTBOX SELECT ROW(historyBox;Size of array(atHistField)+1)

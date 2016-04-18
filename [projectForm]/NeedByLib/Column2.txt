@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($lead)
+C_BOOLEAN($dynamic)
+
+If (Form event=On Clicked)
+	$lead:=0
+	WinChoice ("Is Lead Time fixed or dynamic?";"Fixed";"Dynamic";"Cancel")
+	If (ok=1)
+		If (bChoice2=1)
+			$lead:=Num(Request("Dynamic Lead Time";"3"))
+			$dynamic:=True
+		Else 
+			$lead:=Num(Request("Fixed Lead Time";"24"))
+			$dynamic:=False
+		End if 
+	End if 
+	
+	If ($lead>0)
+		QUERY([NeedByLib];[NeedByLib]Name=asCustomers{asCustomers})
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+		Case of 
+			: (Records in selection([NeedByLib])=0)
+				CREATE RECORD([NeedByLib])
+				[NeedByLib]Name:=asCustomers{asCustomers}
+				[NeedByLib]Leadtime:=$lead
+				[NeedByLib]Router:=1
+				[NeedByLib]LeadtimeSpecial:=$dynamic
+				SAVE RECORD([NeedByLib])
+				QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+				QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+				ORDER BY([NeedByLib];[NeedByLib]Name;>)
+				DELETE FROM ARRAY(asCustomers;asCustomers;1)
+			: (Locked([NeedByLib]))
+				WinPrompt (asCustomers{asCustomers}+" is locked. Configure leadtime later.")
+				QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+				QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+				ORDER BY([NeedByLib];[NeedByLib]Name;>)
+			Else 
+				[NeedByLib]Leadtime:=$lead
+				[NeedByLib]LeadtimeSpecial:=$dynamic
+				SAVE RECORD([NeedByLib])
+				QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+				QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+				ORDER BY([NeedByLib];[NeedByLib]Name;>)
+				DELETE FROM ARRAY(asCustomers;asCustomers;1)
+		End case 
+	End if 
+End if 

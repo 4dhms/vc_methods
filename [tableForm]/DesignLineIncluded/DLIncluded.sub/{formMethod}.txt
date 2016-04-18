@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Display Detail)
+	  //DL_ApplyFont 
+	
+	
+	  //Picture_RestoreOnTheFly 
+	If ([DesignLineIncluded]Source="")
+		[DesignLineIncluded]Source:="Sample"
+		  //SAVE RECORD([DesignLineIncluded])
+	End if 
+	  //SET VISIBLE([DesignLineIncluded]DesignNumber;Num([DesignLineIncluded]DesignNumber)>0)
+End if 
+
+

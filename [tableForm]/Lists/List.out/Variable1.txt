@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($lastRecord)
+
+CREATE SET([Lists];"Remain")
+If (Records in set("UserSet")<1)
+	WinPrompt ("Select something.")
+Else 
+	SELECTION TO ARRAY([Lists]ListItem;$find)
+	USE SET("UserSet")
+	FIRST RECORD([Lists])
+	$lastrecord:=Find in array($find;[Lists]ListItem)
+	WinChoice ("Delete "+String(Records in selection([Lists]))+" list item(s)?";"Yes";"No")
+	If (ok=1)
+		DELETE SELECTION([Lists])
+	End if 
+End if 
+USE SET("Remain")
+ORDER BY([Lists];[Lists]OrderCount;<;[Lists]ListItem;>)
+
+If ($lastRecord<=Records in selection([Lists]))
+	GOTO SELECTED RECORD([Lists];$lastRecord)
+	CREATE EMPTY SET([Lists];"ThisLine")
+	ADD TO SET([Lists];"ThisLine")
+	USE SET("Remain")
+	CLEAR SET("Remain")
+	ORDER BY([Lists];[Lists]OrderCount;<;[Lists]ListItem;>)
+	HIGHLIGHT RECORDS([Lists];"ThisLine")
+End if 
+
+CLEAR SET("ThisLine")
+
+
+SET WINDOW TITLE(String(Records in selection([Lists]))+" list items")

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Not([CostSheets]MyFOB))
+	WinPrompt ("To override FOB calculation, click "+Char(34)+"My FOB"+Char(34)+".")
+End if 
+
+Cost_EntryCalculate 

@@ -1,0 +1,106 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atMon;0)
+ARRAY TEXT(atTue;0)
+ARRAY TEXT(atWed;0)
+ARRAY TEXT(atThu;0)
+ARRAY TEXT(atFri;0)
+C_LONGINT(vlRemaining;$i;$h)
+C_TIME($thisHour)
+C_BOOLEAN($done)
+ARRAY TEXT($hours;0)
+
+Cal_WeekSetup 
+
+vlRemaining:=0
+ORDER BY([Appts];[Appts]ApptStart;<)
+
+$i:=1
+FIRST RECORD([Appts])
+For ($i;1;Records in selection([Appts]))
+	If (Find in array($hours;String([Appts]ApptStart))<1)
+		INSERT IN ARRAY($hours;1;1)
+		$hours{1}:=String([Appts]ApptStart)
+	End if 
+	NEXT RECORD([Appts])
+End for 
+$i:=1
+QUERY([Appts];[Appts]ApptDate>=vdStart;*)
+QUERY([Appts]; & ;[Appts]ApptDate<=vdStart+4)
+CREATE SET([Appts];"ThisWeek")
+
+PRINT SETTINGS
+If (ok=1)
+	
+	$h:=1
+	For ($h;1;Size of array($hours))
+		vtDateFlag:=String(Time($hours{$h});5)
+		If ($h>Size of array($hours))
+		Else 
+			SET PRINT OPTION(Orientation option;2)
+			If (vlRemaining<30)
+				vlRemaining:=576-36
+				Print form([Week];"Week.head")
+			End if 
+			
+			If (Size of array(atMon)+Size of array(atTue)+Size of array(atWed)+Size of array(atThu)+Size of array(atFri)=0)
+				USE SET("ThisWeek")
+				$thisHour:=Time($hours{$h})
+				QUERY SELECTION([Appts];[Appts]ApptStart=$thisHour)
+				Cal_BuildArrays 
+			End if 
+		End if 
+		
+		$done:=False
+		
+		Repeat 
+			If (vlRemaining<30)
+				$done:=True
+				Print form([Week];"Divider")
+				vlRemaining:=vlRemaining-1
+				PAGE BREAK(>)
+			Else 
+				Cal_InitVar 
+				If (Size of array(atMon)>1)
+					vtTextField1:=atMon{1}
+					vtTextField2:=atMon{2}
+					DELETE FROM ARRAY(atMon;1;2)
+				End if 
+				If (Size of array(atTue)>1)
+					vtTextField3:=atTue{1}
+					vtTextField4:=atTue{2}
+					DELETE FROM ARRAY(atTue;1;2)
+				End if 
+				If (Size of array(atWed)>1)
+					vtTextField5:=atWed{1}
+					vtTextField6:=atWed{2}
+					DELETE FROM ARRAY(atWed;1;2)
+				End if 
+				If (Size of array(atThu)>1)
+					vtTextField7:=atThu{1}
+					vtTextField8:=atThu{2}
+					DELETE FROM ARRAY(atThu;1;2)
+				End if 
+				If (Size of array(atFri)>1)
+					vtTextField9:=atFri{1}
+					vtTextField10:=atFri{2}
+					DELETE FROM ARRAY(atFri;1;2)
+				End if 
+				
+				Print form([Week];"Week.line")
+				vtDateFlag:=""
+				vlRemaining:=vlRemaining-30
+			End if 
+			
+			Case of 
+				: (vlRemaining<30) | (Size of array(atMon)+Size of array(atTue)+Size of array(atWed)+Size of array(atThu)+Size of array(atFri)=0)
+					$done:=True
+					Print form([Week];"Divider")
+					vlRemaining:=vlRemaining-1
+			End case 
+		Until ($done)
+	End for 
+End if 
+
+
+CLEAR SET("ThisWeek")
+

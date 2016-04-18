@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c;$i)
+$c:=Year of(Current date(*))-2000+1
+
+ARRAY TEXT(<>asStartYear;$c)
+ARRAY TEXT(<>asEndYear;$c)
+ARRAY TEXT(<>asStartMonth;12)
+ARRAY TEXT(<>asEndMonth;12)
+
+LIST TO ARRAY("Year";<>asStartYear)
+LIST TO ARRAY("Year";<>asEndYear)
+
+<>asStartMonth{1}:="January"
+<>asStartMonth{2}:="February"
+<>asStartMonth{3}:="March"
+<>asStartMonth{4}:="April"
+<>asStartMonth{5}:="May"
+<>asStartMonth{6}:="June"
+<>asStartMonth{7}:="July"
+<>asStartMonth{8}:="August"
+<>asStartMonth{9}:="September"
+<>asStartMonth{10}:="October"
+<>asStartMonth{11}:="November"
+<>asStartMonth{12}:="December"
+
+$i:=1
+For ($i;1;12)
+	<>asEndMonth{$i}:=<>asStartMonth{$i}
+End for 
+
+Array_BuildDays ("Start";1)
+Array_BuildDays ("End";1)  //Month of(Current date(*)))

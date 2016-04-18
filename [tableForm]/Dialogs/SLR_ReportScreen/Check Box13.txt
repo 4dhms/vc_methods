@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (zPrint=1)
+	WinPrompt ("Print Ranking is sorted by sales.")
+	c4:=0
+	c3:=1
+Else 
+	If (c5=1)
+		c4:=0
+		c3:=0
+		c2:=0
+		c1:=0
+		If (nav1+nav2=0)
+			WinChoice ("Are you sorting up or down?";"Up";"Down")
+			If (ok=1)
+				nav1:=1
+			Else 
+				nav2:=1
+			End if 
+		End if 
+	End if 
+	SLR_Sort (1)
+	SLR_BuildTitle 
+	
+End if 

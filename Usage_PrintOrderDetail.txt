@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pcount)
+vlPage:=1
+
+PRINT SETTINGS
+
+For ($i;1;Size of array(asSSDesignNumber))
+	
+	If ($pcount<36)
+		vsPrintingHeader:="Page "+String(vlPage)
+		vlPage:=vlPage+1
+		If ($i>2)
+			Print form("14PTslug")
+			Print form("Usage_PrintOrderFooter")
+			PAGE BREAK(>)
+		End if 
+		Print form("Usage_PrintOrderHeader")
+		$pcount:=660
+	End if 
+	vsValue1:=""
+	vsValue2:=""
+	vsValue3:=""
+	vsValue4:=""
+	vlItem5:=0
+	vsValue6:=""
+	vsValue7:=""
+	vsValue1:=asSSDesignNumber{$i}
+	vsValue2:=asSSDescript{$i}
+	vsValue3:=asCustomers{$i}
+	vlItem5:=alUnits{$i}
+	vsValue7:=atFootnote{$i}
+	
+	Case of 
+		: (alDNColor{$i}=16711685)
+			vlRouter:=1
+		: (alDNColor{$i}=16765650)
+			vlRouter:=2
+		Else 
+			vlRouter:=0
+	End case 
+	
+	Print form("Usage_PrintOrderLine")
+	$pcount:=$pcount-14
+End for 
+
+vlRouter:=0
+vsValue1:=""
+vsValue2:=""
+vsValue3:=""
+vsValue4:=""
+vlItem5:=0
+vsValue6:=""
+vsValue7:=""
+Print form("Usage_PrintOrderLine")
+vsValue2:="Total"
+vlItem5:=vlTotCount
+Print form("Usage_PrintOrderLine")
+$pcount:=$pcount-28
+
+Repeat 
+	Print form("14PTslug")
+	$pcount:=$pcount-14
+Until ($pcount<24)
+
+Print form("Usage_PrintOrderFooter")
+PAGE BREAK

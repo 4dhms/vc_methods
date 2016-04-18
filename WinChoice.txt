@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+<>tAlert:=$1
+
+Case of 
+	: (Count parameters>5)
+		If ($6="Yarn Dye Stripe")
+			vsChoice1:=$2
+			vsChoice2:=$3
+			vsChoice3:=$4
+			vsChoice4:=$5
+			vsChoice5:=$6
+			vlPageRouter:=7
+		Else 
+			vsChoice1:=$2
+			vsChoice2:=$3
+			vsChoice3:=$4
+			vsChoice4:=$5
+			vsChoice5:=$6
+			vlPageRouter:=4
+		End if 
+	: (Count parameters>4)
+		vsChoice1:=$2
+		vsChoice2:=$3
+		vsChoice3:=$4
+		vsChoice4:=$5
+		vlPageRouter:=3
+	: (Count parameters>3)
+		vsChoice1:=$2
+		vsChoice2:=$3
+		vsChoice3:=$4
+		vlPageRouter:=2
+	: (Count parameters>2)
+		vsChoice1:=$2
+		vsChoice2:=$3
+		vlPageRouter:=1
+	: (Count parameters=2)
+		If ($2="price")
+			vlPageRouter:=8
+		End if 
+	Else 
+		vsChoice1:="Yes"
+		vsChoice2:="No"
+		vlPageRouter:=1
+End case 
+
+WinCentOnCenter (300;150;1)
+DIALOG("Confirm")
+CLOSE WINDOW

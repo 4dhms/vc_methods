@@ -1,0 +1,104 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //
+
+C_TEXT($border;$tc;$working)
+C_LONGINT($c)
+C_BOOLEAN($fine)
+
+vtColorCode:=""
+If (vsCPNumber#"")
+	If (vsCPNumber="B@")
+		vsCPNumber:=Replace string(vsCPNumber;"B";"b")
+	End if 
+	
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber)
+	$working:=StripToNumber ([ColorPrintNumber]ThreadColor)
+	
+	Case of 
+		: (Records in selection([ColorPrintNumber])=0)
+			$border:="b"+vsCPNumber
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$border)
+			If (Records in selection([ColorPrintNumber])=1)
+				WinChoice ("Do you mean the border print"+Char(13)+$border+"?")
+				If (ok=1)
+					vsCPNumber:=$border
+					vsCPName:=[ColorPrintNumber]CPName
+					vtMillNumber:=[ColorPrintNumber]MillNumber
+				Else 
+					vsCPNumber:=""
+					GOTO OBJECT(vsCPNumber)
+				End if 
+			Else 
+				WinPrompt ("No such number.")
+				GOTO OBJECT(vsCPNumber)
+			End if 
+		: ([ColorPrintNumber]CPType=1) & (Position("-";[ColorPrintNumber]CPNumber)>0)
+			vsCPNumber:=""
+			WinPrompt ("This color number contains a hyphen with is not allowed. Please create a new one.")
+			GOTO OBJECT(vsCPNumber)
+		Else 
+			vsCPName:=[ColorPrintNumber]CPName
+			vtMillNumber:=[ColorPrintNumber]MillNumber
+			If (vsCPType="Zipper")
+				GOTO OBJECT(vtThreadColor)
+			Else 
+				GOTO OBJECT(vlCPQuantity)
+			End if 
+	End case 
+	
+	If ([ColorPrintNumber]CPType=2)
+		If ($working="")
+			REDUCE SELECTION([ColorPrintNumber];0)
+		Else 
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$working)
+			If (Records in selection([ColorPrintNumber])>0)
+				$fine:=True
+			Else 
+				$c:=Position(" ";$working)
+				If ($c<1)
+					$tc:=String(Num($working))
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$tc)
+				Else 
+					$tc:=Replace string(Substring($working;1;$c-1);"#";"")
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$tc)
+					If (Records in selection([ColorPrintNumber])=0)
+						$tc:=String(Num(Substring($working;$c+1)))
+						QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$tc)
+						If (Records in selection([ColorPrintNumber])=0)
+							$tc:=String(Num($working))
+							QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$tc)
+						End if 
+					End if 
+				End if 
+			End if 
+		End if 
+		
+		If (Records in selection([ColorPrintNumber])>0)
+			Case of 
+				: ([ColorPrintNumber]CPNumber="TBD")
+					vtThreadColor:=""
+				: ($fine)
+					vtThreadColor:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+				Else 
+					vtThreadColor:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+			End case 
+			
+			UNLOAD RECORD([ColorPrintNumber])
+		End if 
+	End if 
+	
+	Case of 
+		: (FORM Get current page=4)
+			  //do nothing this is a zipper
+		: (vfNewColor)
+			vfNewColor:=False
+			vsCPStatus:="Added"
+			vdCPStatusDate:=Current date(*)
+		: (asCPNumbers{asCPNumbers}#vsCPNumber) & (<>vlOrderNumber<0) & ([Samples]RevisionNumber>0)
+			vsCPStatus:="Number changed"
+			vdCPStatusDate:=Current date(*)
+		: (asCPNumbers{asCPNumbers}#vsCPNumber) & (<>vlOrderNumber>0) & ([Orders]RevisionNumber>0)
+			vsCPStatus:="Number changed"
+			vdCPStatusDate:=Current date(*)
+	End case 
+End if 

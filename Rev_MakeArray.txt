@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($tableptr;$fieldptr;$arrayptr)
+C_LONGINT($i;$high;$tableno;$type)
+
+ARRAY TEXT(atOldFieldValues;0)
+
+$tableno:=$1
+$tableptr:=Table(2)
+$high:=Get last field number($tableptr)
+ARRAY TEXT(atOldFieldValues;$high)
+
+$i:=1
+For ($i;1;$high)
+	If (Is field number valid($tableno;$i))
+		$fieldptr:=Field($tableno;$i)
+		GET FIELD PROPERTIES($tableno;$i;$type)
+		Case of 
+			: ($type=0) | ($type=2)
+				atOldFieldValues{$i}:=$fieldptr->
+			: ($type=30)
+				  //BLOB
+			: ($type=3)
+				  //Picture
+			: ($type=6)
+				If ($fieldptr->)
+					atOldFieldValues{$i}:="True"
+				Else 
+					atOldFieldValues{$i}:="False"
+				End if 
+			: ($type=4)
+				atOldFieldValues{$i}:=String($fieldptr->)
+			: ($type=8) | ($type=25) | ($type=9) | ($type=1)
+				atOldFieldValues{$i}:=String($fieldptr->)
+			: ($type=11)
+				atOldFieldValues{$i}:=String($fieldptr->)
+		End case 
+	End if 
+End for 
+

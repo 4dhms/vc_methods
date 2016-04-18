@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>done)
+
+Case of 
+	: (Form event=On Load)
+		SET TIMER(60*10)
+		OBJECT SET TITLE(bGo;"Stop")
+		<>done:=False
+		<>vtMessage:="Spooler running"
+		vlCounter:=0
+		QUERY([Changes];[Changes]OrderNumber=500)
+		If (Records in selection([Changes])=0)
+			CREATE RECORD([Changes])
+			[Changes]OrderNumber:=500
+			[Changes]NewChange:="Spooler checker"
+		End if 
+		[Changes]RevDate:=Current date(*)
+		[Changes]RevTime:=Current time(*)
+		SAVE RECORD([Changes])
+		UNLOAD RECORD([Changes])
+		
+	: (Form event=On Timer)
+		vlCounter:=vlCounter+1
+		vsMeasure:=String(Current time(*))+"  "+String(vlCounter)
+		
+		SP_SendSpool 
+		  //Order_CleanUpFlag 
+		
+		If (vlCounter>12)
+			vlCounter:=0
+			QUERY([Changes];[Changes]OrderNumber=500)
+			If (Records in selection([Changes])=0)
+				CREATE RECORD([Changes])
+				[Changes]OrderNumber:=500
+				[Changes]NewChange:="Spooler checker"
+			End if 
+			[Changes]RevDate:=Current date(*)
+			[Changes]RevTime:=Current time(*)
+			SAVE RECORD([Changes])
+			UNLOAD RECORD([Changes])
+		End if 
+End case 
+

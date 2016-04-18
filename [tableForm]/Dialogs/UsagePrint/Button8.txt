@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+UsageInitArrays (0)
+Case of 
+	: (FORM Get current page=1)
+		UsagePrints 
+	: (asChartDivisions>1)
+		UsageDesignsByDiv 
+	Else 
+		UsageDesigns 
+End case 

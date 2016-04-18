@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asXCPNumbers;0)
+ARRAY TEXT(asXColors;0)
+ARRAY LONGINT(alXhmsPO;0)
+ARRAY TEXT(asXStyleNumbers;0)
+ARRAY LONGINT(alXUnits;0)
+ARRAY TEXT(asXConsumption;0)
+ARRAY LONGINT(alXTotals;0)
+ARRAY LONGINT(alXColorKey;0)
+ARRAY TEXT(asXfabPO;0)
+ARRAY LONGINT(alXShip;0)
+ARRAY LONGINT(alXFabricColor;0)
+ARRAY TEXT(asPOdate;0)
+ARRAY TEXT(asFBdate;0)
+
+ARRAY TEXT(asCPNumbers;0)
+ARRAY TEXT(asColors;0)
+ARRAY LONGINT(alPOOrder;0)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY LONGINT(alUnits;0)
+ARRAY TEXT(atSub1;0)
+ARRAY TEXT(atSub2;0)
+ARRAY LONGINT(alSubTot1;0)
+ARRAY LONGINT(alSubTot2;0)
+ARRAY LONGINT(alFabricColor;0)
+ARRAY LONGINT(alColorKey;0)
+
+C_POINTER(vpcolorPtr)
+C_POINTER(vphmsPOPtr)
+C_POINTER(vpstylePtr)
+C_POINTER(vpunitsPtr)
+C_POINTER(vpconsum1Ptr)
+C_POINTER(vptotals1Ptr)
+C_POINTER(vpconsum2Ptr)
+C_POINTER(vptotals2Ptr)
+C_POINTER(vpcolorKeyPtr)
+C_POINTER(vpcpPtr)
+
+If (vfExpand)
+	vpcpPtr:=->asXCPNumbers
+	vpcolorPtr:=->asXColors
+	vphmsPOPtr:=->alXhmsPO
+	vpstylePtr:=->asXStyleNumbers
+	vpunitsPtr:=->alXUnits
+	vpconsum1Ptr:=->atSub1
+	vpconsum2Ptr:=->atSub2
+	vptotals1Ptr:=->alSubTot1
+	vptotals2Ptr:=->alSubTot2
+	vpcolorKeyPtr:=->alXColorKey
+	  //$shipPtr:=->alXShip
+	  //$fabPOptr:=->asXfabPO
+	  //$fabColorPtr:=->alXFabricColor
+Else 
+	vpcpPtr:=->asCPNumbers
+	vpcolorPtr:=->asColors
+	vphmsPOPtr:=->alPOOrder
+	vpstylePtr:=->asStyleNumbers
+	vpunitsPtr:=->alUnits
+	vpconsum1Ptr:=->atSub1
+	vpconsum2Ptr:=->atSub2
+	vptotals1Ptr:=->alSubTot1
+	vptotals2Ptr:=->alSubTot2
+	  //$fabColorPtr:=->alFabricColor
+	vpcolorKeyPtr:=->alColorKey
+End if 

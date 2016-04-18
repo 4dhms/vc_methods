@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($change)
+C_LONGINT($i)
+C_POINTER($changePtr;$colPtr)
+
+Grade_SizeArrayOnFocus 
+
+$changePtr:=Field(88;25+[SpecFactory]SampleCol)
+$changePtr->:=""
+
+$i:=1
+For ($i;1;10)
+	$colPtr:=Get pointer("vsSize"+String($i))
+	$changePtr:=Field(88;$i+25)
+	If ($colPtr->#"")
+		$changePtr:=Field(88;$i+25)
+		Case of 
+			: ($i=[SpecFactory]SampleCol)
+				$change:=0
+			: ($i<[SpecFactory]SampleCol)
+				$change:=arSizeCalc{$i}-arSizeCalc{$i+1}
+			: ($i>[SpecFactory]SampleCol)
+				$change:=arSizeCalc{$i}-arSizeCalc{$i-1}
+		End case 
+		$changePtr->:=Grade_ConvertBack ($change)
+	End if 
+	
+End for 
+  //
+[Sizes]Changed:=False
+SAVE RECORD([Sizes])

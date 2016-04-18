@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //If (Form event=On Getting Focus)
+  //If ([FabPOLines]LabDip) & ([FabPOLines]LabDipDate=!00/00/0000!)
+  //[FabPOLines]LabDipDate:=Current date(*)
+  //End if 
+  //End if 

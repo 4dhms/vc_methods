@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atMethod;0)
+
+APPEND TO ARRAY(atMethod;"CMLDP")
+APPEND TO ARRAY(atMethod;"CMTLDP")
+APPEND TO ARRAY(atMethod;"CIF")
+APPEND TO ARRAY(atMethod;"FOB")
+APPEND TO ARRAY(atMethod;"LDP")
+If (Find in array(atMethod;[CostSheets]Method)>0)
+	atMethod:=Find in array(atMethod;[CostSheets]Method)
+Else 
+	atMethod:=4
+End if 

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (afDelete>0)
+	QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey;*)
+	QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber<13;*)
+	QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber>0;*)
+	QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=alHistKey{afDelete})
+	
+	Case of 
+		: (afDelete{afDelete}=False)
+			
+		: (Records in selection([DesignLineIncluded])>0) & (afDelete{afDelete}=True)
+			WinPrompt ("You can only delete empty pages.")
+			afDelete{afDelete}:=False
+	End case 
+	
+End if 

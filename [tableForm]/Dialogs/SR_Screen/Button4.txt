@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vtMessage:="Building report"
+<>vlCounter:=0
+EMail_SendingProc 
+OBJECT SET ENABLED(bPrint;True)
+OBJECT SET ENABLED(bExcel;True)
+
+OBJECT SET VISIBLE(*;"xBuild";True)
+OBJECT SET VISIBLE(atQueryText;True)
+
+vlOrdersSubA:=0
+vlOrdersSubB:=0
+vlOrdersGrand:=0
+vlOrdersSubAx:=0
+vlOrdersSubBx:=0
+vlOrdersGrandx:=0
+vlUnitsSubA:=0
+vlUnitsSubB:=0
+vlUnitsGrand:=0
+vlUnitsSubAx:=0
+vlUnitsSubBx:=0
+vlUnitsGrandx:=0
+vlDollarsSubA:=0
+vlDollarsSubB:=0
+vlDollarsGrand:=0
+vlDollarsSubAx:=0
+vlDollarsSubBx:=0
+vlDollarsGrandx:=0
+
+SR_SetTable 
+If (cbQ=1)
+	SR_ShowQs 
+End if 
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)

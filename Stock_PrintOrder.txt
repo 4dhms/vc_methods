@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pixies)
+C_TEXT($lastcancel)
+
+If ($1)
+	PRINT SETTINGS
+End if 
+QUERY([StockOrdersLines];[StockOrdersLines]SONumber=[StockOrders]SONumber)
+
+$pixies:=0
+$i:=1
+vlPage:=1
+$lastcancel:=""
+FIRST RECORD([StockOrdersLines])
+For ($i;1;Records in selection([StockOrdersLines]))
+	If ($pixies<24) | ($lastcancel#[StockOrdersLines]CancelMonth)
+		If (vlPage>1)
+			PAGE BREAK(>)
+		End if 
+		If ($lastcancel=[StockOrdersLines]CancelMonth)
+			vtTitle:=[StockOrdersLines]CancelMonth+" (continued)"
+		Else 
+			vtTitle:=[StockOrdersLines]CancelMonth
+			$lastcancel:=[StockOrdersLines]CancelMonth
+		End if 
+		Print form([StockOrders];"Print.head")
+		vlPage:=vlPage+1
+		$pixies:=500
+	End if 
+	
+	Print form([StockOrdersLines];"Print.line")
+	$pixies:=$pixies-48
+	NEXT RECORD([StockOrdersLines])
+End for 
+Print form([StockOrdersLines];"Print.footer")
+
+PAGE BREAK
+
+[StockOrders]Print:=False
+SAVE RECORD([StockOrders])
+vfPrinting:=False
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Designs])

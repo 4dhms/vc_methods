@@ -1,0 +1,16 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vfInternal:=False
+vfVisible:=False
+vfComponents:=False
+vfStatus:=False
+vfIssues:=False
+vfAll:=False
+vfPDF:=False
+vfPrinting:=False
+vfUnapproved:=False
+vfMini:=False
+
+Center Window (250;500;1;"")
+DIALOG([Dialogs];"ProductionStatus.win")
+CLOSE WINDOW
+

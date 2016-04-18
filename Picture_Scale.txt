@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($w;$h)
+C_REAL($scale1;$scale2)
+
+PICTURE PROPERTIES(vxSketch;$w;$h)
+
+$scale1:=Round(480/$w;2)
+$scale2:=Round(480/$h;2)
+
+  //If ($scale1<$scale2)
+  //$scale:=$scale1
+  //Else 
+  //$scale:=$scale2
+  //End if 
+  //
+If ($scale1<$scale2)
+	$scale2:=Round($h*$scale1;0)
+	$scale1:=480
+Else 
+	$scale1:=Round($w*$scale2;0)
+	$scale2:=480
+End if 
+
+  // TRANSFORM PICTURE(vxSketch;Scale;$scale;$scale)
+
+CREATE THUMBNAIL(vxSketch;vxSketch;$scale1;$scale2)

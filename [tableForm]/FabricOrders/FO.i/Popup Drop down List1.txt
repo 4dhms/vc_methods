@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (atShipTo>0)
+	QUERY([Addesses];[Addesses]Location=atShipTo{atShipTo})
+	[FabricOrders]VendorName:=[Vendors]VendorName
+	[FabricOrders]Terms:=[Vendors]Terms
+	[FabricOrders]VendorKey:=[Vendors]VendorKey
+	RELATE MANY([FabricOrders]FabOrderKey)
+	APPLY TO SELECTION([OrdersFabricXRef];[OrdersFabricXRef]Vendor:=[Vendors]VendorName)
+	
+	If (Old([FabricOrders]VendorName)#[FabricOrders]VendorName)
+		FabPO_ChangedField (->[FabricOrders]VendorName)
+	End if 
+	atShipTo:=0
+End if 

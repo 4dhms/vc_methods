@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$count;$qty)
+
+If (<>vlOrderNumber<0)
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=<>vlOrderNumber)
+	
+	If (Records in selection([CP_OrderXRef])>0)
+		$i:=1
+		$count:=0
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			If (Find in array(alColorKey;[CP_OrderXRef]CPOrdID)>0)
+				$qty:=alCQty{Find in array(alColorKey;[CP_OrderXRef]CPOrdID)}
+				Case of 
+					: ([CP_OrderXRef]ReceivedColor)
+						$count:=$count+$qty
+					: ([CP_OrderXRef]CPStatus="Recd")
+						[CP_OrderXRef]ReceivedColor:=True
+						$count:=$count+$qty
+				End case 
+				NEXT RECORD([CP_OrderXRef])
+			End if 
+		End for 
+		[Samples]Received:=$count
+		[Samples]Outstanding:=[Samples]SGQuantity-$count
+		UNLOAD RECORD([CP_OrderXRef])
+	Else 
+		[Samples]Outstanding:=[Samples]SGQuantity
+	End if 
+	SAVE RECORD([Samples])
+End if 

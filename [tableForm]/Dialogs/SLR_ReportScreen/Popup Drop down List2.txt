@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+APPEND TO ARRAY(asStyleNumbers;asXStyleNumbers{asXStyleNumbers})
+DELETE FROM ARRAY(asXStyleNumbers;asXStyleNumbers;1)
+SORT ARRAY(asStyleNumbers;>)

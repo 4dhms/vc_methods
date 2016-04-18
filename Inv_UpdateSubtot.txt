@@ -1,0 +1,4 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+QUERY([Invoices];[Invoices]OrderNumber=[CostSheets]SheetID)
+[CostSheets]QtySubtot:=Sum([Invoices]InvoiceQuantity)
+[CostSheets]InvAmtSubTot:=Sum([Invoices]InvoiceAmount)

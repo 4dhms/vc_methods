@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asRowheaders>2)
+	OBJECT SET VISIBLE(*;"xKill";False)
+	OBJECT SET ENABLED(bDelete;False)
+	
+	asRowheaders:=asRowheaders-2
+	SS_PullPrevious 
+	SS_Show 
+End if 

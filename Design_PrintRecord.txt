@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Designs])
+CREATE SET([Designs];"DesLibSet")
+
+Center Window (350;100;1;"")
+DIALOG([Dashboard File];"PrtRecSelctn")
+CLOSE WINDOW
+If (OK=1)
+	Case of 
+		: (vPrtRec=1)
+			FORM SET OUTPUT([Designs];"prtDesInfEntry")
+			PAGE SETUP([Designs];"prtDesInfEntry")
+			Print_Record (->[Designs])
+		: (vPrtSel=1)
+			FORM SET OUTPUT([Designs];"prtDesInfEntry")
+			PAGE SETUP([Designs];"prtDesInfEntry")
+			Print_Selection (->[Designs])
+	End case 
+End if 
+FORM SET OUTPUT([Designs];"List Des Info E")
+USE SET("DesLibSet")
+CLEAR SET("DesLibSet")

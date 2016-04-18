@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+C_LONGINT($page)
+
+Case of 
+	: ([CostSheets]SheetName="Estimate@")
+		$show:=True
+		$page:=FORM Get current page
+	Else 
+		$show:=False
+		$page:=7
+		vsCurrentTab:="Cost I"
+End case 
+
+OBJECT SET VISIBLE(vrLDP1b;$show)
+OBJECT SET VISIBLE(vrLDP2b;$show)
+OBJECT SET VISIBLE(vsHead3;$show)
+OBJECT SET VISIBLE(*;"xLDP";$show)
+OBJECT SET VISIBLE(*;"xLDP1";$show)
+OBJECT SET VISIBLE([CostSheets]FOB;$show)
+
+  //FORM GOTO PAGE($page)
+atPages:=$page
+
+  //If ([CostSheets]SheetName#"Estimate@")
+  //<>vlCostRouter:=7
+  //CALL PROCESS(Current process)
+  //End if 

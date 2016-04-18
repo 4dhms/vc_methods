@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+REDUCE SELECTION([SLRReporter];0)
+OBJECT SET ENABLED(bPrint;False)
+OBJECT SET VISIBLE(asDCCustomer;False)
+OBJECT SET VISIBLE(asXStyleNumbers;False)
+ARRAY TEXT(asDCCustomer;0)
+ARRAY TEXT(asCustomers;0)
+ARRAY TEXT(asXStyleNumbers;0)
+ARRAY TEXT(asStyleNumbers;0)
+asDivisions:=0
+$i:=1
+For ($i;1;Size of array(afBatchList))
+	afBatchList{$i}:=False
+End for 
+
+Case of 
+	: (atPages=1)
+		FORM GOTO PAGE(1)
+	: (atPages=2)
+		If (Current user="Designer") & (Shift down)
+			FORM GOTO PAGE(2)
+		Else 
+			atPages:=1
+			ALERT("Under development")
+			FORM GOTO PAGE(1)
+		End if 
+	: (atPages=3)
+		FORM GOTO PAGE(3)
+End case 

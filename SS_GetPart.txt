@@ -1,0 +1,67 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($lineNumber;$router)
+C_TEXT($fabType)
+C_BOOLEAN(vfPDF)
+
+If (Count parameters>0)
+	$router:=$1
+Else 
+	$router:=FORM Get current page
+End if 
+
+If ($router=2)
+	If (Not(vfPDF))
+		SS_AllLines 
+	Else 
+		QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+	End if 
+Else 
+	If (Not(vfPDF))
+		SS_ActiveLines 
+	Else 
+		QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+	End if 
+End if 
+
+Case of 
+	: (pOne=1)
+		$lineNumber:=1
+		$fabType:=[SpecFactory]KnitWoven1
+	: (pTwo=1)
+		$lineNumber:=2
+		$fabType:=[SpecFactory]KnitWoven2
+	: (pThree=1)
+		$lineNumber:=3
+		$fabType:=[SpecFactory]KnitWoven3
+	Else 
+		$lineNumber:=1
+		$fabType:=[SpecFactory]KnitWoven1
+End case 
+
+If ($fabType="")
+	If ([SpecFactory]OrderNumber>0)
+		$fabType:=[Orders]KWCnS
+	Else 
+		$fabType:=[Samples]KWCnS
+	End if 
+End if 
+
+Case of 
+	: ($fabType="Woven")
+		cbWoven:=1
+		cbKnit:=0
+		cbCutSew:=0
+	: ($fabType="Knit")
+		cbWoven:=0
+		cbKnit:=1
+		cbCutSew:=0
+	: ($fabType="CutSew")
+		cbWoven:=0
+		cbKnit:=0
+		cbCutSew:=1
+End case 
+
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=$lineNumber)
+ORDER BY([SpecSheetLines];[SpecSheetLines]SortOrder;>)

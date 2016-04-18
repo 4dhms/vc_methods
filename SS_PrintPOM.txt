@@ -1,0 +1,117 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($keepPrinting)
+C_LONGINT($i;$c;$n;vlremaining;$needed)
+C_TEXT($partName)
+C_BOOLEAN($printLine)
+vlRemaining:=0
+$keepPrinting:=True
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+
+SS_PartArray 
+<>ComponentSheet:=False
+SS_BuildPartCB (True)
+
+If (ok=1)
+	For ($c;1;Size of array(alPartNumber))
+		Case of 
+			: ($c=1)
+				$partName:=[SpecFactory]Part1
+			: ($c=2)
+				$partName:=[SpecFactory]Part2
+			: ($c=3)
+				$partName:=[SpecFactory]Part3
+		End case 
+		QUERY([SpecTemplate];[SpecTemplate]Template=$partName)
+		QUERY([GarmentParts];[GarmentParts]GarmentPartKey=[SpecTemplate]GarmentPartKey)
+		vsNewGarmentPart:=[GarmentParts]GarmentPartName
+		Case of 
+			: (vsNewGarmentPart="") & ($c=1)
+				vsNewGarmentPart:=[SpecFactory]Part1
+			: (vsNewGarmentPart="") & ($c=2)
+				vsNewGarmentPart:=[SpecFactory]Part2
+			: (vsNewGarmentPart="") & ($c=3)
+				vsNewGarmentPart:=[SpecFactory]Part3
+		End case 
+		
+		If (Not(vfPDF))
+			USE SET("ActiveLines")
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+		Else 
+			QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+		End if 
+		QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=$c)
+		
+		ORDER BY([SpecSheetLines];[SpecSheetLines]SortOrder;>)
+		$needed:=(Records in selection([SpecSheetLines])*15)+60
+		If (vlremaining-$needed<1) & (vlremaining<72)
+			vlPage:=vlPage+1
+			vsPrintingHeader:="PAGE "+String(vlPage)
+			PAGE BREAK(>)
+			vlremaining:=575
+			  //`page setup([SpecSheetLines];"HeaderOne.p")
+			If ($keepPrinting)
+				Print form([SpecSheetLines];"HeaderOne.p")
+			End if 
+			vlremaining:=vlremaining-86
+		Else 
+			  //page setup([SpecSheetLines];"HeaderOne.p")
+			If ($keepPrinting)
+				Print form([SpecSheetLines];"Subhead.p")
+			End if 
+			vlremaining:=vlremaining-36
+		End if 
+		$i:=0
+		$n:=Records in selection([SpecSheetLines])
+		
+		
+		While ($i<$n)
+			
+			$printLine:=True
+			Case of 
+				: (vlremaining<27) & (vlremaining>0) & ($n>=$i)
+					$printLine:=False
+					vtLine:=""
+					vtTitle1:=Uppercase(vsNewGarmentPart)+" CONTINUED ON NEXT PAGE"
+					  //page setup([SpecSheetLines];"HeaderOne.p")
+					If ($keepPrinting)
+						Print form([SpecSheetLines];"Comments.a")
+					End if 
+					vlremaining:=0
+				: (vlremaining<14)
+					vlremaining:=575
+					vlPage:=vlPage+1
+					vsPrintingHeader:="PAGE "+String(vlPage)
+					If ([GarmentParts]GarmentPartName=vsNewGarmentPart)
+						vsNewGarmentPart:=vsNewGarmentPart+" (continued)"
+					Else 
+						vsNewGarmentPart:=[GarmentParts]GarmentPartName
+					End if 
+					PAGE BREAK(>)
+					  //page setup([SpecSheetLines];"HeaderOne.p")
+					If ($keepPrinting)
+						Print form([SpecSheetLines];"HeaderOne.p")
+					End if 
+					vlremaining:=vlremaining-86
+			End case 
+			If ($printLine)
+				  //page setup([SpecSheetLines];"HeaderOne.p")
+				If ($keepPrinting)
+					Print form([SpecSheetLines];"Specline.p")
+					vlremaining:=vlremaining-14
+					NEXT RECORD([SpecSheetLines])
+					$i:=$i+1
+				End if 
+			End if 
+		End while 
+		
+	End for 
+End if 
+
+
+If ($keepPrinting)
+	$0:=True
+Else 
+	$0:=False
+End if 

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Samples];[Samples]SampleNumber=$1)
+QUERY SELECTION([Samples];[Samples]Void=False)
+
+Case of 
+	: ([Samples]KWCnS="Woven")
+		vsKWCS:="Woven"
+	: ([Samples]KWCnS="Knit")
+		vsKWCS:="Knit"
+	: ([Samples]KWCnS="CutSew")
+		vsKWCS:="Cut and Sew"
+	Else 
+		vsKWCS:=""
+End case 
+
+Web_Costsheet (-1*$1)

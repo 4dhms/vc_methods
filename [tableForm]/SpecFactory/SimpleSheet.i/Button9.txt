@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($proc)
+
+<>vtNotes:=[SpecLineSample]Comments2
+$proc:=New process("Spec_Notes";0;"Notes")
+
+If (<>vtNotes#[SpecLineSample]Comments2)
+	WinPrompt ("This change can not be saved.")
+End if 
+

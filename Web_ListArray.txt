@@ -1,0 +1,80 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($done)
+C_TEXT($remaining)
+C_TEXT($HTML)
+C_TEXT($tag1A;$tag1B)
+C_TEXT($showing)
+C_LONGINT($lowRange;$hiRange)
+
+  //Web_StatusPageRouter 
+
+  //builds complete order array
+ARRAY LONGINT($allNumbers;0)
+$lowRange:=((vlPage-1)*20)
+$hiRange:=vlPage*20
+
+$remaining:=vtOrders
+
+$i:=1
+Repeat 
+	If (Position(Char(13);$remaining;*)>0)
+		If ($i>$lowRange) & ($i<=$hiRange)
+			INSERT IN ARRAY($allNumbers;Size of array($allNumbers)+1;1)
+			$allNumbers{Size of array($allNumbers)}:=Num(Substring($remaining;1;Position(Char(13);$remaining;*)-1))
+		End if 
+		$remaining:=Substring($remaining;Position(Char(13);$remaining;*)+1;999)
+		$i:=$i+1
+	Else 
+		$done:=True
+	End if 
+Until ($done)
+
+ARRAY LONGINT(alOrders;Size of array($allNumbers))
+
+$i:=1
+For ($i;1;Size of array($allNumbers))
+	alOrders{$i}:=$allNumbers{$i}
+End for 
+
+$tag1A:="<font face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+" size=1 color=#000000><b>"
+$tag1B:="</b></FONT></TD>"+Char(13)+""
+
+  //spin the HTML table header
+$HTML:=Char(1)
+$HTML:=$HTML+"<P><TABLE BORDER=0  BGCOLOR=#ffffff cellpadding=5>"+Char(13)+""  //Create the Table
+$HTML:=$HTML+"<TR BGCOLOR="+Char(34)+"#FFFFFF"+Char(34)+">"+Char(13)+""
+
+  //summary
+If (vlPage*20>=vlRecCount)
+	$showing:=String(vlRecCount%20)+" to "+String(vlRecCount)+" of "+String(vlRecCount)
+Else 
+	$showing:=String((vlPage*20)-19)+" to "+String(vlPage*20)+" of "+String(vlRecCount)
+End if 
+
+
+$HTML:=$HTML+"<TD WIDTH=100>"
+$HTML:=$HTML+$tag1A+$showing+$tag1B+Char(13)+"<BR>"
+
+  //-----------CREATE CELLS
+
+  //vsPageTurner
+$HTML:=$HTML+"<TD WIDTH=100>"
+$HTML:=$HTML+$tag1A+"<input type=hidden name=vsPageTurner value="+vsPageTurner+$tag1B
+
+  //PREVIOUS LINK
+If (vlPage>1)
+	$HTML:=$HTML+"<TD WIDTH=100>"
+	$HTML:=$HTML+"<font size=1 face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+"><b>"
+	$HTML:=$HTML+"<A href=/4DCGI/List01_"+vsPageTurner+">PREVIOUS</A></b>"+$tag1B
+End if 
+
+If (vlPage<vlPageCount)
+	$HTML:=$HTML+"<TD WIDTH=100>"
+	$HTML:=$HTML+"<font size=1 face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+"><b>"
+	$HTML:=$HTML+"<A href=/4DCGI/List02_"+vsPageTurner+">NEXT</A></b>"+$tag1B
+End if 
+
+vtNavigator:=$HTML+"</TR></TABLE>"
+  //SET HTTP HEADER("pragma: no-cache")
+WEB SEND FILE("prodStatList.html")

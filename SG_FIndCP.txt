@@ -1,0 +1,35 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($xref;0)
+C_LONGINT($i;$n;$ordernumber)
+
+SAVE RECORD([Samples])
+
+WinFind ("Enter color/print:";7)
+
+If (OK=1) & (vsRequestString#"")
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=vsRequestString)
+	DISTINCT VALUES([CP_OrderXRef]XrefID;$xref)
+	$i:=1
+	CREATE EMPTY SET([Samples];"Color")
+	CREATE SET([Samples];"Orig")
+	For ($i;1;Size of array($xref))
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=$xref{$i})
+		$n:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($n;1;Records in selection([OrdersFabricXRef]))
+			$ordernumber:=-1*[OrdersFabricXRef]OrderNumber
+			If (vYesNO=1)
+				USE SET("Orig")
+				QUERY SELECTION([Samples];[Samples]SampleNumber=$ordernumber)
+			Else 
+				QUERY([Samples];[Samples]SampleNumber=$ordernumber)
+			End if 
+			ADD TO SET([Samples];"Color")
+		End for 
+	End for 
+	USE SET("Color")
+	CLEAR SET("Color")
+	CLEAR SET("Orig")
+End if 
+
+SET WINDOW TITLE("Samples: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))

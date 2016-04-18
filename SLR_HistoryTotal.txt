@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_POINTER($col)
+
+
+INSERT IN ARRAY(asName1;1;6)
+INSERT IN ARRAY(asName2;1;6)
+INSERT IN ARRAY(alCount;1;6)
+
+$i:=1
+For ($i;1;23)
+	$col:=Get pointer("arMcol"+String($i))
+	INSERT IN ARRAY($col->;1;6)
+End for 
+
+asName1{1}:="Life to Date"
+asName2{1}:="Sales (#)"
+asName2{2}:="Sales ($)"
+asName2{3}:="AUR"
+asName2{4}:="Sell Off %"
+asName2{5}:="EOW OH"
+asName2{6}:="Supply Wk"
+
+$i:=1
+For ($i;1;23)
+	$col:=Get pointer("arMcol"+String($i))
+	
+	$n:=1
+	For ($n;1;Size of array(arMcol1))
+		Case of 
+			: ($n<7)
+				$col->{$n}:=0
+			: ($n%6=1)
+				$col->{1}:=$col->{1}+$col->{$n}
+			: ($n%6=2)
+				$col->{2}:=$col->{2}+$col->{$n}
+			: ($n%6=5)
+				$col->{5}:=$col->{5}+$col->{$n}
+		End case 
+	End for 
+	$col->{3}:=Round($col->{2}/$col->{1};2)
+	$col->{4}:=Round($col->{1}/($col->{1}+$col->{5});3)*100
+	$col->{6}:=Round($col->{5}/$col->{1};0)
+	
+End for 
+

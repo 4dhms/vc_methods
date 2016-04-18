@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$s;$n)
+
+ARRAY TEXT(asXStyle;0)
+ARRAY TEXT(asXDesign;0)
+ARRAY LONGINT(alXOrder;0)
+ARRAY LONGINT(alBD1;0)
+ARRAY LONGINT(alBD2;0)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber<=12)
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;>;[DesignLineIncluded]ItemNumber;>)
+
+SELECTION TO ARRAY([DesignLineIncluded]StyleNumber;asXStyle;[DesignLineIncluded]DesignNumber;asXDesign;[DesignLineIncluded]OrderNumber;alXOrder)
+SELECTION TO ARRAY([DesignLineIncluded]PageNumber;alBD1;[DesignLineIncluded]ItemNumber;alBD2)
+ARRAY LONGINT(alShadeFab;Size of array(asXStyle))
+
+$i:=1
+For ($i;1;Size of array(asXStyle))
+	QUERY([Orders];[Orders]StyleNumber=asXStyle{$i};*)
+	QUERY([Orders]; & ;[Orders]DesignNumber=asXDesign{$i})
+	Case of 
+		: (Records in selection([Orders])=1)
+			alXOrder{$i}:=[Orders]OrderNum
+		: (Records in selection([Orders])>1)
+			QUERY SELECTION([Orders];[Orders]Customer="Stock")
+			If (Records in selection([Orders])=1)
+				alXOrder{$i}:=[Orders]OrderNum
+			Else 
+				FIRST RECORD([Orders])
+				CREATE EMPTY SET([Orders];"dc")
+				$n:=1
+				For ($n;1;Records in selection([Orders]))
+					QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+					$s:=1
+					FIRST RECORD([CP_OrderXRef])
+					For ($s;1;Records in selection([CP_OrderXRef]))
+						QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+						If (Records in selection([DC])>0)
+							ADD TO SET([Orders];"dc")
+						End if 
+						NEXT RECORD([CP_OrderXRef])
+					End for 
+				End for 
+				If (Records in set("dc")=1)
+					alXOrder{$i}:=[Orders]OrderNum
+				End if 
+				CLEAR SET("dc")
+			End if 
+	End case 
+	If (alXOrder{$i}>0)
+		alShadeFab{$i}:=16777215
+	Else 
+		alShadeFab{$i}:=16711690
+	End if 
+End for 
+FORM GOTO PAGE(5)

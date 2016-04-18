@@ -1,0 +1,36 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+<>vlCostRouter:=0
+SAVE RECORD([Samples])
+Spec_Close 
+
+If (Position("Fabric";vtOrderChanges)>0)
+	Fabric_ArraySave 
+End if 
+
+If (Position("Color";vtOrderChanges)>0)
+	Color_Save 
+End if 
+
+If (Position("Components";vtOrderChanges)>0)
+	Comp_Save 
+End if 
+
+Case of 
+	: (bFrstHMS=1)
+		FIRST RECORD([Samples])
+	: (bPrvHMS=1)
+		PREVIOUS RECORD([Samples])
+	: (bNxtHMS=1)
+		NEXT RECORD([Samples])
+	: (bLstHMS=1)
+		LAST RECORD([Samples])
+End case 
+
+QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+
+  //
+SG_NavButtons 
+SG_FM_EntryOnLoad 
+
+  //vsRecInSelection:=String(Selected record number([Sample Garments]))+"/"
+  //«+String(Records in selection([Sample Garments]))

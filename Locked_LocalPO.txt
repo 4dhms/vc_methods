@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($ordernum;<>vlOrderNumber;$1)
+C_TEXT($replyto;$message;$2)
+
+$ordernum:=$1
+$replyto:=$2
+
+
+If (<>SalesPrcID>0)
+	If ($ordernum=<>vlOrderNumber)
+		$message:="PO "+String(<>vlOrderNumber)+" locked by "+Current user
+		EXECUTE ON CLIENT($replyto;"Locked_InfoReturn";$message)
+	End if 
+End if 
+
+

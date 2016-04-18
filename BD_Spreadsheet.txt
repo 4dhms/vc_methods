@@ -1,0 +1,119 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$n;$subtot;$s;$c;$tot;$gtot)
+C_TEXT($path;$breakdown)
+C_POINTER($ptr)
+
+ARRAY TEXT($colors;0)
+ARRAY LONGINT($selfkeys;0)
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	
+	SEND PACKET($docref;"Cancel Date"+Char(9)+"Style"+Char(9)+"Color"+Char(9)+"Price"+Char(9)+"Breakdown"+Char(9)+"Total"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	$gtot:=0
+	
+	For ($i;1;Records in selection([Orders]))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		SELECTION TO ARRAY([CP_OrderXRef]SelfKey;$selfkeys)
+		
+		QUERY([BreakDownLibrary];[BreakDownLibrary]BDKey=[Orders]BDHeaderKey)
+		
+		ARRAY TEXT($sizes;0)
+		If ([BreakDownLibrary]BDN1#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN1)
+		End if 
+		If ([BreakDownLibrary]BDN2#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN2)
+		End if 
+		If ([BreakDownLibrary]BDN3#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN3)
+		End if 
+		If ([BreakDownLibrary]BDN4#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN4)
+		End if 
+		If ([BreakDownLibrary]BDN5#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN5)
+		End if 
+		If ([BreakDownLibrary]BDN6#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN6)
+		End if 
+		If ([BreakDownLibrary]BDN7#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN7)
+		End if 
+		If ([BreakDownLibrary]BDN8#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN8)
+		End if 
+		If ([BreakDownLibrary]BDN9#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN9)
+		End if 
+		If ([BreakDownLibrary]BDN10#"")
+			APPEND TO ARRAY($sizes;[BreakDownLibrary]BDN10)
+		End if 
+		
+		$n:=1
+		For ($n;1;Size of array($selfkeys))
+			$tot:=0
+			QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$selfkeys{$n})
+			QUERY([OrdersBreakdowns];[OrdersBreakdowns]SelfKey=$selfkeys{$n})
+			
+			$c:=1
+			FIRST RECORD([OrdersBreakdowns])
+			For ($c;1;Records in selection([OrdersBreakdowns]))
+				
+				$s:=1
+				$breakdown:=""
+				$subtot:=0
+				
+				For ($s;1;Size of array($sizes))
+					Case of 
+						: ($s=1)
+							$ptr:=->[OrdersBreakdowns]BD1
+						: ($s=2)
+							$ptr:=->[OrdersBreakdowns]BD2
+						: ($s=3)
+							$ptr:=->[OrdersBreakdowns]BD3
+						: ($s=4)
+							$ptr:=->[OrdersBreakdowns]BD4
+						: ($s=5)
+							$ptr:=->[OrdersBreakdowns]BD5
+						: ($s=6)
+							$ptr:=->[OrdersBreakdowns]BD6
+						: ($s=7)
+							$ptr:=->[OrdersBreakdowns]BD7
+						: ($s=8)
+							$ptr:=->[OrdersBreakdowns]BD8
+						: ($s=9)
+							$ptr:=->[OrdersBreakdowns]BD9
+						: ($s=10)
+							$ptr:=->[OrdersBreakdowns]BD10
+					End case 
+					
+					$breakdown:=$breakdown+$sizes{$s}+"/"+String([OrdersBreakdowns]Packs*$ptr->)
+					$subtot:=$subtot+([OrdersBreakdowns]Packs*$ptr->)
+					If ($s<Size of array($sizes))
+						$breakdown:=$breakdown+"-"
+					End if 
+				End for 
+				$tot:=$tot+$subtot
+				$gtot:=$gtot+$subtot
+				
+				SEND PACKET($docref;String([Orders]CancelDate)+Char(9)+[Orders]StyleNumber+Char(9)+[CP_OrderXRef]CPNumber+Char(9)+String([Orders]Price)+Char(9))
+				SEND PACKET($docref;$breakdown+Char(9)+String($subtot)+Char(13))
+				NEXT RECORD([OrdersBreakdowns])
+			End for 
+		End for 
+		SEND PACKET($docref;Char(9)+Char(9)+Char(9)+Char(9)+"Subtotal"+Char(9)+String($tot)+Char(13))
+		NEXT RECORD([Orders])
+	End for 
+	SEND PACKET($docref;Char(9)+Char(9)+Char(9)+Char(9)+"Grand Total"+Char(9)+String($gtot)+Char(13))
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 
+
+

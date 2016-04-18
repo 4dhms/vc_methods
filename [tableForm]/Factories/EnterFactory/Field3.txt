@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[Factories]AlphaKey:=Uppercase([Factories]AlphaKey)
+[Factories]NumberKey:=1000
+If (Find in array(asFactoryAlpha;[Factories]AlphaKey)>0)
+	WinPrompt ("That alpha key has already been used.")
+	[Factories]AlphaKey:=""
+End if 
+

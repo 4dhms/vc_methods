@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsRequestString:=Request("Enter new customer name:")
+
+If (ok=1)
+	QUERY([Customers];[Customers]CustomerName=vsRequestString)
+	If (Records in selection([Customers])>0)
+		WinPrompt (vsRequestString+" already exists")
+	Else 
+		asCustomers:=0
+		FORM SET INPUT([Customers];"Entry.i")
+		Center Window (900;650;4;"")
+		ADD RECORD([Customers];*)
+		CLOSE WINDOW
+	End if 
+End if 
+
+

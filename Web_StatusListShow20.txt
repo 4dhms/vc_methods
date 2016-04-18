@@ -1,0 +1,124 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+C_TEXT($tag1A;$tag1B;$tag2A;$tag2B)
+C_LONGINT($i;$repCount)
+C_TEXT($webFolder)
+C_BOOLEAN($done)
+
+
+Web_ListArray 
+
+$webFolder:=Structure file
+Repeat 
+	$webFolder:=Delete string($webFolder;Length($webFolder);1)
+	If (Substring($webFolder;Length($webFolder);1)=":")
+		$done:=True
+		$webFolder:=$webFolder+"Web:Temp:"
+	End if 
+Until ($done)
+
+If (Test path name($webFolder)#0)
+	CREATE FOLDER($webFolder)
+End if 
+
+$repCount:=Size of array(alOrders)
+
+$tag1A:="<font face="+Char(34)+"Times New Roman, Times"+Char(34)+" serif size=2 color=#666666><b>"
+$tag1B:="</b></FONT></TD>"+Char(13)+""
+$tag2A:="<font size=2 color=#000000 face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+">"
+$tag2B:="</font></TD>"+Char(13)+""
+
+  //spin the HTML table header
+$HTML:=Char(1)
+$HTML:=$HTML+"<P><TABLE BORDER=0  BGCOLOR=#ffffff cellpadding=5>"+Char(13)+""  //Create the Table
+$HTML:=$HTML+"<TR BGCOLOR="+Char(34)+"#FFFFFF"+Char(34)+">"+Char(13)+""
+
+  //-----------CREATE CELLS
+  //PageTurner 
+  //$HTML:=$HTML+"<TD WIDTH=100>"
+  //$HTML:=$HTML+$tag1A+$tag1B
+
+  //PICTURE
+$HTML:=$HTML+"<TD WIDTH=50 HEIGHT=75>"+Char(13)
+
+  //STYLE NUMBER
+$HTML:=$HTML+"<TD WIDTH=100>"
+$HTML:=$HTML+$tag1A+"Style Number"+$tag1B
+
+
+  //DESIGN NUMBER
+$HTML:=$HTML+"<TD WIDTH=100>"
+$HTML:=$HTML+$tag1A+"Design Number"+$tag1B
+
+  //ORDER NUMBER
+$HTML:=$HTML+"<TD WIDTH=100>"
+$HTML:=$HTML+$tag1A+"HMS Order"+$tag1B
+
+  //CUSTOMER
+$HTML:=$HTML+"<TD WIDTH=200>"
+$HTML:=$HTML+$tag1A+"Customer"+$tag1B
+
+  //If (User in group(Current user;"Factory"))
+  //FACTORY ORDER NUMBER
+  //$HTML:=$HTML+"<TD WIDTH=100>"
+  //$HTML:=$HTML+$tag1A+"Factory Order Number"+$tag1B
+  //End if 
+
+
+  //-------------POPULATE CELLS
+
+$i:=1
+For ($i;1;Size of array(alOrders))
+	<>lCounter:=$i
+	  //If (($i%2)=0)
+	$HTML:=$HTML+"<TR BGCOLOR="+Char(34)+"#FFFFFF"+Char(34)+">"+Char(13)+""  //Create Color 1 Row
+	  //Else 
+	  //$HTML:=$HTML+"<TR BGCOLOR="+Char(34)+"#FFFFCC"+Char(34)+">"+Char(13)+""  `Create Color 2 Row
+	  //End if 
+	GOTO RECORD([Orders];alOrders{$i})
+	
+	  //PICTURE
+	$HTML:=$HTML+"<TD align=left WIDTH=50 HEIGHT=75>"+Char(13)
+	$HTML:=$HTML+"<IMG SRC=/4DCGI/HMSLIST_"+[Orders]DesignNumber+">"
+	
+	  //STYLE NUMBER
+	$HTML:=$HTML+"<TD WIDTH=100>"
+	$HTML:=$HTML+$tag2A+[Orders]StyleNumber+$tag2B
+	
+	  //DESIGN NUMBER
+	$HTML:=$HTML+"<TD WIDTH=100>"
+	$HTML:=$HTML+$tag2A+[Orders]DesignNumber+$tag2B
+	
+	  //ORDER NOS
+	$HTML:=$HTML+"<TD WIDTH=100>"
+	$HTML:=$HTML+$tag2A+"<b>"
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_"+String([Orders]OrderNum)+">"+String([Orders]OrderNum)+"</b>"+$tag2B
+	
+	  //CUSTOMER
+	$HTML:=$HTML+"<TD WIDTH=200>"
+	$HTML:=$HTML+$tag2A+[Orders]Customer+$tag2B
+	
+	  // Page Turner
+	$HTML:=$HTML+"<TD WIDTH=5>"+Char(13)+""
+	$HTML:=$HTML+"<input type=hidden text=vsPageTurner value="+vsPageTurner+Char(13)+"<BR>"
+	  //$HTML:=$HTML+"<input type=text text="+Char(34)+"vsPageTurner"+Char(34)+" value="
+	
+	  //If (User in group(Current user;"Factory"))
+	  //  `FACTORY ORDER NUMBER
+	  //$HTML:=$HTML+"<TD WIDTH=100>"
+	  //$HTML:=$HTML+"<font face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+" size="+Char(34)+"2"+Char(34)+" color="+Char(34)+"#000000"+Char(34)+"><b>"
+	  //If ([Orders]FactoryOrderNumber="")
+	  //$HTML:=$HTML+"<input type=text name=textfield>"
+	  //$HTML:=$HTML+"</b></font></TD>"+Char(13)+""
+	  //Else 
+	  //$HTML:=$HTML+[Orders]FactoryOrderNumber+"</b></font></TD>"+Char(13)+""
+	  //End if 
+	  //End if 
+End for 
+
+Web_UserField 
+
+vtTable:=$HTML+"</TR></TABLE>"
+
+  //SET HTTP HEADER("pragma: no-cache")
+WEB SEND FILE("prodStatList.html")

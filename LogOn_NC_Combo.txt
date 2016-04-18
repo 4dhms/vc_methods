@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($colorprint)
+C_TEXT($type)
+
+ARRAY LONGINT($unique;0)
+ARRAY LONGINT($selfkeys;0)
+ARRAY TEXT($cpnumber;0)
+ARRAY TEXT($typelist;0)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Changes]OrderNumber)
+CREATE SET([CP_OrderXRef];"thisOrder")
+
+$i:=1
+For ($i;1;Size of array(asPrintNumber))
+	$type:=Substring(asPrintNumber{$i};1;Position("(";asPrintNumber{$i}))
+	$colorprint:=Replace string(asPrintNumber{$i};$type;"")
+	$colorprint:=Replace string($colorprint;")";"")
+	$type:=Replace string($type;" color (";"")
+	
+	USE SET("thisOrder")
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=$type;*)
+	QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=$colorprint)
+	
+	APPEND TO ARRAY($cpnumber;$colorprint)
+	APPEND TO ARRAY($typelist;$type)
+	APPEND TO ARRAY($selfkeys;[CP_OrderXRef]SelfKey)
+	
+	If (Find in array($unique;[CP_OrderXRef]SelfKey)<1)
+		APPEND TO ARRAY($unique;[CP_OrderXRef]SelfKey)
+	End if 
+End for 
+
+$i:=1

@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //This shows a subset in Sample Fabrics
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	p_SetWndwSamF 
+Else 
+	ALERT("Please highlight some records first.")
+End if 

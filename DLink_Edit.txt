@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($dn)
+C_POINTER($tn)
+C_POINTER($note)
+
+C_LONGINT($left;$top;$right;$bottom)
+
+$tn:=Field(116;vlRouter+3)
+$dn:=Field(116;vlRouter+15)
+$note:=Field(116;vlRouter+41)
+vsKey:=""
+
+GET WINDOW RECT($left;$top;$right;$bottom)
+GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+vsEntryNumber:=""
+
+Case of 
+	: ($tn->=-1)
+		vsKey:=$dn->
+		asSampleTypes:=0
+		DL_CustomEnter 
+		vsEntryNumber:=[DL_Custom]CustomKey
+		vlPage:=2
+		DLink_GrabDesign ($tn->;$dn->;0)
+		
+	: (vlPage=3)
+		asSampleTypes:=$tn->+1
+		vsEntryNumber:=$dn->
+		DLink_GrabDesign ($tn->;$dn->;0)
+		
+	: ($dn->="")
+		asSampleTypes:=1
+		vsEntryNumber:=""
+		vsSubhead:=""
+		vtTitle:=""
+		vlPage:=1
+	Else 
+		asSampleTypes:=$tn->+1
+		vsEntryNumber:=$dn->
+		vlPage:=1
+		DLink_GrabDesign ($tn->;$dn->;0)
+End case 
+
+vtNote:=$note->
+Open window($left+55;$top+35;$left+275;$top+585;0;"";"WincBox")
+DIALOG("DL_EditCell")
+CLOSE WINDOW
+
+

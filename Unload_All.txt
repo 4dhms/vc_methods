@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_LONGINT($i;$c)
+  //C_POINTER($tableptr)
+  //
+  //$c:=Count tasks
+  //
+  //ARRAY STRING(31;asProcName;$c)
+  //ARRAY INTEGER(aiProcNum;$vlNbTasks)
+  //
+  //$vlActualCount:=0
+  //
+  //For ($i;1;$c)
+  //If (Process state($i)>=Executing)
+  //$vlActualCount:=$vlActualCount+1
+  //PROCESS PROPERTIES($vlProcess;asProcName{$vlActualCount};$vlState;$vlTime)
+  //aiProcNum{$vlActualCount}:=$vlProcess
+  //End if 
+  //End for 
+  //  // Eliminate unused extra elements
+  //ARRAY STRING(31;asProcName;$vlActualCount)
+  //ARRAY INTEGER(aiProcNum;$vlActualCount)

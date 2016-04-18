@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+C_LONGINT($i)
+C_TEXT($color)
+ARRAY LONGINT(alXrefKeys;0)
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=vlOrderNumber)
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]FabOrdType;>)
+SELECTION TO ARRAY([OrdersFabricXRef]XrefID;alXrefKeys)
+
+If (vlOrderNumber<0)
+	$color:="#336600"
+Else 
+	$color:="#663300"
+End if 
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<br><table width=850 border=0>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td width=264 class=style1>Fabric/Fiber</td>"
+$HTML:=$HTML+"<td width=264 class=style1>Treatment/Supplier</td>"
+$HTML:=$HTML+"<td width=142 class=style1>Type/Article</td>"
+$HTML:=$HTML+"<td width=162 class=style1>Part</td>"
+$HTML:=$HTML+"<td></font></td>"
+$HTML:=$HTML+"</tr>"
+
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	$HTML:=$HTML+"<tr>"
+	Case of 
+		: ($i=1)
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]FabricName+"</td>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]Treatment+"</td>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]OrdType+"</td>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]Part+"</td>"
+		Else 
+			$HTML:=$HTML+"<tr>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]FabricName+"</td>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]Treatment+"</td>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]OrdType+"</td>"
+			$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]Part+"</td>"
+	End case 
+	$HTML:=$HTML+"</tr>"
+	$HTML:=$HTML+"<tr>"
+	$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]FiberContent+"</td>"
+	$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]FabSupplier+"</td>"
+	$HTML:=$HTML+"<td class=style2>"+[OrdersFabricXRef]FabArtNo+"</td>"
+	$HTML:=$HTML+"<td></font></td>"
+	$HTML:=$HTML+"</tr>"
+	If ($i<Records in selection([OrdersFabricXRef]))
+		$HTML:=$HTML+"<tr>"
+		$HTML:=$HTML+"<tr>"
+		$HTML:=$HTML+"<td><FONT SIZE=1 color=#FFFFFF>---</font></td>"
+		$HTML:=$HTML+"<td><FONT SIZE=1 color=#FFFFFF>---</font></td>"
+		$HTML:=$HTML+"<td><FONT SIZE=1 color=#FFFFFF>---</font></td>"
+		$HTML:=$HTML+"<td></font></td>"
+		$HTML:=$HTML+"</tr>"
+	End if 
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+$HTML:=$HTML+"</Table>"
+
+$0:=$HTML
+

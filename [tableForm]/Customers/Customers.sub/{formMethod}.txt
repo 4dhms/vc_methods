@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vfDetail)
+	OBJECT SET FONT STYLE(vtType1;1)
+	OBJECT SET FONT STYLE(vtType2;1)
+Else 
+	OBJECT SET FONT STYLE(vtType1;0)
+	OBJECT SET FONT STYLE(vtType2;0)
+End if 

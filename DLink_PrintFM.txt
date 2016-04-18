@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtFullName:=[DesignLines]Line
+If ([DesignLines]Season#"")
+	vtFullName:=vtFullName+" -- "+[DesignLines]Season
+End if 
+If ([DesignLines]Title#"")
+	vtFullName:=vtFullName+" -- "+[DesignLines]Title
+End if 
+
+vsPrintingHeader:=String([DesignLinkedPages]PageNumber)+" / "+String(Records in selection([DesignLinkedPages]))
+
+DL_ShowCancel 
+DL_ShowColors 
+DL_ShowPrice 

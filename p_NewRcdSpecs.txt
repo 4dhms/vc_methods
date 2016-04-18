@@ -1,0 +1,30 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //The "p_NewRcdSpecs" adds a record to specs file
+CREATE SET([Specs];"ScSet")
+Case of 
+	: (Screen width=800)
+		Open window(100;74;732;528;8;"New Record")
+	: (Screen width=832)
+		Open window(100;92;732;532;8;"New Record")
+	: (Screen width=624)
+		Open window(5;74;624;757;8;"New Record")
+	: (Screen width>700)
+		vlWinWd:=640
+		vlWinHt:=550
+		vlWinType:=8
+		vsWinTitle:="New Record"
+		
+		Center Window 
+	: (Screen height>600)
+		Open window(5;74;632;770;8;"New Record")
+	: (Screen height<425)
+		Open window(5;74;635;400;8;"New Record")
+	: (Screen height<500)
+		Open window(5;74;635;480;8;"New Record")
+End case 
+ADD RECORD([Specs])
+ADD TO SET([Specs];"ScSet")
+CLOSE WINDOW
+USE SET("ScSet")
+p_SetWndwSpecs 
+CLEAR SET("ScSet")

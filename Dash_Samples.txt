@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+If (Current user="Designer") | (Current user="Spenser")
+	$choice:=Pop up menu("Orders;Fabrics;Tracking;EZ Track;Proto Track")
+Else 
+	$choice:=Pop up menu("Orders;Fabrics;Tracking;EZ Track")
+End if 
+
+Case of 
+		  //: ($choice=5) | ($choice=5) & (<>SamGarPrcID>0)
+		  //WinPrompt ("Close sample garment window before receiving.")
+		  //: ($choice=5)
+		  //vlRouter:=1
+		  //Sample_Receiving 
+		  //: ($choice=6)
+		  //vlRouter:=2
+		  //Sample_Receiving 
+		
+	: ($choice=5)
+		Sample_ProtoTrack 
+	: ($choice=1)
+		Case of 
+			: (<>SpecProcID>0)
+				WinPrompt ("Close specsheet window before entering ordering information.")
+			: (<>SalesPrcID>0)
+				WinPrompt ("Close order window before entering sample information.")
+				SHOW PROCESS(<>SalesPrcID)
+				BRING TO FRONT(<>SalesPrcID)
+			: (<>PrcQteID>0)
+				BRING TO FRONT(<>PrcQteID)
+				WinPrompt ("Close cost sheet screen before opening sample garments.")
+			Else 
+				m_SamGarOrdEnt 
+		End case 
+		
+	: ($choice=2)
+		m_SamFab 
+	: ($choice=3)
+		Sample_Track 
+	: ($choice=4)
+		Sample_EZTrackProc 
+End case 

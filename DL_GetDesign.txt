@@ -1,0 +1,103 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$sampleorder)
+C_TEXT($colorbuild)
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	
+	$i:=1
+	FIRST RECORD([Designs])
+	For ($i;1;Records in selection([Designs]))
+		vtColors:=""
+		If (bColors=1)
+			ARRAY TEXT(asOrderNumbers;0)
+			ARRAY TEXT(atColor;0)
+			ARRAY TEXT(asStyleNumbers;0)
+			
+			QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum)
+			$c:=1
+			
+			For ($c;1;Records in selection([Samples]))
+				$sampleOrder:=-1*[Samples]SampleNumber
+				QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$sampleOrder)
+				QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="self")
+				
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				
+				$n:=1
+				$colorbuild:=""
+				For ($n;1;Records in selection([CP_OrderXRef]))
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+					$colorbuild:=$colorbuild+[ColorPrintNumber]CPName+", "
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+				$colorbuild:=Replace string($colorbuild;" ,";",")
+				$colorbuild:=Substring($colorbuild;1;Length($colorbuild)-2)
+				
+				APPEND TO ARRAY(asOrderNumbers;"SG"+String([Samples]SampleNumber))
+				APPEND TO ARRAY(asStyleNumbers;[Samples]StyleNum)
+				APPEND TO ARRAY(atColor;$colorbuild)
+				NEXT RECORD([Samples])
+			End for 
+			
+			QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+			$c:=1
+			
+			For ($c;1;Records in selection([Orders]))
+				vtColors:=""
+				QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+				QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="self")
+				
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				
+				$n:=1
+				$colorbuild:=""
+				For ($n;1;Records in selection([CP_OrderXRef]))
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+					$colorbuild:=$colorbuild+[ColorPrintNumber]CPName+", "
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+				
+				$colorbuild:=Replace string($colorbuild;" ,";",")
+				$colorbuild:=Substring($colorbuild;1;Length($colorbuild)-2)
+				
+				APPEND TO ARRAY(asOrderNumbers;String([Orders]OrderNum))
+				APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+				APPEND TO ARRAY(atColor;$colorbuild)
+				NEXT RECORD([Orders])
+			End for 
+			
+			Case of 
+				: (Size of array(atColor)=1)
+					vtColors:=atColor{1}
+				: (Size of array(atColor)>1)
+					Center Window (500;200;4;"Design Number: "+[Designs]DesignNum;"WincBox")
+					DIALOG([Dialogs];"DL_Colors")
+					CLOSE WINDOW
+			End case 
+		End if 
+		
+		CREATE RECORD([DesignLineIncluded])
+		[DesignLineIncluded]Fiber:=[Designs]Fabric
+		[DesignLineIncluded]LineKey:=Sequence number([DesignLineIncluded])
+		[DesignLineIncluded]DesignLineKey:=<>vlDLKey
+		[DesignLineIncluded]DesignNumber:=[Designs]DesignNum
+		[DesignLineIncluded]Name:=[Designs]Description
+		[DesignLineIncluded]Stitch:=[Designs]Stitch
+		[DesignLineIncluded]Colors:=vtColors
+		SAVE RECORD([DesignLineIncluded])
+		UNLOAD RECORD([Designs])
+		NEXT RECORD([Designs])
+	End for 
+	UNLOAD RECORD([Designs])
+	UNLOAD RECORD([Samples])
+	UNLOAD RECORD([Orders])
+	UNLOAD RECORD([CP_OrderXRef])
+	UNLOAD RECORD([OrdersFabricXRef])
+	UNLOAD RECORD([ColorPrintNumber])
+	CANCEL
+	CALL PROCESS(<>DLProc)
+	vfCancel:=True
+	
+Else 
+	WinPrompt ("Please select a design.")
+End if 

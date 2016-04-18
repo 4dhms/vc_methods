@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Unload)
+	ARRAY TEXT($nick;0)
+	ALL RECORDS([Addesses])
+	ORDER BY([Addesses];[Addesses]Location;>)
+	SELECTION TO ARRAY([Addesses]Location;$nick)
+	ARRAY TO LIST($nick;"ShipTo")
+	ARRAY TEXT($nick;0)
+End if 

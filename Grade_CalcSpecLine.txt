@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($size1;$step)
+C_LONGINT($i;$previous)
+C_TEXT($sizetxt;$steptxt;$catagory)
+C_POINTER($colPtr;$samplePtr;$targetPtr)
+C_POINTER($header)
+
+Case of 
+	: (pOne=1)
+		$catagory:=[SpecFactory]KnitWoven1
+	: (pTwo=1)
+		$catagory:=[SpecFactory]KnitWoven2
+	: (pThree=1)
+		$catagory:=[SpecFactory]KnitWoven3
+End case 
+
+RELATE ONE([Sizes]SpecLineKey)
+
+$samplePtr:=Field(88;[SpecFactory]SampleCol+1)
+$samplePtr->:=[SpecSheetLines]Spec1A
+
+$i:=[SpecFactory]SampleCol-1
+$size1:=Grade_Converter ([SpecSheetLines]Spec1A)
+$step:=Grade_Converter ([Sizes]Step)
+
+Repeat 
+	$colPtr:=Get pointer("vsSize"+String($i))
+	If ($colPtr->#"")
+		$samplePtr:=Field(88;$i+1)
+		If ([Sizes]Step="Auto")
+			$header:=Get pointer("vsSize"+String($i))
+			$sizetxt:=$header->
+			
+			QUERY([Steps];[Steps]Range=vtGradeRange;*)
+			QUERY([Steps]; & ;[Steps]POM=[SpecSheetLines]OtherDescription;*)
+			QUERY([Steps]; & ;[Steps]Column=Find in array(atCols;$sizetxt);*)
+			QUERY([Steps]; & ;[Steps]Category=$catagory)
+			
+			$steptxt:=[Steps]Step
+			$size1:=$size1-Abs(Grade_Converter ($steptxt))
+		Else 
+			$size1:=$size1-Abs(Grade_Converter ([Sizes]Step))
+		End if 
+		$samplePtr->:=Grade_ConvertBack ($size1)
+	End if 
+	$i:=$i-1
+Until ($i<1)
+
+$previous:=[SpecFactory]SampleCol
+$i:=$previous+1
+$size1:=Grade_Converter ([SpecSheetLines]Spec1A)
+
+Repeat 
+	$colPtr:=Get pointer("vsSize"+String($i))
+	
+	If ($colPtr->#"")
+		$samplePtr:=Field(88;$previous)
+		$targetPtr:=Field(88;$i+1)
+		  //
+		If ([Sizes]Step="Auto")
+			$header:=Get pointer("vsSize"+String($previous))
+			$sizetxt:=$header->
+			
+			QUERY([Steps];[Steps]Range=vtGradeRange;*)
+			QUERY([Steps]; & ;[Steps]POM=[SpecSheetLines]OtherDescription;*)
+			QUERY([Steps]; & ;[Steps]Column=Find in array(atCols;$sizetxt);*)
+			QUERY([Steps]; & ;[Steps]Category=$catagory)
+			$steptxt:=[Steps]Step
+			$size1:=$size1+Abs(Grade_Converter ($steptxt))
+		Else 
+			$size1:=$size1+Abs(Grade_Converter ([Sizes]Step))
+		End if 
+		$targetPtr->:=Grade_ConvertBack ($size1)
+		$previous:=$i
+	End if 
+	$i:=$i+1
+Until ($i>10)
+
+[Sizes]Changed:=False
+SAVE RECORD([Sizes])
+

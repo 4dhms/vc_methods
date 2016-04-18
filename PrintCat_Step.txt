@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($sketch)
+$sketch:=Get pointer("vxSketch"+String($1))
+
+SAVE RECORD([PCPage])
+
+vlPageRouter:=$1
+vxSketch:=$sketch->
+vsCPNumber:=$2
+
+QUERY([PCHistory];[PCHistory]PCKey=[PCatalog]PCKey;*)
+QUERY([PCHistory]; & ;[PCHistory]PrintNumber=$2)
+ORDER BY([PCHistory];[PCHistory]Serial;<)
+FORM GOTO PAGE(2)

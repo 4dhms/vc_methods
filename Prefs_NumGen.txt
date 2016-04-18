@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ALL RECORDS([NumberGenerator])
+vlWinWd:=150
+vlWinHt:=600
+vlWinType:=1
+vsWinTitle:=""
+
+
+Center Window 
+FORM SET INPUT([NumberGenerator];"NumGen.o")
+MODIFY RECORD([NumberGenerator];*)
+CLOSE WINDOW

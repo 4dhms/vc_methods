@@ -1,0 +1,124 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($sampleOrder;$i;$n;$s;$p;$run;$z)
+C_BOOLEAN($continue)
+C_LONGINT($sampleorder)
+C_TEXT($old;$new)
+
+ARRAY LONGINT($selfkeys;0)
+
+$sampleOrder:=-1*Num([Orders]SGPO)
+
+If ([Orders]SGPO#"")
+	If ([Orders]BDHeaderKey>0)
+		WinChoice ("Changing sample order will reset the size breakdowns.";"Continue";"Stop")
+		If (ok=0)
+			[Orders]SGPO:=vtOldData
+		Else 
+			$continue:=True
+			[Orders]BDHeaderKey:=0
+			
+			SAVE RECORD([Orders])
+			$i:=1
+			For ($i;1;Size of array(alSelfKey))
+				If (Find in array($selfkeys;alSelfKey{$i})<1)
+					APPEND TO ARRAY($selfkeys;alSelfKey{$i})
+				End if 
+			End for 
+			
+			$i:=1
+			For ($i;1;Size of array($selfKeys))
+				QUERY([OrdersBreakdowns];[OrdersBreakdowns]SelfKey=$selfKeys{$i})
+				$n:=1
+				FIRST RECORD([OrdersBreakdowns])
+				For ($n;1;Size of array($selfKeys))
+					[OrdersBreakdowns]SelfKey:=-1*[OrdersBreakdowns]SelfKey
+					SAVE RECORD([OrdersBreakdowns])
+					NEXT RECORD([OrdersBreakdowns])
+				End for 
+			End for 
+			Order_BDInit (0)
+		End if 
+	Else 
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	CS_SamplePO 
+	
+	$sampleorder:=-1*Num([Orders]SGPO)
+	QUERY([SpecPix];[SpecPix]OrderNumber=$sampleorder)
+	If (Records in selection([SpecPix])>0)
+		WinChoice ("Do you want to import pictures from sample order.")
+		If (ok=1)
+			ARRAY LONGINT($imagekey;0)
+			SELECTION TO ARRAY([SpecPix]ImageNumber;$imagekey)
+			$p:=1
+			For ($p;1;Size of array($imagekey))
+				QUERY([SpecPix];[SpecPix]ImageNumber=$imagekey{$p})
+				DUPLICATE RECORD([SpecPix])
+				[SpecPix]ImageNumber:=Sequence number([SpecPix])
+				[SpecPix]OrderNumber:=<>vlOrderNumber
+				SAVE RECORD([SpecPix])
+				$old:="S"+String(Abs($sampleorder))+"_"+String([SpecPix]SketchNumber)
+				$new:="B"+String(<>vlOrderNumber)+"_"+String([SpecPix]SketchNumber)
+				$run:=Execute on server("Picture_Copy";64*1024;"CopyPicture";$old;$new)
+			End for 
+		End if 
+	End if 
+	
+	vfFabImport:=True
+	vtOrderChanges:="_Fabric_Color"
+	If (Size of array(asTypeList)>0) | (Size of array(asOrderType)>0)
+		WinPrompt ("Sample Fabrics & color/print numbers will not be imported, because some fabrics e"+"xist already.")
+	Else 
+		WinChoice ("Do you want to import fabrics and or colors/prints?"+Char(13)+"This will save the order, you will not be able to cancel it.";"Both";"Fabric Only";"Cancel")
+		If (ok=1)
+			Fabric_ArrayBuild ($sampleOrder)
+			
+			If (bChoice2#1)
+				SAVE RECORD([Orders])
+				If (Current user#"Designer") & (Not(Shift down))
+					OBJECT SET ENABLED(bCancelOrder;False)
+				End if 
+				Fabric_ColorArray ($sampleOrder)
+				$z:=1
+				For ($z;1;Size of array(asTypeList))
+					adStatusDate{$z}:=!00-00-00!
+					If (asTypeList{$z}="Zipper")
+					Else 
+						asColorStatus{$z}:=""
+					End if 
+				End for 
+				
+				Fabric_ColorRecords 
+			End if 
+		End if 
+		
+		$i:=1
+		For ($i;1;Size of array(arUsage))
+			arUsage{$i}:=0
+			arActual{$i}:=0
+		End for 
+		
+		$i:=1
+		$s:=1
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			If (asTypeList{$i}="Self")
+				asCPLetter{$i}:=Char(64+$s)
+				$s:=$s+1
+			End if 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+	End if 
+	  //Order_NYSupply 
+	LISTBOX SELECT ROW(colorlist;Size of array(asTypeList)+1)
+	UNLOAD RECORD([CP_OrderXRef])
+	UNLOAD RECORD([OrdersFabricXRef])
+	REDUCE SELECTION([CP_OrderXRef];0)
+	REDUCE SELECTION([OrdersFabricXRef];0)
+	Order_GetComponents (<>vlOrderNumber)
+End if 
+
+
+

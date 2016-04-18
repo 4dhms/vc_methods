@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docref)
+C_TEXT($path)
+
+If (<>vlPlatform=3)
+	$path:="C:\\4D Spreadsheets"
+Else 
+	$path:=Get 4D folder
+	$path:=Substring($path;1;Position(":";$path))+"4D Spreadsheets:"
+End if 
+
+If (Test path name($path)#0)
+	CREATE FOLDER($path)
+End if 
+$path:=$path+Replace string([FabricOrders]PONumber;"-";"_")+"_report.xls"
+
+$docref:=Create document($path;"xls")
+SEND PACKET($docref;"Fabric PO "+Char(9)+[FabricOrders]PONumber+Char(9)+String([FabricOrders]FabPODate)+Char(9)+"Article #"+Char(9)+[FabricOrders]ArticleNo+Char(13)+Char(13))
+SEND PACKET($docref;"Color/Print"+Char(9)+"HMS PO"+Char(9)+"Style Number"+Char(9))
+SEND PACKET($docref;"Units"+Char(9)+"Consumption"+Char(9)+"Total Yards"+Char(13))
+
+$i:=1
+For ($i;1;Size of array(asColors))
+	Case of 
+		: (asStyleNumbers{$i}="")
+			SEND PACKET($docref;Char(13))
+			
+		: (asStyleNumbers{$i}="used@") | (asStyleNumbers{$i}="ordered@") | (asStyleNumbers{$i}="over@")
+			SEND PACKET($docref;"     "+Char(9)+"     "+Char(9)+asStyleNumbers{$i}+Char(9)+" "+Char(9)+"     "+Char(9)+String(alTotals{$i})+Char(13))
+		Else 
+			SEND PACKET($docref;asColors{$i}+Char(9)+"#"+String(alPOOrder{$i})+Char(9)+asStyleNumbers{$i}+Char(9)+String(alUnits{$i})+Char(9)+asConsumption{$i}+Char(9)+String(alTotals{$i})+Char(13))
+	End case 
+End for 
+
+CLOSE DOCUMENT($docref)
+
+SHOW ON DISK($path)

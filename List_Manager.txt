@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asTempList;0)
+
+APPEND TO ARRAY(asTempList;"Select List")
+APPEND TO ARRAY(asTempList;"Customers")
+APPEND TO ARRAY(asTempList;"Customer Sales Report")
+APPEND TO ARRAY(asTempList;"Customers DC")
+APPEND TO ARRAY(asTempList;"Factories")
+APPEND TO ARRAY(asTempList;"Label")
+APPEND TO ARRAY(asTempList;"Order Enter")
+APPEND TO ARRAY(asTempList;"Sales")
+APPEND TO ARRAY(asTempList;"Sample Track")
+
+Center Window (250;150;1;"")
+DIALOG("ListManager")
+CLOSE WINDOW
+
+If (ok=1) & (asTempList>1)
+	CREATE RECORD([Changes])
+	[Changes]Tag:="ListChange"
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]FieldName:=asTempList{asTempList}
+	[Changes]NewChange:=vsRequestString
+	SAVE RECORD([Changes])
+	UNLOAD RECORD([Changes])
+End if 

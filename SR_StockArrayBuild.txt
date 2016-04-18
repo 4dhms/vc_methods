@@ -1,0 +1,72 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s)
+
+ARRAY TEXT(asMeetingCust;0)
+ARRAY TEXT($customers;0)
+QUERY([Lists];[Lists]ListName="DC")
+SELECTION TO ARRAY([Lists]ListCode;$customers)
+
+CREATE EMPTY SET([DC];"stock")
+CREATE EMPTY SET([DC];"thisstock")
+CREATE EMPTY SET([DC];"laststock")
+
+$i:=1
+FIRST RECORD([Orders])
+
+For ($i;1;Records in selection([Orders]))
+	<>vlCounter:=Int(($i/Records in selection([Orders]))*50)
+	CALL PROCESS(<>SendingWin)
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum;*)
+	QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Self")
+	
+	ARRAY LONGINT($self;0)
+	SELECTION TO ARRAY([CP_OrderXRef]CPOrdID;$self)
+	
+	$n:=1
+	For ($n;1;Size of array($self))
+		QUERY([DC];[DC]CPOrdID=$self{$n})
+		QUERY SELECTION([DC];[DC]Customer#"")
+		QUERY SELECTION([DC];[DC]Count>0)
+		QUERY SELECTION([DC];[DC]Customer#"+@")
+		QUERY SELECTION([DC];[DC]Customer#"=@")
+		QUERY SELECTION([DC];[DC]Customer#"-@")
+		QUERY SELECTION([DC];[DC]Customer#"[@")
+		QUERY SELECTION([DC];[DC]Customer#"")
+		QUERY SELECTION([DC];[DC]Customer#"(-@")
+		QUERY SELECTION([DC];[DC]Customer#"0")
+		QUERY SELECTION([DC];[DC]Customer#"00")
+		QUERY SELECTION([DC];[DC]Customer#"specialty stores")
+		QUERY SELECTION([DC];[DC]Customer#"@Adjustment@")
+		QUERY SELECTION([DC];[DC]Customer#"Additional@")
+		QUERY SELECTION([DC];[DC]Customer#"Extra@factory@")
+		QUERY SELECTION([DC];[DC]Customer#"fty shortag@")
+		
+		If (Records in selection([DC])=0)
+			REMOVE FROM SET([Orders];"month")
+		Else 
+			$s:=1
+			For ($s;1;Records in selection([DC]))
+				If ([DC]ReportCustomer#"")
+					
+					ADD TO SET([DC];"stock")
+					Case of 
+						: ([Orders]CancelDate>=vdStartA) & ([Orders]CancelDate<vdEndA)
+							ADD TO SET([DC];"thisstock")
+						: ([Orders]CancelDate>=vdStartB) & ([Orders]CancelDate<vdEndB)
+							ADD TO SET([DC];"laststock")
+					End case 
+				End if 
+				NEXT RECORD([DC])
+			End for 
+		End if 
+	End for 
+	NEXT RECORD([Orders])
+End for 
+
+USE SET("stock")
+
+DISTINCT VALUES([DC]ReportCustomer;asMeetingCust)
+
+USE SET("thisstock")
+

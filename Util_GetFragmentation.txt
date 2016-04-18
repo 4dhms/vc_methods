@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($compact)
+C_LONGINT($i)
+
+ARRAY LONGINT($perc;0)
+ARRAY LONGINT($table;0)
+
+$compact:=False
+For ($i;1;Get last table number)
+	If (Is table number valid($i))
+		If (Get table fragmentation(Table($i)->)>20)
+			$compact:=True
+			APPEND TO ARRAY($table;$i)
+			APPEND TO ARRAY($perc;Get table fragmentation(Table($i)->))
+			ALERT(Table name($i)+"   "+String(Get table fragmentation(Table($i)->)))
+			
+		End if 
+	End if 
+End for 

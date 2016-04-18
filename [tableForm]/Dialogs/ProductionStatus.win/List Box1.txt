@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	If (asSortOrder>0)
+		INSERT IN ARRAY(asField;Size of array(asField)+1;1)
+		asField{Size of array(asField)}:=asSortOrder{asSortOrder}
+		DELETE FROM ARRAY(asSortOrder;asSortOrder;1)
+	End if 
+End if 

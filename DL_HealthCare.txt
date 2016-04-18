@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($missing)
+ARRAY LONGINT($item;0)
+vtContent:=""
+$missing:=False
+
+$i:=1
+FIRST RECORD([DesignLineIncluded])
+
+For ($i;1;Records in selection([DesignLineIncluded]))
+	Case of 
+		: ([DesignLineIncluded]ItemNumber=0)
+			$missing:=True
+			
+		: ([DesignLineIncluded]ItemNumber=-6)
+			  //
+		: (Find in array($item;[DesignLineIncluded]ItemNumber)<1)
+			APPEND TO ARRAY($item;[DesignLineIncluded]ItemNumber)
+		Else 
+			vtContent:=vtContent+"Square "+String([DesignLineIncluded]ItemNumber)+Char(13)
+	End case 
+	NEXT RECORD([DesignLineIncluded])
+End for 
+
+If (vtContent#"")
+	vtContent:="Multiple garments in: "+vtContent
+End if 
+Case of 
+	: ($missing) & (vtContent="")
+		vtContent:="There are missing garments. Use Restore button."
+	: ($missing)
+		vtContent:=vtContent+" Missing garments. Restore."
+End case 

@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //new record for HMS Sample Garments
+  //
+CREATE SET([StockOrders];"stock")
+ADD RECORD([StockOrders];*)
+ADD TO SET([StockOrders];"stock")
+USE SET("stock")
+CLEAR SET("stock")

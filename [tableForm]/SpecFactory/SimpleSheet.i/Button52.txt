@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice;$c)
+C_TEXT($path)
+C_POINTER($pic)
+
+$c:=2
+
+If ([Designs]DesignNum#"")
+	
+	$choice:=Pop up menu("Remove;Move to Desktop;Close Menu")
+	
+	Case of 
+		: ($choice=1)
+			Spec_RemovePicture ($c)
+			
+		: ($choice=2)
+			$pic:=Get pointer("vxSketch"+String($c))
+			$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+			
+			$path:=$path+String(<>vlOrderNumber)+"_"+String($c)+".jpg"
+			vtPathName:=$path
+			WRITE PICTURE FILE(vtPathName;$pic->;"JPEG")
+	End case 
+End if 

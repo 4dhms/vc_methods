@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+Case of 
+	: (asSortOrder{asSortOrder}="@Style@")
+		ORDER BY([CostSheets];[Costing]StyleNumber;>;[Costing]OrderNumber;<)
+	: (asSortOrder{asSortOrder}="@Design@")
+		ORDER BY([CostSheets];[Costing]DesignNumber;>;[Costing]OrderNumber;<)
+	: (asSortOrder{asSortOrder}="by sea up")
+		ORDER BY([CostSheets];[CostSheets]UnitCostSea;>)
+	: (asSortOrder{asSortOrder}="by sea down")
+		ORDER BY([CostSheets];[CostSheets]UnitCostSea;<)
+	: (asSortOrder{asSortOrder}="by air up")
+		ORDER BY([CostSheets];[CostSheets]UnitCostAir;>)
+	: (asSortOrder{asSortOrder}="by air down")
+		ORDER BY([CostSheets];[CostSheets]UnitCostAir;<)
+End case 
+
+SELECTION TO ARRAY([CostSheets]SheetNumber;alOrders)
+If (asSortOrder{asSortOrder}="@Style@") | (asSortOrder{asSortOrder}="@Design@")
+	$i:=1
+	FIRST RECORD([CostSheets])
+	
+	For ($i;1;Records in selection([CostSheets]))
+		If ($i>1)
+			If ([CostSheets]SheetNumber#alOrders{$i-1})
+				APPEND TO ARRAY(alRecordNumber;[CostSheets]SheetID)
+			End if 
+		End if 
+		NEXT RECORD([CostSheets])
+	End for 
+	SORT ARRAY(alRecordNumber;>)
+End if 

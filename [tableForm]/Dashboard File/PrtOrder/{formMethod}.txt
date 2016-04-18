@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	vPrtRec:=1
+	vPrtSel:=0
+	If (<>orderForm="PO")
+		OBJECT SET ENABLED(bPrint;False)
+	Else 
+		OBJECT SET ENABLED(bPrint;True)
+	End if 
+	If (User in group(Current user;"PO")) | (User in group(Current user;"Warehouse"))
+		OBJECT SET VISIBLE(bPrintPO;True)
+	Else 
+		OBJECT SET VISIBLE(bPrintPO;False)
+	End if 
+End if 

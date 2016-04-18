@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Getting Focus)
+	vtDCCustomer:=""
+	vlListRouter:=1
+	Center Window (250;450;1;"")
+	DIALOG("DC_Customer")
+	CLOSE WINDOW
+End if 
+POST KEY(9)

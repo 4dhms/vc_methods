@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vlRemaining>0)
+	WinPrompt ("You need to assign another "+String(vlRemaining)+" units.")
+Else 
+	DC_WriteInfo 
+End if 

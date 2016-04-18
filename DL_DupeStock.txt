@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$n;$oldkey;$newkey)
+
+WinChoice ("Are you sure you want to duplicate this line plan?")
+If (ok=1)
+	WinChoice ("Really really sure?";"No";"Really")
+	If (ok=0)
+		
+		$oldkey:=[DesignLines]DesignLineKey
+		
+		DUPLICATE RECORD([DesignLines])
+		[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+		$newkey:=[DesignLines]DesignLineKey
+		[DesignLines]DLCreationDate:=Current date(*)
+		[DesignLines]DLCreator:=Current user
+		[DesignLines]Title:=[DesignLines]Title+" [DUPED]"
+		SAVE RECORD([DesignLines])
+		
+		QUERY([DLPages];[DLPages]DLItemKey=$oldkey)
+		ARRAY REAL($pages;0)
+		SELECTION TO ARRAY([DLPages]PageNumber;$pages)
+		
+		$i:=1
+		For ($i;1;Size of array($pages))
+			QUERY([DLPages];[DLPages]DLItemKey=$oldkey)
+			QUERY SELECTION([DLPages];[DLPages]PageNumber=$pages{$i})
+			
+			DUPLICATE RECORD([DLPages])
+			[DLPages]DLItemKey:=$newkey
+			SAVE RECORD([DLPages])
+		End for 
+		
+		QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$oldkey)
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;<)
+		
+		$c:=[DesignLineIncluded]PageNumber
+		$i:=1
+		For ($i;1;$c)
+			QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$oldkey)
+			QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=$i)
+			
+			ARRAY LONGINT($items;0)
+			SELECTION TO ARRAY([DesignLineIncluded]ItemNumber;$items)
+			
+			$n:=1
+			For ($n;1;Size of array($items))
+				QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$oldkey)
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=$i)
+				QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=$items{$n})
+				
+				If (Records in selection([DesignLineIncluded])=1)
+					DUPLICATE RECORD([DesignLineIncluded])
+					[DesignLineIncluded]DesignLineKey:=$newkey
+					SAVE RECORD([DesignLineIncluded])
+				End if 
+			End for 
+			
+			QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$newkey)
+		End for 
+		
+	End if 
+End if 

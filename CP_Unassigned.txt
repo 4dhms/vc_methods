@@ -1,0 +1,53 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_LONGINT($i;$c)
+
+ARRAY TEXT($divisions;0)
+LIST TO ARRAY("Division Code No";$divisions)
+  //DELETE FROM ARRAY($divisions;Find in array($divisions;"All");1)
+$c:=Size of array($divisions)
+
+  // 
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPType=2;*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPCreationDate>=<>vdAct1;*)
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPCreationDate<=<>vdAct2)
+
+CREATE SET([ColorPrintNumber];"All")
+
+For ($i;1;$c)
+	If ($i=1)
+		QUERY([ColorPrintNumber];[ColorPrintNumber]Division=$divisions{$i};*)
+	Else 
+		QUERY([ColorPrintNumber]; | ;[ColorPrintNumber]Division=$divisions{$i};*)
+	End if 
+End for 
+QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPType=2)
+
+CREATE SET([ColorPrintNumber];"Ass")
+CREATE EMPTY SET([ColorPrintNumber];"Un")
+
+DIFFERENCE("All";"Ass";"Un")
+USE SET("Un")
+CLEAR SET("All")
+CLEAR SET("Ass")
+CLEAR SET("Un")
+
+$message:="There are "+String(Records in selection([ColorPrintNumber]))+" unassigned print orders."+Char(13)
+$message:=$message+"Do you want to print the report?"
+
+WinChoice ($message)
+
+If (ok=1)
+	WinChoice ("Do you want to sort by Order Number or Order Writer?";"Number";"Writer")
+	If (ok=1)
+		ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPNumber;>)
+	Else 
+		ORDER BY([ColorPrintNumber];[ColorPrintNumber]Enterer;>;[ColorPrintNumber]CPNumber;>)
+	End if 
+	FORM SET OUTPUT([ColorPrintNumber];"Unassigned_Print")
+	PAGE SETUP([ColorPrintNumber];"Unassigned_Print")
+	Print_Selection (->[ColorPrintNumber])
+	CANCEL
+End if 
+

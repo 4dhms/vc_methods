@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfWarning)
+C_BOOLEAN($continue)
+C_LONGINT($i)
+  //
+  //If (Current form page=5)
+  //Order_DC_Save 
+  //Order_DC_Print 
+  //SELECT LISTBOX ROW(DCBreakdown;Size of array(asCustomers)+1)
+  //Else 
+vfPDF:=False
+vfEmail:=False
+vtFullName:=""
+
+$i:=1
+vtOrderChanges:=vtOrderChanges+"_Color"
+
+If (Order_Update )
+	<>Close:=True
+	$continue:=True
+	
+	SAVE RECORD([Orders])
+End if 
+
+If ($continue)
+	  //CANCEL
+	vlPage:=1
+	
+	vfComponents:=False
+	
+	If ([Orders]DesignNumber="")
+		WinPrompt ("Enter Design Number")
+	Else 
+		Case of 
+			: (FORM Get current page=10)
+				DCS_Print 
+			: (FORM Get current page=8)
+			Else 
+				vPrint:=0
+				vfPDF:=False
+				Order_PrintOrder 
+				<>PageLoaded:=False
+				If (vPrint=12) | (vPrint=22)
+					CANCEL
+				End if 
+		End case 
+	End if 
+End if 
+

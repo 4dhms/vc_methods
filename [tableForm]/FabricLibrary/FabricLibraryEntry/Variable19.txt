@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=[FabricLibrary]ArticleNumber)
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber;>)
+  //QUERY([FabricOrders];[FabricOrders]FabLibKey=[FabricLibrary]FabricLibKey)
+
+$i:=1
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+	$n:=1
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		If (Find in array(asPrintNumber;[CP_OrderXRef]CPNumber)<1) & ([CP_OrderXRef]CPNumber#"000@")
+			APPEND TO ARRAY(asPrintNumber;[CP_OrderXRef]CPNumber)
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			APPEND TO ARRAY(asPrintName;[ColorPrintNumber]CPName)
+		End if 
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+
+QUERY([FabricOrders];[FabricOrders]ArticleNo=[FabricLibrary]ArticleNumber)
+ORDER BY([FabricOrders];[FabricOrders]FabPODate;>)
+SELECTION TO ARRAY([FabricOrders]PONumber;atCols;[FabricOrders]FabPODate;adPODate;[FabricOrders]Closed;afReceived)
+
+
+FORM GOTO PAGE(3)

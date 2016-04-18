@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asSheetNames>0)
+	arMCol4{arMCol4}:=vrUnit4
+	afBatchList{afBatchList}:=True
+	WH_LineUpdateLDP (asSheetNames)
+End if 

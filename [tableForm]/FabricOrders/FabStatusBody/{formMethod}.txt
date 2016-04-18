@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([FabricOrders]FinalDipDate=!00-00-00!)
+	OBJECT SET VISIBLE([FabricOrders]FinalDipDate;False)
+Else 
+	OBJECT SET VISIBLE([FabricOrders]FinalDipDate;True)
+End if 
+OBJECT SET VISIBLE([FabricOrders]ShippedDate;Not([FabricOrders]ShippedDate=!00-00-00!))
+OBJECT SET VISIBLE([FabricOrders]FinalDelivery;Not([FabricOrders]FinalDelivery=!00-00-00!))

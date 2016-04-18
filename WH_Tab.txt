@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]Customer#"")
+	
+	QUERY([ShippingDocs];[ShippingDocs]Customer=[Orders]Customer)
+	If (Records in selection([ShippingDocs])=0)
+		CREATE RECORD([ShippingDocs])
+		[ShippingDocs]Customer:=[Orders]Customer
+		SAVE RECORD([ShippingDocs])
+	End if 
+	
+	Case of 
+		: ([ShippingDocs]ProofDelivery=1)
+			cb2:=1
+		: ([ShippingDocs]ProofDelivery=2)
+			cb1:=1
+		: ([ShippingDocs]ProofDelivery=3)
+			cb3:=1
+	End case 
+	OBJECT SET VISIBLE([Orders]WH_ProofDelivery;[ShippingDocs]ProofDelivery=2)
+	OBJECT SET VISIBLE([Orders]WH_ProofoDeliveryDate;[ShippingDocs]ProofDelivery=2)
+	OBJECT SET VISIBLE([Orders]WH_Packing;[ShippingDocs]ProofDelivery=2)
+	OBJECT SET VISIBLE([Orders]WH_PackingDate;[ShippingDocs]ProofDelivery=2)
+	
+	Case of 
+		: ([ShippingDocs]BillLading=1)
+			cb5:=1
+		: ([ShippingDocs]BillLading=2)
+			cb4:=1
+		: ([ShippingDocs]BillLading=3)
+			cb6:=1
+	End case 
+	OBJECT SET VISIBLE([Orders]WH_BilloLading;[ShippingDocs]BillLading=2)
+	OBJECT SET VISIBLE([Orders]WH_BilloLadingDate;[ShippingDocs]BillLading=2)
+	
+	Case of 
+		: ([ShippingDocs]ShippingDoc=1)
+			cb8:=1
+		: ([ShippingDocs]ShippingDoc=2)
+			cb7:=1
+		: ([ShippingDocs]ShippingDoc=3)
+			cb9:=1
+	End case 
+	OBJECT SET VISIBLE([Orders]WH_ShippingDoc;[ShippingDocs]ShippingDoc=2)
+	OBJECT SET VISIBLE([Orders]WH_ShippingDocDate;[ShippingDocs]ShippingDoc=2)
+	
+End if 
+
+

@@ -1,0 +1,5 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"Namer.i")
+WinCentOnCenter (400;500;1)
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW

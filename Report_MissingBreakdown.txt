@@ -1,0 +1,124 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docRef)
+C_TEXT($path;$datestamp)
+C_BOOLEAN($est)
+C_LONGINT($i;$n)
+C_DATE($srchDate)
+
+ARRAY TEXT(asSubCC;0)
+
+QUERY([Orders];[Orders]ShipDateFactory>Current date(*);*)
+QUERY([Orders]; & ;[Orders]ActualDeliveryDate=!00-00-00!;*)
+QUERY([Orders]; & ;[Orders]BreakFree=False;*)
+QUERY([Orders]; & ;[Orders]Cancelled=False)
+
+  //ORDER BY([Orders];[Orders]OrderDivision;>;[Orders]OrderNum;>)
+
+PreCarton_DueCalc 
+
+ORDER BY([Orders];[Orders]NeedBy;>;[Orders]OrderDivision;>;[Orders]OrderNum;>)
+
+CREATE EMPTY SET([Orders];"nobreak")
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+	ARRAY LONGINT($self;0)
+	DISTINCT VALUES([CP_OrderXRef]SelfKey;$self)
+	$est:=False
+	
+	$n:=1
+	For ($n;1;Size of array($self))
+		  //If ([Orders]OrderNum=100361)
+		  //ALERT(String([Orders]OrderNum)+"  "+String($self{$n}))
+		  //
+		  //End if 
+		
+		If (Not($est))
+			QUERY([OrdersBreakdowns];[OrdersBreakdowns]SelfKey=$self{$n})
+			QUERY SELECTION([OrdersBreakdowns];[OrdersBreakdowns]Packs>0)
+			
+			If (Records in selection([OrdersBreakdowns])>0)
+				$est:=True
+			End if 
+		End if 
+	End for 
+	
+	If (Not($est))
+		ADD TO SET([Orders];"nobreak")
+	End if 
+	NEXT RECORD([Orders])
+End for 
+USE SET("nobreak")
+CLEAR SET("nobreak")
+
+ORDER BY([Orders];[Orders]NeedBy;>;[Orders]OrderDivision;>;[Orders]OrderNum;>)
+$datestamp:=Replace string(String(Current date(*));"/";"_")
+
+If (Application type=5) | (Current user="Spooler")
+	$path:=PDF_FindFolder +":Breakdown"+$datestamp+".xls"
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	$docRef:=Create document("";"xls")
+	$path:=Document
+End if 
+
+SEND PACKET($docRef;"PO"+Char(9))
+SEND PACKET($docRef;"Style"+Char(9))
+SEND PACKET($docRef;"Division"+Char(9))
+SEND PACKET($docRef;"Customer PO"+Char(9))
+SEND PACKET($docRef;"Factory"+Char(9))
+SEND PACKET($docRef;"Customer"+Char(9))
+SEND PACKET($docRef;"Coordinator"+Char(9))
+SEND PACKET($docRef;"X Factory"+Char(9))
+SEND PACKET($docRef;"Cancel Date"+Char(9))
+SEND PACKET($docRef;"Quantity"+Char(9))
+SEND PACKET($docRef;"Need By"+Char(13))
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+	SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+	If ([Orders]DivisionOverride)
+		SEND PACKET($docRef;[Orders]OrderDivision+Char(9))
+	Else 
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		SEND PACKET($docRef;[Designs]DivisionCodeN+Char(9))
+	End if 
+	SEND PACKET($docRef;[Orders]CustPONumber+Char(9))
+	SEND PACKET($docRef;[Orders]Factory+Char(9))
+	SEND PACKET($docRef;[Orders]Customer+Char(9))
+	SEND PACKET($docRef;[Orders]Coordinator+Char(9))
+	SEND PACKET($docRef;String([Orders]ShipDateFactory)+Char(9))
+	SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+	SEND PACKET($docRef;String([Orders]TotalOrderQuantity;"###,###,##0")+Char(9))
+	SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+	NEXT RECORD([Orders])
+End for 
+CLOSE DOCUMENT($docRef)
+
+
+If (Application type=5) | (Current user="Spooler")
+	ARRAY TEXT(asSubCC;0)
+	APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+	APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+	APPEND TO ARRAY(asSubCC;"Salescoordinators@nubby.com")
+	APPEND TO ARRAY(asSubCC;"Production@nubby.com")
+	APPEND TO ARRAY(asSubCC;"sales@nubby.com")
+	APPEND TO ARRAY(asSubCC;"melaniem@nubby.com")
+	
+	Mail_SimpleSend ("List";$path;"Missing Size Breakdown Report ("+$datestamp+")";"Attached orders are missing breakdown information."+Char(13)+Char(13))
+Else 
+	SHOW ON DISK($path)
+End if 
+
+
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([OrdersBreakdowns])
+

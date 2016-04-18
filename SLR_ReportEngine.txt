@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=1)
+		If (vfByStyle)
+			SLR_BuildReport1a 
+		Else 
+			SLR_BuildReport1 
+		End if 
+End case 
+vlRouter:=1
+SLR_LoadArray 

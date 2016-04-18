@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($top;$left;$right;$bottom)
+
+$left:=(Screen width/2)-($1/2)
+$top:=(Screen height/2)-($2/2)+15
+$right:=(Screen width/2)+($1/2)
+$bottom:=(Screen height/2)+($2/2)+15
+SET WINDOW RECT($left;$top;$right;$bottom)
+

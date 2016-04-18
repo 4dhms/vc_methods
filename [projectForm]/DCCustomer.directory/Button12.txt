@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+LISTBOX SELECT ROW(afListBox1;Find in array(asXCustomer;"L@"))
+OBJECT SET SCROLL POSITION(afListBox1;Find in array(asXCustomer;"L@")+15)
+
+LISTBOX SELECT ROW(afListBox3;Find in array(atCustomerSpec;"L@"))
+OBJECT SET SCROLL POSITION(afListBox3;Find in array(atCustomerSpec;"L@")+15)

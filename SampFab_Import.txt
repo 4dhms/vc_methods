@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$c;$po)
+C_TEXT($pack)
+
+ARRAY TEXT($orders;0)
+
+$docref:=Open document("";"csv")
+If (ok=1)
+	Repeat 
+		RECEIVE PACKET($docref;$pack;Char(13))
+		If (Num($pack)>0)
+			$c:=Position(Char(9);$pack)
+			If ($c>1)
+				$pack:=Substring($pack;1;$c-1)
+			End if 
+			APPEND TO ARRAY($orders;$pack)
+		End if 
+	Until (ok=0)
+	CLOSE DOCUMENT($docref)
+	
+	CREATE EMPTY SET([SampleFabrics];"import")
+	ARRAY LONGINT($missing;0)
+	ARRAY LONGINT($invoiced;0)
+	
+	$i:=1
+	For ($i;1;Size of array($orders))
+		$po:=Num($orders{$i})
+		
+		QUERY([SampleFabrics];[SampleFabrics]SampleFab PO Nu=$po)
+		Case of 
+			: (Records in selection([SampleFabrics])=0)
+				APPEND TO ARRAY($missing;$po)
+			: ([SampleFabrics]Invoice#"")
+				APPEND TO ARRAY($invoiced;[SampleFabrics]SampleFab PO Nu)
+			Else 
+				ADD TO SET([SampleFabrics];"import")
+		End case 
+	End for 
+	USE SET("import")
+	CLEAR SET("import")
+	
+	Case of 
+		: (Size of array($missing)=1)
+			WinPrompt ("There is one missing PO: "+String($missing{1}))
+		: (Size of array($missing)>1)
+			WinChoice ("There are "+String(Size of array($missing))+" missing POs";"Show them";"Cancel")
+			If (ok=1)
+				$c:=1
+				For ($c;1;Size of array($missing))
+					ALERT("Missing PO: "+String($missing{$c}))
+				End for 
+			End if 
+	End case 
+	
+	Case of 
+		: (Size of array($invoiced)=1)
+			WinPrompt ("There is PO which has already been invoiced: "+String($invoiced{1}))
+		: (Size of array($invoiced)>1)
+			WinChoice ("There are "+String(Size of array($invoiced))+" POs which have already been invoiced";"Show them";"Cancel")
+			If (ok=1)
+				$c:=1
+				For ($c;1;Size of array($invoiced))
+					ALERT("Invoiced PO: "+String($invoiced{$c}))
+				End for 
+			End if 
+	End case 
+End if 

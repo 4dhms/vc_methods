@@ -1,0 +1,36 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //edits and adds to the Color Print Family library
+C_BOOLEAN($continue)
+SET MENU BAR(16)
+
+WinChoice ("Which family do you want?";"Color";"Print";"Cancel")
+Case of 
+	: (ok=1)
+		$continue:=True
+		If (bAccept=1)
+			vlRouter:=1
+		Else 
+			vlRouter:=2
+		End if 
+	Else 
+		CANCEL
+End case 
+
+If ($continue)
+	FORM SET OUTPUT([ColorPrintFamilies];"CPFamily.o")
+	FORM SET INPUT([ColorPrintFamilies];"CPFamily.i")
+	vlWinWd:=274
+	vlWinHt:=250
+	vlWinType:=4
+	vsWinTitle:=""
+	<>CloseBox:=True
+	
+	Center Window 
+	SET WINDOW TITLE("Family Library")
+	
+	QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPType=vlRouter)
+	AccessMode (->[ColorPrintFamilies];True)
+	MODIFY SELECTION([ColorPrintFamilies];*)
+	CLOSE WINDOW
+End if 
+<>CPFamilyID:=0

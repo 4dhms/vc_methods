@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Application type=5) & (Current machine#"@Spooler@")
+	Backup_CopyLocal 
+	Backup_Journal 
+	SLR_ClearReport 
+	Admin_Cleanup 
+	FabLib_CleanUp 
+	Sys_MIA 
+	  //Sys_Restart 
+End if 

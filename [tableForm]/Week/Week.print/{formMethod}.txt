@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		
+	: (Form event=On Header)
+		vtTitle:="Appointment Schedule ("+asUsers{asUsers}+")"+Char(13)+"Week of "+String(vdPaperwork)
+		vtTitle1:="Monday"+Char(13)+String(vdPaperwork)
+		vtTitle2:="Tuesday"+Char(13)+String(vdPaperwork+1)
+		vtTitle3:="Wednesday"+Char(13)+String(vdPaperwork+2)
+		vtTitle4:="Thursday"+Char(13)+String(vdPaperwork+3)
+		vtTitle5:="Friday"+Char(13)+String(vdPaperwork+4)
+		vsPrintingHeader:="PRINTED "+String(Current date(*))+" "+String(Current time(*);HH MM)+"  PAGE "+String(Printing page)
+End case 

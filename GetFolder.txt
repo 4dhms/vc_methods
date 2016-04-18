@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($webFolder)
+C_TEXT($char)
+
+$webFolder:=Data file
+Repeat 
+	$char:=Substring($webFolder;Length($webFolder);1)
+	If ($char#":")
+		$webFolder:=Substring($webFolder;1;Length($webFolder)-1)
+	End if 
+Until ($char=":")
+
+$0:=$webFolder

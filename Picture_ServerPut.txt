@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path;$diskName)
+C_TEXT($folderPath;$root)
+C_PICTURE($sketch)
+C_LONGINT($i;$n)
+C_BOOLEAN($continue)
+
+
+$n:=1
+For ($n;1;3)
+	$path:=""
+	Case of 
+		: ($n=1)
+			$root:=Substring(Application file;1;Position(":";Application file))
+			$continue:=True
+		: ($n=2)
+			$root:="4D Backup:"
+		: ($n=3)
+			$root:="4D:"
+	End case 
+	$folderpath:=$root+"4D Images:"
+	
+	If (Test path name($folderpath)=0)
+		$continue:=True
+	Else 
+		$continue:=False
+	End if 
+	
+	If ($continue)
+		
+		If ($2="B") | ($2="S")
+			$path:=$path+$2+Replace string(String($1);".";"_")+".jpg"
+		Else 
+			$path:=$path+$2+String($1)+".jpg"
+		End if 
+		
+		$folderPath:=$folderPath+String(Int($1/100))+":"
+		
+		If (Test path name($folderPath)#0)
+			CREATE FOLDER($folderPath)
+		End if 
+		
+		$path:=$folderPath+$path
+		
+		BLOB TO VARIABLE($3;$sketch)
+		WRITE PICTURE FILE($path;$sketch;"JPEG")
+	End if 
+End for 

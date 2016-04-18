@@ -1,0 +1,2 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinPrompt ("To dupe sample garment, go to order and click Dupe Button in input screen.")

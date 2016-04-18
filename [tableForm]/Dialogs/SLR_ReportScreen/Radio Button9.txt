@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+REDUCE SELECTION([SLRReporter];0)
+OBJECT SET ENABLED(bPrint;False)
+vtTitle:=""
+  //SLR_Sort (1)

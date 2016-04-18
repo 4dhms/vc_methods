@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	Spec_TrackChange ([SpecLineSample]ColumnHeader;->[SpecLineSample]PatternSource;"")
+	SS_SaveCell (alSpecNumber{asRowHeaders};"pat";Self->)
+End if 

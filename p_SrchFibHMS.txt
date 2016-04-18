@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search for fabric content in hms
+
+SAVE RECORD([Orders])
+WinFindList ("Enter Fiber Content:";4)
+If (OK=1)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]FiberContent=vsRequestString)
+	RELATE ONE SELECTION([OrdersFabricXRef];[Orders])
+	
+	Case of 
+		: (Records in selection([Orders])=0)
+			WinPrompt ("Nothing found from that query.")
+			ALL RECORDS([Orders])
+	End case 
+End if 
+
+p_InputLayHMS 
+p_SetWindowHMS 

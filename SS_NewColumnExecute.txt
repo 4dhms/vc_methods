@@ -1,0 +1,95 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($oldColHead)
+C_TEXT($oldPattern)
+C_DATE($oldRec;$oldSubmit)
+
+$oldColHead:=[SpecLineSample]ColumnHeader
+$oldRec:=[SpecLineSample]Received
+$oldSubmit:=[SpecLineSample]SubmitDue
+$oldPattern:=[SpecLineSample]PatternSource
+vlColCount:=alSpecNumber{Size of array(alSpecNumber)}+1
+
+CREATE RECORD([SpecLineSample])
+[SpecLineSample]SF_KeyNumber:=[SpecFactory]SF_KeyNumber
+[SpecLineSample]ColHead2:=$oldColHead
+[SpecLineSample]ColumnHeader:=[SpecFactory]Colhead
+[SpecLineSample]ColumnNumber:=vlColCount
+[SpecLineSample]SubmitDue:=[SpecFactory]Submit
+[SpecLineSample]Received:=[SpecFactory]Received
+[SpecLineSample]Received2:=$oldRec
+[SpecLineSample]SubmitDue2:=$oldSubmit
+[SpecLineSample]Pattern2:=$oldPattern
+[SpecLineSample]Comments:=[SpecFactory]Note
+[SpecLineSample]PatternSource:=[SpecFactory]PatternSource
+SAVE RECORD([SpecLineSample])
+OBJECT SET VISIBLE(bDupe2;True)
+OBJECT SET VISIBLE(*;"xny";True)
+OBJECT SET VISIBLE(*;"xsb";True)
+
+If (Records in set("SampCols")<1)
+	CREATE EMPTY SET([SpecLineSample];"SampCols")
+End if 
+INSERT IN ARRAY(asRowHeaders;Size of array(asRowHeaders)+1;1)
+INSERT IN ARRAY(alSpecNumber;Size of array(asRowHeaders)+1;1)
+alSpecNumber{Size of array(alSpecNumber)}:=vlColCount
+asRowHeaders{Size of array(asRowHeaders)}:=[SpecFactory]Colhead
+asRowHeaders:=Size of array(asRowHeaders)
+[SpecFactory]Colhead:=vsColHead1
+
+ADD TO SET([SpecLineSample];"SampCols")
+
+[SpecFactory]Submit:=vdSubmit1
+[SpecFactory]Received:=!00-00-00!
+[SpecFactory]Colhead:=vsColHead1
+[SpecFactory]Note:=""
+SAVE RECORD([SpecFactory])
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+$i:=1
+FIRST RECORD([SpecSheetLines])
+For ($i;1;Records in selection([SpecSheetLines]))
+	CREATE RECORD([SpecLineCols])
+	[SpecLineCols]SpecLineKey:=[SpecSheetLines]SpecLineKey
+	[SpecLineCols]SpecA:=[SpecSheetLines]Spec1A
+	[SpecLineCols]SpecB:=[SpecSheetLines]Spec1B
+	[SpecLineCols]SpecC:=[SpecSheetLines]Spec1C
+	[SpecLineCols]ColumnNumber:=[SpecLineCols]ColumnNumber+1
+	[SpecLineCols]ColumnNumber:=vlColCount
+	SAVE RECORD([SpecLineCols])
+	[SpecSheetLines]Spec3A:=[SpecSheetLines]Spec2A
+	[SpecSheetLines]Spec3C:=[SpecSheetLines]Spec2C
+	[SpecSheetLines]Spec2A:=[SpecSheetLines]Spec1A
+	[SpecSheetLines]Spec2C:=[SpecSheetLines]Spec1C
+	[SpecSheetLines]Spec1B:=""
+	[SpecSheetLines]Spec1C:=""
+	SAVE RECORD([SpecSheetLines])
+	NEXT RECORD([SpecSheetLines])
+End for 
+If (Size of array(asRowheaders)>0)
+	OBJECT SET VISIBLE(*;"xny1";True)
+	OBJECT SET VISIBLE(*;"xsb1";True)
+	OBJECT SET VISIBLE(*;"xDueDate";True)
+	OBJECT SET VISIBLE(*;"xRec";True)
+	OBJECT SET VISIBLE(*;"xPatternSource";True)
+	OBJECT SET VISIBLE([SpecLineSample]ColumnHeader;True)
+	OBJECT SET VISIBLE([SpecLineSample]SubmitDue;True)
+	OBJECT SET VISIBLE([SpecLineSample]Received;True)
+	OBJECT SET VISIBLE([SpecLineSample]PatternSource;True)
+	OBJECT SET VISIBLE(bDupe1;True)
+End if 
+
+If (Size of array(asRowHeaders)>1)
+	OBJECT SET VISIBLE(*;"xny";True)
+	OBJECT SET VISIBLE(*;"xsb";True)
+	OBJECT SET VISIBLE(*;"xDueDate2";True)
+	OBJECT SET VISIBLE(*;"xRec2";True)
+	OBJECT SET VISIBLE(*;"xPatternSource2";True)
+	OBJECT SET VISIBLE([SpecLineSample]ColHead2;True)
+	OBJECT SET VISIBLE([SpecLineSample]SubmitDue2;True)
+	OBJECT SET VISIBLE([SpecLineSample]Received2;True)
+	OBJECT SET VISIBLE([SpecLineSample]Pattern2;True)
+End if 
+
+SS_GetPart 

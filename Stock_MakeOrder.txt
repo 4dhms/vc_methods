@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($ordernumber;$i;$contactkey)
+C_TEXT($tempID)
+C_BOOLEAN(vfPrintOrder)
+
+vtTerms:=""
+vtShipTo:=""
+vtShipVia:=""
+vsOrderNumber:=""
+vtNotes:=""
+
+Web_StockVarLookUp 
+Web_StockVar 
+
+$contactkey:=Num(vtContactKey)
+
+QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+
+If (vtShipTo="")
+	[StockOrders]ShipTo:=[Customers]ShipTo
+Else 
+	[StockOrders]ShipTo:=vtShipTo
+End if 
+
+If (vtShipVia="")
+	[StockOrders]ShipVia:=[Customers]ShipVia
+Else 
+	[StockOrders]ShipVia:=vtShipVia
+End if 
+
+If (vtTerms="")
+	[StockOrders]Terms:=[Customers]Terms
+Else 
+	[StockOrders]Terms:=vtTerms
+End if 
+
+[StockOrders]CustomerOrder:=vsOrderNumber
+[StockOrders]Notes:=vtNotes
+SAVE RECORD([StockOrders])
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+
+$i:=1
+FIRST RECORD([StockOrdersLines])
+
+For ($i;1;Records in selection([StockOrdersLines]))
+	[StockOrdersLines]SONumber:=[StockOrders]SONumber
+	SAVE RECORD([StockOrdersLines])
+	NEXT RECORD([StockOrdersLines])
+End for 
+
+UNLOAD RECORD([StockOrders])
+UNLOAD RECORD([StockOrdersLines])
+
+vsWebSession:=String(Tickcount)
+  //Web_DL_List 
+vtBuyer:="None"
+WebStock 

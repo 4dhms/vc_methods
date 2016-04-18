@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Array_BuildDates 
+<>asStartMonth:=Month of(Current date(*)-1)
+<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*)-1)))
+Array_BuildDays ("Start";<>asStartMonth)
+<>asStartDay:=Find in array(<>asStartDay;String(Day of(Current date(*)-1)))
+
+<>asEndMonth:=Month of(Current date(*))
+<>asEndYear:=Find in array(<>asEndYear;String(Year of(Current date(*))))
+Array_BuildDays ("End";<>asEndMonth)
+<>asEndDay:=Find in array(<>asEndDay;String(Day of(Current date(*))))
+
+Center Window (250;150;1;"")
+DIALOG("DateRange")
+CLOSE WINDOW

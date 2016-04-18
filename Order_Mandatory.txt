@@ -1,0 +1,191 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($pass;$continue;$breakdown;vfCheckCredit)
+C_TEXT($shiptest)
+C_TEXT($message)
+
+SAVE RECORD([ShippingDocs])
+UNLOAD RECORD([ShippingDocs])
+
+If (Count parameters>0)
+	If ($1=True)
+		$breakdown:=True
+	Else 
+		$breakdown:=False
+	End if 
+End if 
+
+Case of 
+	: (Current user="Designer") & (Shift down)
+		$pass:=True
+	: ([Orders]Cancelled)
+		$pass:=True
+	Else 
+		$pass:=False
+		$shipTest:=Replace string([Orders]ShipInfo;"Air to ";"")
+		$shipTest:=Replace string($shipTest;"Sea to ";"")
+		$shipTest:=Replace string($shipTest;"LDP at ";"")
+		
+		If (Not([Orders]DivisionOverride)) & ([Orders]DesignNumber=[Designs]DesignNum)
+			
+			[Orders]OrderDivision:=[Designs]DivisionCodeN
+		End if 
+		  //Order_NYSupply 
+		<>vlOrderNumber:=[Orders]OrderNum
+		
+		If ([Orders]KWCnS="") & ($continue)
+			KWCS 
+			If (ok=1)
+				$continue:=True
+			Else 
+				$continue:=False
+			End if 
+		Else 
+			$continue:=True
+		End if 
+		
+		If ([Orders]SizeCategory="") & ($continue)
+			SizeCat 
+			If (ok=1)
+				$continue:=True
+			Else 
+				$continue:=False
+			End if 
+		Else 
+			$continue:=True
+		End if 
+End case 
+
+If ($continue)
+	Case of 
+		: ([Orders]KWCnS="")
+			WinAlertSmall ("Enter KNIT, WOVEN or CUT n SEW.")
+		: ([Orders]SeasonName="")
+			If (<>asSeasonName>1)
+				[Orders]SeasonName:=<>asSeasonName{<>asSeasonName}
+			Else 
+				GOTO OBJECT([Orders]SeasonName)
+				WinAlertSmall ("Enter SEASON")
+			End if 
+		: ([Orders]SeasonYear="")  //& ([Orders]Season="")
+			If (<>asSeasonYear>1)
+				[Orders]SeasonYear:=<>asSeasonYear{<>asSeasonYear}
+			Else 
+				GOTO OBJECT([Orders]SeasonYear)
+				WinAlertSmall ("Enter YEAR")
+			End if 
+		: (FORM Get current page>4)
+			$pass:=True
+		: (FORM Get current page=3)
+			$pass:=CP_Mandatories 
+		: ([Orders]CancelDate#!00-00-00!) & ([Orders]CancelDate<Current date)
+			$pass:=True
+		: (<>orderForm="Cost")
+			$pass:=True
+		: (<>orderForm="PO")
+			$pass:=True
+			
+		: ([Orders]Salesperson="")
+			WinAlertSmall ("Enter SALESPERSON")
+			GOTO OBJECT([Orders]Salesperson)
+			
+		: ([Orders]Order_Enterer="")
+			GOTO OBJECT([Orders]Order_Enterer)
+			
+		: ([Orders]DesignNumber="")
+			WinAlertSmall ("Enter DESIGN NUMBER")
+			GOTO OBJECT([Orders]DesignNumber)
+			
+		: ([Orders]StyleNumber="")
+			WinAlertSmall ("Enter STYLE NUMBER")
+			GOTO OBJECT([Orders]StyleNumber)
+			
+		: ([Orders]Customer="")
+			WinAlertSmall ("Enter CUSTOMER")
+			GOTO OBJECT([Orders]Customer)
+			
+		: ([Orders]Label="")
+			WinAlertSmall ("Enter LABEL")
+			GOTO OBJECT([Orders]Label)
+			
+		: ([Orders]LabelSource="")
+			WinAlertSmall ("Enter LABEL SOURCE")
+			GOTO OBJECT([Orders]LabelSource)
+			
+		: ([Orders]Salesperson="") & (Is new record([Orders]))
+			WinAlertSmall ("Enter SALESPERSON")
+			GOTO OBJECT([Orders]Salesperson)
+			
+		: ([Orders]Price Terms="")
+			WinAlertSmall ("Enter TERMS")
+			GOTO OBJECT([Orders]Price Terms)
+			
+		: ([Orders]Price=0)
+			WinAlertSmall ("Enter PRICE")
+			GOTO OBJECT([Orders]Price)
+			
+		: ([Orders]Price Tckt="")
+			WinAlertSmall ("Enter PRICE TICKET")
+			GOTO OBJECT([Orders]Price Tckt)
+			
+		: ([Orders]CancelDate=!00-00-00!)
+			WinAlertSmall ("Enter START CANCEL DATE")
+			GOTO OBJECT([Orders]CancelDate)
+			
+		: ([Orders]Cutting Ticket="")
+			WinAlertSmall ("Enter CUTTING TICKET")
+			
+		: ([Orders]BrkdnCutRatio="")
+			WinAlertSmall ("Enter CUT RATIO")
+			GOTO OBJECT([Orders]BrkdnCutRatio)
+			
+		: ([Orders]Care Label="")
+			WinAlertSmall ("Enter CARE LABEL")
+			GOTO OBJECT([Orders]Care Label)
+			
+			  //: ([Orders]FabricSupplied="") & ([Orders]KWCnS#"Knit")
+			  //WinAlertSmall ("Enter FABRIC SUPPLIED")
+			  //GOTO OBJECT([Orders]FabricSupplied)
+			
+			  //Checks breakdown
+		: (Old([Orders]TotalOrderQuantity)#[Orders]TotalOrderQuantity) | (Position("Breakdown";vtOrderChanges)>0) & (Not($breakdown))
+			Order_BuildBD ([Orders]BDHeaderKey)
+			Case of 
+				: (vlBDGrandTot=0) | (vlBDGrandTot=[Orders]TotalOrderQuantity)
+					$pass:=True
+				: (vlBDGrandTot>[Orders]TotalOrderQuantity)
+					$message:="Quarder quantity is "+String([Orders]TotalOrderQuantity;"###,##0")+"."+Char(13)+"You have breakdowns for "+String(vlBDGrandTot;"###,##0")+". "
+					$message:=$message+Char(13)+Char(13)+"You are over by "+String(vlBDGrandTot-[Orders]TotalOrderQuantity;"###,##0")+"."
+					WinPrompt ($message)
+				: (vlBDGrandTot<[Orders]TotalOrderQuantity)
+					$message:="Order quantity is "+String([Orders]TotalOrderQuantity;"###,##0")+"."+Char(13)+"You have breakdowns for "+String(vlBDGrandTot;"###,##0")+". "
+					$message:=$message+Char(13)+Char(13)+"You are short by "+String([Orders]TotalOrderQuantity-vlBDGrandTot;"###,##0")+"."
+					WinChoice ($message;"I'll fix it";"Allow it")
+					If (ok=0)
+						$pass:=True
+					End if 
+			End case 
+		Else 
+			$pass:=True
+	End case 
+End if 
+
+If (FORM Get current page=3) | (FORM Get current page=4) & (Not([Orders]Cancelled))
+	$pass:=PO_Mandatory 
+End if 
+
+If ($pass)
+	  //If (vfCheckCredit)
+	  //Order_PeterMail 
+	  //vfCheckCredit:=False
+	  //End if 
+	
+	
+	  //Order_ProcessChanges 
+	Order_FindChanges (2)
+	SAVE RECORD([Orders])
+	$0:=True
+Else 
+	$0:=False
+End if 
+
+Order_RequiredFlag 

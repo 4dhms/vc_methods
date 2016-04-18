@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Quota])
+<>vsQuotaCat:=[Quota]Category
+arDutyRates{<>asCategory}:=[Quota]DutyRate
+Cost_QuotaEnter 
+If (<>QuotaRouter=-1)
+	vrUnit3:=[Quota]DutyRate
+	arMCol3{arMCol3}:=[Quota]DutyRate
+End if 
+CANCEL

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Record number([HMSArtNo])<0)
+	FORM GOTO PAGE(2)
+Else 
+	OBJECT SET VISIBLE(b3;True)
+	FORM GOTO PAGE(1)
+End if 

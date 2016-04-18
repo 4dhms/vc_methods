@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_PICTURE($empty)
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+
+QUERY([SpecPix];[SpecPix]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+$c:=Int(Records in selection([SpecPix])/4)
+If (Records in selection([SpecPix])%4>0)
+	$c:=$c+1
+End if 
+
+vlPixPos:=1
+Spec_PixArray 
+
+$i:=1
+For ($i;1;$c)
+	Spec_GetPix 
+	
+	  //PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+	vlPage:=vlPage+1
+	vsPrintingHeader:="PAGE "+String(vlPage)
+	
+	PAGE BREAK(>)
+	Print form("SimplePix.p")
+	
+	vlPixPos:=vlPixPos+4
+End for 
+vlPixPos:=1
+Spec_GetPix 
+

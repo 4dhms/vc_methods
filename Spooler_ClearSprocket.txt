@@ -1,0 +1,16 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+[Spooler]Status:=0
+[Spooler]OrderNumber:=0
+[Spooler]RecordNumber:=0
+[Spooler]Printed:=False
+[Spooler]LogEntry:=""
+[Spooler]OrderList:=""
+SET BLOB SIZE([Spooler]AddressListBlob;0)
+SET BLOB SIZE([Spooler]OrderArrayBlob;0)
+SET BLOB SIZE([Spooler]SortArray;0)
+[Spooler]Genre:=""
+[Spooler]ReturnAddress:=""
+[Spooler]SpoolRouter:=0
+[Spooler]StatusGuide:=""
+[Spooler]SpoolMessage:=""
+SAVE RECORD([Spooler])

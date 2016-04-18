@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(cbKnit;False)
+OBJECT SET VISIBLE(cbWoven;False)
+OBJECT SET VISIBLE(cbCutSew;False)
+OBJECT SET VISIBLE(cbBulk;False)
+OBJECT SET VISIBLE(ssNotApproved;False)
+OBJECT SET VISIBLE(cbMaster;False)
+OBJECT SET VISIBLE(cbStrip;False)
+OBJECT SET ENTERABLE([SpecFactory]ApprovedPattern;False)
+OBJECT SET ENTERABLE([SpecFactory]PatternApproveDate;False)
+OBJECT SET ENTERABLE([SpecFactory]PatternReady;False)
+OBJECT SET ENTERABLE([SpecFactory]Size;False)
+OBJECT SET ENTERABLE([SpecFactory]XFactory;False)

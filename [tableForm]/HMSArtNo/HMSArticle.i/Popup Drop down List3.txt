@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (atCost3>1) & (vlItem3>0)
+	HMSartno_Build 
+	OBJECT SET VISIBLE(vlItem4;True)
+	OBJECT SET VISIBLE(*;"Perc4";True)
+	OBJECT SET VISIBLE(atCost4;True)
+	Case of 
+		: (vsFlag="100%")
+			Fab_NewRedundants 
+			Fab_ArrayColorCode 
+			vsHeader:=String(Size of array(atArtNumber))
+			OBJECT SET VISIBLE(pOne;True)
+			OBJECT SET VISIBLE(pTwo;True)
+			OBJECT SET VISIBLE(pThree;True)
+			FORM GOTO PAGE(3)
+			
+		: (vlItem3=0)
+			GOTO OBJECT(vlItem3)
+		Else 
+			GOTO OBJECT(vlItem4)
+	End case 
+End if 

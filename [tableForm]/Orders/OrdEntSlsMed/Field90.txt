@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]ShipSea)
+	[Orders]ShipFOB:=False
+	[Orders]ShipLDP:=False
+	[Orders]ShipAir:=False
+End if 
+Order_AirSeaBuild 
+vfUpdateShipping:=True

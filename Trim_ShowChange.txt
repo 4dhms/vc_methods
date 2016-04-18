@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($color;$style;$i)
+C_POINTER($fieldPtr)
+
+$i:=1
+
+Case of 
+	: ($i=1)
+		$fieldPtr:=->[CS_Lines]ComponentName
+		If (Substring([CS_Lines]LogCode;$i;1)="1")
+			$color:=3
+			$style:=3
+		Else 
+			$color:=15
+			$style:=0
+		End if 
+		
+		OBJECT SET COLOR($fieldPtr->;-($color+(256*0)))
+		OBJECT SET FONT STYLE($fieldPtr->;$style)
+End case 

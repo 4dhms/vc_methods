@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlSubtotal)
+
+Case of 
+	: (Form event=On Printing Footer)
+		OBJECT SET VISIBLE(vsPrintingHeader;True)
+		OBJECT SET VISIBLE(vlGrandTotal;True)
+		OBJECT SET VISIBLE(vlPageTotal;True)
+		OBJECT SET VISIBLE(*;"xInternal";True)
+		OBJECT SET VISIBLE(*;"xPage";True)
+		OBJECT SET VISIBLE(*;"xGrand";True)
+		
+	: (Form event=On Header)
+		OBJECT SET VISIBLE(*;"xInternal";vfInternal)
+		vlPageTotal:=0
+		vsPrintingHeader:="MORE"
+		vDesc:=""
+		  //clears running total
+		vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Orders]))+" Orders   "+"Page "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE(*;"xVoid";[Orders]Cancelled)
+		OBJECT SET VISIBLE(vsPrintingHeader;False)
+		OBJECT SET VISIBLE(vlGrandTotal;False)
+		OBJECT SET VISIBLE(vlPageTotal;False)
+		OBJECT SET VISIBLE(*;"xInternal";False)
+		OBJECT SET VISIBLE(*;"xPage";False)
+		OBJECT SET VISIBLE(*;"xGrand";False)
+		Order_Print_Lineending 
+		
+		<>vlOrderNumber:=[Orders]OrderNum
+		
+		OBJECT SET VISIBLE(*;"xDiv3";(vfVisible) & ([Orders]ProdComments#""))
+		
+		vlPageTotal:=vlPageTotal+[Orders]TotalOrderQuantity
+		
+		If (Selected record number([Orders])=Records in selection([Orders]))
+			vsPrintingHeader:="LAST PAGE"
+		End if 
+		
+		OBJECT SET VISIBLE([Orders]Fab Rcv Dt;[Orders]Fab Rcv Dt#!00-00-00!)
+		OBJECT SET VISIBLE(*;"xDC";vfInternal)
+		OBJECT SET VISIBLE([Orders]CancelDate;vfInternal)
+		OBJECT SET VISIBLE([Orders]InDC;vfInternal)
+		OBJECT SET VISIBLE(*;"xNY";vfInternal)
+		OBJECT SET VISIBLE([Orders]ShipDateFactory;[Orders]ShipDateFactory#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]Schedule Date;[Orders]Schedule Date#!00-00-00!)
+		OBJECT SET VISIBLE(*;"xAct";[Orders]ActualDeliveryDate#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]ActualDeliveryDate;[Orders]ActualDeliveryDate#!00-00-00!)
+		
+		  //-------------------------
+		Orders_CalcQty 
+		vlSubtotal:=vlSubtotal+([Orders]TotalOrderQuantity)
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		Picture_RestoreOnTheFly 
+		QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		
+		
+		SampFit_RecDate 
+		OBJECT SET VISIBLE([Orders]ApprovalDate;[Orders]ApprovalDate#!00-00-00!)
+End case 

@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($order;cb1;cb2;cb3;cb4;cb5;cb6)
+
+Case of 
+	: (Form event=On Header)
+		OBJECT SET VISIBLE(*;"xFlag1";cb2=1)
+		OBJECT SET VISIBLE(*;"xFlag2";cb4=1)
+		OBJECT SET VISIBLE(*;"xFlag3";cb3=1)
+		OBJECT SET VISIBLE(*;"xFlag4";cb5=1)
+		OBJECT SET VISIBLE(*;"xFlag5";cb1=1)
+		OBJECT SET VISIBLE(*;"xFlag6";cb6=1)
+		
+	: (Form event=On Printing Detail)
+		$order:=-1*[Samples]SampleNumber
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+		vsSeason:=[Samples]SeasonName+" "+Substring([Samples]SeasonYear;3;4)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		vxSketch:=[Designs]Sketch
+		vtDescription:=[Designs]Description
+		Case of 
+			: ([Samples]Sam Type="Proto@")
+				vsType:="Proto"
+			: ([Samples]Sam Type="sales sample@")
+				vsType:="Sales"
+		End case 
+		OBJECT SET VISIBLE([Samples]XFactAct;[Samples]XFactAct#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactoryReq;[Samples]XFactoryReq#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactorySched;[Samples]XFactorySched#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]SampleReceived;[Samples]SampleReceived#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]DueDate;[Samples]DueDate#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]ProtoRecvDate;[Samples]ProtoRecvDate#!00-00-00!)
+End case 

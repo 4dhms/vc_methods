@@ -1,0 +1,153 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($lines;0)
+ARRAY TEXT($col1;0)
+ARRAY TEXT($col2;0)
+ARRAY TEXT($col3;0)
+
+C_BOOLEAN($done;$onecol;$end)
+C_LONGINT($i;$n;$c)
+C_TEXT($rem)
+If ([Orders]Special_Instructions#"")
+	
+	vtType1:=""
+	vtType2:=""
+	vtType3:=""
+	
+	$onecol:=False
+	$done:=False
+	$rem:=Replace string([Orders]Special_Instructions;Char(13)+Char(13);Char(13);*)
+	$c:=Position("Packing instructions:"+Char(13);$rem)
+	
+	If ($c>0)
+		$rem:=Substring($rem;$c+22;999)
+	End if 
+	
+	If ($rem[[Length($rem)]]=Char(13))
+		$rem:=Substring($rem;1;Length($rem))
+	End if 
+	If ($rem[[Length($rem)]]=Char(13))
+		$rem:=Substring($rem;1;Length($rem))
+	End if 
+	
+	$i:=1
+	Repeat 
+		If (Shift down)
+			$done:=True
+		End if 
+		$c:=Position(Char(13);$rem;*)
+		
+		If ($c>25) & (Position(" ";$rem)>25)
+			$rem:=Replace string($rem;"#";" #")
+			$rem:=Replace string($rem;"=";" = ")
+		End if 
+		
+		If ($c>25)
+			$c:=25
+			$end:=False
+			
+			Repeat 
+				$c:=$c-1
+				  //ALERT($rem+"  "+$rem≤$c≥+"  "+String($c))
+				Case of 
+					: ($c>Length($rem))
+						$end:=True
+					: ($c<1)
+						$end:=True
+					: ($rem[[$c]]=" ")
+						$end:=True
+				End case 
+			Until ($end)
+			
+			If ($c<1)
+				$c:=20
+			End if 
+		End if 
+		
+		Case of 
+			: ($rem=Char(13))
+				$done:=True
+			: ($c<1)
+				APPEND TO ARRAY($lines;$rem)
+				$done:=True
+			Else 
+				APPEND TO ARRAY($lines;Substring($rem;1;$c))
+				$rem:=Delete string($rem;1;$c)
+		End case 
+		$i:=1+$i
+	Until ($done)
+	
+	Case of 
+		: (Size of array($lines)<10)
+			$c:=Size of array($lines)
+			$onecol:=True
+		: (Size of array($lines)%3=0)
+			$c:=Size of array($lines)/3
+		Else 
+			$c:=Int(Size of array($lines)/3)+1
+	End case 
+	
+	PrintOrder_NewPage (660-($c*12);"")
+	
+	
+	$i:=1
+	$n:=1
+	For ($i;1;$c)
+		APPEND TO ARRAY($col1;$lines{$n})
+		$n:=$n+1
+	End for 
+	
+	If (Not($onecol))
+		$i:=1
+		For ($i;1;$c)
+			Case of 
+				: (Size of array($lines)<$n)
+					  //do nothing
+				: ($i=1) & ($lines{$n}=Char(13))
+					  //do nothing
+			End case 
+			
+			If ($n>Size of array($lines)) & (Not($onecol))
+				APPEND TO ARRAY($col2;"")
+			Else 
+				APPEND TO ARRAY($col2;$lines{$n})
+			End if 
+			$n:=$n+1
+		End for 
+		
+		$i:=1
+		For ($i;1;$c)
+			Case of 
+				: (Size of array($lines)<$n)
+					  //do nothing
+				: ($i=1) & ($lines{$n}=Char(13))
+					  //do nothing
+			End case 
+			
+			If ($n>Size of array($lines))
+				APPEND TO ARRAY($col3;"")
+			Else 
+				APPEND TO ARRAY($col3;$lines{$n})
+			End if 
+			$n:=$n+1
+		End for 
+	End if 
+	Print form("PackingInstructions")
+	
+	If ($onecol)
+		For ($i;1;Size of array($lines))
+			vtType1:=$lines{$i}
+			Print form([Orders];"Print_DC_Packing")
+		End for 
+		
+	Else 
+		For ($i;1;$c)
+			vtType1:=$col1{$i}
+			vtType2:=$col2{$i}
+			vtType3:=$col3{$i}
+			Print form([Orders];"Print_DC_Packing")
+		End for 
+	End if 
+End if 
+
+
+

@@ -1,0 +1,92 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($fieldptr)
+C_TEXT($testField)
+ARRAY LONGINT(alFieldNumber;0)
+C_REAL($revKey)
+
+Case of 
+	: (Table(Current form table)=53) & (<>vlOrderNumber>0)
+		vlTableNum:=2
+	: (Table(Current form table)=53) & (<>vlOrderNumber>0)
+		vlTableNum:=3
+	Else 
+		vlTableNum:=Table(Current form table)
+End case 
+
+$revKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+QUERY([Changes];[Changes]RevisionKey=$revKey)
+QUERY SELECTION([Changes];[Changes]TableNum=2)
+QUERY SELECTION([Changes];[Changes]RevisionNumber>0)
+QUERY SELECTION([Changes];[Changes]FieldNum#55)
+
+SELECTION TO ARRAY([Changes]FieldNum;alFieldNumber)
+$i:=1
+For ($i;1;Get last field number(vlTableNum))
+	If (Is field number valid(vlTableNum;$i))
+		$fieldptr:=Field(vlTableNum;$i)
+		$testField:=Field name($fieldptr)
+		If (Find in array(alFieldNumber;$i)>0) & ([Orders]RevisionNumber>0)
+			OBJECT SET FONT STYLE($fieldptr->;3)
+			OBJECT SET COLOR($fieldptr->;-(3+(256*0)))
+		End if 
+		
+		If (Count parameters>0)
+			OBJECT SET ENTERABLE($fieldptr->;$1)
+		End if 
+	End if 
+End for 
+
+If (vlTableNum=2)
+	OBJECT SET ENTERABLE([Orders]Category1;False)
+	OBJECT SET ENTERABLE([Orders]Category2;False)
+	OBJECT SET ENTERABLE([Orders]OrderNum;False)
+	OBJECT SET ENTERABLE([Orders]PODate;User in group(Current user;"ProductionTeam"))
+	OBJECT SET ENTERABLE([Orders]ComboColorCode;Current user="Designer")
+	OBJECT SET ENTERABLE([Orders]TotalOrderQuantity;False)
+	OBJECT SET ENTERABLE([Orders]SampleStatus;False)
+	OBJECT SET ENTERABLE([Orders]SampleStatusDate;False)
+	OBJECT SET ENTERABLE([Orders]SampleNextDate;False)
+	If (Count parameters>0)
+		OBJECT SET ENTERABLE([Orders]ShipAir;$1)
+		OBJECT SET ENTERABLE([Orders]ShipSea;$1)
+		OBJECT SET ENTERABLE([Orders]ShipLDP;$1)
+		OBJECT SET ENTERABLE([Orders]ShipFOB;$1)
+	End if 
+End if 
+
+If (Count parameters>0)
+	If ($1)
+		OBJECT SET ENABLED(cbNY;True)
+		OBJECT SET ENABLED(cbLA;True)
+		OBJECT SET ENABLED(cbOther;True)
+		OBJECT SET ENABLED(cbWoven;True)
+		OBJECT SET ENABLED(cbKnit;True)
+		OBJECT SET ENABLED(cbCutSew;True)
+		OBJECT SET ENABLED(zYes;True)
+		OBJECT SET ENABLED(zNo;True)
+		OBJECT SET ENABLED(pFlat;True)
+		OBJECT SET ENABLED(pGOH;True)
+		OBJECT SET ENABLED(pTBA;True)
+		OBJECT SET ENABLED(rPetite;True)
+		OBJECT SET ENABLED(rMissy;True)
+		OBJECT SET ENABLED(rLarge;True)
+	Else 
+		OBJECT SET ENABLED(cbNY;False)
+		OBJECT SET ENABLED(cbLA;False)
+		OBJECT SET ENABLED(cbOther;False)
+		OBJECT SET ENABLED(cbWoven;False)
+		OBJECT SET ENABLED(cbKnit;False)
+		OBJECT SET ENABLED(cbCutSew;False)
+		OBJECT SET ENABLED(zYes;False)
+		OBJECT SET ENABLED(zNo;False)
+		OBJECT SET ENABLED(pFlat;False)
+		OBJECT SET ENABLED(pGOH;False)
+		OBJECT SET ENABLED(pTBA;False)
+		OBJECT SET ENABLED(rPetite;False)
+		OBJECT SET ENABLED(rMissy;False)
+		OBJECT SET ENABLED(rLarge;False)
+	End if 
+	OBJECT SET VISIBLE(bAdd;$1)
+	OBJECT SET VISIBLE(bDelete;$1)
+End if 

@@ -1,0 +1,28 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Getting Focus)
+		vtOldData:=$1
+	: (Form event=On Data Change)
+		If (vtOldData#$1)
+			[CS_Lines]LogCode:=Insert string([CS_Lines]LogCode;"1";$2)
+			CREATE RECORD([Changes])
+			[Changes]RevisionKey:=<>vlOrderNumber
+			[Changes]RevDate:=Current date(*)
+			[Changes]RevTime:=Current time(*)
+			[Changes]OldData:=vtOldData
+			[Changes]NewChange:=$1
+			[Changes]OrderNumber:=Abs(<>vlOrderNumber)
+			SAVE RECORD([Changes])
+		End if 
+		$i:=1
+		For ($i;1;Size of array(alLKey))
+			If (afLUpdate{$i})
+				afSSChange{alLKey{$i}}:=True
+			End if 
+		End for 
+End case 
+
+
+

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		If (Current user="Roberta")
+			[SpecSheetLines]ChineseOverride:=True
+		End if 
+End case 

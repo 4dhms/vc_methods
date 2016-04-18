@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlOrderNumber)
+
+ARRAY LONGINT(alSelfKey;0)
+
+vlOrderNumber:=alOrders{alOrders}
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+
+SELECTION TO ARRAY([CP_OrderXRef]SelfKey;alSelfKey)
+ARRAY LONGINT(alShadeFab;Size of array(alSelfKey))
+
+vlOrderRouter:=2
+QUERY([Orders];[Orders]OrderNum=vlOrderNumber)
+vrPrice:=[Orders]Price
+
+Order_DC 
+
+FORM GOTO PAGE(2)

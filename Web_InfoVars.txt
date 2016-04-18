@@ -1,0 +1,63 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtEmailAddress)
+C_LONGINT($sgpo)
+
+SampFit_RecDate 
+vsFlag:="Order"
+
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+
+  //vtDescription:="<center>"+[Designs]Description+"</center>"
+vtDescription:=[Designs]Description
+vsPatternSource:=[Designs]Patt Srce
+
+Case of 
+	: ([Orders]Cancelled)
+		vsPOFlag:="CANCELLED"
+	: ([Orders]RevisionNumber>0)
+		vsPOFlag:="Revision "+String([Orders]RevisionNumber)
+	Else 
+		vsPOFlag:=""
+End case 
+Case of 
+	: ([Orders]KWCnS="Woven")
+		vsKWCS:="Woven"
+	: ([Orders]KWCnS="Knit")
+		vsKWCS:="Knit"
+	: ([Orders]KWCnS="CutSew")
+		vsKWCS:="Cut and Sew"
+	Else 
+		vsKWCS:=""
+End case 
+
+vlOrderNumber:=[Orders]OrderNum
+vsOrderNumber:=String(vlOrderNumber)
+
+[Orders]TempEmailAddress:="emailaddress"
+vtCategory:=[Orders]Category1
+If ([Orders]Category2#"")
+	vtCategory:="1) "+vtCategory+" 2) "+[Orders]Category2
+End if 
+
+vtFabricList:=Web_Fabric 
+vtCPList:=Web_CP 
+vtCPList:=vtCPList+Web_Components 
+
+Var_GetPicture 
+vsPrice:=String([Orders]Price;"##0.00")
+vsRetailPrice:=String([Orders]RetailPrice;"##0.00")
+vsQuantity:=String([Orders]TotalOrderQuantity;"##,###,##0")
+$sgpo:=Num([Orders]SGPO)
+QUERY([Samples];[Samples]SampleNumber=$sgpo)
+vsSampleSupplier:=[Samples]SamGarFactry
+  //vtOrderTop:=Web_OrderTop 
+  //vtOrderBottom:=Web_OrderBottom 
+
+Web_Order_Breakdown 
+
+Web_Order_Flag 
+
+vtComponentList:=Web_Components 
+vtEmailAddress:=""
+
+

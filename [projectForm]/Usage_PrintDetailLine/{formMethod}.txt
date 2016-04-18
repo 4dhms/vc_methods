@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style;vlItem1;vlItem2;vlItem3)
+
+If (Form event=On Printing Detail)
+	OBJECT SET VISIBLE(vtColor1;vtColor1#"")
+	OBJECT SET VISIBLE(vtColor2;vtColor2#"")
+	OBJECT SET VISIBLE(vlItem1;vlItem1>0)
+	OBJECT SET VISIBLE(vlItem2;vlItem2>0)
+	OBJECT SET VISIBLE(vlItem3;vlItem3>0)
+	  //
+	OBJECT SET VISIBLE(*;"xNo";(vlItem2<1) & (vtColor2#"Total"))
+	
+	If (vtColor2="Total")
+		$style:=1
+	Else 
+		$style:=0
+	End if 
+	
+	OBJECT SET FONT STYLE(vtColor1;$style)
+	OBJECT SET FONT STYLE(vtColor2;$style)
+	OBJECT SET FONT STYLE(vlItem1;$style)
+	OBJECT SET FONT STYLE(vlItem2;$style)
+	OBJECT SET FONT STYLE(vlItem3;$style)
+End if 

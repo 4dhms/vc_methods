@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($test)
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]CreateDate=vdCreateDate)
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	$test:=[CP_OrderXRef]CPType+" color ("+[CP_OrderXRef]CPNumber+")"
+	QUERY([Changes];[Changes]FieldName=$test;*)
+	QUERY([Changes]; & ;[Changes]OrderNumber=[CP_OrderXRef]OrderNumber)
+	If (Records in selection([Changes])=0)
+		QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+		CREATE RECORD([Changes])
+		[Changes]FieldName:=$test
+		[Changes]RevisionNumber:=[Orders]RevisionNumber
+		[Changes]RevisionKey:=[CP_OrderXRef]OrderNumber-([Orders]RevisionNumber/100)
+		[Changes]OrderNumber:=[CP_OrderXRef]OrderNumber
+		[Changes]RevDate:=vdCreateDate
+		[Changes]RevTime:=Current time(*)
+		[Changes]Writer:="System Update"
+		[Changes]ChangeKey:=Sequence number([Changes])
+		[Changes]Tag:="Added"
+		[Changes]NewChange:="Added"
+		[Changes]TableNum:=2
+		SAVE RECORD([Changes])
+		UNLOAD RECORD([Orders])
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+

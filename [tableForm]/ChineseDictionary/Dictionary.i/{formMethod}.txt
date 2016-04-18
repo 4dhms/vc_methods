@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([ChineseDictionary]LexKey=0)
+	[ChineseDictionary]LexKey:=Sequence number([ChineseDictionary])
+End if 

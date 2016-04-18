@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Drop)
+		CREATE RECORD([Attendees])
+		[Attendees]ApptKey:=[Appts]ApptKey
+		[Attendees]Attendee:=asContacts{asContacts}
+		[Attendees]Customer:=True
+		SAVE RECORD([Attendees])
+		INSERT IN ARRAY(asMeetingCust;1;1)
+		asMeetingCust{1}:=asContacts{asContacts}
+		SORT ARRAY(asMeetingCust;>)
+		asMeetingCust:=Find in array(asMeetingCust;asContacts{asContacts})
+		DELETE FROM ARRAY(asContacts;asContacts;1)
+		
+	: (Form event=On Double Clicked)
+		If (asMeetingCust>0)
+			QUERY([Attendees];[Attendees]Attendee=asMeetingCust{asMeetingCust};*)
+			QUERY([Attendees]; & ;[Attendees]Customer=True)
+			
+			INSERT IN ARRAY(asContacts;1;1)
+			asContacts{1}:=asMeetingCust{asMeetingCust}
+			SORT ARRAY(asContacts;>)
+			DELETE RECORD([Attendees])
+			DELETE FROM ARRAY(asMeetingCust;asMeetingCust;1)
+		End if 
+End case 
+
+asContacts:=0
+asMeetingCust:=0

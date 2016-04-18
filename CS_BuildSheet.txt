@@ -1,0 +1,59 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$nextKey;$c)
+ARRAY LONGINT($keys;0)
+ARRAY LONGINT($numbers;0)
+
+
+vDesign1:=[Designs]DesignNum
+vDesign2:=[Designs]Patt Srce
+
+CS_GetSheet 
+
+QUERY([CS_Issues];[CS_Issues]OrderNumber=0;*)
+QUERY([CS_Issues]; | ;[CS_Issues]OrderNumber=<>vlOrderNumber;*)
+QUERY([CS_Issues]; & ;[CS_Issues]CS_ID=[ComponentSheets]CS_ID;*)
+QUERY([CS_Issues];#;[CS_Issues]CS_ID=0)
+
+CS_PullLines 
+
+If (Records in selection([CS_Status])=0) & (Records in selection([CS_Issues])=0)
+	vGroupName:=""
+	vlPage:=0
+	vlRecCount:=vlReccount+1
+Else 
+	
+	If (vfStatus)
+		SELECTION TO ARRAY([CS_Status]CS_LineKey;$keys;[CS_Status]HMSOrderNumber;$numbers)
+		
+		CREATE SET([CS_Status];"Status")
+		$c:=1
+		For ($c;1;Size of array($keys))
+			If ($numbers{$c}>0)
+				USE SET("Status")
+				QUERY SELECTION([CS_Status];[CS_Status]CS_LineKey=$keys{$c};*)
+				QUERY SELECTION([CS_Status];[CS_Status]HMSOrderNumber=0)
+				CREATE SET([CS_Status];"Strip")
+				DIFFERENCE("Status";"Strip";"Status")
+				CLEAR SET("Strip")
+			End if 
+		End for 
+		
+		USE SET("Status")
+		ORDER BY([CS_Status];[CS_Status]CS_Sort;>;[CS_Status]CS_LineKey;>;[CS_Status]CS_StatusKey;>)
+		$i:=1
+		LAST RECORD([CS_Status])
+		$nextKey:=0
+		
+		For ($i;1;Records in selection([CS_Status]))
+			
+			If ([CS_Status]CS_LineKey=$nextKey)
+				REMOVE FROM SET([CS_Status];"Status")
+			Else 
+				$nextKey:=[CS_Status]CS_LineKey
+			End if 
+			PREVIOUS RECORD([CS_Status])
+		End for 
+		USE SET("Status")
+		CLEAR SET("Status")
+	End if 
+End if 

@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(vsArticle;False)
+ARRAY TEXT(asSpareParts;0)
+Case of 
+	: (cbKnit=1)
+		QUERY([SpecTemplate];[SpecTemplate]KnitWoven="Knit")
+	: (cbWoven=1)
+		QUERY([SpecTemplate];[SpecTemplate]KnitWoven="Woven")
+	: (cbCutSew=1)
+		QUERY([SpecTemplate];[SpecTemplate]KnitWoven="Cut & Sew")
+	Else 
+		QUERY SELECTION([SpecTemplate];[SpecTemplate]Size=False)
+End case 
+
+asSpareParts:=0
+SELECTION TO ARRAY([SpecTemplate]Template;asSpareParts)
+  //INSERT ELEMENT(asSpareParts;Size of array(asSpareParts)+1;1)
+  //asSpareParts{Size of array(asSpareparts)}:="Other"
+vsSubhead:="Part Templates"

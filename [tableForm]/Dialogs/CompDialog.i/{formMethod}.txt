@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+
+If (Form event=On Load)
+	
+	Comp_CSLists 
+	OBJECT SET VISIBLE(asMini;Size of array(asMini)>0)
+	If (vlCompLineKey=0)
+		OBJECT SET ENABLED(bHistory;False)
+	Else 
+		OBJECT SET ENABLED(bHistory;True)
+	End if 
+	
+	ARRAY TEXT(<>asSource;0)
+	LIST TO ARRAY("Source";<>asSource)
+	SORT ARRAY(<>asSource;>)
+	Case of 
+		: ([ComponentSheets]HMSOrderNumber>0)
+			cbSG:=0
+			cbOrder:=1
+		: (vfNew) & (<>vlOrderNumber<0)
+			cbSG:=1
+			cbOrder:=0
+			$show:=True
+		: (vfNew)
+			$show:=True
+		Else 
+			$show:=False
+	End case 
+	
+	OBJECT SET VISIBLE(cbSG;$show)
+	OBJECT SET VISIBLE(cbOrder;((vfNew) & (<>vlOrderNumber>0)))
+	
+	Case of 
+		: (Not(vfNew)) & (<>vlOrderNumber>0)
+			OBJECT SET VISIBLE(bRemove;True)
+		: (Not(vfNew)) & (<>vlOrderNumber<0) & (alCompOrderNumber{asCompName}=0)
+			OBJECT SET VISIBLE(bRemove;True)
+		Else 
+			OBJECT SET VISIBLE(bRemove;False)
+	End case 
+	
+	If (vfNew)
+		vsCSStatus:="Component added"
+		vdCSDate:=Current date(*)
+	End if 
+End if 
+

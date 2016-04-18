@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	If (vtTitle="Care@")
+		OBJECT SET VISIBLE([ChineseHeads]_Care;True)
+	Else 
+		OBJECT SET VISIBLE([ChineseHeads]_Care;False)
+	End if 
+End if 

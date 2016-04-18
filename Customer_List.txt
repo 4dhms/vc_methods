@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY TEXT($customers;0)
+ARRAY TEXT($fromlist;0)
+
+LIST TO ARRAY("Customers";$customers)
+
+QUERY([Lists];[Lists]ListName="DC")
+SELECTION TO ARRAY([Lists]ListCode;$fromlist)
+
+$i:=1
+For ($i;1;Size of array($fromlist))
+	If (Find in array($customers;$fromlist{$i})<1)
+		APPEND TO ARRAY($customers;$fromlist{$i})
+	End if 
+End for 
+
+SORT ARRAY($customers;>)
+ARRAY TO LIST($customers;"Customers")
+

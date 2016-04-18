@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Not([RMA]ShipBack)) & (cb1=0)
+		WinChoice ("Does customer need to return item(s).";"Yes";"No")
+		If (ok=1)
+			[RMA]ShipBack:=True
+			cb1:=0
+		Else 
+			[RMA]ShipBack:=False
+			cb1:=1
+		End if 
+		
+	: (Not([RMA]Credit)) & (cb2=0)
+		WinChoice ("Credit or replacement?";"Credit";"Replace")
+		If (ok=1)
+			[RMA]Credit:=True
+			cb2:=0
+		Else 
+			[RMA]Credit:=False
+			cb2:=1
+		End if 
+	Else 
+		RMA_Save 
+		ACCEPT
+		QUERY([RMA];[RMA]StoreID=[ReturnStores]StoreID)
+		ORDER BY([RMA];[RMA]RMAkey;<)
+		
+End case 

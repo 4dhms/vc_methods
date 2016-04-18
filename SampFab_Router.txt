@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([SampleFabrics]Sam FabArtNum 2="") & ([SampleFabrics]Sam FabArtNum 3="") & ([SampleFabrics]Sam FabArtNum 4="") & ([SampleFabrics]Sam FabArtNum 5="") & ([SampleFabrics]Sam FabArtNum 6="") & ([SampleFabrics]Sam FabArtNum 7="") & ([SampleFabrics]Sam FabArtNum 8="") & ([SampleFabrics]Sam FabArtNum 9="") & ([SampleFabrics]Sam FabArtNum10="") & ([SampleFabrics]Sam FabArtNum11="") & ([SampleFabrics]Sam FabArtNum12="") & ([SampleFabrics]Sam FabArtNum13="") & ([SampleFabrics]Sam FabArtNum14="") & ([SampleFabrics]Sam FabArtNum15="")
+	$0:=1
+Else 
+	$0:=2
+End if 

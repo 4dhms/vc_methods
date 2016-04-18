@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+
+Case of 
+	: ($1=1)
+		vlPage:=vlPage-1
+		vsPageTurner:=Web_PageTurner (String(vlPage);String(vlRecCount))
+		$continue:=True
+	: ($1=2)
+		vlPage:=vlPage+1
+		vsPageTurner:=Web_PageTurner (String(vlPage);String(vlRecCount))
+		$continue:=True
+End case 
+
+If ($continue)
+	Web_StatusListShow20 
+End if 
+
+

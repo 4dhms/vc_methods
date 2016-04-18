@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+C_TEXT($file)
+C_BLOB($param)
+C_TEXT($drive)
+
+$drive:=Get 4D folder(3)
+$path:=Substring($drive;1;Position(":";$drive))+"HMS Export:"
+
+$file:=$path+"orderIM"
+DOCUMENT TO BLOB($file;$param)
+IMPORT DATA($path+"orders.4ie";$param;*)
+SET BLOB SIZE($param;0)
+TRACE
+
+$file:=$path+"fabIM"
+DOCUMENT TO BLOB($file;$param)
+IMPORT DATA($path+"fabric.4ie";$param;*)
+SET BLOB SIZE($param;0)
+
+$file:=$path+"cpIM"
+DOCUMENT TO BLOB($file;$param)
+IMPORT DATA($path+"color.4ie";$param;*)
+SET BLOB SIZE($param;0)
+
+$file:=$path+"costingIM"
+DOCUMENT TO BLOB($file;$param)
+IMPORT DATA($path+"costing.4ie";$param;*)
+SET BLOB SIZE($param;0)
+
+$file:=$path+"costsheetsIM"
+DOCUMENT TO BLOB($file;$param)
+IMPORT DATA($path+"costsheets.4ie";$param;*)
+SET BLOB SIZE($param;0)
+
+
+ALERT("Done")
+

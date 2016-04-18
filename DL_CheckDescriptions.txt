@@ -1,0 +1,37 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($update;$done)
+$update:=False
+
+FIRST RECORD([DesignLineIncluded])
+$i:=1
+If (Records in selection([DesignLineIncluded])>0)
+	
+	Repeat 
+		QUERY([Designs];[Designs]DesignNum=[DesignLineIncluded]DesignNumber)
+		If ([Designs]Description#[DesignLineIncluded]Name) & (Not($update))
+			If (Not($update))
+				WinChoice ("Some of the descriptions have been changed in the design library."+Char(13)+"Do you want to update the design line plan?")
+				If (ok=1)
+					$update:=True
+				Else 
+					$done:=True
+				End if 
+			End if 
+			If ($update)
+				[DesignLineIncluded]Name:=[Designs]Description
+				SAVE RECORD([DesignLineIncluded])
+			End if 
+		End if 
+		If ($update)
+			[DesignLineIncluded]Name:=[Designs]Description
+			SAVE RECORD([DesignLineIncluded])
+		End if 
+		NEXT RECORD([DesignLineIncluded])
+		$i:=$i+1
+		
+		If ($i>Records in selection([DesignLineIncluded]))
+			$done:=True
+		End if 
+	Until ($done)
+End if 

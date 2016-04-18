@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($rex)
+
+Case of 
+	: (Form event=On Clicked)
+		If ([FabPOLines]LabDip=True)
+			[FabPOLines]LabDipDate:=Current date(*)
+		Else 
+			[FabPOLines]LabDipDate:=!00-00-00!
+		End if 
+		
+	: (Form event=On Getting Focus)
+		If ([FabPOLines]LineID=0) & ([FabPOLines]ColorPrint="") & ([FabPOLines]Quantity=0)
+			[FabPOLines]LineID:=Sequence number([FabPOLines])
+		End if 
+	: (Form event=On Load)
+		If ([FabPOLines]UnitPrice=0)
+			QUERY([FabricLibrary];[FabricLibrary]FabricLibKey=[FabricOrders]FabLibKey)
+			[FabPOLines]UnitPrice:=[FabricLibrary]Unit Price
+		End if 
+		If ([FabPOLines]POUnit="")
+			[FabPOLines]POUnit:=[FabricLibrary]UnitOfMeasure
+		End if 
+		If ([FabPOLines]POWidth="")
+			[FabPOLines]POWidth:=[FabricLibrary]Width
+		End if 
+		$rex:=Records in selection([FabPOLines])
+		If ([FabPOLines]FabType="")
+			Case of 
+				: ($rex=1)
+					[FabPOLines]FabType:="Self"
+				: ($rex=2)
+					[FabPOLines]FabType:="Combo 1"
+				: ($rex=3)
+					[FabPOLines]FabType:="Combo 2"
+				: ($rex=4)
+					[FabPOLines]FabType:="Combo 3"
+			End case 
+		End if 
+	: (Form event=On Display Detail)
+		vlRecordnumber:=Record number([FabPOLines])
+		  //If ([FabPOLines]Changed)
+		  //FabPO_ColorCode (3)
+		  //Else 
+		  //FabPO_ColorCode (0)
+		  //End if 
+		OBJECT SET VISIBLE(*;"xChange";[FabPOLines]Changed)
+		
+	: (Form event=On Data Change)
+		If ([FabricOrders]ReviseNumber>0) | ([FabricOrders]POSent)
+			[FabPOLines]Changed:=True
+		End if 
+End case 
+
+vlOut:=[FabPOLines]Delivered-[FabPOLines]Quantity

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vtMessage:="Building report"
+<>vlCounter:=0
+EMail_SendingProc 
+OBJECT SET ENABLED(bPrint;True)
+
+OBJECT SET VISIBLE(*;"xBuild";True)
+
+SR_BuildShell 
+SR_BuildBreakdown 
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)

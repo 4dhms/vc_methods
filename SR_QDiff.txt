@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_REAL($sub1;$sub2)
+
+$i:=1
+For ($i;1;Size of array(arMCol1))
+	arMCol3{$i}:=arMCol1{$i}-arMCol2{$i}
+	arMCol6{$i}:=arMCol4{$i}-arMCol5{$i}
+	arMCol9{$i}:=arMCol7{$i}-arMCol8{$i}
+	
+	$sub1:=arMCol1{$i}+arMCol4{$i}+arMCol7{$i}
+	$sub2:=arMCol2{$i}+arMCol5{$i}+arMCol8{$i}
+	
+	arMCol10{$i}:=$sub1
+	arMCol11{$i}:=$sub2
+	arMCol12{$i}:=$sub2-$sub1
+	arMCol13{$i}:=Round(($sub1-$sub2)/$sub2;3)*100
+End for 
+
+$i:=1
+$c:=Size of array(arMCol1)
+
+For ($i;1;Size of array(arMCol1))
+	If (arMCol11{$c}+arMCol12{$c}=0)
+		LISTBOX DELETE ROWS(saleslist;$c)
+	End if 
+	$c:=$c-1
+End for 

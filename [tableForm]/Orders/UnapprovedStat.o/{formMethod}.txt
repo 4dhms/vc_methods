@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlSubtotal;$i)
+
+Case of 
+	: (Form event=On Printing Footer)
+		OBJECT SET VISIBLE(vsPrintingHeader;True)
+		OBJECT SET VISIBLE(vlPageTotal;True)
+		OBJECT SET VISIBLE(*;"xPage";True)
+		
+	: (Form event=On Header)
+		If (vsFactory="")
+			vtHeader:="Waiting Approval "
+		Else 
+			vtHeader:="Waiting Approval - "+vsFactory
+		End if 
+		vtHeader:=vtHeader+"  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+" - "+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+		vlPageTotal:=0
+		vsPrintingHeader:="MORE"
+		vDesc:=""
+		  //clears running total
+		vsDatePage:=String(Current date(*))+"   Page "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE(vsPrintingHeader;False)
+		OBJECT SET VISIBLE(vlPageTotal;False)
+		OBJECT SET VISIBLE(*;"xPage";False)
+		
+		<>vlOrderNumber:=[Orders]OrderNum
+		vlPageTotal:=vlPageTotal+[Orders]TotalOrderQuantity
+		
+		If (Selected record number([Orders])=Records in selection([Orders]))
+			vsPrintingHeader:="LAST PAGE"
+		End if 
+		
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		Picture_RestoreOnTheFly 
+		If (Not([Designs]SketchProcessed))
+		End if 
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		
+		Order_PullCP (<>vlOrderNumber)
+		CS_GetSheet 
+		
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPStatus#"ning apprd@";*)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPStatus#"approved bulk";*)
+		QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPStatus#"approved")
+		
+		If ([ComponentSheets]CS_ID>0)
+			QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID;*)
+			QUERY([CS_Lines]; | ;[CS_Lines]OrderNumber=[Orders]OrderNum)
+			
+			QUERY SELECTION([CS_Lines];[CS_Lines]OrderNumber=0;*)
+			QUERY SELECTION([CS_Lines]; | ;[CS_Lines]OrderNumber=[Orders]OrderNum)
+			ORDER BY([CS_Lines];[CS_Lines]CS_Sort;<)
+			ARRAY LONGINT($linekey;0)
+			SELECTION TO ARRAY([CS_Lines]CS_LineKey;$linekey)
+			CREATE EMPTY SET([CS_Status];"Current")
+			$i:=1
+			For ($i;1;Size of array($linekey))
+				QUERY([CS_Status];[CS_Status]CS_LineKey=$linekey{$i})
+				QUERY([CS_Lines];[CS_Lines]CS_LineKey=$lineKey{$i})
+				ORDER BY([CS_Status]CS_StatusKey;<)
+				
+				If ([CS_Status]ActionStatus="Approved") | ([CS_Status]ActionStatus="Approved Bulk") | ([CS_Status]ActionStatus="ning apprd@")
+				Else 
+					ADD TO SET([CS_Status];"Current")
+				End if 
+			End for 
+			USE SET("Current")
+			CLEAR SET("Current")
+			ORDER BY([CS_Status];[CS_Lines]CS_Sort;>)
+		End if 
+End case 

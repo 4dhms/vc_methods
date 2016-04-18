@@ -1,0 +1,205 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfDCS)
+
+ARRAY TEXT(asSheetNames;0)
+QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+
+Case of 
+	: (Records in selection([Costing])=0)
+		REDUCE SELECTION([CostSheets];0)
+	: (User in group(Current user;"SuperCostSheets")) | (User in group(Current user;"DCS"))
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		If (atPages{atPages}="DCS") | (vsCurrentTab="DCS")
+			vsCurrentTab:="DCS"
+			<>vfDCS:=True
+			QUERY SELECTION([CostSheets];[CostSheets]DCS=True)
+		Else 
+			<>vfDCS:=False
+			QUERY SELECTION([CostSheets];[CostSheets]DCS=False)
+		End if 
+	: (User in group(Current user;"LateCostsheet"))
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	Else 
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		QUERY SELECTION([CostSheets];[CostSheets]SheetName="@Estimate@")
+End case 
+
+Case of 
+	: (User in group(Current user;"SuperDuperCostSheets")) | (User in group(Current user;"LateCostsheet")) | (User in group(Current user;"SuperCostSheets")) | (User in group(Current user;"DCS"))
+		If (Records in selection([CostSheets])=0)
+			APPEND TO ARRAY(asSheetNames;"No Costsheet")
+			APPEND TO ARRAY(asSheetNames;"-")
+			APPEND TO ARRAY(asSheetNames;"New Sheet")
+		Else 
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			CREATE SET([CostSheets];"ThisSheet")
+			SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames;[CostSheets]SheetID;alSheetKeys)
+			
+			
+			FIRST RECORD([CostSheets])
+			asSheetNames:=Find in array(asSheetNames;[CostSheets]SheetName)
+			APPEND TO ARRAY(asSheetNames;"-")
+			APPEND TO ARRAY(asSheetNames;"New Sheet")
+			
+			  //If (User in group(Current user;"SuperDuperCostSheets"))
+			  //APPEND TO ARRAY(asSheetNames;"Spreadsheet")
+			  //End if 
+		End if 
+		asSheetNames:=1
+		OBJECT SET VISIBLE(asSheetNames;True)
+	: (User in group(Current user;"SpreadSheets")) & (<>vlOrderNumber<0)
+		If (Records in selection([CostSheets])=0)
+			APPEND TO ARRAY(asSheetNames;"No Costsheet")
+			asSheetNames:=1
+		Else 
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			CREATE SET([CostSheets];"ThisSheet")
+			SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames;[CostSheets]SheetID;alSheetKeys)
+			FIRST RECORD([CostSheets])
+			asSheetNames:=Find in array(asSheetNames;[CostSheets]SheetName)
+			OBJECT SET VISIBLE(asSheetNames;True)
+		End if 
+	Else 
+		OBJECT SET VISIBLE(asSheetNames;False)
+End case 
+
+  //QUERY SELECTION([CostSheets];[CostSheets]DCS=<>vfDCS)
+ORDER BY([CostSheets];[CostSheets]SheetID;<)
+
+Case of 
+	: (Record number([CostSheets])>0)
+		Case of 
+			: (atPages{atPages}="DCS") & (User in group(Current user;"DCS"))
+				vsCurrentTab:="DCS"
+			: ([CostSheets]DCS=False) & (<>vfDCS) & (Find in array(atPages;"Cost I")>0) & (Records in selection([CostSheets])>0) & (vsCurrentTab#"Cost II")
+				vsCurrentTab:="Cost I"
+				atPages:=Find in array(atPages;"Cost I")
+			: ([CostSheets]DCS=False) & (<>vfDCS) & (Find in array(atPages;"Cost")>0) & (Records in selection([CostSheets])>0) & (Not(User in group(Current user;"DCS")))
+				vsCurrentTab:="Cost"
+				atPages:=Find in array(atPages;"Cost")
+			: (atPages{atPages}="DCS") | (vsCurrentTab="DCS")
+				<>vfDCS:=True
+			Else 
+				<>vfDCS:=[CostSheets]DCS
+		End case 
+End case 
+
+If ([Costing]Factory#<>vsFactory)
+	[Costing]Factory:=<>vsFactory
+	SAVE RECORD([Costing])
+End if 
+
+If (Not([CostSheets]DCS)) & (Records in selection([CostSheets])>0)
+	If (<>vlOrderNumber>0)
+		If ([CostSheets]Price#[Orders]Price)
+			[CostSheets]Price:=[Orders]Price
+		End if 
+		If ([CostSheets]Figurer#[Orders]NetDiscount)
+			[CostSheets]Figurer:=[Orders]NetDiscount
+		End if 
+		Case of 
+			: ([CostSheets]DutyActual=0) & ([Orders]ActlDutyRate>0) & ([CostSheets]SheetName#"Actual@")
+				[CostSheets]DutyActual:=[Orders]ActlDutyRate
+			: ([CostSheets]DutyActual#[Orders]ActlDutyRate) & (User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet) & ([CostSheets]SheetName#"Actual@")
+				[CostSheets]DutyActual:=[Orders]ActlDutyRate
+		End case 
+	Else 
+		
+	End if 
+	
+	QUERY([Invoices];[Invoices]OrderNumber=<>vlOrderNumber)
+	
+	Sheet_Update 
+	OBJECT SET VISIBLE(*;"xCushion";(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+	OBJECT SET VISIBLE(*;"xCushion1";(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+	OBJECT SET VISIBLE([CostSheets]Cushion;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+	OBJECT SET VISIBLE([CostSheets]DutyActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+	OBJECT SET VISIBLE([CostSheets]DutyAmountActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+	Cost_OldDataArray 
+	Cost_ShipToggle 
+End if 
+
+  //TRACE
+If (User in group(Current user;"SpreadSheets")) | (User in group(Current user;"SuperCostSheets"))
+	Case of 
+		: (vsCurrentTab="DCS") | (atPages{atPages}="DCS") & (User in group(Current user;"DCS"))
+			  //(vsCurrentTab="Cost@") | (vsCurrentTab="DCS") |
+			DCS_BuildArray 
+			
+			Case of 
+				: (<>vlOrderNumber>0) & (FORM Get current page#10)
+					If (atPages{atPages}="DCS")
+						vsCurrentTab:="DCS"
+						FORM GOTO PAGE(10)
+					Else 
+						WinChoice ("This is a Detailed Cost Sheet.";"View it";"Stay here")
+						If (ok=1)
+							vsCurrentTab:="DCS"
+							FORM GOTO PAGE(10)
+						Else 
+							QUERY([Invoices];[Invoices]OrderNumber=<>vlOrderNumber)
+						End if 
+					End if 
+				Else 
+					FORM GOTO PAGE(8)
+			End case 
+			
+		: (vsCurrentTab="DCS") | (atPages{atPages}="DCS") & (Records in selection([CostSheets])=0) & (User in group(Current user;"DCS"))
+			vsCurrentTab:="DCS"
+			ARRAY TEXT(asList11;0)
+			ARRAY TEXT(asList12;0)
+			ARRAY TEXT(asList13;0)
+			ARRAY TEXT(asList14;0)
+			ARRAY TEXT(asList15;0)
+			ARRAY LONGINT(alRecordKey;0)
+			ARRAY REAL(arFOB;0)
+			DCS_Method 
+			Cost_EntryShowA 
+			
+			
+			If (<>vlOrderNumber>0)
+				FORM GOTO PAGE(10)
+			Else 
+				FORM GOTO PAGE(8)
+			End if 
+			
+			
+		: (User in group(Current user;"LateCostsheet"))
+			Cost_LateSheet 
+		: (vsCurrentTab="Cost II") | (atPages{atPages}="Cost II") & (<>vlOrderNumber>0)
+			vsCurrentTab:="Cost II"
+			OBJECT SET VISIBLE(vrCFOB1;<>vfSupersheet)
+			OBJECT SET VISIBLE(vrCFOB2;Not(<>vfSupersheet))
+			OBJECT SET VISIBLE([CostSheets]FOB;<>vfSupersheet)
+			
+			  //OBJECT SET VISIBLE([CostSheets]FOB;<>vfSupersheet)
+			If ([CostSheets]DCS)
+				FORM GOTO PAGE(8)
+			Else 
+				Cost_EntryCalculate 
+				FORM GOTO PAGE(9)
+			End if 
+		: (vsCurrentTab="Cost I") | (atPages{atPages}="Cost@") & (<>vlOrderNumber>0)
+			vsCurrentTab:="Cost I"
+			FORM GOTO PAGE(8)
+		: (vsCurrentTab="Cost II") | (atPages{atPages}="Cost II") & (<>vlOrderNumber<0)
+			vsCurrentTab:="Cost II"
+			OBJECT SET VISIBLE(vrCFOB1;<>vfSupersheet)
+			OBJECT SET VISIBLE(vrCFOB2;Not(<>vfSupersheet))
+			  //OBJECT SET VISIBLE([CostSheets]FOB;<>vfSupersheet)
+			FORM GOTO PAGE(6)
+		: (vsCurrentTab="Cost") | (atPages{atPages}="Cost") & (<>vlOrderNumber<0)
+			vsCurrentTab:="Cost"
+			FORM GOTO PAGE(5)
+		: (vsCurrentTab="Cost I") | (atPages{atPages}="Cost I") & (<>vlOrderNumber<0)
+			vsCurrentTab:="Cost I"
+			FORM GOTO PAGE(5)
+		: (vsCurrentTab="Cost II") | (atPages{atPages}="Cost II") & (<>vlOrderNumber<0)
+			vsCurrentTab:="Cost II"
+			OBJECT SET VISIBLE(vrCFOB1;<>vfSupersheet)
+			OBJECT SET VISIBLE(vrCFOB2;Not(<>vfSupersheet))
+			  //OBJECT SET VISIBLE([CostSheets]FOB;<>vfSupersheet)
+			FORM GOTO PAGE(6)
+	End case 
+End if 
+

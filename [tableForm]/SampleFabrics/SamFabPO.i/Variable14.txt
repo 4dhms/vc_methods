@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SampFab_LastRev 
+SAVE RECORD([SampleFabrics])
+SampFab_FM 

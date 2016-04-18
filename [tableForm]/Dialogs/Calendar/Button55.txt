@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (vsCustomer="store")
+	ARRAY TEXT(asCustomers;0)
+	QUERY([Contacts];[Contacts]Store=True)
+	$i:=1
+	FIRST RECORD([Contacts])
+	For ($i;1;Records in selection([Contacts]))
+		QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+		If (Find in array(asCustomers;[Customers]CustomerName)<1)
+			APPEND TO ARRAY(asCustomers;[Customers]CustomerName)
+		End if 
+		NEXT RECORD([Contacts])
+	End for 
+Else 
+	If (vsCustomer="")
+		QUERY([Customers];[Customers]CustomerName#"")
+	Else 
+		QUERY([Customers];[Customers]CustomerName=vsCustomer+"@")
+	End if 
+	
+	Case of 
+		: (Records in selection([Customers])>1)
+			ARRAY TEXT(asCustomers;0)
+			SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+			SORT ARRAY(asCustomers;>)
+			REDUCE SELECTION([Contacts];0)
+		: (Records in selection([Customers])=0)
+			WinPrompt (vsCustomer+" does not exist.")
+		: (Records in selection([Customers])=1)
+			QUERY([Contacts];[Contacts]CustomerKey=[Customers]CustomerKey)
+			ORDER BY([Contacts];[Contacts]Contact;>)
+			vtCustomerAddress:=[Customers]DefaultAddress
+			vtCustomerNotes:=[Customers]NotesInternal
+			asCustomers:=Find in array(asCustomers;[Customers]CustomerName)
+			ARRAY TEXT(asCustomers;0)
+			SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+			
+			If (Find in array(asCustomers;vsCustomer+"@")<1)
+				ARRAY TEXT(asCustomers;0)
+				SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+				asCustomers:=Find in array(asCustomers;[Customers]CustomerName)
+			End if 
+		Else 
+			If (Size of array(asCustomers)<Records in table([Customers]))
+				Customer_Setup 
+			End if 
+			QUERY([Contacts];[Contacts]CustomerKey=[Customers]CustomerKey)
+			asCustomers:=Find in array(asCustomers;[Customers]CustomerName)
+			vtCustomerNotes:=[Customers]NotesInternal
+	End case 
+End if 
+vsContact:=""
+vsCustomer:=""

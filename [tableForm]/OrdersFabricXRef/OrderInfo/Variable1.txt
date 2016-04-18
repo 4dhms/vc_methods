@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($oldOrder)
+
+$oldOrder:=[OrdersFabricXRef]OrderNumber
+
+WinChoice ("Are you sure you want to remove "+String(Abs([OrdersFabricXRef]OrderNumber))+" from the list?")
+If (ok=1)
+	CREATE SET([OrdersFabricXRef];"Related")
+	REMOVE FROM SET([OrdersFabricXRef];"Related")
+	[OrdersFabricXRef]FabricOrderKey:=0
+	SAVE RECORD([OrdersFabricXRef])
+	
+	If ([FabricOrders]ReviseNumber>0)
+		CREATE RECORD([Changes])
+		[Changes]RevisionNumber:=[FabricOrders]ReviseNumber
+		[Changes]OrderNumber:=-1
+		[Changes]RevDate:=Current date(*)
+		[Changes]RevTime:=Current time(*)
+		[Changes]Writer:=Current user
+		[Changes]ChangeKey:=Sequence number([Changes])
+		[Changes]FabOrder:=[FabricOrders]PONumber
+		[Changes]FieldName:="Order Removed"
+		If ($oldOrder>0)
+			[Changes]OldData:="PO"+String(Abs($oldOrder))
+		Else 
+			[Changes]OldData:="SG"+String(Abs($oldOrder))
+		End if 
+		[Changes]NewChange:=""
+		SAVE RECORD([Changes])
+		UNLOAD RECORD([Changes])
+	End if 
+	
+	USE SET("Related")
+	CLEAR SET("Related")
+	ACCEPT
+	
+End if 

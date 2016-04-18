@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vlPrintedPixels:=0
+
+If (PrintOrder_PrinterSetup )
+	vfPO:=True
+	Order_PrintDCs 
+	
+End if 
+

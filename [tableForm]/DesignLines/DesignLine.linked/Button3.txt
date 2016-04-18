@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY PICTURE(aSketch;0)
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(asStyleNumbers;0)
+
+Case of 
+	: (asSampleTypes=1)
+		WinPrompt ("Select Linkage")
+		OBJECT SET VISIBLE(bFind;True)
+		
+	: (asSampleTypes=2)
+		DLink_FindDesign 
+	: (asSampleTypes=3)
+		DLink_FindSample 
+	: (asSampleTypes=4)
+		DLink_FindOrder 
+End case 
+vsFlag:=String(Size of array(aSketch))+" garments"
+
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([Designs])

@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($sketch)
+C_POINTER($note)
+
+$i:=1
+For ($i;1;4)
+	$sketch:=Get pointer("vxSketch"+String($i))
+	$note:=Get pointer("vtTextField"+String($i))
+	If ($i+vlPixPos>vlPixCount)
+		GET PICTURE FROM LIBRARY("empty.jpg";$sketch->)
+		$note->:=""
+	Else 
+		$note->:=atNote{vlPixPos+$i}
+		$sketch->:=aSketch{vlPixPos+$i}
+	End if 
+End for 
+vlTrimRouter:=1
+
+Case of 
+	: (vlPixPos>3) & (vlPixCount-vlPixPos<4)
+		OBJECT SET ENABLED(bPrevious;True)
+		OBJECT SET ENABLED(bNext;False)
+	: (vlPixPos<4) & (vlPixCount>4)
+		OBJECT SET ENABLED(bPrevious;False)
+		OBJECT SET ENABLED(bNext;True)
+	: (vlPixPos<4) & (vlPixCount<5)
+		OBJECT SET ENABLED(bPrevious;False)
+		OBJECT SET ENABLED(bNext;False)
+	: (vlPixPos>3) & (vlPixCount>vlPixPos)
+		OBJECT SET ENABLED(bPrevious;True)
+		OBJECT SET ENABLED(bNext;True)
+	: (vlPixPos>3) & (vlPixCount>vlPixPos)
+		OBJECT SET ENABLED(bPrevious;True)
+		OBJECT SET ENABLED(bNext;False)
+	Else 
+		OBJECT SET ENABLED(bPrevious;False)
+		OBJECT SET ENABLED(bNext;False)
+End case 
+
+
+UNLOAD RECORD([SpecPix])

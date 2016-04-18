@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($sn;0)
+ARRAY TEXT($un;0)
+
+C_TEXT($strip)
+C_TIME($docref)
+C_LONGINT($i)
+
+QUERY([Orders];[Orders]OrderEntryDate>=!2014-01-01!;*)
+QUERY([Orders]; & ;[Orders]OrderEntryDate<!2015-01-01!)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+SELECTION TO ARRAY([Orders]StyleNumber;$sn)
+ALERT(String(Size of array($sn)))
+
+$i:=1
+For ($i;1;Size of array($sn))
+	$strip:=StripToNumber ($sn{$i})
+	If (Find in array($un;$strip)<1)
+		QUERY([Orders];[Orders]OrderEntryDate<!2014-01-01!;*)
+		QUERY([Orders]; & ;[Orders]StyleNumber="@"+$strip+"@")
+		QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=$strip;*)
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]StyleNumberDate<!2014-01-01!)
+		
+		
+		If (Shift down)
+			ALERT(String(Records in selection([Orders]))+"  "+$strip)
+		End if 
+		If (Records in selection([Orders])=0) & (Records in selection([StyleNumberGen])=0)
+			APPEND TO ARRAY($un;$strip)
+		End if 
+	End if 
+End for 
+ALERT(String(Size of array($un)))
+
+SORT ARRAY($un;>)
+$docref:=Create document("";"txt")
+If (ok=1)
+	$i:=1
+	For ($i;1;Size of array($un))
+		SEND PACKET($docref;$un{$i}+Char(13))
+	End for 
+End if 
+CLOSE DOCUMENT($docref)

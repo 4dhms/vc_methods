@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Open window(Screen width-220;50;Screen width-145;75;1984;"";"Wincbox")
+DIALOG("Ping")
+CLOSE WINDOW

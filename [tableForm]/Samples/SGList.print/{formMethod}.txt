@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:=String(Current date)+"  Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+End case 

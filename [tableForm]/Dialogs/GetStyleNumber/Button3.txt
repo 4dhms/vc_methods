@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET ENABLED(bGet;True)
+OBJECT SET ENABLED(bNext;True)
+<>vsStyleNumber:=""

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbArticle=1)
+	cbStitch:=0
+Else 
+	cbCombo:=0
+End if 
+OBJECT SET VISIBLE(cbCombo;cbArticle=1)

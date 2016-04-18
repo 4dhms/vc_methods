@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+	  //ORDER BY([DesignLineIncluded];[DesignLineIncluded]StyleNumber;>)
+End if 

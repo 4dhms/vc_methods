@@ -1,0 +1,112 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$negnum)
+C_TEXT($oldGrade;$newGrade)
+C_TEXT($virgin)
+C_BOOLEAN($continue)
+C_LONGINT($oldSize;$newSize)
+$continue:=True
+
+ARRAY TEXT(asErrorList;0)
+vfFail:=False
+
+QUERY([SpecFactory];[SpecFactory]OrderNumber=$1)
+$oldSize:=[SpecFactory]SampleCol
+$negnum:=-1*[SpecFactory]SF_KeyNumber
+QUERY([Sizes];[Sizes]SF_KeyNumber=$negNum)
+$oldGrade:=[Sizes]Size1+" "+[Sizes]Size2+" "+[Sizes]Size3+" "+[Sizes]Size4+" "+[Sizes]Size5+" "+[Sizes]Size6+" "+[Sizes]Size7+" "+[Sizes]Size8+" "+[Sizes]Size9+" "+[Sizes]Size10+" "+[Sizes]Size11+" "+[Sizes]Size12
+
+QUERY([SpecFactory];[SpecFactory]OrderNumber=$2)
+$newSize:=[SpecFactory]SampleCol
+$negnum:=-1*[SpecFactory]SF_KeyNumber
+QUERY([Sizes];[Sizes]SF_KeyNumber=$negNum)
+$newGrade:=vsSize1+" "+vsSize2+" "+vsSize3+" "+vsSize4+" "+vsSize5+" "+vsSize6+" "+vsSize7+" "+vsSize8+" "+vsSize9+" "+vsSize10+" "+vsSize11+" "+vsSize12
+$virgin:=Replace string($newGrade;" ";"")
+
+If ($oldGrade#$newGrade) & ($virgin#"")
+	WinChoice ("Chosen grading:"+Char(13)+$oldGrade+Char(13)+"vs current:"+Char(13)+$newGrade;"Replace";"Cancel")
+	If (ok=0)
+		$continue:=False
+	End if 
+End if 
+If ($oldSize#$newSize) & ($continue)
+	WinChoice ("Chosen grading sample size differs from this garment.";"Replace";"Cancel")
+	If (ok=0)
+		$continue:=False
+	End if 
+End if 
+
+If ($continue)
+	
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=$1)
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+	
+	ARRAY TEXT($oldDescrip;Records in selection([SpecSheetLines]))
+	ARRAY TEXT($oldMeas;Records in selection([SpecSheetLines]))
+	
+	$i:=1
+	FIRST RECORD([SpecSheetLines])
+	For ($i;1;Records in selection([SpecSheetLines]))
+		If ([SpecSheetLines]SpecLibKey>0)
+			QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+			$oldDescrip{$i}:=[SpecLibrary]DescriptionA
+		Else 
+			$oldDescrip{$i}:=[SpecSheetLines]OtherDescription
+		End if 
+		$oldMeas{$i}:=[SpecSheetLines]Spec1A
+		NEXT RECORD([SpecSheetLines])
+	End for 
+	
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=$2)
+	QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY SELECTION([SpecSheetLines];[SpecSheetLines]DeletedLine=False)
+	ARRAY TEXT($newDescrip;Records in selection([SpecSheetLines]))
+	ARRAY TEXT($newMeas;Records in selection([SpecSheetLines]))
+	ARRAY LONGINT(alNewSpecLineKeys;Records in selection([SpecSheetLines]))
+	$i:=1
+	FIRST RECORD([SpecSheetLines])
+	For ($i;1;Records in selection([SpecSheetLines]))
+		If ([SpecSheetLines]SpecLibKey>0)
+			QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+			$newDescrip{$i}:=[SpecLibrary]DescriptionA
+		Else 
+			$newDescrip{$i}:=[SpecSheetLines]OtherDescription
+		End if 
+		$newMeas{$i}:=[SpecSheetLines]Spec1A
+		alNewSpecLineKeys{$i}:=[SpecSheetLines]SpecLineKey
+		NEXT RECORD([SpecSheetLines])
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($oldDescrip))
+		If (Find in array($newDescrip;$oldDescrip{$i})>0)
+			If ($oldMeas{$i}#$newMeas{Find in array($newDescrip;$oldDescrip{$i})})
+				vfFail:=True
+				INSERT IN ARRAY(asErrorList;1;1)
+				asErrorList{1}:=$oldDescrip{$i}+"  ("+$oldMeas{$i}+" vs "+$newMeas{Find in array($newDescrip;$oldDescrip{$i})}+")"
+			End if 
+		End if 
+	End for 
+	
+	If (vfFail)
+		vtNotes:="The following POMs have different different sample measurements."
+	Else 
+		$i:=1
+		For ($i;1;Size of array($oldDescrip))
+			If (Find in array($newDescrip;$oldDescrip{$i})>0)
+			Else 
+				INSERT IN ARRAY(asErrorList;1;1)
+				asErrorList{1}:=$oldDescrip{$i}
+			End if 
+		End for 
+		
+		vtNotes:="The following POMs do not exist on the new spec"+"sheet."
+	End if 
+End if 
+
+If (Size of array(asErrorList)=0)
+	$0:=True
+Else 
+	$0:=False
+End if 
+

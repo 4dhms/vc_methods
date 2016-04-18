@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asVendorTypes=1)
+	WinPrompt ("Chose Purchase Order type.")
+Else 
+	WinChoice ("You are creating a new purchase order for "+<>asVendorTypes{<>asVendorTypes}+"."+Char(13)+"Is this correct?")
+	If (ok=1)
+		CREATE SET([FabricOrders];"FabOrdSet")
+		SET WINDOW TITLE("")
+		
+		ADD RECORD([FabricOrders];*)
+		ADD TO SET([FabricOrders];"FabOrdSet")
+		USE SET("FabOrdSet")
+		CLEAR SET("FabOrdSet")
+		ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)
+	End if 
+End if 

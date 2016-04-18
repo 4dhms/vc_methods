@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfPrinting:=True
+
+Case of 
+	: (cbBlock=1)
+		FORM SET OUTPUT([DesignLinkedPages];"PrintColors")
+	: ([DesignLines]8Up)
+		FORM SET OUTPUT([DesignLinkedPages];"Print8")
+	Else 
+		FORM SET OUTPUT([DesignLinkedPages];"Print12")
+End case 
+QUERY SELECTION([DesignLinkedPages];[DesignLinkedPages]Print=True)
+If (Records in selection([DesignLinkedPages])=0)
+	WinPrompt ("Check Print boxes to create a printing selection.")
+End if 
+ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+SET PRINT OPTION(Orientation option;2)
+If (vfPDF)
+	PRINT SELECTION([DesignLinkedPages];*)
+Else 
+	PRINT SELECTION([DesignLinkedPages])
+End if 
+
+vfPrinting:=False
+QUERY([DesignLinkedPages];[DesignLinkedPages]DesignLineKey=[DesignLines]DesignLineKey)
+ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+

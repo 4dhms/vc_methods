@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([Cartons];"Test")
+FIRST RECORD([Cartons])
+For ($i;1;Records in selection([Cartons]))
+	QUERY([Orders];[Orders]OrderNum=[Cartons]OrderNumber)
+	If (Records in selection([Cartons])=0)
+		ADD TO SET([Cartons];"test")
+	End if 
+	NEXT RECORD([Cartons])
+End for 
+
+If (Records in set("test")>0)
+	USE SET("test")
+	CLEAR SET("test")
+	ALERT("Not clear")
+Else 
+	ALERT("Good")
+End if 
+

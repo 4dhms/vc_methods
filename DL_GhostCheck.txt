@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+
+ARRAY LONGINT($pages;0)
+ARRAY LONGINT($items;0)
+ARRAY TEXT($code;0)
+
+SELECTION TO ARRAY([DesignLineIncluded]PageNumber;$pages;[DesignLineIncluded]ItemNumber;$items)
+
+$i:=1
+For ($i;1;Size of array($pages))
+	APPEND TO ARRAY($code;String($pages{$i})+"_"+String($items{$i}))
+End for 
+
+ARRAY TEXT($over;0)
+
+$i:=1
+For ($i;1;Size of array($code))
+	If (Count in array($code;$code{$i})>1)
+		If (Find in array($over;$code{$i})<1)
+			APPEND TO ARRAY($over;$code{$i})
+		End if 
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array($over))
+	WinPrompt ("Warning:"+Char(13)+"Multiple styles Page "+Substring($over{$i};1;Position("_";$over{$i})-1)+" Square "+Substring($over{$i};Position("_";$over{$i})+1;99)+Char(13)+Char(13)+"Move to pasteboard to reveal hidden garment.")
+End for 

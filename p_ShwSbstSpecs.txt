@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //mShoSbstSpecs global procedure
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	SET WINDOW TITLE("Specs: "+String(Records in selection([Specs]))+" of "+String(Records in table([Specs])))
+Else 
+	ALERT("Please highlight some records first.")
+End if 

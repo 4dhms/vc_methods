@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($change)
+
+WinChoice ("Do you want to convert this Fabric to a Trim?")
+If (ok=1)
+	WinChoice ("Are you sure?";"No";"Yes")
+	If (ok=0)
+		$change:="Converted from Fabric to Trim "
+		$change:=$change+"by "+Current user+" on "+String(Current date(*))+" at "+String(Current time(*))+Char(13)+Char(13)
+		[FabricLibrary]History:=$change+[FabricLibrary]History
+		[FabricLibrary]Type:=2
+		SAVE RECORD([FabricLibrary])
+		ACCEPT
+	End if 
+End if 

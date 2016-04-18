@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+ARRAY BOOLEAN($count;0)
+RELATE ONE SELECTION([DesignLineIncluded];[Designs])
+
+SELECTION TO ARRAY([Designs]ArchivedPict;$count)
+
+$c:=Count in array($count;True)
+If ($c>0)
+	WinChoice ("There are "+String($c)+" archived sketches. Do you want to restore them?")
+	
+	If (ok=1)
+		
+		FIRST RECORD([DesignLineIncluded])
+		$i:=1
+		For ($i;1;Records in selection([DesignLineIncluded]))
+			QUERY([Designs];[Designs]DesignNum=[DesignLineIncluded]DesignNumber)
+			Picture_RestoreOnTheFly 
+			NEXT RECORD([DesignLineIncluded])
+		End for 
+	End if 
+End if 
+

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($digest)
+
+SAVE RECORD([ReturnStores])
+
+$i:=1
+FIRST RECORD([Returns])
+For ($i;1;Records in selection([Returns]))
+	$digest:=$digest+[Returns]StyleNumber
+	If ($i<Records in selection([Returns]))
+		$digest:=$digest+", "
+	End if 
+	NEXT RECORD([Returns])
+End for 
+[RMA]Digest:=$digest
+SAVE RECORD([RMA])
+
+  //If (Find in array(asCustomers;[ReturnStores]StoreName)<1)
+  //APPEND TO ARRAY(asCustomers;[ReturnStores]StoreName)
+  //SORT ARRAY(asCustomers;>)
+  //End if 

@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vtFootnote:=""
+		Report_LoadArrays 
+	: (Form event=On Display Detail)
+		OBJECT SET VISIBLE(vdETA;Record number([CostSheets])>=0)
+		OBJECT SET VISIBLE([Orders]TotalOrderQuantity;[CostSheets]SheetName="Actual A")
+		vlCostsheet:=([CostSheets]ActualUnitsShipped*[CostSheets]NetUnitPrice)
+		Case of 
+			: ([CostSheets]ShipAir)
+				vsVia:="Air"
+				vdETA:=[CostSheets]ShippedDate+7
+			: ([CostSheets]ShipSea)
+				vsVia:="Boat"
+				Case of 
+					: ([CostSheets]OtherShip="NY")
+						vdETA:=[CostSheets]ShippedDate+30
+					: ([CostSheets]OtherShip="LA")
+						vdETA:=[CostSheets]ShippedDate+20
+				End case 
+			Else 
+				vdETA:=[CostSheets]ShippedDate+7
+		End case 
+		If (vdETA>[Orders]CancelDate)
+			vsFlag:="LATE"
+		Else 
+			vsFlag:=""
+		End if 
+End case 
+
+

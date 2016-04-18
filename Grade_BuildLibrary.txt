@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asPOMType=1)
+		  //WinAlert ("Select POM category.")
+	: (<>asGradeCat=1)
+		  //WinAlert ("Select Grade category.")
+	: (cbKnit=cbWoven)
+		WinChoice ("Select Knit or Woven.";"Knit";"Woven")
+		If (ok=1)
+			cbKnit:=1
+		Else 
+			cbWoven:=1
+		End if 
+		Grade_Lib_Gather 
+	Else 
+		Grade_Lib_Gather 
+End case 

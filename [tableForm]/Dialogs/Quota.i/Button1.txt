@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>QuotaRouter=-1)
+		vrUnit3:=[Quota]DutyRate
+		arMCol3{arMCol3}:=arDutyRates{arDutyRates}
+	: (<>QuotaRouter=3)
+		CANCEL
+	Else 
+		Cost_QuotaEnter 
+		CANCEL
+End case 
+

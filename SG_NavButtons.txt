@@ -1,0 +1,28 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (<>SalesPrcID>0)
+	OBJECT SET ENABLED(bFrstHMS;False)
+	OBJECT SET ENABLED(bPrvHMS;False)
+	OBJECT SET ENABLED(bNxtHMS;False)
+	OBJECT SET ENABLED(bLstHMS;False)
+	OBJECT SET ENABLED(bCancelSample;False)
+	OBJECT SET ENABLED(bDupe;False)
+	
+Else 
+	OBJECT SET ENABLED(bCancelSample;True)
+	OBJECT SET ENABLED(bDupe;True)
+	If (Selected record number([Samples])=1) | (Records in selection([Samples])=1) | (Is new record([Samples]))
+		OBJECT SET ENABLED(bFrstHMS;False)
+		OBJECT SET ENABLED(bPrvHMS;False)
+	Else 
+		OBJECT SET ENABLED(bFrstHMS;True)
+		OBJECT SET ENABLED(bPrvHMS;True)
+	End if 
+	
+	If (Selected record number([Samples])=Records in selection([Samples])) | (Records in selection([Samples])=1) | (Is new record([Samples]))
+		OBJECT SET ENABLED(bNxtHMS;False)
+		OBJECT SET ENABLED(bLstHMS;False)
+	Else 
+		OBJECT SET ENABLED(bNxtHMS;True)
+		OBJECT SET ENABLED(bLstHMS;True)
+	End if 
+End if 

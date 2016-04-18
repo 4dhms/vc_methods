@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlMailer)
+C_BOOLEAN($continue)
+C_TEXT($message)
+
+
+If (SG_Mandatories )
+	SAVE RECORD([Samples])
+	
+	If (Position("Fabric";vtOrderChanges)>0)
+		Fabric_ArraySave 
+	End if 
+	
+	  //If (Position("Color";vtOrderChanges)>0)
+	Color_Save 
+	  //End if 
+	
+	If (Position("Components";vtOrderChanges)>0)
+		Comp_Save 
+	End if 
+	
+	  //WinChoice ("Email this sample request or all "+String(Records in selection([Samples]))+"?";"This one";"All")
+	  //If (ok=1)
+	  //vPrtSel:=0
+	  //vPrtRec:=1
+	  //vPrint:=21
+	  //Else 
+	  //vPrtRec:=0
+	  //vPrtSel:=1
+	  //vPrint:=22
+	  //End if 
+	
+	If (Not([Samples]Revised))
+		$message:="Once you send this PO"+Char(13)+"changes will be marked as revisions."
+		$message:=$message+Char(13)+Char(13)+"Do you want to continue?"
+		WinChoice ($message;"Send PO";"Wait")
+		If (ok=1)
+			$continue:=True
+			[Samples]Revised:=True
+			SAVE RECORD([Samples])
+		Else 
+			$continue:=False
+		End if 
+	Else 
+		$continue:=True
+	End if 
+	
+	If ($continue)
+		Sample_Email 
+	End if 
+End if 

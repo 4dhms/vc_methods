@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Center Window (375;450;1;"")
+DIALOG("SLR_SalesPlan")
+CLOSE WINDOW
+<>vlSalesPlan:=0

@@ -1,0 +1,308 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$usedbase;$usedother;$unitsbase;$unitsother;$otherdivision;$otherseason;$otherdivision)
+C_TEXT($strip;$season;$year;$prev;$char;$division)
+C_LONGINT($usedBase2;$usedOther2;$ordersBase;$ordersOther;$unitsbase;$unitsother;$otherdivisionorder;$otherseasonorder;$otherdivisionunit;$otherseasonunit;$totalunits)
+C_POINTER($colptr)
+
+$season:=asSeasonName{asSeasonName}
+$year:=asSeasonYear{asSeasonYear}
+PrintUsage_Init (0)
+PrintUsage_Init (21)
+
+asList11{1}:="Prints (base)"
+alDCShade{1}:=15461355
+asList11{2}:="Prints (-2+)"
+alDCShade{2}:=15461355
+asList11{3}:="Total (-1/-2+)"
+alDCShade{3}:=15461355
+
+asList11{4}:="Used (base)"
+alDCShade{4}:=16777215
+asList11{5}:="Used (-2+)"
+alDCShade{5}:=16777215
+
+asList11{6}:="Used (base) Other Season"
+alDCShade{6}:=15461355
+asList11{7}:="Used (-2+) Other Season"
+alDCShade{7}:=15461355
+
+asList11{8}:="Used (base) Total"
+alDCShade{8}:=16777215
+asList11{9}:="Used (-2+) Total"
+alDCShade{9}:=16777215
+
+asList11{10}:="Orders (base)"
+alDCShade{10}:=15461355
+asList11{11}:="Units (base)"
+alDCShade{11}:=15461355
+asList11{12}:="Orders (-2+)"
+alDCShade{12}:=15461355
+asList11{13}:="Units (-2+)"
+alDCShade{13}:=15461355
+
+asList11{14}:="Other Divisions Orders"
+alDCShade{14}:=16777215
+asList11{15}:="Other Divisions Units"
+alDCShade{15}:=16777215
+If ($season="Full Year")
+	asList11{16}:="Other Year Orders"
+	asList11{17}:="Other Year Units"
+Else 
+	asList11{16}:="Other Seasons Orders"
+	asList11{17}:="Other Seasons Units"
+End if 
+alDCShade{16}:=16777215
+alDCShade{17}:=16777215
+
+asList11{18}:="Total Orders"
+alDCShade{18}:=15461355
+asList11{19}:="Total Units"
+alDCShade{19}:=15461355
+
+asList11{20}:="Avg units/Base Prints used"
+alDCShade{20}:=16777215
+asList11{21}:="Avg units/All Prints used"
+alDCShade{21}:=16777215
+
+$i:=1
+For ($i;1;10)
+	ARRAY TEXT($offdivision;0)
+	ARRAY TEXT($offseason;0)
+	Case of 
+		: ($i=5)
+			  //desrcriptions
+		: ($i=10)
+			  //PrintUsage_DivTot 
+		Else 
+			If ($i=4)
+				$colptr:=Get pointer("arMCol12")
+				$division:="12@"
+			Else 
+				$colptr:=Get pointer("arMCol"+String($i))
+				$division:=Substring(String(100+Num($i));2;2)+"@"
+			End if 
+			
+			If ($season="Full Year")
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPType=2;*)
+				QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonYear=$year;*)
+				QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]Division=$division)
+			Else 
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPType=2;*)
+				QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonName=$season;*)
+				QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonYear=$year;*)
+				QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]Division=$division)
+			End if 
+			  //all
+			CREATE SET([ColorPrintNumber];"prints")
+			$colptr->{3}:=Records in selection([ColorPrintNumber])
+			  //base
+			QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber="@-1")
+			$colptr->{1}:=Records in selection([ColorPrintNumber])
+			CREATE SET([ColorPrintNumber];"base")
+			USE SET("prints")
+			QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"@-1")
+			  //plus
+			CREATE SET([ColorPrintNumber];"plus")
+			$colptr->{2}:=Records in selection([ColorPrintNumber])
+			
+			$usedbase:=0
+			$usedother:=0
+			$usedbase2:=0
+			$usedother2:=0
+			$ordersBase:=0
+			$ordersOther:=0
+			$unitsbase:=0
+			$unitsother:=0
+			$otherdivisionorder:=0
+			$otherseasonorder:=0
+			$otherdivisionunit:=0
+			$otherseasonunit:=0
+			$totalunits:=0
+			
+			ARRAY TEXT($usetest;0)
+			
+			  //used base
+			$n:=1
+			USE SET("base")
+			ARRAY TEXT($printlist;0)
+			ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPCreationDate;>;[ColorPrintNumber]CPNumber;>)
+			
+			SELECTION TO ARRAY([ColorPrintNumber]CPNumber;$printlist)
+			For ($n;1;Size of array($printlist))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=$printlist{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+				
+				$s:=1
+				FIRST RECORD([CP_OrderXRef])
+				
+				For ($s;1;Records in selection([CP_OrderXRef]))
+					
+					QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+					QUERY SELECTION([Orders];[Orders]Cancelled=False)
+					
+					Case of 
+						: ($season="Full Year") & ([Orders]SeasonYear=$year) & ([Orders]OrderDivision=$division)
+							If (Find in array($usetest;$printlist{$n})<1)
+								$usedbase:=$usedbase+1
+								APPEND TO ARRAY($usetest;$printlist{$n})
+							End if 
+							
+							$unitsbase:=$unitsbase+[CP_OrderXRef]Quantity
+							$ordersbase:=$ordersbase+Records in selection([Orders])
+						: ([Orders]SeasonName=$season) & ([Orders]SeasonYear=$year) & ([Orders]OrderDivision=$division)
+							If (Find in array($usetest;$printlist{$n})<1)
+								$usedbase:=$usedbase+1
+								APPEND TO ARRAY($usetest;$printlist{$n})
+							End if 
+							
+							$unitsbase:=$unitsbase+[CP_OrderXRef]Quantity
+							$ordersbase:=$ordersbase+Records in selection([Orders])
+					End case 
+					
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+			End for 
+			  //used base other
+			$n:=1
+			For ($n;1;Size of array($printlist))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=$printlist{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+				
+				$s:=1
+				FIRST RECORD([CP_OrderXRef])
+				
+				For ($s;1;Records in selection([CP_OrderXRef]))
+					QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+					QUERY SELECTION([Orders];[Orders]Cancelled=False)
+					
+					Case of 
+						: ([Orders]SeasonName#$season) | ($season="Full Year") | ([Orders]SeasonYear#$year) | ([Orders]OrderDivision#$division)
+							If (Find in array($usetest;$printlist{$n})<1)
+								$usedbase2:=$usedbase2+1
+								APPEND TO ARRAY($usetest;$printlist{$n})
+							End if 
+							If ([Orders]OrderDivision#$division)
+								$otherdivisionorder:=$otherdivisionorder+Records in selection([Orders])
+								$otherdivisionunit:=$otherdivisionunit+[CP_OrderXRef]Quantity
+							Else 
+								$otherseasonorder:=$otherseasonorder+Records in selection([Orders])
+								$otherseasonunit:=$otherseasonunit+[CP_OrderXRef]Quantity
+							End if 
+					End case 
+					
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+			End for 
+			
+			  //used plus
+			$n:=1
+			USE SET("plus")
+			ARRAY TEXT($printlist;0)
+			ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPCreationDate;>;[ColorPrintNumber]CPNumber;>)
+			SELECTION TO ARRAY([ColorPrintNumber]CPNumber;$printlist)
+			For ($n;1;Size of array($printlist))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=$printlist{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+				
+				$s:=1
+				FIRST RECORD([CP_OrderXRef])
+				
+				For ($s;1;Records in selection([CP_OrderXRef]))
+					
+					QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+					QUERY SELECTION([Orders];[Orders]Cancelled=False)
+					
+					Case of 
+						: ($season="Full Year") & ([Orders]SeasonYear=$year) & ([Orders]OrderDivision=$division)
+							If (Find in array($usetest;$printlist{$n})<1)
+								$usedother:=$usedother+1
+								APPEND TO ARRAY($usetest;$printlist{$n})
+							End if 
+							$unitsother:=$unitsother+[CP_OrderXRef]Quantity
+							$ordersother:=$ordersother+Records in selection([Orders])
+						: ($season="Full Year") & ([Orders]SeasonYear=$year) & ([Orders]OrderDivision#$division)
+							$otherdivisionorder:=$otherdivisionorder+Records in selection([Orders])
+							$otherdivisionunit:=$otherdivisionunit+[CP_OrderXRef]Quantity
+						: ([Orders]SeasonName=$season) & ([Orders]SeasonYear=$year) & ([Orders]OrderDivision=$division)
+							If (Find in array($usetest;$printlist{$n})<1)
+								$usedother:=$usedother+1
+								APPEND TO ARRAY($usetest;$printlist{$n})
+							End if 
+							$unitsother:=$unitsother+[CP_OrderXRef]Quantity
+							$ordersother:=$ordersother+Records in selection([Orders])
+					End case 
+					
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+			End for 
+			  //used plus other
+			$n:=1
+			For ($n;1;Size of array($printlist))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=$printlist{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+				
+				$s:=1
+				FIRST RECORD([CP_OrderXRef])
+				
+				For ($s;1;Records in selection([CP_OrderXRef]))
+					QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+					QUERY SELECTION([Orders];[Orders]Cancelled=False)
+					
+					Case of 
+						: ([Orders]SeasonName#$season) | ($season="Full Year") | ([Orders]SeasonYear#$year) | ([Orders]OrderDivision#$division)
+							If (Find in array($usetest;$printlist{$n})<1)
+								$usedother2:=$usedother2+1
+								APPEND TO ARRAY($usetest;$printlist{$n})
+							End if 
+							If ([Orders]OrderDivision#$division)
+								$otherdivisionorder:=$otherdivisionorder+Records in selection([Orders])
+								$otherdivisionunit:=$otherdivisionunit+[CP_OrderXRef]Quantity
+							Else 
+								$otherseasonorder:=$otherseasonorder+Records in selection([Orders])
+								$otherseasonunit:=$otherseasonunit+[CP_OrderXRef]Quantity
+							End if 
+					End case 
+					
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+			End for 
+			
+			$totalunits:=$unitsbase+$unitsother+$otherdivisionunit+$otherseasonunit
+			
+			$colptr->{4}:=$usedbase
+			$colptr->{5}:=$usedother
+			$colptr->{6}:=$usedbase2
+			$colptr->{7}:=$usedother2
+			$colptr->{8}:=$usedbase+$usedbase2
+			$colptr->{9}:=$usedother+$usedother2
+			$colptr->{10}:=$ordersbase
+			$colptr->{11}:=$unitsbase
+			$colptr->{12}:=$ordersother
+			$colptr->{13}:=$unitsother
+			$colptr->{14}:=$otherdivisionorder
+			$colptr->{15}:=$otherdivisionunit
+			$colptr->{16}:=$otherseasonorder
+			$colptr->{17}:=$otherseasonunit
+			$colptr->{18}:=$ordersbase+$ordersother+$otherdivisionorder+$otherseasonorder
+			$colptr->{19}:=$totalunits
+			If ($usedbase=0)
+				$colptr->{20}:=0
+			Else 
+				$colptr->{20}:=Round($totalunits/$usedbase;0)
+			End if 
+			If ($usedbase+$usedother=0)
+				$colptr->{21}:=0
+			Else 
+				$colptr->{21}:=Round($totalunits/($usedbase+$usedother);0)
+			End if 
+			  //
+			
+			
+			
+	End case 
+End for 
+
+PrintUsage_BuildLineTot 
+
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CP_OrderXRef])

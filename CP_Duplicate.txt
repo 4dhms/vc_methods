@@ -1,0 +1,71 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($familyKey;$type;$version)
+C_TEXT($name)
+C_TEXT($customer)
+C_TEXT($division)
+C_TEXT($category)
+C_TEXT($numberCheck)
+C_BOOLEAN($done)
+C_LONGINT($n)
+
+$familyKey:=[ColorPrintNumber]CPFamilyKey
+$type:=[ColorPrintNumber]CPType
+$version:=[ColorPrintNumber]Version
+$name:=[ColorPrintNumber]CPName
+$customer:=[ColorPrintNumber]Customer
+$division:=[ColorPrintNumber]Division
+
+$n:=$2
+
+Repeat 
+	$numberCheck:=$1+"-"+String($n)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$numberCheck)
+	If (Records in selection([ColorPrintNumber])>0)
+		$n:=$n+1
+	Else 
+		$done:=True
+	End if 
+Until ($done)
+
+
+CREATE RECORD([ColorPrintNumber])
+[ColorPrintNumber]CPFamilyKey:=$familyKey
+[ColorPrintNumber]CPType:=$type
+If ($1="new")
+	$name:=""
+	$version:=1
+	Case of 
+		: ($type=1)
+			$category:="Solid"
+		: ($type=2)
+			$category:="print"
+		: ($type=3)
+			$category:="embroidery"
+		: ($type=4)
+			$category:="layout"
+	End case 
+	[ColorPrintNumber]CPNumber:=PO_GetNumber ($category)
+	If ($type>1)
+		[ColorPrintNumber]CPNumber:=[ColorPrintNumber]CPNumber+"-1"
+	End if 
+Else 
+	[ColorPrintNumber]CPNumber:=$numberCheck
+End if 
+
+
+<>asSeasonYear:=1
+<>asSeasonName:=1
+[ColorPrintNumber]SeasonName:=""
+[ColorPrintNumber]SeasonYear:=""
+[ColorPrintNumber]BuySeason:=""
+[ColorPrintNumber]BuyDivision:=""
+[ColorPrintNumber]Version:=$version
+[ColorPrintNumber]CPNumberKey:=Sequence number([ColorPrintNumber])
+[ColorPrintNumber]ColorWay:=""
+[ColorPrintNumber]CPCreationDate:=Current date(*)
+[ColorPrintNumber]CPName:=$name
+[ColorPrintNumber]Customer:=$customer
+[ColorPrintNumber]Division:=$division
+[ColorPrintNumber]NewCP:=True
+[ColorPrintNumber]Enterer:=Current user
+SAVE RECORD([ColorPrintNumber])

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asColors<2)
+		WinPrompt ("Select color.")
+	: (vtFabric1="")
+		WinPrompt ("Select Fabric PO.")
+	: (vlTotQty=0)
+		WinPrompt ("Select quantity.")
+	Else 
+		ACCEPT
+End case 
+

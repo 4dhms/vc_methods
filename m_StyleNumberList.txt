@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>GetStyleNumber=0)
+		<>GetStyleNumber:=New process("p_StyleNumberList";0;"Style Number List")
+	Else 
+		SHOW PROCESS(<>GetStyleNumber)
+		BRING TO FRONT(<>GetStyleNumber)
+End case 

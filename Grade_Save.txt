@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($subkey)
+SAVE RECORD([SpecFactory])
+$subKey:=[SpecFactory]SF_KeyNumber*-1
+QUERY([Sizes];[Sizes]SF_KeyNumber=$subKey)
+If (Records in selection([Sizes])=0)
+	CREATE RECORD([Sizes])
+	[Sizes]SF_KeyNumber:=$subKey
+End if 
+[Sizes]Size1:=vsSize1
+[Sizes]Size2:=vsSize2
+[Sizes]Size3:=vsSize3
+[Sizes]Size4:=vsSize4
+[Sizes]Size5:=vsSize5
+[Sizes]Size6:=vsSize6
+[Sizes]Size7:=vsSize7
+[Sizes]Size8:=vsSize8
+[Sizes]Size9:=vsSize9
+[Sizes]Size10:=vsSize10
+[Sizes]Size11:=vsSize11
+[Sizes]Size12:=vsSize12
+SAVE RECORD([Sizes])
+UNLOAD RECORD([Sizes])

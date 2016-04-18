@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL(vrTotalSales1)
+
+If (asColors>0) & (vsCustomer#"") & (vsStyleNumber#"") & (vsDivision#"")
+	If (vfNew)
+		vfNew:=False
+		CREATE RECORD([SLRAcct])
+		[SLRAcct]SLRAcct:=vsCustomer
+		[SLRAcct]SLRAcctKey:=Sequence number([SLRAcct])
+		[SLRAcct]SLRStyleNumber:=vsStyleNumber
+		[SLRAcct]Division:=vsDivision
+		SAVE RECORD([SLRAcct])
+		OBJECT SET ENABLED(bMore;True)
+	End if 
+	[SLRAcct]WeekOne:=vdWeekOne
+	
+	OBJECT SET VISIBLE(bMore;True)
+	vtUnitsTot:=""
+	vtSalesTot:=""
+	vtOnHand:=""
+	SLR_ColorWeeks (False)
+	
+	FIRST RECORD([SLRWks])
+	vlWkNumber:=[SLRWks]WkNumber+1
+	If (vlWkNumber=1)
+		vdDate:=vdWeekOne
+	Else 
+		vdDate:=[SLRWks]SLRWkEnd+7
+	End if 
+	OBJECT SET ENABLED(bAccept;True)
+	If (vsStyleNumber="@ CL")
+	Else 
+		FORM GOTO PAGE(2)
+		GOTO OBJECT(vlTotalUnits)
+	End if 
+End if 
+

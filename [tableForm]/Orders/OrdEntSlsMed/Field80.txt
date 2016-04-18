@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]CreditOK)
+	[Orders]CreditOKDate:=Current date(*)
+End if 

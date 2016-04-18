@@ -1,0 +1,143 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$i;$s)
+C_BOOLEAN($del;$test;$done;$delete)
+C_TEXT(vsQStyle)
+
+If (Current user="Designer")
+	If (Shift down)
+		CONFIRM("What's it going to be?";"Not test";"Test")
+		If (ok=1)
+			$test:=False
+		Else 
+			$test:=True
+		End if 
+	End if 
+End if 
+
+If (vsQStyle#"")
+	cbDay1:=0
+	cb12:=1
+	vfOneStyle:=True
+Else 
+	vfOneStyle:=False
+	cb12:=0
+End if 
+
+If (LISTBOX Get number of columns(afLogOn)=15)
+	LISTBOX DELETE COLUMN(afLogOn;8)
+End if 
+
+LogOn_Harvest 
+
+LISTBOX SORT COLUMNS(afLogOn;2;>;7;<;8;>;1;<)  //;3;<;9)
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	If (asStyleNumbers{$i}="KG@")
+		If (Position(" ";asColors{$i})>0)
+			asColors{$i}:=Substring(asColors{$i};1;Position(" ";asColors{$i})-1)
+		End if 
+	End if 
+End for 
+
+
+
+ARRAY TEXT($stylecounter;0)
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	If (cbDivision=1)
+		If (asDivisions{$i}#"04-@")
+			asStyleNumbers{$i}:="X"
+		End if 
+	Else 
+		If (asDivisions{$i}="04-@")
+			asStyleNumbers{$i}:="X"
+		End if 
+	End if 
+	If (Find in array($stylecounter;asStyleNumbers{$i})<1)
+		$s:=1
+		ARRAY TEXT($colortest;0)
+		APPEND TO ARRAY($stylecounter;asStyleNumbers{$i})
+	End if 
+	  //If (asStyleNumbers{$i}="11331W")
+	  //ALERT(asColors{$i}+"  "+String(Length(asColors{$i})))
+	  //End if 
+	
+	Case of 
+		: (Find in array($colortest;asColors{$i})>0)
+			asStyleNumbers{$i}:="X"
+		: (Find in array($colortest;asColors{$i})<1)
+			APPEND TO ARRAY($colortest;asColors{$i})
+			Case of 
+				: ($test)
+					
+					  //: (asStyleNumbers{$i}=asStyleNumbers{$i-1}) & (asColors{$i}="") & (asXSizeRange{$i}="")
+					  //asStyleNumbers{$i}:="X"
+					  //: (asStyleNumbers{$i}=asStyleNumbers{$i+1}) & (asColors{$i}="")
+					  //asStyleNumbers{$i}:="X"
+			End case 
+	End case 
+End for 
+
+If (cb11=1)
+	$i:=1
+	For ($i;1;Size of array(asStyleNumbers))
+		If (afProcess{$i}=True) & (Not($test))
+			asStyleNumbers{$i}:="X"
+		End if 
+	End for 
+End if 
+
+$n:=1
+Repeat 
+	If ($n>Size of array(asStyleNumbers))
+		$done:=True
+	Else 
+		
+		Case of 
+			: (cb13=1) & (atChange{$n}="NS@") & (asStyleNumbers{$n}#"X")
+				$delete:=False
+			: (cb13=1) & (atChange{$n}#"NS@")
+				$delete:=True
+			: (asStyleNumbers{$n}="X") & (Not($test))
+				$delete:=True
+			Else 
+				$delete:=False
+		End case 
+		
+		If ($delete)
+			DELETE FROM ARRAY(asStyleNumbers;$n;1)
+			DELETE FROM ARRAY(adActionDate;$n;1)
+			DELETE FROM ARRAY(afProcess;$n;1)
+			DELETE FROM ARRAY(asDivisions;$n;1)
+			DELETE FROM ARRAY(asSeasonName;$n;1)
+			DELETE FROM ARRAY(asGroups;$n;1)
+			DELETE FROM ARRAY(asXSizeRange;$n;1)
+			DELETE FROM ARRAY(atChange;$n;1)
+			DELETE FROM ARRAY(asColors;$n;1)
+			DELETE FROM ARRAY(arSalePrice;$n;1)
+			DELETE FROM ARRAY(asColorCodes;$n;1)
+			DELETE FROM ARRAY(asUsers;$n;1)
+			DELETE FROM ARRAY(asProcessDate;$n;1)
+		Else 
+			$n:=$n+1
+		End if 
+	End if 
+Until ($done)
+
+ARRAY TEXT(asSort;Size of array(asStyleNumbers))
+$i:=1
+For ($i;1;Size of array(asSort))
+	asSort{$i}:=asColorCodes{$i}[[1]]
+End for 
+
+  //LISTBOX SORT COLUMNS(afLogOn;2;>;7;<;8;>;3;<;9)
+LogOn_Bars 
+vsRecInSelection:=String(Size of array(asStyleNumbers))+" items"
+vsQStyle:=""
+
+LISTBOX SELECT ROW(afLogOn;500)
+
+LogOn_ColorCol 
+

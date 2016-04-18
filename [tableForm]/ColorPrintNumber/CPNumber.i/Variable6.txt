@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor="") & (Record number([ColorPrintNumber])<0)
+	WinPrompt ("Enter Thread Color")
+	GOTO OBJECT([ColorPrintNumber]ThreadColor)
+Else 
+	If (ColorPrint_Mandatories )
+		NAV_ColorPrint (3)
+	End if 
+End if 

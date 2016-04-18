@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CREATE EMPTY SET([Orders];"Print")
+$i:=1
+For ($i;1;Size of array(alRecordNumber))
+	GOTO RECORD([Orders];alRecordNumber{$i})
+	ADD TO SET([Orders];"Print")
+End for 
+
+If (Records in set("Print")>0)
+	USE SET("Print")
+End if 
+CLEAR SET("Print")

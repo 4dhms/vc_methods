@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE RECORD([Changes])
+[Changes]NewChange:=$1
+[Changes]RevDate:=Current date(*)
+[Changes]RevTime:=Current time(*)
+[Changes]OrderNumber:=4
+SAVE RECORD([Changes])

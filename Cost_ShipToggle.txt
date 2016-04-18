@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([CostSheets]OtherShip="NY")
+		cbCostNY:=1
+		cbCostLA:=0
+		cbCostOther:=0
+		OBJECT SET VISIBLE([CostSheets]OtherShip;False)
+	: ([CostSheets]OtherShip="LA")
+		cbCostNY:=0
+		cbCostLA:=1
+		cbCostOther:=0
+		OBJECT SET VISIBLE([CostSheets]OtherShip;False)
+	: ([CostSheets]OtherShip#"")
+		cbCostNY:=0
+		cbCostLA:=0
+		cbCostOther:=1
+		OBJECT SET VISIBLE([CostSheets]OtherShip;True)
+End case 

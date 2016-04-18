@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+
+ARRAY TEXT($styleNumbers;0)
+Case of 
+	: (Form event=On Getting Focus)
+		vsStyleNumber:=[Orders]StyleNumber
+	: (Form event=On Data Change)
+		If (Length([Orders]StyleNumber)>10)
+			WinPrompt ("Style number cannot exceed ten (10) characters.")
+			[Orders]StyleNumber:=Substring([Orders]StyleNumber;1;10)
+		End if 
+		<>vsDesignNumber:=[Orders]DesignNumber
+		<>vsStyleNumber:=[Orders]StyleNumber
+		SN_CheckNumber 
+		If (<>vsStyleNumber="")
+			[Orders]StyleNumber:=""
+			GOTO OBJECT([Orders]StyleNumber)
+		Else 
+			
+			QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=[Orders]StyleNumber)
+			Case of 
+				: ([StyleNumberGen]DesignNumber="")
+					  //do nothing
+				: ([Orders]DesignNumber="")
+					[Orders]DesignNumber:=[StyleNumberGen]DesignNumber
+					QUERY([Designs];[Designs]DesignNum=[StyleNumberGen]DesignNumber)
+				: ([Orders]DesignNumber#[StyleNumberGen]DesignNumber)
+					WinChoice ("The Design Number in the"+Char(13)+"Style Number Book is "+[StyleNumberGen]DesignNumber+"."+Char(13)+"Do you want to stay with "+[Orders]DesignNumber+"?";"Yes";"No")
+					If (ok=0)
+						[Orders]DesignNumber:=[StyleNumberGen]DesignNumber
+						QUERY([Designs];[Designs]DesignNum=[StyleNumberGen]DesignNumber)
+					End if 
+			End case 
+			Case of 
+				: ([StyleNumberGen]Primary Customer="")
+					  //do nothing
+				: ([Orders]Customer="")
+					[Orders]Customer:=[StyleNumberGen]Primary Customer
+				: ([Orders]Customer#[StyleNumberGen]Primary Customer)
+					WinChoice ("The customer in the"+Char(13)+"Style Number Book is "+[StyleNumberGen]Primary Customer+"."+Char(13)+"Do you want to stay with "+[Orders]Customer+"?";"Yes";"No")
+					If (ok=0)
+						[Orders]Customer:=[StyleNumberGen]Primary Customer
+					End if 
+			End case 
+			
+			SELECTION TO ARRAY([StyleNumberGen]DesignNumber;$styleNumbers)
+			If (Find in array($styleNumbers;[Orders]DesignNumber)>0)
+				
+			Else 
+				FIRST RECORD([StyleNumberGen])
+				WinPrompt ("That Style Number belongs to"+Char(13)+"Design Number "+[StyleNumberGen]DesignNumber+"."+Char(13)+"Are you sure this is correct?")
+			End if 
+			UNLOAD RECORD([StyleNumberGen])
+		End if 
+		
+		If ([Orders]StyleNumber#"")
+			<>vtBDTest:=""
+			$run:=New process("Order_StyleSizeRange";0;"CheckBD";[Orders]StyleNumber)
+			Repeat 
+			Until (<>vtBDTest#"") | (Shift down)
+			If (<>vtBDTest#[Orders]BrkdnCutRatio) & (<>vtBDTest#"NG")
+				WinChoice ("The pre-existing Size Breakdown for S/N:"+[Orders]StyleNumber+" is "+<>vtBDTest+".";"Use it";"Cancel")
+				If (ok=1)
+					[Orders]BrkdnCutRatio:=<>vtBDTest
+				End if 
+			End if 
+			Order_KWCSToggle 
+		End if 
+End case 
+Order_CheckUPC 
+
+

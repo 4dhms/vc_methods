@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($month;$year;$c;$i;$n;$s)
+C_POINTER($sun;$mon;$tue;$wed;$thu;$fri;$sat)
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart<=vdDayOne;*)
+QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkEnd>=vdDayOne)
+
+$month:=[SLRWkLibrary]WkMonth
+$year:=[SLRWkLibrary]WkYear
+
+Case of 
+	: ($month=1)
+		vsFlag:="February "+String($year)+" 4 wks"
+	: ($month=2)
+		vsFlag:="March "+String($year)+" 5 wks"
+	: ($month=3)
+		vsFlag:="April "+String($year)+" 4 wks"
+	: ($month=4)
+		vsFlag:="May "+String($year)+" 4 wks"
+	: ($month=5)
+		vsFlag:="June "+String($year)+" 5 wks"
+	: ($month=6)
+		vsFlag:="July "+String($year)+" 4 wks"
+	: ($month=7)
+		vsFlag:="August "+String($year)+" 4 wks"
+	: ($month=8)
+		vsFlag:="September "+String($year)+" 5 wks"
+	: ($month=9)
+		vsFlag:="October "+String($year)+" 4 wks"
+	: ($month=10)
+		vsFlag:="November "+String($year)+" 4 wks"
+	: ($month=11)
+		vsFlag:="December "+String($year)+" 5 wks"
+	: ($month=12)
+		vsFlag:="January "+String($year+1)+" 4 wks"
+End case 
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkYear=$year;*)
+QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkMonth=$month)
+ORDER BY([SLRWkLibrary];[SLRWkLibrary]WkStart;>)
+vdDayOne:=[SLRWkLibrary]WkStart
+If ($month=2) | ($month=5) | ($month=8) | ($month=11)
+	$c:=5
+Else 
+	$c:=4
+End if 
+OBJECT SET VISIBLE(vlItem29;$c=5)
+OBJECT SET VISIBLE(vlItem30;$c=5)
+OBJECT SET VISIBLE(vlItem31;$c=5)
+OBJECT SET VISIBLE(vlItem32;$c=5)
+OBJECT SET VISIBLE(vlItem33;$c=5)
+OBJECT SET VISIBLE(vlItem34;$c=5)
+OBJECT SET VISIBLE(vlItem35;$c=5)
+
+FIRST RECORD([SLRWkLibrary])
+$i:=1
+$n:=1
+$s:=1
+For ($i;1;$c)
+	$sun:=Get pointer("vlItem"+String($n))
+	$mon:=Get pointer("vlItem"+String($n+1))
+	$tue:=Get pointer("vlItem"+String($n+2))
+	$wed:=Get pointer("vlItem"+String($n+3))
+	$thu:=Get pointer("vlItem"+String($n+4))
+	$fri:=Get pointer("vlItem"+String($n+5))
+	$sat:=Get pointer("vlItem"+String($n+6))
+	
+	$sun->:=Day of([SLRWkLibrary]WkStart)
+	$mon->:=Day of([SLRWkLibrary]WkStart+1)
+	$tue->:=Day of([SLRWkLibrary]WkStart+2)
+	$wed->:=Day of([SLRWkLibrary]WkStart+3)
+	$thu->:=Day of([SLRWkLibrary]WkStart+4)
+	$fri->:=Day of([SLRWkLibrary]WkStart+5)
+	$sat->:=Day of([SLRWkLibrary]WkEnd)
+	
+	$n:=$n+7
+	NEXT RECORD([SLRWkLibrary])
+End for 
+
+
+

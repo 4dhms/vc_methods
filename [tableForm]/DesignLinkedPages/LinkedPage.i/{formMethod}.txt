@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asSampleTypes;8)
+		asSampleTypes{1}:="Linkage"
+		asSampleTypes{2}:="Design Library"
+		asSampleTypes{3}:="Sample Number"
+		asSampleTypes{4}:="Order Number"
+		asSampleTypes{5}:="Design on Sample"
+		asSampleTypes{6}:="Design on Order"
+		asSampleTypes{7}:="Style on Sample"
+		asSampleTypes{8}:="Style on Order"
+		DLink_MoreArray 
+		
+		If (Is new record([DesignLinkedPages]))
+			[DesignLinkedPages]PageNumber:=vlPage
+			[DesignLinkedPages]DesignLineKey:=[DesignLines]DesignLineKey
+			[DesignLinkedPages]Print:=True
+		End if 
+		QUERY([DL_Other];[DL_Other]DesignKey=[DesignLines]DesignLineKey)
+		DLink_BuildPage 
+		DL_ShowCustom 
+		DL_ShowCancel 
+		
+		OBJECT SET VISIBLE(*;"xCover";[DesignLines]8Up)
+	: (Form event=On Unload)
+		ARRAY TEXT(asSampleTypes;4)
+		asSampleTypes{1}:="Linkage"
+		asSampleTypes{2}:="Design Library"
+		asSampleTypes{3}:="Sample Number"
+		asSampleTypes{4}:="Order Number"
+End case 

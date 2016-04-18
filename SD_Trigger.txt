@@ -1,0 +1,96 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;$i;$n;$c;$p)
+C_BOOLEAN($open;$close)
+C_TEXT($dl)
+
+
+Case of 
+	: (Form event=On Double Clicked)
+		$line:=asOrderNumbers
+		vlLeadDN:=$line
+		$n:=$line
+		$i:=1
+		$dl:=StripToNumber (asDesignNumbers{$line})+"@"
+		
+		Case of 
+			: (Size of array(asDesignNumbers)=1)
+				$open:=True
+			: ($line=Size of array(asDesignNumbers)) & (asDesignNumbers{$line}=$dl) & (asDesignNumbers{$line-1}#$dl)
+				$open:=True
+			: (asDesignNumbers{$line}=$dl) & (asDesignNumbers{$line+1}#$dl)
+				$open:=True
+			: ($line=1) & (asDesignNumbers{$line+1}=$dl)
+				$close:=True
+			: (asDesignNumbers{$line}=$dl) & (asDesignNumbers{$line+1}=$dl) & (asDesignNumbers{$line-1}#$dl)
+				$close:=True
+		End case 
+		
+		Case of 
+			: ($close)
+				SD_Prep 
+				vlDesignNumberCount:=asOrderNumbers
+				
+			: ($open=True)
+				SD_Prep 
+				vlDesignNumberCount:=asOrderNumbers
+				<>vtMessage:="Unpacking"
+				<>vlCounter:=0
+				EMail_SendingProc 
+				
+				$i:=1
+				$n:=0
+				$c:=0
+				
+				For ($i;1;Size of array(afProcess))
+					If (afProcess{$i}=True)
+						If ($n=0)
+							$n:=$i+1
+							vlLine:=$i
+						Else 
+							$c:=$c+1
+						End if 
+					End if 
+				End for 
+				
+				  //SD_ResetLine 
+				  //If ($c>0) & ($n<Size of array(afProcess))
+				  //SD_DeleteArray ($n;$c)
+				  //End if 
+				
+				QUERY([Designs];[Designs]DesignNum=asDesignNumbers{$line})
+				Picture_RestoreOnTheFly 
+				QUERY([Orders];[Orders]DesignNumber=$dl)
+				Case of 
+					: (vsStyleNumber#"")
+						QUERY SELECTION([Orders];[Orders]StyleNumber=vsStyleNumber)
+					: (vsOrderNumber#"")
+						QUERY SELECTION([Orders];[Orders]OrderNum=vsOrderNumber)
+				End case 
+				ORDER BY([Orders]ActlDutyRate;[Orders]DesignNumber;>;[Orders]OrderNum;>)
+				
+				$c:=Records in selection([Orders])
+				FIRST RECORD([Orders])
+				
+				SD_InsertArray ($line+1;$c-1)
+				  //LISTBOX INSERT ROWS(afOrderList;$line+1;$c-1)
+				
+				$p:=Int(Records in selection([Orders])/100)
+				
+				$n:=$line
+				For ($i;1;$c)
+					SD_AddLine ($n)
+					$n:=$n+1
+					NEXT RECORD([Orders])
+					If (Records in selection([Orders])%$p=0)
+						<>vlCounter:=<>vlCounter+10
+						CALL PROCESS(<>SendingWin)
+					End if 
+				End for 
+				SD_FontColor 
+				<>CloseDialog:=True
+				CALL PROCESS(<>SendingWin)
+		End case 
+End case 
+UNLOAD RECORD([Orders])
+
+

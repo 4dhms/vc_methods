@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Printing Detail)
+		vsSeason:=[Samples]SeasonName+" "+Substring([Samples]SeasonYear;3;4)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		Case of 
+			: ([Samples]Sam Type="Proto@")
+				vsType:="Proto"
+			: ([Samples]Sam Type="sales sample@")
+				vsType:="Sales"
+		End case 
+		OBJECT SET VISIBLE([Samples]XFactAct;[Samples]XFactAct#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactoryReq;[Samples]XFactoryReq#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactorySched;[Samples]XFactorySched#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]SampleReceived;[Samples]SampleReceived#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]DueDate;[Samples]DueDate#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]ProtoRecvDate;[Samples]ProtoRecvDate#!00-00-00!)
+		OBJECT SET VISIBLE(*;"xVoid";[Samples]Void)
+End case 

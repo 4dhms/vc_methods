@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]WH_ProofDelivery)
+	[Orders]WH_ProofoDeliveryDate:=Current date(*)
+End if 

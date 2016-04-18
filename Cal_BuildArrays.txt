@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+ARRAY TEXT(atMon;0)
+ARRAY TEXT(atTue;0)
+ARRAY TEXT(atWed;0)
+ARRAY TEXT(atThu;0)
+ARRAY TEXT(atFri;0)
+C_DATE($one;$two;$three;$four;$five)
+
+$one:=vdStart
+$two:=vdStart+1
+$three:=vdStart+2
+$four:=vdStart+3
+$five:=vdStart+4
+
+
+ORDER BY([Appts];[Appts]ApptDate;[Appts]ApptStart;>)
+FIRST RECORD([Appts])
+
+For ($n;1;Records in selection([Appts]))
+	Case of 
+		: ([Appts]ApptDate=$one)
+			INSERT IN ARRAY(atMon;Size of array(atMon)+1;2)
+			atMon{Size of array(atMon)-1}:=[Appts]ApptWith
+			atMon{Size of array(atMon)}:=[Appts]ApptGroup
+		: ([Appts]ApptDate=$two)
+			INSERT IN ARRAY(atTue;Size of array(atTue)+1;2)
+			atTue{Size of array(atTue)-1}:=[Appts]ApptWith
+			atTue{Size of array(atTue)}:=[Appts]ApptGroup
+		: ([Appts]ApptDate=$three)
+			INSERT IN ARRAY(atWed;Size of array(atWed)+1;2)
+			atWed{Size of array(atWed)-1}:=[Appts]ApptWith
+			atWed{Size of array(atWed)}:=[Appts]ApptGroup
+		: ([Appts]ApptDate=$four)
+			INSERT IN ARRAY(atThu;Size of array(atThu)+1;2)
+			atThu{Size of array(atThu)-1}:=[Appts]ApptWith
+			atThu{Size of array(atThu)}:=[Appts]ApptGroup
+		: ([Appts]ApptDate=$five)
+			INSERT IN ARRAY(atFri;Size of array(atFri)+1;2)
+			atFri{Size of array(atFri)-1}:=[Appts]ApptWith
+			atFri{Size of array(atFri)}:=[Appts]ApptGroup
+	End case 
+	NEXT RECORD([Appts])
+End for 

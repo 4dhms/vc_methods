@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	If (asList1>0)
+		QUERY([Vendors];[Vendors]VendorName=asList1{asList1})
+		CREATE RECORD([HMSArtNoRelated])
+		[HMSArtNoRelated]ArticleNumber:=[HMSArtNo]HANumber
+		[HMSArtNoRelated]Vendor:=True
+		[HMSArtNoRelated]HANkey:=[HMSArtNo]HANkey
+		[HMSArtNoRelated]VendorKey:=[Vendors]VendorKey
+		SAVE RECORD([HMSArtNoRelated])
+		
+		Fab_RelatedArtNos 
+	End if 
+End if 

@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asCPFamilies;0)
+
+QUERY([ColorPrintFamilies];[ColorPrintFamilies]CPFamilyName=vsRequestString)
+
+[ColorPrintNumber]CPNumber:=vsNewColorNumber
+[ColorPrintNumber]CPFamilyKey:=[ColorPrintFamilies]CPFamilyKey
+[ColorPrintNumber]CPType:=vlRouter
+[ColorPrintNumber]CPNumberKey:=Sequence number([ColorPrintNumber])
+[ColorPrintNumber]Version:=1
+[ColorPrintNumber]NewCP:=True
+
+Case of 
+	: (vlRouter=5)
+		[ColorPrintNumber]CPNumber:="YD"+Substring(String(10000+Num(vsNewColorNumber));2;10)+"-1"
+	: (vlRouter>1) & (Position("-";[ColorPrintNumber]CPNumber)<1)
+		[ColorPrintNumber]CPNumber:=[ColorPrintNumber]CPNumber+"-1"
+End case 
+
+[ColorPrintNumber]Enterer:=Current user
+If (vlRouter>2)
+	[ColorPrintNumber]CPFamilyKey:=-1*vlRouter
+End if 
+
+Case of 
+	: (<>CPRouter=1)
+		cbSolid:=1
+	: (<>CPRouter=2)
+		cbPrint:=1
+	: (<>CPRouter=3)
+		cbEmbroidery:=1
+	: (<>CPRouter=4)
+		cbLayout:=1
+	: (<>CPRouter=5)
+		cbYarnDye:=1
+	: (<>CPRouter=6)
+		cbNovelty:=1
+End case 
+
+OBJECT SET VISIBLE([ColorPrintNumber]BorderPrint;[ColorPrintNumber]CPType=2)
+If ([ColorPrintNumber]CPNumber="b@") | ([ColorPrintNumber]CPNumber="Xb@")
+	[ColorPrintNumber]BorderPrint:=True
+End if 
+If ([ColorPrintNumber]CPNumber="P@") | ([ColorPrintNumber]CPNumber="bP@") | ([ColorPrintNumber]CPNumber="XP@") | ([ColorPrintNumber]CPNumber="XbP@")
+	[ColorPrintNumber]Placement:=True
+End if 

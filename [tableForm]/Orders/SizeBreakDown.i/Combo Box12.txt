@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$i)
+C_POINTER($size)
+
+Case of 
+	: ([Orders]BDHeaderKey>0)
+		WinChoice ("Changing breakdown headers will reset the size breakdowns.";"Continue";"Stop")
+		If (ok=1)
+			[Orders]BDHeaderKey:=0
+			SAVE RECORD([Orders])
+			
+			$n:=1
+			FIRST RECORD([OrdersBreakdowns])
+			For ($n;1;Size of array(alBDSelfKeys))
+				[OrdersBreakdowns]SelfKey:=-1*[OrdersBreakdowns]SelfKey
+				SAVE RECORD([OrdersBreakdowns])
+				NEXT RECORD([OrdersBreakdowns])
+			End for 
+			Order_BuildBD (-9)
+		Else 
+			asBreakdowns:=1
+		End if 
+	: (asBreakdowns{asBreakdowns}="Add Breakdown")
+		OBJECT SET VISIBLE(bSaveBD;True)
+		$i:=1
+		For ($i;1;12)
+			$size:=Get pointer("vsSize"+String($i))
+			$size->:=""
+			OBJECT SET VISIBLE($size->;True)
+		End for 
+		asBreakdowns:=1
+	: (asBreakdowns>1)
+		Order_BuildBD (-9)
+		
+End case 

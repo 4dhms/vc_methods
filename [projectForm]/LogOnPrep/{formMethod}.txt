@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($range)
+C_LONGINT($m;$d)
+C_TEXT($y)
+
+Case of 
+	: (Form event=On Load)
+		
+		Array_BuildDates 
+		ARRAY TEXT(<>asStartYear;0)
+		APPEND TO ARRAY(<>asStartYear;String(Year of(Current date(*))))
+		APPEND TO ARRAY(<>asStartYear;String(Year of(Current date(*))-1))
+		ARRAY TEXT(<>asEndYear;0)
+		APPEND TO ARRAY(<>asEndYear;String(Year of(Current date(*))))
+		APPEND TO ARRAY(<>asEndYear;String(Year of(Current date(*))-1))
+		
+		$range:=Current date(*)-14
+		$m:=Month of($range)
+		$d:=Day of($range)
+		$y:=String(Year of($range))
+		vsRecInSelection:=""
+		
+		Array_BuildDays ("Start";$m)
+		<>asStartMonth:=$m
+		<>asStartDay:=$d
+		<>asStartYear:=Find in array(<>asStartYear;$y)
+		If (Day of(Current date(*))=1)
+			<>asEndDay:=Day of(Current date(*)-1)
+			<>asEndMonth:=Month of(Current date(*)-1)
+		Else 
+			<>asEndDay:=Day of(Current date(*)-1)
+			<>asEndMonth:=Month of(Current date(*))
+		End if 
+		<>asEndYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+		
+		  //If (User in group(Current user;"LogOn"))
+		  //OBJECT SET VISIBLE(bHide;True)
+		  //OBJECT SET VISIBLE(cbAll;True)
+		  //End if 
+		  //cb11:=1
+		  //pOne:=0
+		  //pTwo:=1
+		cbDay1:=1
+		
+	: (Form event=On Outside Call)
+		vlProgress:=<>vlCounter
+		
+	: (Form event=On Unload)
+		UNLOAD RECORD([Orders])
+		CLEAR SET("changed")
+		CLEAR SET("full")
+End case 

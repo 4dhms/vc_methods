@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual@")
+vlShipQty:=0
+
+$i:=1
+FIRST RECORD([CostSheets])
+For ($i;1;Records in selection([CostSheets]))
+	vlShipQty:=vlShipQty+[CostSheets]ActualUnitsShipped
+	NEXT RECORD([CostSheets])
+End for 
+vlShipAmt:=vlShipQty*vNetUnitPrc
+vlShipQtySub:=vlShipQtySub+vlShipQty
+vlShipQtyTot:=vlShipQtyTot+vlShipQty
+vlShipQtyGross:=vlShipQtyGross+vlShipQty
+vlShipAmtSub:=vlShipAmtSub+vlShipAmt
+vlShipAmtTot:=vlShipAmtTot+vlShipAmt
+vlShipAmtGross:=vlShipAmtGross+vlShipAmt
+
+vlInvQtySub:=vlInvQtySub+vlInvQty
+vlInvQtyTot:=vlInvQtyTot+vlInvQty
+vlInvQtyGross:=vlInvQtyGross+vlInvQty
+vlInvAmtSub:=vlInvAmtSub+vlInvAmt
+vlInvAmtTot:=vlInvAmtTot+vlInvAmt
+vlInvAmtGross:=vlInvAmtGross+vlInvAmt
+
+UNLOAD RECORD([CostSheets])
+UNLOAD RECORD([Invoices])
+UNLOAD RECORD([Costing])

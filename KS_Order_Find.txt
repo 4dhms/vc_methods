@@ -1,0 +1,73 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderNumber)
+C_TEXT(vtQFactory)
+
+Case of 
+	: (vsQOrderNumber="") & (vsQStyle="") & (vsQDesign="") & (vtQFactory="") & (vdStart=!00-00-00!) & (vdEnd=!00-00-00!)
+		WinPrompt ("There is no search criteria.")
+	: (vsQDesign="unique")
+		Order_UniqueDN 
+	Else 
+		CREATE SET([Orders];"LastFound")
+		If (vAddto=1)
+			CREATE SET([Orders];"Base")
+		End if 
+		
+		Case of 
+			: (c2=1) & (vdStart#!00-00-00!) & (vdEnd#!00-00-00!)
+				QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+				QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+			: (c1=1) & (vdStart#!00-00-00!) & (vdEnd#!00-00-00!)
+				QUERY([Orders];[Orders]ShipDateFactory>=vdStart;*)
+				QUERY([Orders]; & ;[Orders]ShipDateFactory<=vdEnd)
+			: (c2=1) & (vdStart#!00-00-00!) & (vdEnd=!00-00-00!)
+				QUERY([Orders];[Orders]CancelDate>=vdStart)
+			: (c1=1) & (vdStart#!00-00-00!) & (vdEnd#!00-00-00!)
+				QUERY([Orders];[Orders]ShipDateFactory>=vdStart)
+			: (c2=1) & (vdEnd=!00-00-00!)
+				QUERY([Orders];[Orders]CancelDate<=vdStart)
+			: (c1=1) & (vdEnd#!00-00-00!)
+				QUERY([Orders];[Orders]ShipDateFactory<=vdStart)
+			Else 
+				ALL RECORDS([Orders])
+		End case 
+		
+		Case of 
+			: (vsQOrderNumber#"")
+				$orderNumber:=Num(vsQOrderNumber)
+				QUERY SELECTION([Orders];[Orders]OrderNum=$orderNumber)
+			: (vsQStyle#"")
+				QUERY SELECTION([Orders];[Orders]StyleNumber=vsQStyle)
+			: (vsQDesign#"")
+				QUERY SELECTION([Orders];[Orders]DesignNumber=vsQDesign)
+			: (vtQFactory#"")
+				QUERY SELECTION([Orders];[Orders]Factory=vtQFactory)
+		End case 
+		
+		If (cbSpec=1)
+			KS_Order_FindSpec 
+			cbSpec:=0
+		End if 
+		
+		If (vAddto=1)
+			CREATE SET([Orders];"Added")
+			CREATE EMPTY SET([Orders];"New")
+			UNION("Base";"Added";"New")
+			USE SET("New")
+			CLEAR SET("New")
+			CLEAR SET("Added")
+			CLEAR SET("Base")
+		End if 
+End case 
+
+p_SetWindowHMS 
+
+vsQOrderNumber:=""
+vsQStyle:=""
+vsQDesign:=""
+vtQFactory:=""
+vdEnd:=!00-00-00!
+vdStart:=!00-00-00!
+ORDER BY([Orders];[Orders]OrderNum;<)
+
+

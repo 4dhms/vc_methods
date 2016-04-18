@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (vlColSlider>0)
+	FIRST RECORD([SpecLibGrade])
+	$i:=1
+	
+	For ($i;1;Records in selection([SpecLibGrade]))
+		Grade_UpdateLine 
+		NEXT RECORD([SpecLibGrade])
+	End for 
+End if 

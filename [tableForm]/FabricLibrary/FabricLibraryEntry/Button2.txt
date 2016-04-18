@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cbKnit:=0
+cbWoven:=0
+cbCutSew:=0
+OBJECT SET VISIBLE(bBack;True)
+FORM GOTO PAGE(2)

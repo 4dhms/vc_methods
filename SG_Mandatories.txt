@@ -1,0 +1,62 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_LONGINT($order)
+
+  //Samples_ProcessChanges 
+Rev_HarvestChanges (3)
+
+$order:=-1*[Samples]SampleNumber
+QUERY([SpecFactory];[SpecFactory]OrderNumber=$order)
+If (Records in selection([SpecFactory])>0)
+	[Samples]SpecSheet:=True
+End if 
+
+If (Not([Samples]NoOrder))
+	
+	
+	Case of 
+		: (Current user="Designer") & (Shift down)
+			$continue:=True
+		: ([Samples]KWCnS="")
+			KWCS 
+			Sample_RequiredFlag 
+		: ([Samples]SeasonName="") & ([Samples]Retired="")
+			WinPrompt ("Enter SEASON for Sample garments.")
+			$continue:=False
+		: ([Samples]SeasonYear="") & ([Samples]Retired="")
+			WinPrompt ("Enter SEASON YEAR for Sample garments.")
+			$continue:=False
+		: ([Samples]Customer="")
+			WinPrompt ("Enter CUSTOMER for Sample garment.")
+			$continue:=False
+		: ([Samples]Sam Type="")
+			WinPrompt ("Enter SAMPLE TYPE for Sample garment.")
+			$continue:=False
+		: (Record number([Samples])>0)
+			$continue:=True
+		Else 
+			$continue:=True
+	End case 
+Else 
+	  //Orders_CalcQty 
+	$continue:=True
+End if 
+
+If (Not([Samples]DivisionOverride))
+	[Samples]SampleDivision:=[Designs]DivisionCodeN
+End if 
+
+If (FORM Get current page>3)
+	SAVE RECORD([Costing])
+	SAVE RECORD([CostSheets])
+End if 
+
+If ($continue)
+	If (Application type=0)
+		  //do nothing, running standalone
+	Else 
+		Pix_Save 
+	End if 
+End if 
+
+$0:=$continue

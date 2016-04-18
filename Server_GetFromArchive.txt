@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($archiveNumber)
+C_TEXT($picturePath)
+C_BOOLEAN($done)
+C_TIME($startTime)
+
+Repeat 
+Until (Not(Semaphore("UpdatePict")))
+  /// So this function kinda sucks and its slow - Anthony 
+If (Semaphore("UpdatePict"))
+Else 
+	$archiveNumber:=$1
+	$picturePath:=Archive_Folder ($archiveNumber)
+	$startTime:=Current time(*)
+	Repeat 
+		QUERY([Designs];[Designs]ArchiveNumber=$archiveNumber)
+		If (Current time-$startTime>?00:00:05?) | (Not(Locked([Designs])))
+			$done:=True
+		End if 
+	Until ($done)
+	
+	READ PICTURE FILE($picturePath;[Designs]Sketch)
+	[Designs]ArchivedPict:=False
+	SAVE RECORD([Designs])
+	UNLOAD RECORD([Designs])
+	CLEAR SEMAPHORE("UpdatePict")
+End if 

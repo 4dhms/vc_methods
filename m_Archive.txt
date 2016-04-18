@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlArchive)
+
+Case of 
+	: (<>vlArchive>0)
+		SHOW PROCESS(<>vlArchive)
+		BRING TO FRONT(<>vlArchive)
+	: (<>vlArchive=0)
+		<>vlArchive:=New process("p_Archive";0;"Archive")
+	Else 
+		SHOW PROCESS(<>vlArchive)
+		BRING TO FRONT(<>vlArchive)
+End case 

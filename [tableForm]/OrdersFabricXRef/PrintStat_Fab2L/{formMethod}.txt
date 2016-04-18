@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfShow)
+
+Case of 
+	: (Form event=On Printing Detail)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[OrdersFabricXRef]OrderNumber)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType=[OrdersFabricXRef]OrdType)
+		QUERY([FabricOrders];[FabricOrders]FabOrderKey=[CP_OrderXRef]FabOrderKey)
+		OBJECT SET VISIBLE([FabricOrders]ReqDeliveryDate;[FabricOrders]ReqDeliveryDate#!00-00-00!)
+		OBJECT SET VISIBLE([FabricOrders]FinalDelivery;[FabricOrders]FinalDelivery#!00-00-00!)
+		OBJECT SET VISIBLE([FabricOrders]ShippedDate;Not([FabricOrders]ShippedDate=!00-00-00!))
+		
+		If ([OrdersFabricXRef]OrdType="Trim")
+			OBJECT SET VISIBLE(*;"xDiv";Not(vfShow))
+			vfShow:=True
+		Else 
+			OBJECT SET VISIBLE(*;"xDiv";False)
+		End if 
+		
+		If ([OrdersFabricXRef]FabricName="")
+			vtFullName:=[FabricOrders]ItemName
+		Else 
+			vtFullName:=[OrdersFabricXRef]FabricName
+			If ([OrdersFabricXRef]FiberContent#"")
+				vtFullName:=vtFullName+"  -  "+[OrdersFabricXRef]FiberContent
+			End if 
+			If ([OrdersFabricXRef]Treatment#"")
+				vtFullName:=vtFullName+" - "+[OrdersFabricXRef]Treatment
+			End if 
+			
+			If ([FabricOrders]VendorName#"")
+				vtVendor:=[FabricOrders]VendorName
+			Else 
+				vtVendor:=[OrdersFabricXRef]FabSupplier
+			End if 
+		End if 
+		
+End case 

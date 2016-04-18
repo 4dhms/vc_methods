@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfEdit:=False
+
+vsPart1:=""
+vsPart2:=""
+vsPart3:=""
+asOrderNumbers:=0
+
+FabPO_EditOrder 
+If (Records in selection([OrdersFabricXRef])=1)
+	vsOrders:="1 Related Order:"
+Else 
+	vsOrders:=String(Size of array(asOrderNumbers))+" Related Orders:"
+End if 

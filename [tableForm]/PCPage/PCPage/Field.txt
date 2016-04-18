@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($old;$new)
+
+$old:=Old([PCPage]Print1)
+$new:=[PCPage]Print1
+
+If (Form event=On Data Change)
+	PrintCat_GetPix (1;[PCPage]Print1)
+	  //Case of 
+	  //: ($old="") & ($old#"")
+	  //vDesc:="added"
+	  //CP_NumberUpdateAdd 
+	  //: ($old#"") & ($old#$new)
+	  //vDesc:="changed"
+	  //CP_NumberUpdateAdd 
+	  //End case 
+End if 

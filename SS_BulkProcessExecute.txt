@@ -1,0 +1,36 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($newFactoryKey;$oldFactoryKey;$i)
+$oldFactoryKey:=[SpecFactory]SF_KeyNumber
+
+If (SS_ApproveConfirm )
+	
+	$i:=1
+	For ($i;1;Size of array(alMakeSheet))
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=alMakeSheet{$i})
+		If (Records in selection([SpecFactory])>0)
+			[SpecFactory]OrderNumber:=[SpecFactory]OrderNumber*100
+			SAVE RECORD([SpecFactory])
+		End if 
+		
+		USE SET("ThisSpecSheet")
+		$newFactoryKey:=SS_BatchFactory (alMakeSheet{$i};afApproved{$i})
+		SS_BatchLines ($oldFactoryKey;$newFactoryKey)
+	End for 
+	
+	
+	For ($i;1;Size of array(alApproveSheet))
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=alApproveSheet{$i})
+		If (Records in selection([SpecFactory])>0) & (Not([SpecFactory]ApprovedForProd))
+			[SpecFactory]ApprovedForProd:=True
+			[SpecFactory]ApproveDate:=Current date(*)
+			SAVE RECORD([SpecFactory])
+		End if 
+		If (cbAdd=1)
+			ssNewSample:=0
+			SS_AddBatchCol 
+		End if 
+	End for 
+	
+	UNLOAD RECORD([Orders])
+	ACCEPT
+End if 

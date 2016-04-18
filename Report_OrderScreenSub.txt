@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vlReportQuantBD:=alQuantity{alQuantity}
+vrRptNetSalesBD:=arNetSales{arNetSales}
+vrRptNetProfitBD:=arNetProfit{arNetProfit}
+vrRptSpecDiscBD:=arSpecialDiscount{arSpecialDiscount}
+vrRptNetNetSalesBD:=arNetNetSales{arNetNetSales}
+vrRptNetNetProfitBD:=arNetProfit{arNetProfit}
+vrRptAvgNetMarkUpBD:=Round((vrRptNetProfitBD/vrRptNetSalesBD)*100;1)
+vrRptAvgNetNetMarkUpBD:=Round((vrRptNetNetProfitBD/vrRptNetSalesBD)*100;1)

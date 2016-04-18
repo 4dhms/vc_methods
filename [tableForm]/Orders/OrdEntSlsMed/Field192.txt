@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE([Designs]DivisionCodeN;Not([Orders]DivisionOverride))
+OBJECT SET VISIBLE([Orders]OrderDivision;([Orders]DivisionOverride))
+
+
+If ([Orders]DivisionOverride)
+	GOTO OBJECT([Orders]OrderDivision)
+Else 
+	If ([Orders]DesignNumber=[Designs]DesignNum)
+		[Orders]OrderDivision:=[Designs]DivisionCodeN
+	End if 
+End if 
+Rev_LogEvent ("Division Router";vtOldData;vtNewData)
+

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(asList3))
+	QUERY([ColorConverter];[ColorConverter]CPOrdID=alColorKey{$i})
+	If (Records in selection([ColorConverter])=0)
+		CREATE RECORD([ColorConverter])
+		[ColorConverter]CPOrdID:=alColorKey{$i}
+	End if 
+	[ColorConverter]Self:=asList1{$i}
+	[ColorConverter]Combo1:=asList2{$i}
+	[ColorConverter]StockName:=asList3{$i}
+	SAVE RECORD([ColorConverter])
+End for 
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[CP_OrderXRef]OrderNumber)
+QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+DL_PullColors (False)
+
+
+ACCEPT

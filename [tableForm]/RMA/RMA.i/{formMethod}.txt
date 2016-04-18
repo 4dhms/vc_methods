@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If (Is new record([RMA]))
+		[RMA]RMAkey:=Sequence number([RMA])-11776
+		[RMA]RMAdate:=Current date(*)
+		[RMA]StoreID:=vlRMAStoreKey
+		QUERY([ReturnStores];[ReturnStores]StoreID=[RMA]StoreID)
+	Else 
+		If ([RMA]StoreID>0)
+			QUERY([ReturnStores];[ReturnStores]StoreID=[RMA]StoreID)
+		Else 
+			QUERY([ReturnStores];[ReturnStores]StoreID=vlRMAStoreKey)
+		End if 
+		If ([RMA]ShipBack)
+			cb1:=0
+		Else 
+			cb1:=1
+		End if 
+		If ([RMA]Credit)
+			cb2:=0
+		Else 
+			cb2:=1
+		End if 
+		If (Position(" ";[ReturnStores]StoreEmail)>0)
+			[ReturnStores]StoreEmail:=Replace string([ReturnStores]StoreEmail;" ";"")
+		End if 
+	End if 
+End if 
+

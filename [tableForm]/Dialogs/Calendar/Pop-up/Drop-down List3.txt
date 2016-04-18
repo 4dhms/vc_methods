@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asGroups{asGroups}="Sales")
+		vfAll:=False
+	: (asGroups{asGroups}="Designs")
+		vfAll:=False
+	: (asGroups{asGroups}="Other")
+		vfAll:=False
+	: (asGroups{asGroups}="All")
+		vfAll:=True
+End case 
+User_List 
+Cal_FindSched 

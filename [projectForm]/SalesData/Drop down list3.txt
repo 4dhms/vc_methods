@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsSeason)
+
+If (<>asDN>0)
+	vsStyleNumber:=<>asDN{<>asDN}
+	ARRAY TEXT(asColors;0)
+	SLR_Get 
+End if 

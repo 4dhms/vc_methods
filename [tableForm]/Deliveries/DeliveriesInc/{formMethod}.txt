@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If ([Deliveries]FabOrderKey=0)
+		[Deliveries]FabOrderKey:=[FabricOrders]FabOrderKey
+		[Deliveries]DeliveryDate:=Current date
+	End if 
+End if 

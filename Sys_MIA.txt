@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$first;$low;$high)
+C_DATE($range)
+C_TEXT($message)
+
+ARRAY LONGINT($orders;0)
+
+$range:=Current date(*)-180
+
+QUERY([Orders];[Orders]CancelDate>$range)
+ORDER BY([Orders];[Orders]OrderNum;>)
+$low:=[Orders]OrderNum
+ORDER BY([Orders];[Orders]OrderNum;<)
+$high:=[Orders]OrderNum
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber>=$low)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber<=$high)
+
+DISTINCT VALUES([OrdersFabricXRef]OrderNumber;$orders)
+SORT ARRAY($orders;>)
+
+ARRAY LONGINT($mia;0)
+
+For ($i;1;Size of array($orders))
+	QUERY([Orders];[Orders]OrderNum=$orders{$i})
+	Case of 
+		: ($orders{$i}=96192)
+		: ($orders{$i}=94520)
+		: ($orders{$i}=94352)
+		: ($orders{$i}=83483)
+		: ($orders{$i}=108852)
+		: (Records in selection([Orders])=0)
+			APPEND TO ARRAY($mia;$orders{$i})
+	End case 
+End for 
+
+SORT ARRAY($mia;<)
+
+If (Size of array($mia)>0)
+	
+	$message:=""
+	$i:=1
+	For ($i;1;Size of array($mia))
+		If ($i>1)
+			$message:=$message+", "
+		End if 
+		$message:=$message+String($mia{$i})
+	End for 
+	
+	If (Size of array($mia)=1)
+		$message:="The following PO has gone missing: "+$message
+	Else 
+		$message:="The following POs have gone missing: "+$message
+	End if 
+	
+	ARRAY TEXT(asSubCC;0)
+	APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+	
+	Mail_SimpleSend ("List";"None";"MIA";$message)
+End if 

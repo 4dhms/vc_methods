@@ -1,0 +1,98 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($lineKey;$lineKey)
+Case of 
+	: ($1<0)
+		CREATE SET([Sizes];"SizeSet")
+		$lineKey:=-1*[SpecFactory]SF_KeyNumber
+		QUERY([Sizes];[Sizes]SF_KeyNumber=$lineKey)
+		Case of 
+			: ($2="1")
+				[Sizes]Size1:=$3
+			: ($2="2")
+				[Sizes]Size2:=$3
+			: ($2="3")
+				[Sizes]Size3:=$3
+			: ($2="4")
+				[Sizes]Size4:=$3
+			: ($2="5")
+				[Sizes]Size5:=$3
+			: ($2="6")
+				[Sizes]Size6:=$3
+			: ($2="7")
+				[Sizes]Size7:=$3
+			: ($2="8")
+				[Sizes]Size8:=$3
+			: ($2="9")
+				[Sizes]Size9:=$3
+			: ($2="10")
+				[Sizes]Size10:=$3
+			: ($2="11")
+				[Sizes]Size11:=$3
+			: ($2="12")
+				[Sizes]Size12:=$3
+		End case 
+		SAVE RECORD([Sizes])
+		USE SET("SizeSet")
+		ORDER BY([Sizes];[Sizes]SortOrder;>)
+		CLEAR SET("SizeSet")
+	: ($2="Rec") | ($2="Sub") | ($2="Head") | ($2="pat") | ($2="comment") | ($2="comment2")
+		SAVE RECORD([SpecLineSample])
+		CREATE SET([SpecLineSample];"base")
+		
+		QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		QUERY SELECTION([SpecLineSample];[SpecLineSample]ColumnNumber=$1)
+		Case of 
+			: ($2="Rec")
+				[SpecLineSample]Received:=Date($3)
+			: ($2="Sub")
+				[SpecLineSample]SubmitDue:=Date($3)
+			: ($2="Head")
+				[SpecLineSample]ColumnHeader:=$3
+			: ($2="pat")
+				[SpecLineSample]PatternSource:=$3
+				  //: ($2="comment")
+				  //[SpecLineSample]Comments:=$3
+			: ($2="comment2")
+				[SpecLineSample]Comments:=$3
+		End case 
+		SAVE RECORD([SpecLineSample])
+		USE SET("base")
+		CLEAR SET("base")
+	Else 
+		QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey)
+		QUERY SELECTION([SpecLineCols];[SpecLineCols]ColumnNumber=$1)
+		
+		If (Records in selection([SpecLineCols])=0)
+			CREATE RECORD([SpecLineCols])
+			[SpecLineCols]SpecLineKey:=[SpecSheetLines]SpecLineKey
+			[SpecLineCols]ColumnNumber:=$1
+		End if 
+		Case of 
+			: ($2="A")
+				[SpecLineCols]SpecA:=$3
+			: ($2="B")
+				[SpecLineCols]SpecB:=$3
+			: ($2="C")
+				[SpecLineCols]SpecC:=$3
+		End case 
+		SAVE RECORD([SpecLineCols])
+		
+		  //If (Records in set("SampCols")>0)
+		  //USE SET("SampCols")
+		  //Else 
+		  //QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		  //End if 
+		  //QUERY SELECTION([SpecLineSample];[SpecLineSample]ColumnNumber=Abs($1))
+		
+		  //Case of 
+		  //: ($2="Note")
+		  //[SpecLineSample]Comments:=$3
+		  //: ($2="ColHead")
+		  //[SpecLineSample]ColumnHeader:=$3
+		  //: ($2="Received")
+		  //[SpecLineSample]Received:=Date($3)
+		  //: ($2="Submit")
+		  //[SpecLineSample]SubmitDue:=Date($3)
+		  //End case 
+		SAVE RECORD([SpecLineSample])
+End case 

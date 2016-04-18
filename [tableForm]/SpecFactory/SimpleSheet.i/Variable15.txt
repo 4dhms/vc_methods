@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($nextPage)
+QUERY([SpecPix];[SpecPix]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+CREATE SET([SpecPix];"ComPix")
+
+If (Records in set("ComPix")%4=0) & (Records in set("ComPix")>0) & (Size of array(aSketch)>3)
+	$nextPage:=True
+End if 
+If ($nextPage)
+	vlTrimRouter:=vlTrimRouter+4
+	vlPixPos:=vlPixPos+4
+End if 
+
+Picture_Put 

@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCustomer)
+C_TEXT(vsSeason)
+
+QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=vsStyleNumber)
+If (Records in selection([StyleNumberGen])>0)
+	QUERY([Designs];[Designs]DesignNum=[StyleNumberGen]DesignNumber)
+Else 
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+End if 
+
+vxSketch:=[Designs]Sketch
+OBJECT SET VISIBLE(vxSketch;True)
+vtTitle:=[Designs]Description
+If ([SLRAcct]Combo)
+	SLR_BuildComboPulldown 
+Else 
+	SLR_BuildCPulldown 
+End if 
+
+Case of 
+	: ([SLRAcct]Classification="")
+		atFabrication:=1
+	: (Find in array(atFabrication;[SLRAcct]Classification)>0)
+		atFabrication:=Find in array(atFabrication;[SLRAcct]Classification)
+End case 
+  //QUERY([SLRAcct];[SLRAcct]SLRAcct=vsCustomer;*)
+  //QUERY([SLRAcct]; & ;[SLRAcct]Division=vsDivision;*)
+  //QUERY([SLRAcct]; & ;[SLRAcct]SLRStyleNumber=vsStyleNumber)
+
+Case of 
+	: (Records in selection([SLRAcct])=0)
+		vfNew:=True
+		QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart<=Current date(*);*)
+		QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkEnd>=Current date(*))
+		vdWeekOne:=[SLRWkLibrary]WkEnd-7
+		
+	: (Records in selection([SLRAcct])=1)
+		  //If ([SLRAcct]WeekOne=!00/00/00!)
+		  //RELATE MANY SELECTION([SLRColor]SLRAcctKey)
+		  //RELATE MANY SELECTION([SLRWks]SLRColorKey)
+		  //QUERY SELECTION([SLRWks];[SLRWks]SLRWkEnd#!00/00/00!)
+		  //ORDER BY([SLRWks];[SLRWks]SLRWkEnd;>)
+		  //[SLRAcct]WeekOne:=[SLRWks]SLRWkEnd
+		  //SAVE RECORD([SLRAcct])
+		  //End if 
+		
+		vfNew:=False
+		vdWeekOne:=[SLRAcct]WeekOne
+		vsCustomer:=[SLRAcct]SLRAcct
+		If (vsSeason#"")
+			FORM GOTO PAGE(2)
+		End if 
+		SLR_ColorWeeks (False)
+		  //Else 
+		  //vfNew:=False
+End case 
+  //End if 
+If (vsCustomer="Macy@")
+	INSERT IN ARRAY(asColors;1;1)
+	asColors{1}:="All Colors"
+End if 
+asColors:=1

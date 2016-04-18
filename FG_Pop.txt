@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY TEXT($hz;0)
+ARRAY TEXT($sz;0)
+
+LIST TO ARRAY("FactoriesHZ";$hz)
+LIST TO ARRAY("FactoriesSZ";$sz)
+
+$i:=1
+For ($i;1;Size of array($hz))
+	QUERY([Lists];[Lists]ListName="FactoriesHZ";*)
+	QUERY([Lists]; & ;[Lists]ListItem=$hz{$i})
+	If (Records in selection([Lists])=0)
+		CREATE RECORD([Lists])
+		[Lists]ListName:="FactoriesHZ"
+		[Lists]ListItem:=$hz{$i}
+		[Lists]UserName:="system"
+		SAVE RECORD([Lists])
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array($sz))
+	QUERY([Lists];[Lists]ListName="FactoriesSZ";*)
+	QUERY([Lists]; & ;[Lists]ListItem=$sz{$i})
+	If (Records in selection([Lists])=0)
+		CREATE RECORD([Lists])
+		[Lists]ListName:="FactoriesZ"
+		[Lists]ListItem:=$sz{$i}
+		[Lists]UserName:="system"
+		SAVE RECORD([Lists])
+	End if 
+End for 
+

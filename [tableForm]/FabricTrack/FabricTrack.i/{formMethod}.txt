@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY LONGINT(alPOrder;0)
+		ARRAY TEXT(asPStyle;0)
+		ARRAY TEXT(asPDesign;0)
+		ARRAY DATE(adPCancel;0)
+		ARRAY REAL(arConsumption;0)
+		ARRAY TEXT(asPArticle;0)
+		ARRAY TEXT(asSArticle;0)
+		ARRAY LONGINT(alSOrder;0)
+		ARRAY TEXT(asSStyle;0)
+		ARRAY TEXT(asSDesign;0)
+		ARRAY DATE(adSCancel;0)
+		ARRAY TEXT(asPPO;0)
+		ARRAY TEXT(asSPO;0)
+		ARRAY TEXT(asMOrder;0)
+		FabricTrack_ArrayInit (0)
+		ARRAY BOOLEAN(afAllShip;0)
+		
+		If (Not(Is new record([FabricTrack])))
+			vtArticleNumber:=[FabricTrack]ArticleNumber
+			FabricTrack_SetUp 
+			FabricTrack_Build 
+		Else 
+			FabricTrack_SetUp 
+			[FabricTrack]ArticleNumber:=vtArticleNumber
+			[FabricTrack]SheetName:=vtArticleNumber
+			[FabricTrack]TrackKey:=Sequence number([FabricTrack])
+			FORM GOTO PAGE(2)
+		End if 
+		
+	: (Form event=On Unload)
+		UNLOAD RECORD([FabricTrack])
+		
+		
+End case 

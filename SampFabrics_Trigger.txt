@@ -1,0 +1,45 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL(vTotal1)
+C_REAL(vTotal2)
+C_REAL(vTotal3)
+C_REAL(vTotal4)
+C_REAL(vTotal5)
+C_REAL(vTotal6)
+C_REAL(vTotal7)
+C_REAL(vTotal8)
+C_REAL(vTotal9)
+C_REAL(vTotal10)
+C_REAL(vTotal11)
+C_REAL(vTotal12)
+C_REAL(vTotal13)
+C_REAL(vTotal14)
+C_REAL(vTotal15)
+C_LONGINT($i)
+C_POINTER($tot)
+
+
+  //
+
+vTotal1:=[SampleFabrics]Sam Fab Qty 1*[SampleFabrics]SamFab UntPrc 1
+vTotal2:=[SampleFabrics]Sam Fab Qty 2*[SampleFabrics]SamFab UntPrc 2
+vTotal3:=[SampleFabrics]Sam Fab Qty 3*[SampleFabrics]SamFab UntPrc 3
+vTotal4:=[SampleFabrics]Sam Fab Qty 4*[SampleFabrics]SamFab UntPrc 4
+vTotal5:=[SampleFabrics]Sam Fab Qty 5*[SampleFabrics]SamFab UntPrc 5
+vTotal6:=[SampleFabrics]Sam Fab Qty 6*[SampleFabrics]SamFab UntPrc 6
+vTotal7:=[SampleFabrics]Sam Fab Qty 7*[SampleFabrics]SamFab UntPrc 7
+vTotal8:=[SampleFabrics]Sam Fab Qty 8*[SampleFabrics]SamFab UntPrc 8
+vTotal9:=[SampleFabrics]Sam Fab Qty 9*[SampleFabrics]SamFab UntPrc 9
+vTotal10:=[SampleFabrics]Sam Fab Qty 10*[SampleFabrics]SamFab UntPrc10
+vTotal11:=[SampleFabrics]Sam Fab Qty 11*[SampleFabrics]SamFab UntPrc11
+vTotal12:=[SampleFabrics]Sam Fab Qty 12*[SampleFabrics]SamFab UntPrc12
+vTotal13:=[SampleFabrics]Sam Fab Qty 13*[SampleFabrics]SamFab UntPrc13
+vTotal14:=[SampleFabrics]Sam Fab Qty 14*[SampleFabrics]SamFab UntPrc14
+vTotal15:=[SampleFabrics]Sam Fab Qty 15*[SampleFabrics]SamFab UntPrc15
+vQtyTtSF1:=[SampleFabrics]Sam Fab Qty 1+[SampleFabrics]Sam Fab Qty 2+[SampleFabrics]Sam Fab Qty 3+[SampleFabrics]Sam Fab Qty 4+[SampleFabrics]Sam Fab Qty 5+[SampleFabrics]Sam Fab Qty 6+[SampleFabrics]Sam Fab Qty 7+[SampleFabrics]Sam Fab Qty 8+[SampleFabrics]Sam Fab Qty 9+[SampleFabrics]Sam Fab Qty 10+[SampleFabrics]Sam Fab Qty 11+[SampleFabrics]Sam Fab Qty 12+[SampleFabrics]Sam Fab Qty 13+[SampleFabrics]Sam Fab Qty 14+[SampleFabrics]Sam Fab Qty 15
+vQtyTotSF:=vTotal1+vTotal2+vTotal3+vTotal4+vTotal5+vTotal6+vTotal7+vTotal8+vTotal9+vTotal10+vTotal11+vTotal12+vTotal13+vTotal14+vTotal15
+
+$i:=1
+For ($i;1;15)
+	$tot:=Get pointer("vTotal"+String($i))
+	OBJECT SET VISIBLE($tot->;$tot->>0)
+End for 

@@ -1,0 +1,21 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i)
+C_TEXT($path)
+
+ARRAY TEXT(asUsers;0)
+ARRAY LONGINT(alUserID;0)
+GET USER LIST(asUsers;alUserID)
+
+  //$docref:=Create document("";"txt")
+  //$path:=Document
+  //
+  //If (ok=1)
+  //SORT ARRAY(asUsers;>)
+  //$i:=1
+  //For ($i;1;Size of array(asUsers))
+  //SEND PACKET($docref;asUsers{$i}+Char(13))
+  //End for 
+  //CLOSE DOCUMENT($docref)
+  //SHOW ON DISK($path)
+  //End if 

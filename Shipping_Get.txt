@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsDestination)
+C_TEXT(vsMethod)
+C_BOOLEAN($0;$run)
+C_TEXT($shiptest)
+
+$shipTest:=Replace string([Orders]ShipInfo;"Air to ";"")
+$shipTest:=Replace string($shipTest;"Sea to ";"")
+$shipTest:=Replace string($shipTest;"LDP at ";"")
+
+Case of 
+	: (Length($shipTest)<2)
+		$run:=True
+	: (Not([Orders]ShipAir)) & (Not([Orders]ShipSea)) & (Not([Orders]ShipLDP)) & (Not([Orders]ShipFOB))
+		$run:=True
+	Else 
+		$run:=False
+End case 
+
+If ($run)
+	Center Window (200;180;1;"")
+	DIALOG([Dialogs];"Shipping.i")
+	CLOSE WINDOW
+	
+	If (ok=1)
+		Case of 
+			: (cbAir=1)
+				vsMethod:="Air"
+			: (cbSea=1)
+				vsMethod:="Sea"
+			: (cbLDP=1)
+				vsMethod:="LDP"
+			: (cbFOB=1)
+				vsMethod:="FOB"
+		End case 
+		
+		Case of 
+			: (b1=1)
+				vsDestination:="NY"
+			: (b2=1)
+				vsDestination:="LA"
+			: (b3=1)
+				vsDestination:="Other"
+		End case 
+		Order_RecordShip 
+	Else 
+		WinPrompt ("A shipping method is mandatory.")
+		$0:=False
+	End if 
+Else 
+	$0:=True
+End if 
+

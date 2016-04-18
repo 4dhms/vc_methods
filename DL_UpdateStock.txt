@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($seasonname;$seasonyear)
+C_LONGINT($i)
+
+ARRAY LONGINT($orders;0)
+ARRAY LONGINT($dlord;0)
+
+$i:=1
+FIRST RECORD([DesignLineIncluded])
+For ($i;1;Records in selection([DesignLineIncluded]))
+	If ([DesignLineIncluded]OrderNumber=0)
+		QUERY([Orders];[Orders]StyleNumber=[DesignLineIncluded]StyleNumber;*)
+		QUERY([Orders]; & ;[Orders]DesignNumber=[DesignLineIncluded]DesignNumber)
+		
+		If (Records in selection([Orders])=1)
+			[DesignLineIncluded]OrderNumber:=[Orders]OrderNum
+			SAVE RECORD([DesignLineIncluded])
+		End if 
+	End if 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[DesignLineIncluded]OrderNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	DL_PullColors (False)
+	NEXT RECORD([DesignLineIncluded])
+End for 
+
+$seasonyear:=String(Num([DesignLines]Season))
+$seasonname:=Replace string([DesignLines]Season;" "+$seasonyear;"")
+
+QUERY([Orders];[Orders]Customer="Stock";*)
+  //QUERY([Orders]; | [Orders]Stock=True;*)
+  //QUERY([Orders]; & [Orders]OffDL=False;*)
+QUERY([Orders]; & ;[Orders]SeasonName=$seasonname;*)
+QUERY([Orders]; & ;[Orders]SeasonYear=$seasonyear;*)
+QUERY([Orders]; & ;[Orders]OrderDivision=[DesignLines]Division)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]OffDL=False)
+
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+
+SELECTION TO ARRAY([DesignLineIncluded]OrderNumber;$dlord)
+
+$i:=1
+CREATE EMPTY SET([Orders];"missing")
+For ($i;1;Size of array($orders))
+	If (Find in array($dlord;$orders{$i})<1)
+		ADD TO SET([Orders];"missing")
+	End if 
+End for 
+
+
+  //ORDER BY([DesignLineIncluded];[DesignLineIncluded]SoldOut;>;[DesignLineIncluded]CancelDate;>;[DesignLineIncluded]StyleNumber;>)

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+
+  //$path:=Replace string(Application file;".app";"")
+$path:=Application file
+
+ALERT($path+"  "+String(Test path name($path)))
+
+ALERT(Document creator($path))

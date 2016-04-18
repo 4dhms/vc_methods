@@ -1,0 +1,2 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsPrintingHeader:="Printed: "+String(Current date)+"  Page: "+String(vlPage)

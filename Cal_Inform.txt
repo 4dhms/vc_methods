@@ -1,0 +1,63 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_LONGINT($i)
+
+$message:=Current user+" has included you in a meeting "
+If ([Appts]ApptWith#"")
+	$message:=$message+"with "+[Appts]ApptWith+" "
+End if 
+If (asStHour{asStHour}="Noon")
+	$message:=$message+"at Noon"
+Else 
+	$message:=$message+"at "+asStHour{asStHour}+":"+asStMin{asStMin}
+End if 
+$message:=$message+" on "+String([Appts]ApptDate)+"."
+
+If ([Appts]Notes#"")
+	$message:=$message+Char(13)+Char(13)+[Appts]Notes
+End if 
+
+ARRAY TEXT(asSubCC;0)
+If (Current user="Designer")
+	APPEND TO ARRAY(asSubCC;"Designer")
+End if 
+
+$i:=1
+For ($i;1;Size of array(asMeeting))
+	QUERY([VendorEmail];[VendorEmail]User=asMeeting{$i})
+	If (asMeeting{$i}#Current user)
+		If (Position("@";[VendorEmail]EmailAddress)>0)
+			APPEND TO ARRAY(asSubCC;[VendorEmail]EmailAddress)
+		End if 
+	End if 
+End for 
+
+If (Size of array(asSubCC)>0)
+	
+	QUERY([Spooler];[Spooler]Waiting=False;*)
+	QUERY([Spooler]; & ;[Spooler]SpoolLog=False)
+	QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+	
+	If (Records in selection([Spooler])<1) | (Locked([Spooler]))
+		CREATE RECORD([Spooler])
+	Else 
+		Spooler_ClearSprocket 
+	End if 
+	
+	[Spooler]SpoolKey:=Sequence number([Spooler])
+	<>vlMailKey:=[Spooler]SpoolKey
+	[Spooler]Waiting:=True
+	[Spooler]Attempts:=0
+	[Spooler]ReturnAddress:=<>vtMailFrom
+	[Spooler]SpoolRouter:=8
+	[Spooler]OutputChoice:=0
+	[Spooler]StatusGuide:=[Appts]ApptWith+" Meeting "+String([Appts]ApptDate)
+	[Spooler]Status:=0
+	VARIABLE TO BLOB(asSubCC;[Spooler]AddressListBlob)
+	SET BLOB SIZE([Spooler]OrderArrayBlob;0)
+	[Spooler]Genre:="Meeting notification"
+	[Spooler]SpoolMessage:=$message
+	SAVE RECORD([Spooler])
+	UNLOAD RECORD([Spooler])
+End if 
+

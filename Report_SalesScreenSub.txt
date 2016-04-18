@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If ($1=1)
+	vrRptAvgNetMarkUp:=Round((vrRptNetProfit/vrRptNetSales)*100;1)
+	vrRptAvgNetNetMarkUp:=Round((vrRptNetNetProfit/vrRptNetNetSales)*100;1)
+	vrRptSpecDisc:=vrRptNetSales-vrRptNetNetSales
+	arAvgNetMarkup{Size of array(arAvgNetMarkup)}:=vrRptAvgNetMarkUp
+	arAvgNetNetMarkup{Size of array(arAvgNetNetMarkup)}:=vrRptAvgNetNetMarkUp
+	arSpecialDiscount{Size of array(arSpecialDiscount)}:=vrRptSpecDisc
+Else 
+	vrRptAvgNetMarkUpBD:=Round((vrRptNetProfitBD/vrRptNetSalesBD)*100;1)
+	vrRptAvgNetNetMarkUpBD:=Round((vrRptNetNetProfitBD/vrRptNetNetSalesBD)*100;1)
+	vrRptSpecDiscBD:=vrRptNetSalesBD-vrRptNetNetSalesBD
+	arBDAvgNetMarkup{Size of array(arBDAvgNetMarkup)}:=vrRptAvgNetMarkUpBD
+	arBDAvgNetNetMarkup{Size of array(arBDAvgNetNetMarkup)}:=vrRptAvgNetNetMarkUpBD
+	arBDSpecialDiscount{Size of array(arBDSpecialDiscount)}:=vrRptSpecDiscBD
+	
+End if 

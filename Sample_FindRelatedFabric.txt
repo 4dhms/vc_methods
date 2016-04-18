@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($orderNumber;0)
+C_BOOLEAN($article)
+C_LONGINT($i;$n)
+
+CREATE SET([Samples];"Orig")
+CREATE EMPTY SET([Samples];"Fabric")
+
+WinChoice ("Are you serching by Fabric Name"+Char(13)+"or Article Number?";"Name";"Article")
+If (ok=0)
+	WinFind ("Enter article number:";7)
+	$article:=True
+Else 
+	WinFind ("Enter fabric:";7)
+End if 
+
+If (OK=1) & (vsRequestString#"")
+	Repeat 
+		If ($article)
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=vsRequestString)
+		Else 
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricName=vsRequestString)
+		End if 
+		
+		$i:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($i;1;Records in selection([OrdersFabricXRef]))
+			APPEND TO ARRAY($orderNumber;Abs([OrdersFabricXRef]OrderNumber))
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+		If (Not($article))
+			WinFind ("Enter variations:";7)
+		End if 
+	Until (ok=0) | (vsRequestString="") | ($article)
+	
+	$i:=1
+	For ($i;1;Size of array($orderNumber))
+		If (vYesNO=1)
+			USE SET("Orig")
+			QUERY SELECTION([Samples];[Samples]SampleNumber=$ordernumber{$i})
+		Else 
+			QUERY([Samples];[Samples]SampleNumber=$ordernumber{$i})
+		End if 
+		$n:=1
+		FIRST RECORD([Samples])
+		For ($n;1;Records in selection([Samples]))
+			ADD TO SET([Samples];"Fabric")
+		End for 
+	End for 
+	USE SET("Fabric")
+	CLEAR SET("Orig")
+	CLEAR SET("Fabric")
+	If ($article)
+		Sample_FindCompArticle 
+	End if 
+End if 
+
+
+
+SET WINDOW TITLE("Sample Garments: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))

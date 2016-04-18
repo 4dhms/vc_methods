@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		Grade_CatArray 
+		If (Find in array(<>asGradeCat;[SpecGradeCats]ACatName)<1)
+			<>asGradeCat:=1
+		Else 
+			<>asGradeCat:=Find in array(<>asGradeCat;[SpecGradeCats]ACatName)
+		End if 
+		
+	: (Form event=On Unload)
+		ARRAY TEXT(<>asGradeCat;0)
+End case 

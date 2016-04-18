@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Dialogs];"SR_Print")
+PAGE SETUP([Dialogs];"SR_Print")
+Print_Record (->[Dialogs])

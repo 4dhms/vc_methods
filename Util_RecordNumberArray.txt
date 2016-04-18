@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$count)
+C_POINTER($tablePtr)
+
+$tablePtr:=Table($1)
+
+
+$i:=1
+$count:=Records in selection($tablePtr->)
+ARRAY LONGINT(alRecordNumber;$count)
+FIRST RECORD($tablePtr->)
+For ($i;1;$count)
+	alRecordNumber{$i}:=Record number($tablePtr->)
+	NEXT RECORD($tablePtr->)
+End for 

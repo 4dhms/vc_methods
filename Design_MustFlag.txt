@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Designs]SeasonName#"") & ([Designs]SeasonYear#"")
+	OBJECT SET COLOR(*;"xSeason@";-(Black+(256*Light grey)))
+End if 
+
+If ([Designs]Patt Srce#"")
+	OBJECT SET COLOR(*;"xPattern@";-(Black+(256*Light grey)))
+End if 
+
+If ([Designs]KWCnS#"") & ([Designs]KWCnS#"False")
+	OBJECT SET COLOR(cbWoven;-(Black+(256*Light grey)))
+	OBJECT SET COLOR(cbKnit;-(Black+(256*Light grey)))
+	OBJECT SET COLOR(cbCutSew;-(Black+(256*Light grey)))
+End if 
+

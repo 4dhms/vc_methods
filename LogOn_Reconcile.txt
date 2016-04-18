@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($sn;$path;$4DColor;$UPC)
+C_LONGINT($p;$i;$n;$c)
+
+ARRAY LONGINT($orders;0)
+
+$docref:=Open document("";"csv")
+If (ok=1)
+	Repeat 
+		RECEIVE PACKET($docref;$sn;Char(13))
+		
+		APPEND TO ARRAY($orders;Num($sn))
+	Until (ok=0)
+	CLOSE DOCUMENT($docref)
+	
+	$docref:=Create document("";"xls")
+	If (ok=1)
+		$path:=Document
+		SEND PACKET($docref;"PO"+Char(9)+"UPC"+Char(9)+"Style"+Char(9)+"LogOn Color"+Char(9)+"4D Color"+Char(9)+"Size"+Char(13))
+		$i:=1
+		For ($i;1;Size of array($orders))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i})
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+			
+			QUERY([Orders];[Orders]OrderNum=$orders{$i})
+			
+			ARRAY TEXT($colors;0)
+			ARRAY LONGINT($self;0)
+			
+			$n:=1
+			FIRST RECORD([CP_OrderXRef])
+			For ($n;1;Records in selection([CP_OrderXRef]))
+				If (Find in array($colors;[CP_OrderXRef]LOColor)<1)
+					APPEND TO ARRAY($colors;[CP_OrderXRef]LOColor)
+					APPEND TO ARRAY($self;[CP_OrderXRef]CPOrdID)
+				End if 
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			
+			$n:=1
+			For ($n;1;Size of array($colors))
+				QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self{$n})
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self";*)
+				QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 1")
+				ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPType;<)
+				
+				FIRST RECORD([CP_OrderXRef])
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				$4dcolor:=[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName
+				If (Records in selection([CP_OrderXRef])>1)
+					NEXT RECORD([CP_OrderXRef])
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+					$4dcolor:=$4dcolor+" [c] "+[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName
+				End if 
+				
+				QUERY([UPCCodes];[UPCCodes]StyleNumber=[Orders]StyleNumber)
+				QUERY SELECTION([UPCCodes];[UPCCodes]Color=$colors{$n})
+				
+				$c:=1
+				FIRST RECORD([UPCCodes])
+				For ($c;1;Records in selection([UPCCodes]))
+					$upc:=Replace string([UPCCodes]UPC;Char(13);"")
+					$upc:=Replace string($upc;Char(10);"")
+					
+					SEND PACKET($docref;String([Orders]OrderNum)+Char(9)+$upc+Char(9)+[Orders]StyleNumber+Char(9)+[UPCCodes]Color+Char(9)+$4dcolor+Char(9)+[UPCCodes]Size+Char(13))
+					NEXT RECORD([UPCCodes])
+				End for 
+			End for 
+		End for 
+		CLOSE DOCUMENT($docref)
+		SHOW ON DISK($path)
+	End if 
+End if 

@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCategory;vsDivision;vsDesignNumber)
+CP_BuildDivArray (2)
+Design_SuffixPrep 
+
+FORM SET INPUT([Dialogs];"GetDesignNumber")
+
+vlWinWd:=300
+vlWinHt:=180
+vlWinType:=1
+vsWinTitle:=""
+
+
+Center Window 
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+If (ok=1)
+	CREATE RECORD([DesignNumber])
+	[DesignNumber]DNumKey:=Num(Substring(vsDesignNumber;3;5))
+	[DesignNumber]DNumDivision:=vsDivision
+	[DesignNumber]DNumCategory:=vsCategory
+	[DesignNumber]DNumCDate:=Current date(*)
+	[DesignNumber]DNumTime:=Current time(*)
+	[DesignNumber]DesignNumber:=vsDesignNumber
+	[DesignNumber]Creator:=Current user
+	SAVE RECORD([DesignNumber])
+End if 

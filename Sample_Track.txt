@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>CloseBox:=True
+Center Window (800;600;4;"")
+DIALOG([Dialogs];"SampleTrack")
+CLOSE WINDOW

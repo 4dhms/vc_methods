@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($designRoot)
+
+ARRAY TEXT(<>asDN;0)
+ARRAY TEXT(<>asDiv;0)
+ARRAY TEXT(<>atDescrip;0)
+
+$designRoot:=String(Num(<>vsDesignNumber))
+
+QUERY([Designs];[Designs]DesignNum="@"+$designRoot+"@";*)
+QUERY([Designs]; | ;[Designs]DesignNum="@"+$designRoot+"@")
+
+QUERY SELECTION([Designs];[Designs]DesignNum#<>vsDesignNumber)
+
+SELECTION TO ARRAY([Designs]DesignNum;<>asDN;[Designs]DivisionCodeN;<>asDiv;[Designs]Description;<>atDescrip)

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (pOne=1)
+	ORDER BY([Lists];[Lists]ArticleNumber;>;[Lists]ListItem;>)
+Else 
+	ORDER BY([Lists];[Lists]ListItem;>;[Lists]ArticleNumber;>)
+End if 

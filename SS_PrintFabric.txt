@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[SpecFactory]OrderNumber)
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]SortOrder;>)
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+	If ([FabricLibrary]SecondaryFabric="")
+		Print form([SpecSheetLines];"HeaderFabric.p")
+		vlremaining:=vlremaining-14
+	Else 
+		Print form([SpecSheetLines];"HeaderFabricCompound.p")
+		vlremaining:=vlremaining-26
+	End if 
+	
+	NEXT RECORD([OrdersFabricXRef])
+End for 

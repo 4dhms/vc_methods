@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlReceiving)
+
+If (<>vlReceiving=0)
+	<>vlReceiving:=New process("Sample_Receiving";0;"Receiving")
+Else 
+	SHOW PROCESS(<>vlReceiving)
+	BRING TO FRONT(<>vlReceiving)
+End if 

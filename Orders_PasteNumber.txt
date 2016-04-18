@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+QUERY([Orders];[Orders]OrderNum=$1)
+
+If ($2<0)
+	[Orders]ComboOrderNumber:=Abs($2)
+Else 
+	[Orders]PlainOrderNumber:=$2
+End if 
+SAVE RECORD([Orders])
+UNLOAD RECORD([Orders])

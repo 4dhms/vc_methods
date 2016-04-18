@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfGroup)
+
+Case of 
+	: (Form event=On Load)
+		If (Is new record([SampleTrack]))
+			[SampleTrack]TrackId:=Sequence number([SampleTrack])
+			[SampleTrack]SentBy:=Current user
+			[SampleTrack]DateOut:=Current date(*)
+			If (vfGroup)
+				cbGroup:=1
+				[SampleTrack]Division:=vtPart1
+				[SampleTrack]Store:=vtPart2
+				[SampleTrack]Notes:=vtPart3
+				
+			End if 
+			GOTO OBJECT([SampleTrack]StyleNumber)
+		End if 
+End case 

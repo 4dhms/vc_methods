@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SampFab_LastRev 
+SAVE RECORD([SampleFabrics])
+CREATE SET([SampleFabrics];"HMSseP")
+vlWinWd:=350
+vlWinHt:=100
+vlWinType:=1
+vsWinTitle:=""
+
+
+Center Window 
+DIALOG([Dashboard File];"PrtRecSelctn")
+CLOSE WINDOW
+If (OK=1)
+	[SampleFabrics]Printed:=True
+	SAVE RECORD([SampleFabrics])
+	SET PRINT OPTION(Orientation option;2)
+	Case of 
+		: (vPrtRec=1)
+			FORM SET OUTPUT([SampleFabrics];"PrtSamFab")
+			Print_Record (->[SampleFabrics])
+		: (vPrtSel=1)
+			FORM SET OUTPUT([SampleFabrics];"PrtSamFab")
+			Print_Selection (->[SampleFabrics])
+	End case 
+End if 
+FORM SET OUTPUT([SampleFabrics];"Output")
+USE SET("HMSseP")
+ORDER BY([SampleFabrics];[SampleFabrics]SampleFab PO Nu;<)
+CLEAR SET("HMSseP")

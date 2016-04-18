@@ -1,0 +1,16 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+vtError:=$1
+Case of 
+	: ($1="Email sent@") | ($1="Costsheet under repair@")
+		vtError:=vtError+Char(13)+Char(13)+"Click the back button to return to order."
+	: (Position("password";vtError)<1) | (Position("appointments";vtError)<1)
+		vtError:=vtError+Char(13)+Char(13)+"Click the back button and try again."
+	Else 
+		vtError:=vtError+Char(13)+Char(13)+"Restart your browser and try again."
+End case 
+
+vtError:=Char(1)+Replace string(vtError;Char(13);"<br>")
+
+
+WEB SEND FILE("errors.html")

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(asList1))
+	Case of 
+		: (Length(asList1{$i})=1)
+			asList1{$i}:="00"+asList1{$i}
+		: (Length(asList1{$i})=2)
+			asList1{$i}:="0"+asList1{$i}
+	End case 
+End for 

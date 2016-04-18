@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($r)
+
+$r:=[NeedByLib]Router
+DELETE RECORD([NeedByLib])
+QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+QUERY SELECTION([NeedByLib];[NeedByLib]Router=$r)
+ORDER BY([NeedByLib];[NeedByLib]Name;>)
+CANCEL
+

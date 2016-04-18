@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asVendorTypes{<>asVendorTypes}="Show All")
+	WinPrompt ("Select"+Char(13)+"Fabric"+Char(13)+"Buttons or"+Char(13)+"Trim"+Char(13)+"from pulldown menu.")
+Else 
+	FORM SET OUTPUT([FabricOrders];"FabStatusScr")
+	MODIFY SELECTION([FabricOrders];*)
+	CLOSE WINDOW
+End if 

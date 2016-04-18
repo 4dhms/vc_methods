@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+SS_ReloadVar 
+For ($i;1;Size of array(afSpecsheet))
+	If (Find in array(alMasterSpecSheet;alOrders{$i})<1)
+		afSpecSheet{$i}:=True
+	End if 
+	
+End for 

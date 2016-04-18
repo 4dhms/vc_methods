@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($script)
+C_TIME($docref)
+
+$docRef:=Open document("")
+If (OK=1)
+	CLOSE DOCUMENT($docRef)
+	DOCUMENT TO BLOB(Document;$script)
+End if 
+QUERY([Spooler];[Spooler]Genre="Blob")
+
+If (Records in selection([Spooler])=0)
+	CREATE RECORD([Spooler])
+	[Spooler]Genre:="Blob"
+	[Spooler]SpoolKey:=Sequence number([Spooler])
+End if 
+[Spooler]SortArray:=$script
+SAVE RECORD([Spooler])
+UNLOAD RECORD([Spooler])
+
+

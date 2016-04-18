@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($test)
+
+CREATE EMPTY SET([Customers];"null")
+ALL RECORDS([Customers])
+
+$i:=1
+For ($i;1;Records in selection([Customers]))
+	$test:=[Customers]CartonMU+[Customers]ColorTrimOK+[Customers]Contact+[Customers]DefaultAddress+[Customers]FitSize+[Customers]Folding
+	$test:=$test+[Customers]HangTag+[Customers]Label+[Customers]NotesInternal+[Customers]NotesPublic+[Customers]OverShort
+	$test:=$test+[Customers]Packing+[Customers]Polybag+[Customers]PPCount+[Customers]PPSize+[Customers]PriceTicket+[Customers]PriceTicketDefault
+	$test:=$test+[Customers]RN+[Customers]ShipTo+[Customers]Telephone+[Customers]Testing+[Customers]TOPCount+[Customers]TOPSize
+	$test:=Replace string($test;" ";"")
+	
+	If (Length($test)<2)
+		QUERY([Contacts];[Contacts]CustomerKey=[Customers]CustomerKey)
+		If (Records in selection([Contacts])=0)
+			ADD TO SET([Customers];"null")
+		End if 
+	End if 
+	NEXT RECORD([Customers])
+End for 
+
+USE SET("null")
+CLEAR SET("null")
+

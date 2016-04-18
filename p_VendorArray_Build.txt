@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY TEXT(asVendors;0)
+ARRAY LONGINT(alVendorKeys;0)
+ARRAY TEXT($vendors;0)
+ARRAY LONGINT($keys;0)
+
+SAVE RECORD([Vendors])
+UNLOAD RECORD([Vendors])
+
+Array_VendorTypes 
+Array_VendorsByType 
+
+Case of 
+	: (<>asVendorTypes{<>asVendorTypes}="Fabric")
+		QUERY([Vendors];[Vendors]Fabric=True)
+		SELECTION TO ARRAY([Vendors]VendorName;asFabSpler)
+	: (<>asVendorTypes{<>asVendorTypes}="Button")
+		QUERY([Vendors];[Vendors]Button=True)
+	: (<>asVendorTypes{<>asVendorTypes}="Trim")
+		QUERY([Vendors];[Vendors]Trim=True)
+	Else 
+		ALL RECORDS([Vendors])
+End case 
+
+  //This totally bizarre method exists solely to circumvent a totally bizarre runtim
+  //This is a workaround
+SELECTION TO ARRAY([Vendors]VendorName;asVendors;[Vendors]VendorName;$vendors;[Vendors]VendorKey;$keys)
+ARRAY LONGINT(alVendorKeys;Size of array($vendors))
+
+SORT ARRAY(asVendors;>)
+
+$i:=1
+For ($i;1;Size of array($vendors))
+	alVendorKeys{$i}:=$keys{Find in array($vendors;asVendors{$i})}
+End for 
+UNLOAD RECORD([Vendors])
+
+  //ARRAY TO LIST(asVendors;"Suppliers")

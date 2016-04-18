@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Shift down)
+	yNot:=0
+	yYes:=0
+	[Orders]BlouseType:=0
+	If (Position("Standard Blouse";[Orders]Special_Instructions)>0)
+		[Orders]Special_Instructions:=Replace string([Orders]Special_Instructions;"Standard blouse"+Char(13);"";*)
+	End if 
+	If (Position("Special Blouse";[Orders]Special_Instructions)>0)
+		[Orders]Special_Instructions:=Replace string([Orders]Special_Instructions;"Special blouse"+Char(13);"";*)
+	End if 
+Else 
+	If (yNot=1)
+		[Orders]BlouseType:=1
+		If (Position("Special Blouse";[Orders]Special_Instructions)>0)
+			[Orders]Special_Instructions:=Replace string([Orders]Special_Instructions;"Special blouse"+Char(13);"";*)
+		End if 
+		If (Position("Standard Blouse";[Orders]Special_Instructions)<1)
+			[Orders]Special_Instructions:="Standard blouse"+Char(13)+[Orders]Special_Instructions
+		End if 
+		Rev_SpecialBlouse 
+	End if 
+End if 

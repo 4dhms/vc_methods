@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"Returns")
+
+<>CloseBox:=True
+
+Center Window (600;540;4;"")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>vlReturns:=0

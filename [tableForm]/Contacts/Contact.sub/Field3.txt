@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		If ([Customers]DefaultAddress="")
+			[Customers]DefaultAddress:=Replace string([Contacts]MailingAddress;Char(13);Char(10);*)
+			
+			SAVE RECORD([Customers])
+		End if 
+End case 

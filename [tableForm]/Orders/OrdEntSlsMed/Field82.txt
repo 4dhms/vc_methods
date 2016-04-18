@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]ShipFOB)
+	[CostSheets]ShipSea:=False
+	[CostSheets]ShipAir:=False
+	[CostSheets]ShipLDP:=False
+	Cost_ShipChange ("FOB")
+End if 
+Cost_FreightToggle 
+Cost_EntryCalculate 

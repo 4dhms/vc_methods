@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($color;$rem;$thisone;$root;$lead)
+C_LONGINT($c;)
+
+ARRAY TEXT(atColorBuild;0)
+
+$color:=$1
+
+$c:=Position("[c]";$color)
+
+If ($c<1)
+	APPEND TO ARRAY(atColorBuild;Substring($color;1;Position(" ";$color)-1))
+Else 
+	APPEND TO ARRAY(atColorBuild;Substring($color;1;Position(" ";$color)-1))
+	$rem:=Substring($color;$c+4;999)
+	
+	  //$rem:=Substring($rem;Position(" ";$rem)+1;999)
+	$thisone:=Substring($rem;1;$c-1)
+	APPEND TO ARRAY(atColorBuild;Substring($rem;1;Position(" ";$rem)-1))
+	
+	$c:=Position("[c]";$rem)
+	
+	If ($c<1)
+		  //APPEND TO ARRAY(atColorBuild;Substring($rem;1;Position(" ";$rem)-1))
+	Else 
+		$rem:=Substring($rem;$c+4;999)
+		  //$rem:=Substring($rem;Position(" ";$rem)+1;999)
+		$thisone:=Substring($rem;1;$c-1)
+		APPEND TO ARRAY(atColorBuild;Substring($rem;1;Position(" ";$rem)-1))
+	End if 
+End if 

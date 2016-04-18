@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>asVendorTypes{<>asVendorTypes}="Fabric")
+		OBJECT SET VISIBLE(vtQPrint;True)
+		OBJECT SET VISIBLE(bPreexist;True)
+		OBJECT SET VISIBLE(bReport;True)
+		OBJECT SET VISIBLE(*;"xCP";True)
+	Else 
+		OBJECT SET VISIBLE(vtQPrint;False)
+		OBJECT SET VISIBLE(bPreexist;False)
+		OBJECT SET VISIBLE(bReport;False)
+		OBJECT SET VISIBLE(*;"xCP";False)
+End case 

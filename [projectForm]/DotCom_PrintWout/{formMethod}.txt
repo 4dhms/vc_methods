@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style)
+
+If (Form event=On Printing Detail)
+	If (vsPart8="")
+		$style:=0
+	Else 
+		$style:=1
+	End if 
+	OBJECT SET VISIBLE(*;"xLine";(vsPart11#"") & (vsPart2#"S") & (vsPart2#"M") & (vsPart2#"L") & (vsPart2#"XL") & (vsPart2#"Grand Total"))
+	
+	OBJECT SET FONT STYLE(vsPart1;$style)
+	OBJECT SET FONT STYLE(vsPart2;$style)
+	OBJECT SET FONT STYLE(vsPart3;$style)
+	OBJECT SET FONT STYLE(vsPart4;$style)
+	OBJECT SET FONT STYLE(vsPart5;$style)
+	OBJECT SET FONT STYLE(vsPart6;$style)
+	OBJECT SET FONT STYLE(vsPart7;$style)
+	OBJECT SET FONT STYLE(vsPart8;$style)
+	OBJECT SET FONT STYLE(vsPart9;$style)
+	OBJECT SET FONT STYLE(vsPart10;$style)
+	OBJECT SET FONT STYLE(vsPart11;$style)
+	
+End if 

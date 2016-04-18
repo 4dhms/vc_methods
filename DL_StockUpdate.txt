@@ -1,0 +1,116 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+C_LONGINT($i;$n)
+C_TEXT($rem;$message)
+
+ARRAY TEXT($season;0)
+ARRAY TEXT($year;0)
+ARRAY TEXT($division;0)
+
+$rem:=[DesignLines]QSeason
+
+Repeat 
+	If ($rem#"")
+		APPEND TO ARRAY($season;Substring($rem;1;Position(" 20";$rem)-1))
+		APPEND TO ARRAY($year;Substring($rem;Position("20";$rem);4))
+	End if 
+	Case of 
+		: (Position("20";$rem)<1) | (Shift down)
+			$done:=True
+	End case 
+	$rem:=Substring($rem;Position("20";$rem)+5;999)
+Until ($done)
+
+$rem:=[DesignLines]Division
+$done:=False
+
+ARRAY TEXT($division;0)
+LIST TO ARRAY("Division Code No";$division)
+
+$i:=1
+$n:=1
+
+For ($i;1;Size of array($division))
+	If (Position($division{$n};[DesignLines]Division)<1)
+		DELETE FROM ARRAY($division;$n;1)
+	Else 
+		$n:=$n+1
+	End if 
+End for 
+
+QUERY([Orders];[Orders]Customer="stock")
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+$i:=1
+For ($i;1;Size of array($division))
+	Case of 
+		: (Size of array($division)=1)
+			QUERY SELECTION([Orders];[Orders]OrderDivision=$division{1})
+		: ($i=1)
+			QUERY SELECTION([Orders];[Orders]OrderDivision=$division{$i};*)
+		: ($i=Size of array($division))
+			QUERY SELECTION([Orders]; | ;[Orders]OrderDivision=$division{$i})
+		Else 
+			QUERY SELECTION([Orders]; | ;[Orders]OrderDivision=$division{$i};*)
+	End case 
+End for 
+
+CREATE SET([Orders];"full")
+CREATE EMPTY SET([Orders];"new")
+
+$i:=1
+For ($i;1;Size of array($season))
+	USE SET("full")
+	QUERY SELECTION([Orders];[Orders]SeasonName=$season{$i};*)
+	QUERY SELECTION([Orders]; & ;[Orders]SeasonYear=$year{$i})
+	
+	CREATE SET([Orders];"temp")
+	UNION("temp";"new";"new")
+End for 
+
+USE SET("new")
+CLEAR SET("new")
+CLEAR SET("temp")
+ARRAY LONGINT($orders;0)
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+
+ARRAY LONGINT(alOrders;0)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+
+CREATE SET([DesignLineIncluded];"DL")
+CREATE EMPTY SET([Orders];"order")
+
+$i:=1
+For ($i;1;Size of array($orders))
+	
+	USE SET("DL")
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]OrderNumber=$orders{$i})
+	
+	If (Records in selection([DesignLineIncluded])=0)
+		QUERY([Orders];[Orders]OrderNum=$orders{$i})
+		ADD TO SET([Orders];"order")
+	End if 
+End for 
+USE SET("order")
+ORDER BY([Orders];[Orders]CancelDate;>)
+SELECTION TO ARRAY([Orders]OrderNum;alOrders)
+CLEAR SET("order")
+
+If (Size of array(alOrders)>0)
+	If (Size of array(alOrders)=1)
+		$message:="There is 1 order not included."
+	Else 
+		$message:="There are "+String(Size of array(alOrders))+" orders not included."
+	End if 
+	WinChoice ($message+Char(13)+"Do you want to add to this line plan?")
+	If (ok=1)
+		DL_StockAddNew 
+	End if 
+Else 
+	WinPrompt ("There are no new orders.")
+End if 
+
+USE SET("DL")
+CLEAR SET("DL")

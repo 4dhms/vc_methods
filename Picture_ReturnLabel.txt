@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($folderpath;$subfolder;$path)
+
+$path:=Substring(Application file;1;Position(":";Application file))+"4D Images:Labels:"+Substring($1;1;3)+":"+$1+".jpg"
+
+If (Test path name($path)=1)
+	READ PICTURE FILE($path;vxSketch)
+Else 
+	GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+End if 
+
+EXECUTE ON CLIENT($2;"Pix_Catch";vxSketch)
+
+  //GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)

@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($value;$i)
+
+Case of 
+	: (Form event=On Drop)
+		vlDragItem:=alSortList
+		$value:=alSortList{alSortList}
+		vlDropItem:=Drop position
+		
+		INSERT IN ARRAY(alSortList;vlDropItem+1;1)
+		alSortList{vlDropItem+1}:=$value
+		If (vlDragItem>vlDropItem)
+			vlDragItem:=vlDragItem+1
+		End if 
+		DELETE FROM ARRAY(alSortList;vlDragItem;1)
+		
+	: (Form event=On Double Clicked) & (Shift down)
+		WinChoice ("Are you sure you want to delete"+Char(13)+"Page "+String(alSortList{alSortList}))
+		If (ok=1)
+			QUERY SELECTION([PCPage];[PCPage]PageNumber=alSortList{alSortList})
+			DELETE RECORD([PCPage])
+			QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+			ORDER BY([PCPage];[PCPage]PageNumber;>)
+			$i:=1
+			FIRST RECORD([PCPage])
+			For ($i;1;Records in selection([PCPage]))
+				[PCPage]PageNumber:=$i
+				SAVE RECORD([PCPage])
+				NEXT RECORD([PCPage])
+			End for 
+			ARRAY LONGINT(alSortList;0)
+			SELECTION TO ARRAY([PCPage]PageNumber;alSortList)
+		End if 
+		
+End case 
+

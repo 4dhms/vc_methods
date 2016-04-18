@@ -1,0 +1,161 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($specialNumber;$dupedfrom)
+$specialNumber:=(<>vlOrderNumber*10)+1
+
+vlOldOrderNumber:=[Orders]OrderNum
+
+vlOrderNumber:=[Orders]OrderNum
+$dupedfrom:=[Orders]OrderNum
+
+<>Enter:=True
+DUPLICATE RECORD([Orders])
+asPOv:=1
+If (Length([Orders]StyleNumber)>10)
+	WinPrompt ("Style number can not exceed seven 10) characters.")
+	[Orders]StyleNumber:=Substring([Orders]StyleNumber;1;10)
+End if 
+[Orders]UPC:=0
+[Orders]MasterSpec:=False
+[Orders]CreditOK:=False
+[Orders]CustomerStyle:=""
+[Orders]Salesperson:=""
+[Orders]PC:=False
+[Orders]PriceTicket:=False
+[Orders]DCInfo:=False
+[Orders]BDHeaderKey:=-1
+[Orders]DCSent:=!00-00-00!
+[Orders]Price_Tckt_Sent:=""
+[Orders]SeasonName:=""
+[Orders]SeasonYear:=""
+[Orders]Order_Enterer:=Current user
+[Orders]RevisionNumber:=0
+[Orders]RevisionKey:=0
+[Orders]Price_Tckt_Sent:=""
+[Orders]TOPSampleDate:=!00-00-00!
+[Orders]OrderEntryDate:=Current date(*)
+[Orders]ActualDeliveryDate:=!00-00-00!
+[Orders]Schedule Date:=!00-00-00!
+[Orders]OrderNum:=Num(PO_GetNumber ("Order"))
+[Orders]ShipDateFactory:=!00-00-00!
+[Orders]Factory:=""
+[Orders]WH_PackingDate:=!00-00-00!
+[Orders]ShipInfo:=""
+[Orders]OtherShip:=""
+[Orders]Price Tckt:=""
+[Orders]M F Ready:=!00-00-00!
+[Orders]Date to open LC:=!00-00-00!
+[Orders]Proforma Number:=""
+[Orders]Proforma Date:=!00-00-00!
+[Orders]LC Number:=""
+[Orders]LC Open Date:=!00-00-00!
+[Orders]Technical Descr:=""
+[Orders]Specs Date:=!00-00-00!
+[Orders]NeedByReport:=!00-00-00!
+[Orders]Inspect Date 1:=!00-00-00!
+[Orders]Inspect Date2:=!00-00-00!
+[Orders]DomesticGroup:=False
+[Orders]VietnamGroup:=False
+[Orders]LastCostSheet:=""
+Cost_ClearDuped 
+[Orders]Customs Date:=!00-00-00!
+[Orders]ArchiveNot:=False
+[Orders]LOProcessDate:=!00-00-00!
+[Orders]PPSampleDate:=!00-00-00!
+[Orders]RevHistory:=""
+[Orders]FitSampleSent:=False
+[Orders]FitSampleDate:=!00-00-00!
+[Orders]TOPSampleSent:=False
+[Orders]TOPSampleDate:=!00-00-00!
+[Orders]ComboColorCode:=False
+[Orders]ReorderPP:=False
+[Orders]Unused:=""
+[Orders]PPSampleSent:=False
+[Orders]FirstCreator:=""
+[Orders]TestDate:=!00-00-00!
+[Orders]FitSampleDate:=!00-00-00!
+[Orders]TestContent:=""
+[Orders]TestNotes:=""
+
+[Orders]TestNumber:=""
+[Orders]TestCare:=""
+[Orders]TestInvoice:=""
+[Orders]TestProcessDate:=!00-00-00!
+
+[Orders]WHInvoice:=False
+[Orders]BreakFree:=False
+[Orders]WHInvoiceNos:=""
+[Orders]Hold:=False
+[Orders]ShipAir:=False
+[Orders]ShipSea:=False
+[Orders]ShipLDP:=False
+[Orders]ShipFOB:=False
+[Orders]WHNotes:=""
+[Orders]PriceTicket:=False
+[Orders]WH_Packing:=False
+[Orders]SampleNextDate:=!00-00-00!
+[Orders]ApprovalDate:=!00-00-00!
+[Orders]RetailPrice:=0
+[Orders]SampleStatus:=""
+[Orders]SampleStatusDate:=!00-00-00!
+[Orders]SampleNextDate:=!00-00-00!
+[Orders]Category1:=""
+[Orders]Category2:=""
+[Orders]ProdComments:=""
+[Orders]Special_Instructions:=""
+[Orders]Comments_Sales:=""
+[Orders]Price:=0
+[Orders]NetDiscount:=0
+[Orders]ComboOrderNumber:=0
+[Orders]PlainOrderNumber:=0
+[Orders]SDProcessed:=False
+[Orders]CancelDate:=!00-00-00!
+[Orders]LOProcessor:=""
+[Orders]PODate:=!00-00-00!
+[Orders]CustPONumber:=""
+[Orders]POOpen:=True
+[Orders]CostSheet:=True
+[Orders]PartReq:=True
+
+[Orders]WH_BilloLading:=False
+[Orders]WH_BilloLadingDate:=!00-00-00!
+[Orders]WH_ProofDelivery:=False
+[Orders]WH_ProofoDeliveryDate:=!00-00-00!
+[Orders]WH_ShippingDoc:=False
+[Orders]WH_ShippingDocDate:=!00-00-00!
+If ([Orders]OrderDivision="05-Cupio@") | ([Designs]DivisionCodeN="05-Cupio@") | ([Designs]DivisionCodeN="04-Cupio@")
+	[Orders]DivisionOverride:=True
+	[Orders]OrderDivision:="03-Cupio"
+End if 
+
+SAVE RECORD([Orders])
+SET WINDOW TITLE("Duplicate Order")
+ONE RECORD SELECT([Orders])
+
+If (Find in array(asCustomerBuild;[Orders]Customer)>0)
+	Order_TicketChange 
+Else 
+	WinPrompt ([Orders]Customer+" is not on the official client list.")
+	[Orders]Customer:=""
+End if 
+vlDupeOrderNumber:=[Orders]OrderNum
+
+  //NO COMPONENT SHEET BECAUSE THAT IS PULLED FROM SG
+If (Num([Orders]SGPO)>0)
+	Dupe_UniqueLine 
+End if 
+Dupe_FabricOrder 
+  //  
+Orders_FM_EnterOnLoad 
+
+CREATE RECORD([Changes])
+[Changes]RevisionNumber:=<>vlRevisionNumber
+[Changes]RevisionKey:=[Orders]OrderNum
+[Changes]OrderNumber:=[Orders]OrderNum
+[Changes]RevDate:=Current date(*)
+[Changes]RevTime:=Current time(*)
+[Changes]Writer:=Current user
+[Changes]ChangeKey:=Sequence number([Changes])
+[Changes]Tag:="Duped"
+[Changes]OldData:="Duped from "+String(vlOldOrderNumber)
+SAVE RECORD([Changes])
+UNLOAD RECORD([Changes])

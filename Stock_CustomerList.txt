@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($range)
+C_TEXT($div)
+C_LONGINT($i;$n)
+C_TEXT($path)
+C_TIME($docref)
+
+ARRAY TEXT($raw;0)
+ARRAY TEXT($refined;0)
+ARRAY LONGINT($orders;0)
+
+$range:=Date(Request("How far back do you want to go?";String(Current date(*)-365)))
+
+If (ok=1) & ($range#!00-00-00!)
+	$div:=Request("Enter Division Number (example: 06).")+"@"
+	If (ok=1)
+		QUERY([Orders];[Orders]OrderEntryDate>=$range;*)
+		If ($div#"")
+			QUERY([Orders]; & ;[Orders]OrderDivision=$div;*)
+		End if 
+		QUERY([Orders]; & ;[Orders]Cancelled=False)
+		
+		SELECTION TO ARRAY([Orders]OrderNum;$orders)
+		
+		$i:=1
+		For ($i;1;Size of array($orders))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i})
+			QUERY([DC];[DC]CPOrdID=[CP_OrderXRef]CPOrdID)
+			
+			ARRAY TEXT($cust;0)
+			SELECTION TO ARRAY([DC]Customer;$cust)
+			
+			$n:=1
+			For ($n;1;Size of array($cust))
+				APPEND TO ARRAY($raw;$cust{$n})
+			End for 
+		End for 
+		
+		$i:=1
+		For ($i;1;Size of array($raw))
+			If (Find in array($refined;$raw{$i})<1) & ($raw{$i}#"") & ($raw{$i}#"0@")
+				APPEND TO ARRAY($refined;$raw{$i})
+			End if 
+		End for 
+		SORT ARRAY($refined;>)
+		
+		$docref:=Create document("";"xls")
+		If (ok=1)
+			$path:=Document
+			$i:=1
+			For ($i;1;Size of array($refined))
+				  //CONFIRM($refined{$i})
+				  //If (ok=0)
+				  //TRACE
+				  //End if 
+				SEND PACKET($docref;$refined{$i}+Char(13))
+			End for 
+			CLOSE DOCUMENT($docref)
+			SHOW ON DISK($path)
+		End if 
+	End if 
+End if 
+

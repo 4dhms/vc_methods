@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($line)
+
+If (Form event=On Printing Detail)
+	OBJECT SET VISIBLE(vsPart7;vsPart7#"00/00/00")
+	If (vsPart4="")
+		OBJECT SET FONT STYLE(vsPart6;1)
+	Else 
+		OBJECT SET FONT STYLE(vsPart6;0)
+	End if 
+	
+	Case of 
+		: (vsPart3="Ordered@") | (vsPart3="Shipped@") | (vsPart3="Received@") | (vsPart3="Over@") | (vsPart3="Under@") | (vsPart3="Used@")
+			$line:=False
+		: (vsPart3="") & (vsPart5#"")
+			$line:=False
+		Else 
+			$line:=True
+	End case 
+	
+	If (vsPart3="Over@")
+		If (Num(vsPart4)<0)
+			OBJECT SET FONT STYLE(vsPart3;1)
+			OBJECT SET FONT STYLE(vsPart4;1)
+			vsPart3:="UNDER"
+		Else 
+			OBJECT SET FONT STYLE(vsPart3;0)
+			OBJECT SET FONT STYLE(vsPart4;0)
+		End if 
+	End if 
+	
+	OBJECT SET VISIBLE(*;"xLine";$line)
+End if 

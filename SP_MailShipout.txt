@@ -1,0 +1,92 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($debug)
+C_TEXT($jobtext)
+C_TEXT(vtFailureMessage)
+$debug:=False
+
+If (EMail_GetPreferences )
+	  //EMail_Log ($debug;$errorcode;"Init")
+	Case of 
+		: ([Spooler]Genre="FI")
+			EMail_FTP (vtArticleNumber+" Usage";"Attached is the fabric inventory for "+vtArticleNumber)
+			
+		: (Position("Change";[Spooler]Genre)>0)
+			EMail_FTP ([Spooler]Genre;[Spooler]SpoolMessage)
+			
+		: ([Spooler]Genre="Meeting notification")
+			EMail_FTP ([Spooler]StatusGuide;[Spooler]SpoolMessage)
+		: ([Spooler]Genre="TC")
+			$jobText:=vtBodyText
+			EMail_FTP ("Distribution Info";vtEMPOText+Char(13)+$jobText)  //;$address) 
+			
+		: ([Spooler]Genre="DP")
+			$jobText:="Attached are design sheet(s)."
+			EMail_FTP ("Design Line Plan";$jobtext)
+			
+		: ([Spooler]Genre="DL")
+			$jobText:="Attached are design sheet(s)."+Char(13)+Char(13)
+			EMail_FTP (vtSubjectLine;$jobtext)
+		: ([Spooler]Genre="SP")
+			$jobText:=vtEMPOText+"Attached are Speed Post Forms."
+			EMail_FTP ("Speed Post";$jobtext)
+		: ([Spooler]Genre="Unshipd")
+			$jobText:=vtEMPOText+"Attached are unshipped prints."
+			EMail_FTP ("Unshipped Prints Report";$jobtext)
+		: ([Spooler]Genre="Status")
+			$jobtext:=vtEMPOText+"Attached is the current "+[Spooler]Genre+" Report."
+			EMail_FTP (vtSubjectLine;$jobtext)
+		: ([Spooler]Genre="Fitting") | ([Spooler]Genre="VS")
+			$jobtext:=vtEMPOText+"Attached is the current "+[Spooler]Genre+" Report."
+			EMail_FTP ([Spooler]Genre+" Report";$jobtext)
+		: ([Spooler]Genre="FO@")
+			$jobText:="Please find orders attached."
+			EMail_FTP (vtSubjectLine;vtEMPOText+Char(13)+$jobText)  //;$address) 
+		: ([Spooler]Robert)
+			$jobText:=vtBodyText
+			EMail_FTP ("New Order";vtEMPOText+Char(13)+$jobText)  //;$address) 
+		Else 
+			$jobText:=vtBodyText
+			EMail_FTP (vtSubjectLine;vtEMPOText+Char(13)+$jobText)  //;$address) 
+	End case 
+	
+	  //PDF_CleanUp 
+	
+	AccessMode (->[Preferences];False)
+	
+End if 
+
+  //vfFailure:=False
+  //
+  //If (vfFailure)
+  //vfFailure:=False
+  //If ([Spooler]Attempts>3)
+  //EXECUTE ON CLIENT("@";"Email_FailureNotice";[Spooler]User;vtFailureMessage)
+  //[Spooler]Waiting:=False
+  //Else 
+  //[Spooler]Attempts:=[Spooler]Attempts+1
+  //End if 
+  //SAVE RECORD([Spooler])
+  //Else 
+  //$message:=vsPOFlag+" sent "+String(Current time)+" "+String(Current date)
+If ([Spooler]Genre="PO@")
+End if 
+If ([Spooler]Robert)
+	[Spooler]Robert:=False
+Else 
+	[Spooler]Waiting:=False
+End if 
+SAVE RECORD([Spooler])
+  //End if 
+
+UNLOAD RECORD([Preferences])
+UNLOAD RECORD([Vendors])
+UNLOAD RECORD([SpecFactory])
+UNLOAD RECORD([Spooler])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([SpecTemplate])
+UNLOAD RECORD([ComponentSheets])
+UNLOAD RECORD([CS_Lines])
+UNLOAD RECORD([DesignLines])
+UNLOAD RECORD([DLPages])
+UNLOAD RECORD([DL_Other])
+UNLOAD RECORD([DesignLineIncluded])

@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	p_SetWndwSpdpst 
+	FORM SET OUTPUT([Speedpost Form];"PrtSpeedp")
+	PAGE SETUP([Speedpost Form];"PrtSpeedp")
+	Print_Selection (->[Speedpost Form])
+	FORM SET OUTPUT([Speedpost Form];"SpeedpostOutp")
+	p_SetWndwSpdpst 
+Else 
+	ALERT("Please highlight a record(s) first.")
+End if 

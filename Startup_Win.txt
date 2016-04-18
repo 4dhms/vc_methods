@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SET WINDOW RECT(10;Screen height-120;210;Screen height-10)
+SET WINDOW TITLE("HMS")

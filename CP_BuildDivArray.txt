@@ -1,0 +1,65 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+
+ARRAY TEXT(asChartDivisions;0)
+
+Case of 
+	: ($1=0)
+		ARRAY TEXT(asDivisions;11)
+		asDivisions{11}:="Clear"
+		
+	: ($1=1) | ($1=3)
+		ARRAY TEXT(asDivisions;11)
+		asDivisions{10}:="All"
+		asDivisions{11}:="Breakdown"
+		
+		ARRAY TEXT(asReportCards;3)
+		asReportCards{1}:="Units per order"
+		asReportCards{2}:="Prints as a %"
+		asReportCards{3}:="Clear"
+		asReportCards:=0
+	Else 
+		ARRAY TEXT(asDivisions;0)
+End case 
+
+APPEND TO ARRAY(asDivisions;"Select DIVISION")
+APPEND TO ARRAY(asDivisions;"01-Blouses")
+APPEND TO ARRAY(asDivisions;"02-Dresses")
+APPEND TO ARRAY(asDivisions;"03-Cupio")
+APPEND TO ARRAY(asDivisions;"05-Cupio Blush")
+APPEND TO ARRAY(asDivisions;"06-Cable & Gauge")
+APPEND TO ARRAY(asDivisions;"07-T's")
+APPEND TO ARRAY(asDivisions;"08-Cable & Gauge Sport")
+APPEND TO ARRAY(asDivisions;"09-Spense Knits")
+APPEND TO ARRAY(asDivisions;"10-Java")
+APPEND TO ARRAY(asDivisions;"11-eCom")
+APPEND TO ARRAY(asDivisions;"12-Melissa Paige")
+
+If ($1=3)
+	DELETE FROM ARRAY(asDivisions;1;1)
+	asDivisions:=0
+	DELETE FROM ARRAY(asDivisions;8;3)
+	
+Else 
+	asDivisions:=1
+End if 
+
+Case of 
+	: ($1=1)
+		COPY ARRAY(asDivisions;asChartDivisions)
+		asChartDivisions{1}:="All Divisions"
+		asChartDivisions:=1
+	: ($1=4)
+		COPY ARRAY(asDivisions;asChartDivisions)
+		asChartDivisions{1}:="All Divisions"
+		asChartDivisions:=1
+		DELETE FROM ARRAY(asDivisions;1;1)
+		APPEND TO ARRAY(asDivisions;"All Divisions")
+End case 
+
+$c:=Find in array(asDivisions;"03-Cupio")
+If ($c>0)
+	INSERT IN ARRAY(asDivisions;$c+1;1)
+	asDivisions{$c+1}:="04-Eldeen"
+End if 
+

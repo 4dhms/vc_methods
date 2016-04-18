@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfReorder)
+
+REDUCE SELECTION([SLRWks];0)
+vlReorderCount:=0
+
+
+If (Not(vfNew))
+	QUERY([SLRAcct];[SLRAcct]SLRAcct=vsCustomer;*)
+	QUERY([SLRAcct]; & ;[SLRAcct]Division=vsDivision;*)
+	QUERY([SLRAcct]; & ;[SLRAcct]SLRStyleNumber=vsStyleNumber)
+	
+	vlReorderCount:=Records in selection([SLRAcct])-1
+	ARRAY DATE($w1;0)
+	ORDER BY([SLRAcct]WeekOne;<)
+	SELECTION TO ARRAY([SLRAcct]WeekOne;$w1)
+	FIRST RECORD([SLRAcct])
+	
+	
+	If (Records in selection([SLRAcct])>1)
+		vfReorder:=True
+		WinChoice ("There are multiple entries.";"Reorder";"Original")
+		If (ok=1)
+			QUERY SELECTION([SLRAcct];[SLRAcct]Reorder=1)
+		Else 
+			QUERY SELECTION([SLRAcct];[SLRAcct]Reorder=0)
+		End if 
+	Else 
+		vfReorder:=False
+	End if 
+	
+	Case of 
+		: (Records in selection([SLRAcct])=1)
+			vdWeekOne:=[SLRAcct]WeekOne
+			
+			SLR_SetUp 
+			SLR_Process 
+			SLR_ColorShift 
+		Else 
+			SLR_SetUp 
+			SLR_Process 
+	End case 
+	
+End if 

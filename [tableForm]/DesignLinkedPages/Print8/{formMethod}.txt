@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail) | (Form event=On Load)
+	QUERY([DL_Other];[DL_Other]DesignKey=[DesignLines]DesignLineKey)
+	DLink_BuildPage 
+	DLink_PrintFM 
+End if 

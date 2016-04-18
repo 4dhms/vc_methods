@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (FORM Get current page#3)
+	SS_BulkProcessor 
+	cbStrip:=0
+	FORM GOTO PAGE(3)
+End if 

@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($char)
+C_TEXT(vtEmailAddress)
+
+vlOrderNumber:=$1
+<>vlOrderNumber:=$1
+
+QUERY([Costing];[Costing]OrderNumber=vlOrderNumber)
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+ORDER BY([CostSheets];[CostSheets]SheetNumber;<)
+
+Cost_EntryCalculate 
+
+vsDisc:=String([CostSheets]Figurer;"#0.##%")
+vsSpecDisc:=String([CostSheets]SpecialDiscount;"#0.##%")
+vsNetUnitPrice:=String([CostSheets]NetUnitPrice;"$#0.00")
+vsNetNetUnitPrice:=String([CostSheets]NetNetUnitPrice;"$#0.00")
+vsFlag:="ordercost"
+
+QUERY([Designs];[Designs]DesignNum=[Costing]DesignNumber)
+
+vtDescription:=[Designs]Description
+vsPatternSource:=[Designs]Patt Srce
+
+vtFabricList:=Web_Fabric 
+vtCPList:=Web_CP 
+vtOrderTop:=Web_Cost_TopVar 
+vtOrderBottom:=Web_Cost_BottomVar 
+vtWarehouseStatus:=Web_Cost_WarehouseStatus 
+
+vComments:=Char(1)+"<font color=#663300 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Comments</font><br>"
+vComments:=vComments+"<font size=2 color=#000000 face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+">"
+vComments:=vComments+vtSpecA
+For ($i;1;Length([Orders]Comments_Sales))
+	$char:=Substring([Orders]Comments_Sales;$i;1)
+	If (Character code($char)=13)
+		vComments:=vComments+"<br>"
+	Else 
+		vComments:=vComments+$char
+	End if 
+End for 
+vComments:=vComments+vtSpecB+"<br><br>"
+
+vtDescription:=[Designs]Description
+vtComponentList:=Web_Components 
+vtEmailAddress:=""
+Web_Cost_Load 
+vtGetPicture:="/4DCGI/DESIGN_"+[Costing]DesignNumber
+WEB SEND FILE("costsheet.html")

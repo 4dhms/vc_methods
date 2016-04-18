@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([SpecGradeCats];[SpecGradeCats]ACatName=<>asGradeCat{<>asGradeCat})
+vsSize1:=[SpecGradeCats]ACol1
+vsSize2:=[SpecGradeCats]ACol2
+vsSize3:=[SpecGradeCats]ACol3
+vsSize4:=[SpecGradeCats]ACol4
+vsSize5:=[SpecGradeCats]ACol5
+vsSize6:=[SpecGradeCats]ACol6
+vsSize7:=[SpecGradeCats]ACol7
+vsSize8:=[SpecGradeCats]ACol8
+vsSize9:=[SpecGradeCats]ACol9
+vsSize10:=[SpecGradeCats]ACol10
+
+Grade_ColArray 

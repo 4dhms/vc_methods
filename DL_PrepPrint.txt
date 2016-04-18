@@ -1,0 +1,72 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$p)
+C_BOOLEAN(vf8UpH;vf8Up)
+
+ARRAY LONGINT($alPageNumber;Size of array(alHistKey))
+
+$i:=1
+For ($i;1;Size of array(alHistKey))
+	If (afPrint{$i}=True)
+		$alPageNumber{$i}:=alHistKey{$i}
+	End if 
+End for 
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+vlRecCount:=Records in selection([DLPages])
+
+CREATE SET([DLPages];"Pages")
+FIRST RECORD([DLPages])
+$i:=1
+For ($i;1;Records in selection([DLPages]))
+	If (Find in array($alPageNumber;[DLPages]PageNumber)<1)
+		REMOVE FROM SET([DLPages];"Pages")
+	End if 
+	NEXT RECORD([DLPages])
+End for 
+USE SET("Pages")
+CLEAR SET("Pages")
+
+vfPrinting:=True
+vPge:=1
+
+ORDER BY([DLPages];[DLPages]PageNumber;>)
+
+If (cbOther=1)
+	FORM SET OUTPUT([DLPages];"Coverpage.print")
+	If (cbEmail=1)
+		PRINT RECORD([DLPages];*)
+	Else 
+		PAGE SETUP([DLPages];"DesignLine.print")
+		Print_Record (->[DLPages])
+	End if 
+End if 
+
+If (cbDL=1)
+	vfVisible:=True
+Else 
+	vfVisible:=False
+End if 
+
+$p:=1
+vPge:=1
+Case of 
+	: ([DesignLines]Stock) & ([DesignLines]8Up)
+		FORM SET OUTPUT([DLPages];"DLStock8up.print")
+	: ([DesignLines]Stock)
+		FORM SET OUTPUT([DLPages];"DLStock.print")
+	: ([DesignLines]OnePerPage)
+		FORM SET OUTPUT([DLPages];"DLSingle.print")
+	: (vf8Up)
+		If (vfColors)
+			If (vf8UpH)
+				FORM SET OUTPUT([DLPages];"8upH.p")
+			Else 
+				FORM SET OUTPUT([DLPages];"DesignLine8Up.print")
+			End if 
+		Else 
+			FORM SET OUTPUT([DLPages];"DLSketch8up.print")
+		End if 
+	Else 
+		FORM SET OUTPUT([DLPages];"DesignLine.print")
+End case 
+

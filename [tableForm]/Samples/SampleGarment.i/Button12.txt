@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+List_Window ("Sample Type";->[Samples]Sam Type)
+If (Sample_TypeField )
+Else 
+	GOTO OBJECT([Samples]Sam Type)
+End if 

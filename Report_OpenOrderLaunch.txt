@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($test)
+
+$test:=Execute on server("Report_OpenOrder";64*1064;"ReportEmail")
+
+  // $test:=Execute on server("_Test";64*1064;"ReportEmail")

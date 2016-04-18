@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Designer") & ([FabricOrders]ReviseNumber>0) & (Shift down)
+	WinChoice ("Are you sure you want to revert the revision number?")
+	If (ok=1)
+		[FabricOrders]ReviseNumber:=[FabricOrders]ReviseNumber-1
+		SAVE RECORD([FabricOrders])
+		If ([FabricOrders]ReviseNumber=0)
+			asPOv{asPOv}:="Original Order"
+		Else 
+			asPOv{asPOv}:="Revision "+String([FabricOrders]ReviseNumber)
+		End if 
+	End if 
+End if 

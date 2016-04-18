@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([Costing];"Cost")
+FIRST RECORD([Costing])
+For ($i;1;Records in selection([Costing]))
+	If ([Costing]OrderNumber>0)
+		QUERY([Orders];[Orders]OrderNum=[Costing]OrderNumber)
+		If (Records in selection([Orders])=0)
+			ADD TO SET([Costing];"Cost")
+		Else 
+			If (Shift down)
+				ALERT(String([Costing]OrderNumber))
+			End if 
+		End if 
+	Else 
+		QUERY([Samples];[Samples]SampleNumber=Abs([Costing]OrderNumber))
+		If (Records in selection([Samples])=0)
+			ADD TO SET([Costing];"Cost")
+		Else 
+			If (Shift down)
+				ALERT(String([Costing]OrderNumber))
+			End if 
+		End if 
+	End if 
+	NEXT RECORD([Costing])
+End for 
+
+USE SET("Cost")
+CLEAR SET("Cost")
+
+ALERT("Done")

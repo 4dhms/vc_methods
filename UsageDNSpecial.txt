@@ -1,0 +1,79 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($setname)
+C_TEXT($test;$div)
+C_DATE($start;$end)
+C_LONGINT($i)
+ARRAY TEXT(asRepDesign;0)
+READ ONLY([Orders])
+
+$start:=Date(String(asStartMonth)+"/1/"+asSeasonYear{asSeasonYear})
+$end:=Current date(*)
+
+QUERY([Samples];[Samples]SamGarFactry=vsFactory)
+QUERY SELECTION([Samples];[Samples]SampleOrderDate>=$start;*)
+QUERY SELECTION([Samples]; & ;[Samples]SampleOrderDate<=$end)
+
+$i:=1
+FIRST RECORD([Samples])
+CREATE EMPTY SET([Designs];"special")
+For ($i;1;Records in selection([Samples]))
+	QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+	ADD TO SET([Designs];"special")
+	NEXT RECORD([Samples])
+End for 
+USE SET("special")
+CLEAR SET("special")
+ALERT(String(Records in selection([Designs])))
+
+If (asChartDivisions>1)
+	$div:=Substring(asChartDivisions{asChartDivisions};1;2)
+	QUERY SELECTION([Designs];[Designs]DivisionCodeN=$div+"@")
+	CREATE EMPTY SET([Designs];$div)
+Else 
+	$i:=1
+	For ($i;1;Size of array(asDivisions)-1)
+		CREATE EMPTY SET([Designs];Substring(asDivisions{$i};1;2))
+	End for 
+End if 
+
+$i:=1
+ORDER BY([Designs];[Designs]DesignNum;<)
+FIRST RECORD([Designs])
+
+For ($i;1;Records in selection([Designs]))
+	$test:=String(Num([Designs]DesignNum))
+	If ($test+"ST"=[Designs]DesignNum)
+		$test:=[Designs]DesignNum
+	End if 
+	If ([Designs]DesignNum=$test)
+		MESSAGE("Processing Design Number "+$test+Char(13))
+		QUERY([Samples];[Samples]DesignNum=$test+"@")
+		If (vsFactory#"")
+			QUERY SELECTION([Samples];[Samples]SamGarFactry=vsFactory)
+		End if 
+		
+		QUERY([Orders];[Orders]DesignNumber=$test+"@")
+		If (vsFactory#"")
+			QUERY SELECTION([Orders];[Orders]Factory=vsFactory)
+		End if 
+		
+		ARRAY TEXT($types;0)
+		SELECTION TO ARRAY([Samples]Sam Type;$types)
+		
+		If (Records in selection([Samples])>0) | (Records in selection([Orders])>0)
+			$setname:=Substring([Designs]DivisionCodeN;1;2)
+			If ($setname="00")
+				$setname:="12"
+			End if 
+			Case of 
+				: (asChartDivisions>1)
+					ADD TO SET([Designs];$setname)
+				: (Find in array(asDivisions;$setname+"@")>0)
+					ADD TO SET([Designs];$setname)
+					
+			End case 
+		End if 
+	End if 
+	NEXT RECORD([Designs])
+End for 
+

@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (User in group(Current user;"Design"))
+Else 
+	If (afCCoverride{asTypeList})
+		WinChoice ("Do you want to turn off color code override or change the code?";"Turn Off";"Change")
+		If (ok=1)
+			vtColorCode:=""
+			vfCodeOverride:=False
+			afCCoverride{asTypeList}:=False
+			asCC{asTypeList}:=""
+		Else 
+			FORM GOTO PAGE(2)
+		End if 
+	Else 
+		WinChoice ("If you override this color code it will take effect immediately.";"Continue";"Stop")
+		If (ok=1)
+			WinChoice ("Are you sure you want to override this color code?";"Stop";"Yes")
+			If (ok=0)
+				FORM GOTO PAGE(2)
+			End if 
+		End if 
+	End if 
+End if 

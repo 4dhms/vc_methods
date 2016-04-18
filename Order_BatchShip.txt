@@ -1,0 +1,126 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsVia)
+C_LONGINT($i;$router)
+C_BOOLEAN($air;$sea;$fob;$ldp)
+C_DATE($shipdatefactory)
+C_DATE($actualdate)
+C_DATE($scheduledate)
+
+$air:=[Orders]ShipAir
+$fob:=[Orders]ShipFOB
+$ldp:=[Orders]ShipLDP
+$sea:=[Orders]ShipSea
+vsVia:=[Orders]ShipInfo
+$actualdate:=[Orders]ActualDeliveryDate
+$shipdatefactory:=[Orders]ShipDateFactory
+$scheduledate:=[Orders]Schedule Date
+
+If (Records in selection([Orders])>100)
+	WinPrompt ("You can not batch process more than 100 orders at the same time.")
+Else 
+	
+	If (Order_Update )
+		SAVE RECORD([Orders])
+		
+		If (FORM Get current page=3)
+			WinChoice ("Update shipping for "+String(Records in selection([Orders]))+" orders to "+[Orders]Factory+"?")
+			If (ok=1)
+				$router:=1
+			End if 
+		Else 
+			
+			WinChoice ("Update shipping or actual on "+String(Records in selection([Orders]))+" orders to "+[Orders]Factory+"?";"Shipping";"Schedule";"Actual";"All";"Cancel")
+			Case of 
+				: (ok=1) & (bChoice2=1)
+					$router:=2
+				: (ok=1) & (bChoice3=1)
+					$router:=3
+				: (ok=1) & (bChoice4=1)
+					$router:=4
+				: (ok=1)
+					$router:=1
+				Else 
+					$router:=0
+			End case 
+		End if 
+		
+		If ($router>0)
+			ACCEPT
+			
+			FIRST RECORD([Orders])
+			
+			$i:=1
+			For ($i;1;Records in selection([Orders]))
+				[Orders]ShipAir:=$air
+				[Orders]ShipFOB:=$fob
+				[Orders]ShipLDP:=$ldp
+				[Orders]ShipSea:=$sea
+				[Orders]ShipInfo:=vsVia
+				If ($router=1) | ($router=4)
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Ship date"
+					[Changes]Tag:="Batch Ship change"
+					[Changes]OldData:=String([Orders]ShipDateFactory)
+					[Changes]NewChange:=String($shipdatefactory)
+					SAVE RECORD([Changes])
+					[Orders]ShipDateFactory:=$shipdatefactory
+				End if 
+				
+				If ($router=2) | ($router=4)
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Schedule date"
+					[Changes]Tag:="Batch Schedule change"
+					[Changes]OldData:=String([Orders]Schedule Date)
+					[Changes]NewChange:=String($actualdate)
+					SAVE RECORD([Changes])
+					[Orders]Schedule Date:=$scheduledate
+				End if 
+				
+				If ($router=3) | ($router=4)
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Actual date"
+					[Changes]Tag:="Batch Actual change"
+					[Changes]OldData:=String([Orders]ActualDeliveryDate)
+					[Changes]NewChange:=String($actualdate)
+					SAVE RECORD([Changes])
+					[Orders]ActualDeliveryDate:=$actualdate
+				End if 
+				
+				SAVE RECORD([Orders])
+				NEXT RECORD([Orders])
+			End for 
+			
+			  //<>vlCostRouter:=10
+			  //CALL PROCESS(<>SalesPrcID)
+			
+		End if 
+	End if 
+End if 
+

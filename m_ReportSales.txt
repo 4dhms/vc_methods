@@ -1,0 +1,24 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //Sales Entry procedure
+  //
+ARRAY TEXT($users;0)
+APPEND TO ARRAY($users;"Designer")
+APPEND TO ARRAY($users;"Spenser")
+APPEND TO ARRAY($users;"Nubby")
+APPEND TO ARRAY($users;"Lou")
+APPEND TO ARRAY($users;"August")
+APPEND TO ARRAY($users;"Zoe")
+
+
+Case of 
+	: (Find in array($users;Current user)<1)
+		WinPrompt ("See Spenser for access.")
+	: (<>ReportProc>0)
+		SHOW PROCESS(<>ReportProc)
+		BRING TO FRONT(<>ReportProc)
+	: (<>ReportProc=0)
+		<>ReportProc:=New process("p_ReportSales";0;"Sales Report")
+	Else 
+		SHOW PROCESS(<>ReportProc)
+		BRING TO FRONT(<>ReportProc)
+End case 

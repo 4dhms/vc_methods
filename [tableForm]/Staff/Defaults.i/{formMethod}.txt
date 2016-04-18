@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	Case of 
+		: ([Staff]SizeCatagory="Petite")
+			rPetite:=1
+		: ([Staff]SizeCatagory="Missy")
+			rMissy:=1
+		: ([Staff]SizeCatagory="Large")
+			rLarge:=1
+	End case 
+	Print_Box 
+	
+	If ([Staff]AfterApproval="") & ([Staff]Care="") & ([Staff]CuttingTicket="") & ([Staff]LabelSource="") & ([Staff]PriceTerms="") & ([Staff]SizeCatagory="")
+		[Staff]AfterApproval:="Customer needs TOP"
+		[Staff]Care:="Factory to advise"
+		[Staff]CuttingTicket:="Provided herein"
+		[Staff]LabelSource:="Factory supplied"
+		[Staff]PriceTerms:="8/10"
+	End if 
+End if 

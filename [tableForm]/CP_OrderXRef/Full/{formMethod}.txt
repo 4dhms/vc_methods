@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Display Detail)
+	QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+	
+	vtSeason:=[Orders]SeasonName+"  "+[Orders]SeasonYear
+End if 

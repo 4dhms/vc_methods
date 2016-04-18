@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Is new record([ColorPrintNumber]))
+	WinChoice ("Are you sure you want to cancel this new color/print number?")
+	If (ok=1)
+		CANCEL
+	End if 
+Else 
+	CANCEL
+End if 

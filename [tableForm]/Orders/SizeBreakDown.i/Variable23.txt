@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Order_DC_Save 
+Order_DC 
+Order_DC_Print 
+
+ACCEPT

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+INSERT IN ARRAY(asTypeList;$1;1)
+  //INSERT ELEMENT(asFabPO;$1;1)
+INSERT IN ARRAY(asCPLetter;$1;1)
+INSERT IN ARRAY(asCPStyleNum;$1;1)
+INSERT IN ARRAY(asCPNumbers;$1;1)
+INSERT IN ARRAY(asCC;$1;1)
+INSERT IN ARRAY(afCCoverride;$1;1)
+INSERT IN ARRAY(asCPColorName;$1;1)
+INSERT IN ARRAY(asMillNumber;$1;1)
+INSERT IN ARRAY(atThreadColor;$1;1)
+INSERT IN ARRAY(asCarton;$1;1)
+INSERT IN ARRAY(asColorStatus;$1;1)
+INSERT IN ARRAY(adStatusDate;$1;1)
+INSERT IN ARRAY(alCQty;$1;1)
+INSERT IN ARRAY(alSelfKey;$1;1)
+INSERT IN ARRAY(alShadeFab;$1;1)
+INSERT IN ARRAY(alCPXref;$1;1)
+INSERT IN ARRAY(alStyleFab;$1;1)
+INSERT IN ARRAY(alColorKey;$1;1)
+alShadeFab{$1}:=16777215
+

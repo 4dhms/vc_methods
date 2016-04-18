@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>vsPrintBox="No")
+	vlNoPrintBox:=1
+Else 
+	vlNoPrintBox:=0
+End if 

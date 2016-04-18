@@ -1,0 +1,99 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($fieldName;$olddata;$newdata)
+C_TEXT($table)
+C_TEXT($tag)
+C_BOOLEAN($log)
+
+If (Count parameters>1)
+	$tag:=$2
+Else 
+	$tag:=""
+End if 
+
+$table:=Table name(Table($1))
+$oldData:=Rev_DistillField ($1;True)
+$newData:=Rev_DistillField ($1;False)
+$fieldName:=(Field name($1))
+
+
+  //ALERT($olddata+"  "+$newdata)
+  //Dev_Trayce 
+  //If (Shift down)
+  //ALERT($olddata+"  "+$newdata)
+  //End if 
+If (Shift down)
+	ALERT($fieldName+"  "+$olddata+"  "+$newdata)
+End if 
+
+Case of 
+	: ($fieldName="BrkdnCutRatio") | ($fieldName="SampleReceived") | ($fieldName="ProtoRecvDate") | ($fieldName="CancelDate") | ([Orders]RevisionNumber>0) | ([Orders]PODate#!00-00-00!) & ($oldData#$newData)
+		$log:=True
+	: ($fieldName="Customer") | ($fieldName="WHInvoiceNos") & ($oldData#$newData)
+		$log:=True
+	: ([Samples]RevisionNumber>0) & ($oldData#$newData)
+		$log:=True
+End case 
+
+If ($log)
+	CREATE RECORD([Changes])
+	Case of 
+		: ($table="Orders")
+			[Changes]RevisionNumber:=[Orders]RevisionNumber
+			[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber*0.01)
+			[Changes]OrderNumber:=[Orders]OrderNum
+			[Changes]TableNum:=2
+		: ($table="Samples")
+			[Changes]RevisionNumber:=[Samples]RevisionNumber
+			[Changes]RevisionKey:=([Samples]SampleNumber+([Samples]RevisionNumber*0.01))*-1
+			[Changes]OrderNumber:=-1*[Samples]SampleNumber
+			[Changes]TableNum:=3
+	End case 
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]Writer:=Current user
+	[Changes]ChangeKey:=Sequence number([Changes])
+	[Changes]Tag:="Changed"
+	[Changes]FieldNum:=Field($1)
+	
+	
+	Case of 
+		: ($tag="@Extension@")
+			[Changes]FieldName:=$tag
+		: ($tag="new revision")
+			[Changes]FieldName:=$tag
+		: (Position("added";$tag)>0)
+			[Changes]FieldName:=Replace string($tag;" added";"")
+			[Changes]Tag:="Added"
+			vtOldData:=""
+			vtNewData:="Added"
+		: (Position("changed";$tag)>0)
+			[Changes]FieldName:=Replace string($tag;" changed";"")
+			[Changes]Tag:="Changed"
+		: (Position("removed";$tag)>0)
+			[Changes]FieldName:=Replace string($tag;" removed";"")
+			[Changes]Tag:="Removed"
+			
+		Else 
+			[Changes]Tag:="Changed"
+			[Changes]FieldName:=Rev_NameOrdField ($fieldName)
+	End case 
+	
+	[Changes]OldData:=$olddata
+	[Changes]NewChange:=$newdata
+	
+	If ($fieldName="ShipInfo") & ($olddata#"")
+		vtContent:="Shipping method changed from "+$olddata+" to "+$newdata+Char(13)
+		vtContent:=vtContent+"("+Current user+", "+String(Current date(*))+" "+String(Current time(*))+")"
+		Digest_ShipChange 
+	End if 
+	
+	If ($tag="Cancelled")
+		[Changes]OldData:="Quantity: "+String([Orders]TotalOrderQuantity)
+	End if 
+	
+	SAVE RECORD([Orders])
+	
+	SAVE RECORD([Changes])
+	UNLOAD RECORD([Changes])
+End if 
+

@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($stripper)
+$stripper:=Substring($1;Position("[";$1)+1;999)
+
+vsWebUser:=Substring($stripper;1;Position("&";$stripper)-1)
+vsWebSession:=Substring($stripper;Position("&";$stripper)+1;999)
+vsWebSession:=Substring(vsWebSession;1;Position("]";vsWebSession)-1)
+

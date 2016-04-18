@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alCtnIn;0)
+ARRAY TEXT(asCtnBreak;0)
+ARRAY LONGINT(alCtnCount;0)
+ARRAY TEXT(asCtnPO;0)
+ARRAY TEXT(asCtnPack;0)
+ARRAY LONGINT(alCtnKey;0)
+ARRAY TEXT(asCtnColor;0)
+ARRAY TEXT(asCtnColorCode;0)
+ARRAY LONGINT(alCtnQty;0)
+ARRAY LONGINT(alCtnBG;0)
+ARRAY LONGINT(alCtnKey;0)
+
+C_LONGINT($i)
+
+QUERY([Cartons];[Cartons]OrderNumber=[Orders]OrderNum)
+ORDER BY([Cartons];[Cartons]CtnKey;>)
+
+FIRST RECORD([Cartons])
+$i:=1
+For ($i;1;Records in selection([Cartons]))
+	APPEND TO ARRAY(alCtnKey;[Cartons]CtnKey)
+	APPEND TO ARRAY(asCtnColor;[Cartons]CtnColor)
+	APPEND TO ARRAY(asCtnColorCode;[Cartons]CtnColorCode)
+	APPEND TO ARRAY(alCtnQty;Num([Cartons]CtnQty))
+	
+	APPEND TO ARRAY(alCtnBG;0)
+	
+	APPEND TO ARRAY(alCtnIn;[Cartons]CtnIn)
+	APPEND TO ARRAY(asCtnBreak;[Cartons]CtnBreak)
+	APPEND TO ARRAY(alCtnCount;[Cartons]CtnCount)
+	APPEND TO ARRAY(asCtnPO;[Cartons]CtnPO)
+	APPEND TO ARRAY(asCtnPack;[Cartons]CtnPack)
+	NEXT RECORD([Cartons])
+End for 
+
+DC_Ctn_Color 

@@ -1,0 +1,5 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+vtButton:=Char(1)
+Web_StockVar 
+
+Web_DL_List 

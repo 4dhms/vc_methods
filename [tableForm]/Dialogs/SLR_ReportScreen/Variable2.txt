@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($stylecore)
+C_LONGINT($i;$n)
+
+If (Form event=On Data Change) & (vtSLRsn#"")
+	
+	If (vfByStyle)
+		ARRAY TEXT(asCustomers;0)
+		
+		$stylecore:=StripToNumber (vtSLRsn)
+		
+		If (Find in array(asStyleNumbers;$stylecore)<1)
+			APPEND TO ARRAY(asStyleNumbers;$stylecore)
+			
+			$i:=1
+			For ($i;1;Size of array(asStyleNumbers))
+				$stylecore:="@"+asStyleNumbers{$i}+"@"
+				QUERY([SLRAcct];[SLRAcct]SLRStyleNumber=$stylecore)
+				$n:=1
+				FIRST RECORD([SLRAcct])
+				For ($n;1;Records in selection([SLRAcct]))
+					If (Find in array(asCustomers;[SLRAcct]SLRAcct)<1)
+						APPEND TO ARRAY(asCustomers;[SLRAcct]SLRAcct)
+					End if 
+					NEXT RECORD([SLRAcct])
+				End for 
+			End for 
+		End if 
+	Else 
+		APPEND TO ARRAY(asStyleNumbers;vtSLRsn)
+	End if 
+	SORT ARRAY(asStyleNumbers;>)
+	SORT ARRAY(asCustomers;>)
+	vtSLRsn:=""
+	GOTO OBJECT(vtSLRsn)
+End if 

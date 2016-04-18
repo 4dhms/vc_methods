@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($new)
+
+If (Is new record([FabPOLines]))
+	$new:=True
+End if 
+
+Case of 
+	: (Records in selection([Deliveries])=1)
+		[FabPOLines]BatchStatus:="1 shipmt"
+	: (Records in selection([Deliveries])>1)
+		[FabPOLines]BatchStatus:=String(Records in selection([Deliveries]))+" shipmts"
+End case 
+[FabPOLines]Delivered:=Sum([Deliveries]DeliveredAmt)
+
+If ([FabPOLines]Delivered>[FabPOLines]Quantity)
+	[FabPOLines]DeliveredCalc:=[FabPOLines]Quantity
+Else 
+	[FabPOLines]DeliveredCalc:=[FabPOLines]Delivered
+End if 
+
+HMSOrder_Subtot 
+SAVE RECORD([FabPOLines])
+
+If ($new)
+	ADD TO SET([FabPOLines];"fabpo")
+	USE SET("fabpo")
+	CLEAR SET("fabpo")
+End if 
+ACCEPT

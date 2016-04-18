@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+
+$line:=Size of array(asColor1)-1
+
+LISTBOX INSERT ROWS(DCBreakdown;$line)
+alDCline{$line}:=alDCline{$line-1}+1
+arPrice{$line}:=[Orders]RetailPrice
+adCreateDate{$line}:=Current date(*)
+If (<>vlStockProc>0)
+	QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+	QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+	asCustomers{$line}:=[Customers]CustomerName
+	arPrice{$line}:=arMCol1{arMCol1}
+End if 
+
+GOTO OBJECT(adCancel{$line})

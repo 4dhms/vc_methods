@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSLRENter)
+
+Case of 
+	: (<>vlSLRENter>0)
+		SHOW PROCESS(<>vlSLRENter)
+		BRING TO FRONT(<>vlSLRProc)
+	: (<>vlSLRENter=0)
+		<>vlSLRENter:=New process("SLR_DataEntry";0;"SLR")
+	Else 
+		SHOW PROCESS(<>vlSLRENter)
+		BRING TO FRONT(<>vlSLRENter)
+End case 

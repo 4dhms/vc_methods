@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfNewMonth:=False
+SET TIMER(60)
+ARRAY TEXT(asRegular;0)
+vtDateFlag:=String(Current date(*);1)+"  "+String(Current time(*);5)
+vdCalToday:=Current date(*)
+  //ALL RECORDS([RegularMeetings])
+  //ORDER BY([RegularMeetings];[RegularMeetings]NextMeetingDate;>)
+  //SELECTION TO ARRAY([RegularMeetings]MeetingName;asRegular)
+Cal_LoadDay 
+FORM GOTO PAGE(1)

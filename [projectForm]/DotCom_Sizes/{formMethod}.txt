@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	OBJECT SET VISIBLE(vtPart2;vTotal4>0)
+	OBJECT SET VISIBLE(vTotal4;vTotal4>0)
+	OBJECT SET VISIBLE(vTotal5;vTotal4>0)
+	OBJECT SET VISIBLE(vTotal6;vTotal4>0)
+	OBJECT SET VISIBLE(vxSketch2;vTotal4>0)
+	OBJECT SET VISIBLE(*;"Text4";vTotal4>0)
+	OBJECT SET VISIBLE(*;"Text5";vTotal4>0)
+	OBJECT SET VISIBLE(*;"Text6";vTotal4>0)
+	OBJECT SET VISIBLE(*;"Text7";vTotal4>0)
+	
+	OBJECT SET VISIBLE(vtPart3;vTotal7>0)
+	OBJECT SET VISIBLE(vTotal7;vTotal7>0)
+	OBJECT SET VISIBLE(vTotal8;vTotal7>0)
+	OBJECT SET VISIBLE(vTotal9;vTotal7>0)
+	OBJECT SET VISIBLE(vxSketch3;vTotal7>0)
+	OBJECT SET VISIBLE(*;"Text8";vTotal7>0)
+	OBJECT SET VISIBLE(*;"Text9";vTotal7>0)
+	OBJECT SET VISIBLE(*;"Text10";vTotal7>0)
+	OBJECT SET VISIBLE(*;"Text11";vTotal7>0)
+	
+	OBJECT SET VISIBLE(vtPart4;vTotal10>0)
+	OBJECT SET VISIBLE(vTotal10;vTotal10>0)
+	OBJECT SET VISIBLE(vTotal11;vTotal10>0)
+	OBJECT SET VISIBLE(vTotal12;vTotal10>0)
+	OBJECT SET VISIBLE(vxSketch4;vTotal10>0)
+	OBJECT SET VISIBLE(*;"Text12";vTotal10>0)
+	OBJECT SET VISIBLE(*;"Text13";vTotal10>0)
+	OBJECT SET VISIBLE(*;"Text14";vTotal10>0)
+	OBJECT SET VISIBLE(*;"Text15";vTotal10>0)
+	
+End if 

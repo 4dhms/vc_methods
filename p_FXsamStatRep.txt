@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (User in group(Current user;"Cupio"))
+	WinPrompt ("This report is unavailable at this time.")
+Else 
+	ACCEPT
+	vfProdStatus:=False
+	Case of 
+		: (Screen width>700)
+			FORM SET OUTPUT([Samples];"FXSamStatRep")
+		: (Screen height>700)
+			FORM SET OUTPUT([Samples];"FXSamStatRep")
+		: (Screen height<425)
+			FORM SET OUTPUT([Samples];"FXSamStatRep")
+		: (Screen height<500)
+			FORM SET OUTPUT([Samples];"FXSamStatRep")
+	End case 
+	ORDER BY([Samples];[Samples]SampleNumber;<)
+	MODIFY SELECTION([Samples];*)
+	CLOSE WINDOW
+End if 

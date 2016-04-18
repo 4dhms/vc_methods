@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Fabric Library entry
+
+Case of 
+	: (<>FabLibProcID=0)
+		<>FabLibProcID:=New process("p_FabLib";0;"FabLibEntry";"Fabric")
+	Else 
+		SHOW PROCESS(<>FabLibProcID)
+		BRING TO FRONT(<>FabLibProcID)
+End case 
+

@@ -1,0 +1,96 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($row;$col;$wkn;$i)
+C_POINTER($week)
+
+$row:=[SLRReporter]RowKey
+$col:=6
+
+vsUnits1:=String(alTablePop{$row}{$col+1})
+vsUnits2:=String(alTablePop{$row}{$col+2})
+vsUnits3:=String(alTablePop{$row}{$col+3})
+vsUnits4:=String(alTablePop{$row}{$col+4})
+vsUnits5:=String(alTablePop{$row}{$col+5})
+vsUnits6:=String(alTablePop{$row}{$col+6})
+vsUnits13:=String(alTablePop{$row}{$col+7})  //added column out of sequence
+
+$row:=$row+1
+vsUnits7:=String(alTablePop{$row}{$col+1})
+vsUnits8:=String(alTablePop{$row}{$col+2})
+vsUnits9:=String(alTablePop{$row}{$col+3})
+vsUnits10:=String(alTablePop{$row}{$col+4})
+vsUnits11:=String(alTablePop{$row}{$col+5})
+vsUnits12:=String(alTablePop{$row}{$col+6})
+vsUnits14:=String(alTablePop{$row}{$col+7})  //added column out of sequence
+
+vsDollars1:=String(Round(Num(vsUnits7)/Num(vsUnits1);2);"###.00")
+vsDollars2:=String(Round(Num(vsUnits8)/Num(vsUnits2);2);"###.00")
+vsDollars3:=String(Round(Num(vsUnits9)/Num(vsUnits3);2);"###.00")
+vsDollars4:=String(Round(Num(vsUnits10)/Num(vsUnits4);2);"###.00")
+vsDollars5:=String(Round(Num(vsUnits11)/Num(vsUnits5);2);"###.00")
+vsDollars6:=String(Round(Num(vsUnits12)/Num(vsUnits6);2);"###.00")
+vsDollars13:=String(Round(Num(vsUnits14)/Num(vsUnits13);2);"###.00")  //added column out of sequence
+
+$row:=$row+1
+vsChange1:=String(alTablePop{$row}{$col+1})
+vsChange2:=String(alTablePop{$row}{$col+2})
+vsChange3:=String(alTablePop{$row}{$col+3})
+vsChange4:=String(alTablePop{$row}{$col+4})
+vsChange5:=String(alTablePop{$row}{$col+5})
+vsChange6:=String(alTablePop{$row}{$col+6})
+vsChange13:=String(alTablePop{$row}{$col+7})  //added column out of sequence
+
+vsDollars7:=String(Round((Num(vsUnits1)/(Num(vsUnits1)+Num(vsChange1))*100);1);"###.0")
+vsDollars8:=String(Round((Num(vsUnits2)/(Num(vsUnits2)+Num(vsChange2))*100);1);"###.0")
+vsDollars9:=String(Round((Num(vsUnits3)/(Num(vsUnits3)+Num(vsChange3))*100);1);"###.0")
+vsDollars10:=String(Round((Num(vsUnits4)/(Num(vsUnits4)+Num(vsChange4))*100);1);"###.0")
+vsDollars11:=String(Round((Num(vsUnits5)/(Num(vsUnits5)+Num(vsChange5))*100);1);"###.0")
+vsDollars12:=String(Round((Num(vsUnits6)/(Num(vsUnits6)+Num(vsChange6))*100);1);"###.0")
+vsDollars13:=String(Round((Num(vsUnits13)/(Num(vsUnits13)+Num(vsChange13))*100);1);"###.0")  //added column out of sequence
+
+
+vsChange7:=String(Round(Num(vsChange1)/Num(vsUnits1);0);"###;##")
+vsChange8:=String(Round(Num(vsChange2)/Num(vsUnits2);0);"###;##")
+vsChange9:=String(Round(Num(vsChange3)/Num(vsUnits3);0);"###;##")
+vsChange10:=String(Round(Num(vsChange4)/Num(vsUnits4);0);"###;##")
+vsChange11:=String(Round(Num(vsChange5)/Num(vsUnits5);0);"###;##")
+vsChange12:=String(Round(Num(vsChange6)/Num(vsUnits6);0);"###;##")
+vsChange14:=String(Round(Num(vsChange13)/Num(vsUnits14);0);"###;##")  //added column out of sequence
+
+Case of 
+	: ([SLRReporter]WkNumber2>0)
+		vlItem1:=[SLRReporter]WkNumber2
+	: ([SLRReporter]WkNumber1>0)
+		vlItem1:=[SLRReporter]WkNumber1-1
+	Else 
+		vlItem1:=0
+End case 
+If (vlItem1>0)
+	vlItem2:=vlItem1-1
+Else 
+	vlItem2:=[SLRReporter]WkNumber2
+End if 
+If (vlItem2>0)
+	vlItem3:=vlItem2-1
+Else 
+	vlItem3:=[SLRReporter]WkNumber3
+End if 
+If (vlItem3>0)
+	vlItem4:=vlItem3-1
+Else 
+	vlItem4:=[SLRReporter]WkNumber4
+End if 
+If (vlItem4>0)
+	vlItem5:=vlItem4-1
+Else 
+	vlItem5:=[SLRReporter]WkNumber5
+End if 
+
+$wkn:=vlItem5-1
+$i:=1
+For ($i;1;7)
+	$week:=Get pointer("vlItem"+(String($i+5)))
+	If ($wkn>0)
+		$week->:=$wkn
+	End if 
+	$wkn:=$wkn-1
+End for 

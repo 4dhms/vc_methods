@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	OBJECT SET VISIBLE([Orders]WHInvoiceNos;[Orders]WHInvoice)
+	If (Not([Orders]WHInvoice))
+		[Orders]WHInvoiceNos:="")
+	End if 
+End if 
+

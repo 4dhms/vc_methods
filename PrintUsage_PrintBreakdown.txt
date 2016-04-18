@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pixelct)
+
+$pixelct:=0
+vlPage:=0
+
+SET PRINT OPTION(Orientation option;1)
+PRINT SETTINGS
+If (ok=1)
+	$i:=1
+	For ($i;1;Size of array(asList21))
+		If ($pixelct<18)
+			$pixelct:=660
+			If (vlPage>0)
+				PAGE BREAK(>)
+			End if 
+			vlPage:=vlPage+1
+			vsDatePage:=String(Current date(*))+"  "+String(vlPage)
+			vsPart21:="Print Number"
+			vsPart13:="Name"
+			vsPart14:="Orders"
+			vsPart15:="Units"
+			vsPart16:="Other"
+			Print form("Header1")
+			Print form([Orders];"PrintOrder_3pt")
+			Print form("PrintUsage_PrintBreak")
+			Print form("Rule")
+			Print form([Orders];"PrintOrder_3pt")
+		End if 
+		
+		vsPart21:=asList21{$i}
+		vsPart13:=asList13{$i}
+		vsPart14:=String(arMCol14{$i};"######")
+		vsPart15:=String(arMCol15{$i};"###,###")
+		vsPart16:=asList16{$i}
+		Print form("PrintUsage_PrintBreak")
+		$pixelct:=$pixelct-16
+	End for 
+	
+	PAGE BREAK
+End if 

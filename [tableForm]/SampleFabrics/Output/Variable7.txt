@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([SampleFabrics];"SamSet")
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	FORM SET OUTPUT([SampleFabrics];"PrtSamFab")
+	PAGE SETUP([SampleFabrics];"PrtSamFab")
+	Print_Selection (->[SampleFabrics])
+	FORM SET OUTPUT([SampleFabrics];"Output")
+Else 
+	ALERT("Please highlight a record(s) first.")
+End if 
+USE SET("SamSet")
+CLEAR SET("SamSet")

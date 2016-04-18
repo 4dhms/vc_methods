@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Peter") | (Current user="Designer")
+	WinChoice ("Are you sure you want to remove this address?")
+	If (ok=1)
+		DELETE RECORD([Factories])
+		CANCEL
+	End if 
+Else 
+	WinPrompt ("Ask Peter to delete this address.")
+End if 

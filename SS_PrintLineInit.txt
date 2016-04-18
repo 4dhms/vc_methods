@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+vsSize1:=""
+vsSize2:=""
+vsSize3:=""
+vsSize4:=""
+vsSize5:=""
+vsSize6:=""
+vsSize7:=""
+vsSize8:=""
+vsSize9:=""
+vsSize10:=""

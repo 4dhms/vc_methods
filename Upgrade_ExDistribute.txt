@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+
+$run:=Execute on server("Upgrade_Distribute";1064*128;"Upgrade")

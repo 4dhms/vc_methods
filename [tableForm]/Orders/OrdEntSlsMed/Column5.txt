@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Shift down)
+	SET TEXT TO PASTEBOARD(asCC{asCC})
+End if 

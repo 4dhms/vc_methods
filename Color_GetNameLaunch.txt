@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+C_BOOLEAN($done)
+
+<>vtColorCode:=""
+$run:=New process("Color_GetName";0*1064;"GetName";$1)
+
+Repeat 
+	Case of 
+		: (<>vtColorCode#"")
+			$done:=True
+		: (Shift down)
+			$done:=True
+	End case 
+Until ($done)
+
+If (<>vtColorCode="NONE")
+	vtColor:=""
+Else 
+	vtColor:=<>vtColorCode
+End if 
+<>vtColorCode:=""

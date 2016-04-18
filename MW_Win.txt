@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Open window(Screen width-200;100;Screen width-50;150;1984;"")
+DIALOG("MakeWork")
+CLOSE WINDOW

@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_REAL($subtot)
+
+[FabPOLines]LineExt:=Round(([FabPOLines]Quantity*[FabPOLines]UnitPrice);2)
+[FabricOrders]OrderedCount:=Sum([FabPOLines]Quantity)
+$subtot:=Sum([FabPOLines]Quantity)
+[FabricOrders]InCount:=Sum([FabPOLines]Delivered)
+
+[FabricOrders]OutCount:=[FabricOrders]InCount-$subtot
+vsSubTot:="Total ordered:  "+String($subtot;"###,###.00")
+vrPOExt:=Sum([FabPOLines]LineExt)

@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (bGo=1)
+		FORM GOTO PAGE(1)
+	: (bGo=2)
+		Spec_Page2 
+	: (bGo=3)
+		Spec_Page3 
+	: (bGo=4)
+		Spec_Page4 
+	: (bGo=5)
+		Spec_Page5 
+	: (bGo=6)
+		Spec_Page6 
+End case 

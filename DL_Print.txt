@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($title)
+C_BOOLEAN(vfStockInv)
+
+If (Size of array(asPages)>0)
+	If (vfStockInv)
+		vfColors:=True
+	Else 
+		WinChoice ("Large sketches and no color/size info?"+Char(13)+"Or color/size info with smaller sketches?";"With info";"Sketches only")
+		If (ok=1)
+			vfColors:=True
+		Else 
+			vfColors:=False
+		End if 
+	End if 
+	
+	  //If (cbEmail=1)
+	  //Case of 
+	  //: (cbDL=1)
+	  //Email_Confirm ("DPY";"Line Plan")
+	  //Else 
+	  //Email_Confirm ("DPN";"Line Plan")
+	  //End case 
+	  //
+	  //Else 
+	DL_PrepPrint 
+	PAGE SETUP([DLPages];"DesignLine.print")
+	If (vfPDF)
+		$title:=Replace string([DesignLines]Title;"/";"_")
+		$title:=Replace string($title;":";"_")
+		
+		vtPathName:=Request("File name:";$title)+".pdf"
+		vtPathName:=Select folder("Select destination:")+vtPathName
+		
+		If (ok=1)
+			SET PRINT OPTION(Mac spool file format option;0)
+			SET PRINT OPTION(Destination option;3;vtPathName)
+			Print_Selection (->[DLPages])
+			SHOW ON DISK(vtPathName)
+		End if 
+		vfPDF:=False
+	Else 
+		Print_Selection (->[DLPages])
+		
+	End if 
+	vStyle:=""
+	vfPrinting:=False
+	  //End if 
+	DL_BuildPage (1;True)
+	asPages:=1
+	LISTBOX SELECT ROW(afDLPages;1)
+	
+	FORM GOTO PAGE(1)
+Else 
+	WinPrompt ("There is nothing to print.")
+	CANCEL
+End if 
+
+
+

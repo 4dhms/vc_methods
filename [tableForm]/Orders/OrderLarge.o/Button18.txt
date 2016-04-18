@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_REAL($duty)
+
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	
+	Case of 
+		: ($i%5=0)
+			$duty:=[CostSheets]Duty1*0.75
+		: ($i%4=0)
+			$duty:=[CostSheets]Duty1*0.85
+		: ($i%3=0)
+			$duty:=[CostSheets]Duty1*0.5
+		: ($i%2=0)
+			$duty:=[CostSheets]Duty1*0.6
+	End case 
+	
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	
+	[Designs]SGProcessed:=True
+	[Designs]ProcessDate:=Current date(*)
+	[Designs]SpecialGarment:="Special Garment"
+	[Designs]SpecialComment:=String(Random)
+	[Designs]DutyAmt:=$duty
+	SAVE RECORD([Designs])
+	NEXT RECORD([Orders])
+End for 
+ALERT("Done")

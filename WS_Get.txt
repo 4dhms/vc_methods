@@ -1,0 +1,5 @@
+  //%attributes = {"publishedSoap":true,"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atQueryText;0)
+
+SOAP DECLARATION(vxMover;Is BLOB;1)
+BLOB TO VARIABLE(vxMover;atQueryText)

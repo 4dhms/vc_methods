@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Do you want to find samples or preview?";"Preview";"Find")
+If (ok=1)
+	Order_ShowSample 
+Else 
+	Styles_ShowStatusProc ([Orders]StyleNumber)
+End if 

@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+QUERY([Appts];[Appts]ApptDate>=Current date(*);*)
+QUERY([Appts]; & ;[Appts]ApptWith=vsCustomer)
+
+If (Records in selection([Appts])>0)
+	SET WINDOW TITLE(vsCustomer)
+	ORDER BY([Appts];[Appts]ApptStart;>;[Appts]ApptEnd;>)
+	FORM GOTO PAGE(2)
+Else 
+	WinPrompt ("There are no recorded future visits with "+vsCustomer)
+End if 
+OBJECT SET VISIBLE(adDates;Records in selection([Appts])>0)

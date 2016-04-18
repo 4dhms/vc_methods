@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Spenser") | (Current user="Zoe") | (Current user="Dusha") | (Current user="Marisol") | (Current user="Lai Mun") | (Current user="Designer")
+	Center Window (250;600;1;"")
+	DIALOG("CustomerList")
+	CLOSE WINDOW
+End if 

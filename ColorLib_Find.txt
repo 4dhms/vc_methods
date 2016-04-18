@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtYear)
+C_TEXT(vtMillNumber)
+
+Case of 
+	: (vsSeason#"") & (vtYear="")
+		WinPrompt ("Enter season year.")
+	: (vsSeason="") & (vtYear#"")
+		WinPrompt ("Enter season season.")
+		
+	: (vsCPNumber="") & (vsName="") & (vsSeason="") & (vtStudioNumber="") & (vtMillNumber="")
+		WinPrompt ("You need to enter what you are searching for in at least one of the boxes to the "+"left.")
+	Else 
+		If (asFind>1)
+			WinChoice ("Do you want to search within "+asFind{asFind}+"?"+Char(13)+"Or create a new selection?";"New Search";"In "+asFind{asFind})
+			If (ok=1)
+				ALL RECORDS([ColorPrintNumber])
+			End if 
+		Else 
+			ALL RECORDS([ColorPrintNumber])
+		End if 
+		
+		If (vtMillNumber#"")
+			QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]MillNumber=vtMillNumber)
+		End if 
+		
+		Case of 
+			: (vsCPNumber#"") & (vsName="") & (vsSeason="")
+				QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber+"@")
+			: (vsName#"") | (vsSeason#"") & (vsCPNumber#"")
+				QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber+"@";*)
+		End case 
+		
+		Case of 
+			: (vsCPNumber="") & (vsName#"") & (vsSeason="")
+				QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPName="@"+vsName+"@")
+			: (vsCPNumber#"") & (vsName#"") & (vsSeason="")
+				QUERY SELECTION([ColorPrintNumber]; & ;[ColorPrintNumber]CPName="@"+vsName+"@")
+			: (vsCPNumber#"") & (vsName#"") & (vsSeason#"")
+				QUERY SELECTION([ColorPrintNumber]; & ;[ColorPrintNumber]CPName="@"+vsName+"@";*)
+		End case 
+		
+		Case of 
+			: (vsCPNumber="") & (vsName="") & (vsSeason#"")
+				QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]SeasonName=vsSeason+"@")
+			: (vsSeason#"")
+				QUERY SELECTION([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonName=vsSeason+"@")
+		End case 
+		
+		If (vtStudioNumber#"")
+			QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]StudioNumber=vtStudioNumber)
+		End if 
+		
+		If (Records in selection([ColorPrintNumber])<1)
+			WinPrompt ("Nothing matches that search criteria.")
+		Else 
+			asFind:=1
+			vsCPNumber:=""
+			vsName:=""
+			vsSeason:=""
+			If (Records in selection([ColorPrintNumber])=1) & (Not(Locked([ColorPrintNumber])))
+				If ([ColorPrintNumber]NewCP=True)
+					[ColorPrintNumber]NewCP:=False
+					SAVE RECORD([ColorPrintNumber])
+				End if 
+				FORM SET INPUT([ColorPrintNumber];"CPNumber.i")
+				MODIFY RECORD([ColorPrintNumber];*)
+				
+			End if 
+		End if 
+End case 

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (FORM Get current page=2)
+	WinChoice ("Are you sure you want to clear the log?")
+	If (ok=1)
+		ALL RECORDS([EMailLog])
+		DELETE SELECTION([EMailLog])
+	End if 
+Else 
+	ALL RECORDS([EMailLog])
+	ORDER BY([EMailLog];[EMailLog]EMLogDate;<;[EMailLog]EMLogTime;<)
+	OBJECT SET ENABLED(bSetup;True)
+	OBJECT SET ENABLED(bQueue;True)
+	OBJECT SET TITLE(bQueue;"Queue")
+	OBJECT SET TITLE(bLog;"Clear Log")
+	FORM GOTO PAGE(2)
+End if 

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Header)
+	vsPrintingHeader:="Printed ("+String(Current date(*))+")"
+End if 

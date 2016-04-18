@@ -1,0 +1,16 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vfStatus:=True
+
+CS_BuildSheet 
+
+If (<>vlOrderNumber>0) & ([ComponentSheets]HMSOrderNumber<0)
+	vsHeader:="Sample Garment Order "+String(Abs([ComponentSheets]HMSOrderNumber))
+Else 
+	vsHeader:=""
+End if 
+
+If (Records in selection([CS_Lines])<1) & (Records in selection([CS_Issues])<1)
+	OBJECT SET VISIBLE(*;"xEnd";True)
+Else 
+	OBJECT SET VISIBLE(*;"xEnd";False)
+End if 

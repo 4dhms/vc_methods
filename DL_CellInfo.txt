@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlMoveCell)
+
+  //If (vlMoveCell>0)
+  //Else 
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey;*)
+QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=[DLPages]PageNumber;*)
+QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]ItemNumber=$1)
+
+If ([DesignLines]Stock)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[DesignLineIncluded]OrderNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	DL_PullColors (False)
+	SAVE RECORD([DesignLineIncluded])
+End if 
+
+If (Records in selection([DesignLineIncluded])>0)
+	FORM SET INPUT([DesignLineIncluded];"Design.win")
+	vlWinWd:=600
+	vlWinHt:=250
+	
+	vlWinType:=4
+	vsWinTitle:=""
+	Center Window 
+	MODIFY RECORD([DesignLineIncluded];*)
+	CLOSE WINDOW
+End if 
+  //End if 

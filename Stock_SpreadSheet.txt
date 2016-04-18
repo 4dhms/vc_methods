@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY TEXT(asBDSelf;0)
+ARRAY LONGINT(alBD1;0)
+ARRAY LONGINT(alBDSelfKeys;0)
+ARRAY REAL(arPrice;0)
+
+C_LONGINT($i)
+C_TEXT($colorname)
+
+FIRST RECORD([StockOrdersLines])
+$i:=1
+For ($i;1;Records in selection([StockOrdersLines]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=[StockOrdersLines]CP_OrdID)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self";*)
+	QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 1")
+	QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+	
+	APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+	APPEND TO ARRAY(alOrders;[Orders]OrderNum)
+	If (Records in selection([CP_OrderXRef])=1)
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		APPEND TO ARRAY(asBDSelf;[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName)
+	Else 
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPType;<)
+		FIRST RECORD([CP_OrderXRef])
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		$colorname:=[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName+" / "
+		NEXT RECORD([CP_OrderXRef])
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		$colorname:=$colorname+[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName
+		APPEND TO ARRAY(asBDSelf;$colorname)
+	End if 
+	APPEND TO ARRAY(alBD1;[StockOrdersLines]Quantity)
+	APPEND TO ARRAY(arPrice;[StockOrdersLines]Price)
+	APPEND TO ARRAY(alBDSelfKeys;[CP_OrderXRef]SelfKey)
+	NEXT RECORD([StockOrdersLines])
+End for 
+
+FORM GOTO PAGE(2)

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([ChineseDictionary];"full")
+Repeat 
+	ADD RECORD([ChineseDictionary];*)
+	ADD TO SET([ChineseDictionary];"full")
+Until (ok=0)
+USE SET("full")
+CLEAR SET("full")
+ORDER BY([ChineseDictionary];[ChineseDictionary]EnglishName;>)

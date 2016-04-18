@@ -1,0 +1,5 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If ([Orders]PODate=!00-00-00!)
+	[Orders]PODate:=Current date(*)
+	OBJECT SET COLOR(*;"xPODate@";-(Dark blue+(256*Light grey)))
+End if 

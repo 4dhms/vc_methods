@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test1)
+C_TEXT($test2)
+C_TEXT($test3)
+C_TEXT($test4)
+C_LONGINT($i)
+
+vsHeader:=""
+OBJECT SET VISIBLE(bUpdate;False)
+OBJECT SET VISIBLE(vsHeader;False)
+USE SET("fabrics")
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]SortOrder;>)
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	
+	If ([OrdersFabricXRef]FabArtNo#"")
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+		$test1:=Replace string([FabricLibrary]FabricName;" ";"")
+		$test2:=Replace string([OrdersFabricXRef]FabricName;" ";"")
+		$test3:=Replace string([FabricLibrary]FiberContent;" ";"")
+		$test4:=Replace string([OrdersFabricXRef]FiberContent;" ";"")
+		If (Records in selection([FabricLibrary])>0)
+			If ($test1#$test2) | ($test3#$test4) & ([OrdersFabricXRef]FabArtNo#"TBD")  //& (vsHeader="")
+				vsHeader:="SPEC CHANGE: Article # "+[OrdersFabricXRef]FabArtNo
+				OBJECT SET VISIBLE(bUpdate;True)
+				OBJECT SET VISIBLE(vsHeader;True)
+			End if 
+			UNLOAD RECORD([FabricLibrary])
+		End if 
+	End if 
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+

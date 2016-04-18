@@ -1,0 +1,68 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style;$color)
+
+
+If (Abs($1)=3)
+	$style:=3
+	$color:=3
+Else 
+	$style:=0
+	$color:=15
+End if 
+
+If ($1>0)
+	OBJECT SET FONT STYLE([FabPOLines]ColorPrint;$style)
+	OBJECT SET COLOR([FabPOLines]ColorPrint;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]Quantity;$style)
+	OBJECT SET COLOR([FabPOLines]Quantity;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]LastDelivery;$style)
+	OBJECT SET COLOR([FabPOLines]LastDelivery;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]POUnit;$style)
+	OBJECT SET COLOR([FabPOLines]POUnit;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]POWidth;$style)
+	OBJECT SET COLOR([FabPOLines]POWidth;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]UnitPrice;$style)
+	OBJECT SET COLOR([FabPOLines]UnitPrice;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]POWidth;$style)
+	OBJECT SET COLOR([FabPOLines]POWidth;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]LineExt;$style)
+	OBJECT SET COLOR([FabPOLines]LineExt;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]Delivered;$style)
+	OBJECT SET COLOR([FabPOLines]Delivered;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE(vlOut;$style)
+	OBJECT SET COLOR(vlOut;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([FabPOLines]TransPO;$style)
+	OBJECT SET COLOR([FabPOLines]TransPO;-($color+(256*0)))
+	
+Else 
+	OBJECT SET FONT STYLE(vOrd;$style)
+	OBJECT SET COLOR(vOrd;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE(vdSubmitDate;$style)
+	OBJECT SET COLOR(vdSubmitDate;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE(vStyle;$style)
+	OBJECT SET COLOR(vStyle;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE(vDesign;$style)
+	OBJECT SET COLOR(vDesign;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE([OrdersFabricXRef]OrdType;$style)
+	OBJECT SET COLOR([OrdersFabricXRef]OrdType;-($color+(256*0)))
+	
+	OBJECT SET FONT STYLE(vtVendor;$style)
+	OBJECT SET COLOR(vtVendor;-($color+(256*0)))
+	
+	
+End if 
+

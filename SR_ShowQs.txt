@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET VISIBLE(vlOrdersQa1;cbQ=1)
+OBJECT SET VISIBLE(vlOrdersQa2;cbQ=1)
+OBJECT SET VISIBLE(vlOrdersQb1;cbQ=1)
+OBJECT SET VISIBLE(vlOrdersQb2;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQa1;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQa2;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQb1;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQb2;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQa1;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQa2;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQb1;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQb2;cbQ=1)
+
+OBJECT SET VISIBLE(vlOrdersQa11;cbQ=1)
+OBJECT SET VISIBLE(vlOrdersQa12;cbQ=1)
+OBJECT SET VISIBLE(vlOrdersQb11;cbQ=1)
+OBJECT SET VISIBLE(vlOrdersQb12;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQa11;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQa12;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQb11;cbQ=1)
+OBJECT SET VISIBLE(vlUnitsQb12;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQa11;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQa12;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQb11;cbQ=1)
+OBJECT SET VISIBLE(vlDollarsQb12;cbQ=1)
+
+OBJECT SET VISIBLE(vsPart1;cbQ=1)
+OBJECT SET VISIBLE(vsPart2;cbQ=1)
+OBJECT SET VISIBLE(vsPart3;cbQ=1)
+OBJECT SET VISIBLE(vsPart4;cbQ=1)
+
+vlOrdersQa1:=vlOrders1+vlOrders2+vlOrders3
+vlOrdersQa2:=vlOrders4+vlOrders5+vlOrders6
+vlOrdersQb1:=vlOrders7+vlOrders8+vlOrders9
+vlOrdersQb2:=vlOrders10+vlOrders11+vlOrders12
+vlUnitsQa1:=vlUnits1+vlUnits2+vlUnits3
+vlUnitsQa2:=vlUnits4+vlUnits5+vlUnits6
+vlUnitsQb1:=vlUnits7+vlUnits8+vlUnits9
+vlUnitsQb2:=vlUnits10+vlUnits11+vlUnits12
+vlDollarsQa1:=vlDollars1+vlDollars2+vlDollars3
+vlDollarsQa2:=vlDollars4+vlDollars5+vlDollars6
+vlDollarsQb1:=vlDollars7+vlDollars8+vlDollars9
+vlDollarsQb2:=vlDollars10+vlDollars11+vlDollars12
+
+vlOrdersQa11:=vlOrders13+vlOrders14+vlOrders15
+vlOrdersQa12:=vlOrders16+vlOrders17+vlOrders18
+vlOrdersQb11:=vlOrders19+vlOrders20+vlOrders21
+vlOrdersQb12:=vlOrders22+vlOrders23+vlOrders24
+vlUnitsQa11:=vlUnits13+vlUnits14+vlUnits15
+vlUnitsQa12:=vlUnits16+vlUnits17+vlUnits18
+vlUnitsQb11:=vlUnits19+vlUnits20+vlUnits21
+vlUnitsQb12:=vlUnits22+vlUnits23+vlUnits24
+vlDollarsQa11:=vlDollars13+vlDollars14+vlDollars15
+vlDollarsQa12:=vlDollars16+vlDollars17+vlDollars18
+vlDollarsQb11:=vlDollars19+vlDollars20+vlDollars21
+vlDollarsQb12:=vlDollars22+vlDollars23+vlDollars24

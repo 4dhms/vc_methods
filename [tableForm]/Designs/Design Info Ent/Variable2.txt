@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Design_Mandatory )
+	SAVE RECORD([Designs])
+	vfEmail:=False
+	WinChoice ("Which do you want to print?";"Record";"Design")
+	If (ok=1)
+		Design_PrintRecord 
+	Else 
+		Design_PrintDesign 
+	End if 
+End if 

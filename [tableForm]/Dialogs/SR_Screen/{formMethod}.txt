@@ -1,0 +1,111 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlOrdersQa1;vlOrdersQa2;vlOrdersQb1;vlOrderQb1;vlOrdersQa11;vlOrdersQa12;vlOrdersQb11;vlOrdersQb12)
+C_LONGINT(vlDollarsQa1;vlDollarsQa2;vlDollarsQb1;vlOrderQb1;vlDollarsQa11;vlDollarsQa12;vlDollarsQb11;vlDollarsQb12)
+C_LONGINT(vlUnitsQa1;vlUnitsQa2;vlUnitsQb1;vlOrderQb1;vlUnitsQa11;vlUnitsQa12;vlUnitsQb11;vlUnitsQb12)
+
+Case of 
+	: (Form event=On Load)
+		pFour:=1
+		
+		If (Shift down)
+			WinChoice ("Do you want to use the beta tester version?")
+			If (ok=1)
+				FORM GOTO PAGE(2)
+			Else 
+				FORM GOTO PAGE(1)
+			End if 
+		Else 
+			FORM GOTO PAGE(1)
+		End if 
+		
+		
+		cbBreakout:=0
+		
+		vtFootNote:=""
+		OBJECT SET ENABLED(bPrint;False)
+		ARRAY TEXT(asSeasonA;3)
+		ARRAY LONGINT(alYearA;4)
+		ARRAY TEXT(asDivisions;0)
+		Case of 
+			: (Current user="Sara Wingate")
+				ARRAY TEXT(asDivisions;3)
+				asDivisions{1}:="03-Cupio"
+				asDivisions{2}:="05-Cupio Blush"
+				asDivisions{3}:="03-Cupio + 05-Cupio Blush"
+			: (Current user="Shari") | (Current user="Andrea")
+				ARRAY TEXT(asDivisions;1)
+				asDivisions{1}:="12-Melissa Paige"
+			: (Current user="Sharon")
+				ARRAY TEXT(asDivisions;1)
+				asDivisions{1}:="08-Cable & Gauge Sport"
+			: (User in group(Current user;"SpenseKnits"))
+				ARRAY TEXT(asDivisions;1)
+				asDivisions{1}:="09-Spense Knits"
+			: (Current user="Ed") | (Current user="Mary Jo")
+				ARRAY TEXT(asDivisions;3)
+				asDivisions{1}:="06-Cable & Gauge"
+				asDivisions{2}:="06-C&G + 07-Ts"
+				asDivisions{3}:="07-T's"
+			: (User in group(Current user;"DressesOnly"))
+				ARRAY TEXT(asDivisions;1)
+				asDivisions{1}:="02-Dresses"
+			: (Current user="Mark")
+				ARRAY TEXT(asDivisions;4)
+				asDivisions{1}:="01-Blouses"
+				asDivisions{2}:="02-Dresses"
+				asDivisions{3}:="04-Social"
+			Else 
+				LIST TO ARRAY("Division Code No";asDivisions)
+				INSERT IN ARRAY(asDivisions;1;1)
+				INSERT IN ARRAY(asDivisions;6;1)
+				INSERT IN ARRAY(asDivisions;8;1)
+				asDivisions{1}:="All Divisions"
+				asDivisions{6}:="03-Cupio + 05-Cupio Blush"
+				asDivisions{8}:="06-C&G + 07-Ts"
+		End case 
+		
+		If (Current user="Spenser") | (Current user="Designer")
+			APPEND TO ARRAY(asDivisions;"03-Cupio only")
+			APPEND TO ARRAY(asDivisions;"05-Cupio Blouse only")
+		End if 
+		
+		asDivisions:=1
+		alYearA{1}:=Year of(Current date(*))-2
+		alYearA{2}:=Year of(Current date(*))-1
+		alYearA{3}:=Year of(Current date(*))
+		alYearA{4}:=Year of(Current date(*))+1
+		
+		asSeasonA{1}:="Spring"
+		asSeasonA{2}:="Fall"
+		asSeasonA{3}:="Date range"
+		
+		alYearA:=3
+		If (Month of(Current date(*))<8) | (Current user="Lou") | (Current user="Designer")
+			asSeasonA:=1
+			If (Month of(Current date(*))>11)
+				alYearA:=4
+			End if 
+		Else 
+			asSeasonA:=2
+		End if 
+		ARRAY TEXT(atQueryText;0)
+		APPEND TO ARRAY(atQueryText;"Customer Q")
+		If (asSeasonA=1)
+			APPEND TO ARRAY(atQueryText;"Q1")
+			APPEND TO ARRAY(atQueryText;"Q2")
+			APPEND TO ARRAY(atQueryText;"Q3")
+			APPEND TO ARRAY(atQueryText;"Q4")
+		Else 
+			APPEND TO ARRAY(atQueryText;"Q3")
+			APPEND TO ARRAY(atQueryText;"Q4")
+			APPEND TO ARRAY(atQueryText;"Q1")
+			APPEND TO ARRAY(atQueryText;"Q2")
+		End if 
+		atQueryText:=1
+		
+		SR_Init (False)
+		SR_BuildShell 
+		
+	: (Form event=On Unload)
+		CLEAR SET("Master")
+End case 

@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($scale1;$scale2)
+C_LONGINT($h;$w)
+
+vxSketch:=[Designs]Sketch
+
+PICTURE PROPERTIES(vxSketch;$w;$h)
+
+$scale1:=Round(460/$w;2)
+$scale2:=Round(480/$h;2)
+
+If ($scale1<$scale2)
+	$scale2:=Round($h*$scale1;0)
+	$scale1:=460
+Else 
+	$scale1:=Round($w*$scale2;0)
+	$scale2:=480
+End if 
+
+
+CREATE THUMBNAIL(vxSketch;vxSketch;$scale1;$scale2)
+
+If (Picture size(vxSketch)<[Designs]PictureSIze)
+	[Designs]Sketch:=vxSketch
+	[Designs]PictureSIze:=Picture size([Designs]Sketch)
+	SAVE RECORD([Designs])
+End if 

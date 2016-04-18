@@ -1,0 +1,4 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Samples])
+ALL RECORDS([Samples])
+SET WINDOW TITLE("Sample Garments: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))

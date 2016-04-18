@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Array_BuildDays ("End";<>asEndMonth)
+<>asEndDay:=Size of array(<>asEndDay)
+REDUCE SELECTION([Orders];0)
+CLEAR SET("Orders")

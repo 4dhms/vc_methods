@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderNumber)
+
+If (Form event=On Display Detail)
+	Case of 
+		: (Record number([OrdersFabricXRef])<0)
+			vOrd:=""
+			vdSubmitDate:=!00-00-00!
+			vStyle:=""
+			vDesign:=""
+			vtVendor:=""
+			
+		: ([OrdersFabricXRef]OrderNumber<0)
+			$orderNumber:=[OrdersFabricXRef]OrderNumber*-1
+			QUERY([Samples];[Samples]SampleNumber=$orderNumber)
+			vOrd:="SG"+String(Abs([OrdersFabricXRef]OrderNumber))
+			vdSubmitDate:=[Samples]SampleOrderDate
+			vStyle:=[Samples]StyleNum
+			vDesign:=[Samples]DesignNum
+			vtVendor:=[Samples]SamGarFactry
+			UNLOAD RECORD([Samples])
+		Else 
+			QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+			vOrd:="PO"+String(Abs([OrdersFabricXRef]OrderNumber))
+			vdSubmitDate:=[Orders]PODate
+			vStyle:=[Orders]StyleNumber
+			vDesign:=[Orders]DesignNumber
+			vtVendor:=[Orders]Factory
+			UNLOAD RECORD([Orders])
+	End case 
+	
+	If ([OrdersFabricXRef]NewtoPO)
+		FabPO_ColorCode (-3)
+	Else 
+		FabPO_ColorCode (-1)
+	End if 
+End if 

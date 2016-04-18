@@ -1,0 +1,268 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($sampleQ)
+C_LONGINT($c)
+
+Cost_Enterable 
+$c:=Find in array(atPages;vsCurrentTab)
+If ($c>0)
+	atPages:=$c
+End if 
+
+OBJECT SET ENABLED(bCancelSample;True)
+vlTableNum:=Table(Current form table)
+OBJECT SET VISIBLE(*;"xVoid";[Samples]Void)
+vtOrderChanges:=""
+
+$sampleQ:=String([Samples]SampleNumber)
+QUERY([Orders];[Orders]SGPO=$sampleQ)
+If (Records in selection([Orders])>0)
+	OBJECT SET VISIBLE(*;"xOrders";True)
+Else 
+	OBJECT SET VISIBLE(*;"xOrders";False)
+End if 
+UNLOAD RECORD([Orders])
+
+If ([Samples]DesignNum="")
+	REDUCE SELECTION([Designs];0)
+Else 
+	QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+	If ([Designs]ArchivedPict)
+		Picture_RestoreOnTheFly 
+	End if 
+	QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+	
+	If ([Samples]KWCnS#[Designs]KWCnS) & ([Designs]KWCnS#"")
+		[Samples]KWCnS:=[Designs]KWCnS
+	End if 
+End if 
+Revise_Array 
+
+Revise_SG_FlagFields ([Samples]RevisionNumber=0)
+If ([Samples]Revised)
+	<>Enter:=False
+Else 
+	<>Enter:=True
+End if 
+
+
+SG_PopDivision 
+cbKnit:=0
+cbWoven:=0
+cbCutSew:=0
+Case of 
+	: ([Samples]KWCnS="Knit")
+		cbKnit:=1
+	: ([Samples]KWCnS="Woven")
+		cbWoven:=1
+	: ([Samples]KWCnS="CutSew")
+		cbCutSew:=1
+End case 
+
+vtOldData:=""
+vtHistory:=""
+<>vlRevisionNumber:=[Samples]RevisionNumber
+<>vlOrderNumber:=[Samples]SampleNumber*-1
+<>vsDesignNumber:=[Samples]DesignNum
+vfPO:=False
+If ([Samples]EmailDate#!00-00-00!)
+	vsMailFlag:="Last email: "+String([Samples]EmailDate)
+Else 
+	vsMailFlag:=""
+End if 
+
+If (User in group(Current user;"CostSheets"))
+	OBJECT SET ENABLED(bCost;True)
+Else 
+	OBJECT SET ENABLED(bCost;False)
+End if 
+If (Is new record([Samples]))
+	  //----------------------------
+	  //update Order_AdSample & SG_DupeOrder
+	[Samples]SampleNumber:=Num(PO_GetNumber ("Sample"))
+	<>vlOrderNumber:=-1*[Samples]SampleNumber
+	  //----------------------------
+	vsOldColorNumber:=""
+	vsNewColorNumber:=""
+	vtHistory:=""
+	REDUCE SELECTION([Designs];0)
+	[Samples]ComponentSheet:=True
+	FORM GOTO PAGE(1)
+	[Samples]NewSGSystem:=True
+	  //SAVE RECORD([Samples])
+	vfNewRecord:=True
+	CS_NewSG 
+Else 
+	vfNewRecord:=False
+	vsOldColorNumber:=""
+	vsNewColorNumber:=""
+	Order_GetFabric 
+	Order_GetComponents (<>vlOrderNumber)
+	
+	Case of 
+		: (atPages<1)
+			atPages:=1
+			
+		: (atPages{atPages}="Cmpnts")
+			
+		: (atPages{atPages}="Hist")
+			GetHistory 
+	End case 
+End if 
+OBJECT SET ENABLED(bComponent;True)
+OBJECT SET VISIBLE(*;"xNoOrder1";[Samples]NoOrder)
+OBJECT SET VISIBLE(*;"xNoOrder2";[Samples]NoOrder)
+
+<>vlOrderNumber:=[Samples]SampleNumber*-1
+<>vsDesignNumber:=[Samples]DesignNum
+CS_NewViewSG 
+
+<>vlSGPO:=-1*[Samples]SampleNumber
+  // 
+vlOrderNumber:=Abs([Samples]SampleNumber)
+Fab_BuildOrderArray (<>vlOrderNumber)
+
+If (Records in selection([OrdersFabricXRef])=1)
+	FIRST RECORD([OrdersFabricXRef])
+	If ([OrdersFabricXRef]OrdType="")
+		[OrdersFabricXRef]OrdType:="Self"
+		SAVE RECORD([OrdersFabricXRef])
+	End if 
+End if 
+
+  //QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=◊vlOrderNumber)
+  //QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+  //QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="Combo@")
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]XrefID;>)
+
+If ([OrdersFabricXRef]SolidPrint="Print")
+	vfPrint:=True
+Else 
+	vfPrint:=False
+End if 
+
+If ([Samples]MultipleStyles)
+	OBJECT SET ENTERABLE([Samples]StyleNum;False)
+Else 
+	OBJECT SET ENTERABLE([Samples]StyleNum;True)
+	GOTO OBJECT(vsEmpty)
+End if 
+
+
+vsRecInSelection:=String(Selected record number([Samples]))+"/"+String(Records in selection([Samples]))
+If ([Samples]OrderEnterer SG="")
+	[Samples]OrderEnterer SG:=Current user
+End if 
+SG_NavButtons 
+
+asSGStatus:=[Samples]SGStatus+1
+  //clean up
+  //If ([Samples]DateReceived="00/00/00")
+  //[Samples]DateReceived:=""
+  //End if 
+If ([Samples]Patt="00/00/00")
+	[Samples]Patt:=""
+End if 
+
+vtDescription:=[Designs]Description
+
+Sample_SeasonToggle 
+
+Case of 
+	: (Find in array(<>asSeasonName;[Samples]SeasonName)<1)
+		<>asSeasonName:=1
+	Else 
+		<>asSeasonName:=Find in array(<>asSeasonName;[Samples]SeasonName)
+End case 
+Case of 
+	: (Find in array(<>asSeasonYear;[Samples]SeasonYear)<1)
+		<>asSeasonYear:=1
+	Else 
+		<>asSeasonYear:=Find in array(<>asSeasonYear;[Samples]SeasonYear)
+End case 
+
+Case of 
+	: (vsCurrentTab="Cost I")
+		FORM GOTO PAGE(5)
+	: (vsCurrentTab="Cost II")
+		FORM GOTO PAGE(6)
+	: (vsCurrentTab="DCS")
+		FORM GOTO PAGE(8)
+		  //Cost_Tab 
+	: (atPages{atPages}="Cmpnts")
+		
+		
+	: (atPages{atPages}="Hist")
+		GetHistory 
+End case 
+
+Case of 
+	: (Is new record([Samples])) & (<>vlOrderNumber<0)
+		Fabric_ArrayInit (0)
+		ARRAY TEXT(asTypeList;0)
+		ARRAY TEXT(asCPLetter;0)
+		ARRAY TEXT(asCPStyleNum;0)
+		ARRAY TEXT(asCC;0)
+		ARRAY BOOLEAN(afCCoverride;0)
+		ARRAY TEXT(asCPNumbers;0)
+		ARRAY TEXT(asCPColorName;0)
+		ARRAY TEXT(asMillNumber;0)
+		ARRAY TEXT(atThreadColor;0)
+		ARRAY TEXT(asCarton;0)
+		ARRAY TEXT(asColorStatus;0)
+		ARRAY DATE(adStatusDate;0)
+		ARRAY LONGINT(alCQty;0)
+		ARRAY LONGINT(alSelfKey;0)
+		ARRAY LONGINT(alStyleFab;0)
+		ARRAY LONGINT(alShadeFab;0)
+		ARRAY LONGINT(alColorChange;0)
+		ARRAY LONGINT(alColorKey;0)
+		ARRAY LONGINT(alCPXref;0)
+		ARRAY LONGINT(alCompOrderNumber;0)
+		ARRAY LONGINT(alCompLineKey;0)
+		ARRAY LONGINT(alCompDeleted;0)
+		ARRAY LONGINT(alCompQty;0)
+		ARRAY TEXT(asCompName;0)
+		ARRAY TEXT(atCompNote;0)
+		ARRAY TEXT(asCompArt;0)
+		ARRAY TEXT(asCompSource;0)
+		ARRAY TEXT(asCompStatus;0)
+		ARRAY DATE(adCompStatusDate;0)
+		
+		atPages:=1
+		FORM GOTO PAGE(1)
+		
+	: (vsCurrentTab="Pix")
+		atPages:=2
+		FORM GOTO PAGE(2)
+		
+	: (vsCurrentTab="")
+		atPages:=1
+	Else 
+		atPages:=Find in array(atPages;vsCurrentTab)
+		Case of 
+			: (atPages{atPages}="Hist")
+				GetHistory 
+		End case 
+		If (Not(<>vfDCS))
+			FORM GOTO PAGE(atPages)
+			GOTO OBJECT(vsEmpty)
+		End if 
+End case 
+vtOrderChanges:=""
+Sample_CalcQty 
+Sample_RequiredFlag 
+
+If (Application type=0)
+	  //do nothing, running standalone
+Else 
+	Pix_Load 
+	If ([Samples]SampleDivision="05-@") & ([Designs]LabelPict)
+		OBJECT SET VISIBLE([Samples]DontPrintLabel;True)
+		OBJECT SET VISIBLE(bView;True)
+	Else 
+		OBJECT SET VISIBLE([Samples]DontPrintLabel;False)
+		OBJECT SET VISIBLE(bView;False)
+	End if 
+End if 
+  //LockTrack 
+

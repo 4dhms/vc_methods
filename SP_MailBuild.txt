@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtSubjectLine)
+C_TEXT($vsPoNumber)
+C_BOOLEAN($special)
+$special:=False
+vfPO:=True
+
+Case of 
+	: ([Spooler]Genre="RMA")
+		$special:=True
+		vtPDFName:="RMA"+String([Spooler]RecordNumber)
+		vtBodyText:=[Spooler]SpoolMessage
+		
+	: ([Spooler]Genre="Meeting notification")
+		$special:=True
+		vtPDFName:="Meeting Notification"
+		vtBodyText:=[Spooler]SpoolMessage
+		
+	: ([Spooler]SpoolRouter=9)
+		  //Spenser change notification
+		$special:=True
+		vtPDFName:="Change"
+		vtBodyText:=[Spooler]SpoolMessage
+		
+	: ([Spooler]Genre="CS")
+		$special:=False
+		GOTO RECORD([CostSheets];[Spooler]RecordNumber)
+		QUERY([Costing];[Costing]SheetNumber=[CostSheets]SheetNumber)
+		$vsPONumber:=String([Costing]OrderNumber)
+		vtBodyText:="Attached is costing for "+$vsPONumber
+	: ([Spooler]Genre="Status")
+		vtProdStatGuide:=[Spooler]StatusGuide
+		Order_StatusReturn (True)
+		$vsPoNumber:="Status"
+	: ([Spooler]Genre="POs")
+		$vsPoNumber:="POs"
+	: ([Spooler]Genre="FO@") | ([Spooler]Genre="DL")
+		$vsPoNumber:=vpNumberPtr->
+	: ([Spooler]Genre="SP")
+		$vsPoNumber:=vpNumberPtr->
+	Else 
+		$vsPoNumber:=String(vpNumberPtr->)
+End case 
+
+  //QUERY([Vendors];[Vendors]VendorName=vtVendor)
+  //$vendorkey:=[Vendors]VendorKey
+
+If ([Spooler]Genre="Meeting Notification")
+	vtSubjectLine:=[Spooler]StatusGuide
+Else 
+	Email_Attachments ([Spooler]Genre)
+	SP_MailPrep ([Spooler]Genre)
+	Case of 
+		: (vtPDFName="Design Line Plan") & (vtSubjectLine#"")
+		: (vtPDFName="Design Line Plan") & (vtSubjectLine="")
+			vtSubjectLine:=vtPDFName
+		Else 
+			vtSubjectLine:=vtPDFName
+	End case 
+End if 
+
+SP_MailShipout 

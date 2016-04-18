@@ -1,0 +1,179 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_PICTURE($empty)
+C_POINTER($titlePtr;$sketchPtr;$designPtr;$stylePtr;$FabricPtr;$StitchPtr;$pricePtr;$sizePtr;$colorPtr;$msrpPtr;$label)
+C_LONGINT($workLine;$i;$c;$n;$ordernumber;cbPrice)
+C_TEXT($stripPO)
+C_BOOLEAN(vfVisible)
+
+GET PICTURE FROM LIBRARY("empty.jpg";$empty)
+$titlePtr:=Get pointer("vtTitle"+String(Abs($1)))
+$sketchPtr:=Get pointer("vxSketch"+String(Abs($1)))
+$designPtr:=Get pointer("vDesign"+String(Abs($1)))
+$stylePtr:=Get pointer("vStyle"+String(Abs($1)))
+$fabricPtr:=Get pointer("vtFabric"+String(Abs($1)))
+$StitchPtr:=Get pointer("vtStitch"+String(Abs($1)))
+$pricePtr:=Get pointer("vsPrice"+String(Abs($1)))
+$msrpPtr:=Get pointer("vsMSRP"+String(Abs($1)))
+$colorPtr:=Get pointer("vtColor"+String(Abs($1)))
+$workLine:=Find in array(alItemNumber;$1)
+$sizePtr:=Get pointer("vsSize"+String(Abs($1)))
+$msrpPtr->:=""
+  //$vert:="v"+String($1)
+
+  //If ($1#4) & ($1#8) & ($1#12) & (Size of array(afDuplices)>=$1) & (Size of array(afDuplices)#0)
+  //if (afDuplices{$1}=True)
+  //OBJECT MOVE($colorPtr->;0;0;156;0)
+  //OBJECT SET VISIBLE(*;$vert;False)
+  //End if 
+  //End if 
+
+  //If ($1#1) & ($1#5) & ($1#9) & (Size of array(afDuplices)>=$1) & (Size of array(afDuplices)#0)
+  //If (afDuplices{$1-1}=True)
+  //OBJECT SET VISIBLE($sketchptr->;False)
+  //OBJECT SET VISIBLE($colorPtr->;False)
+  //OBJECT SET VISIBLE(*;"ms"+String($1);False)
+  //End if 
+  //End if 
+
+If ($workLine>0)
+	QUERY([Designs];[Designs]DesignNum=asDesignNumbers{$workLine})
+	If ([Designs]ArchivedPict)
+		Picture_RestoreProc 
+	End if 
+	
+	$titlePtr->:=atTitle{$workLine}
+	$sketchPtr->:=[Designs]Sketch
+	Case of 
+		: (Num(asDesignNumbers{$workLine})<0)
+			$designPtr->:="Note:"
+		: (Not(vfVisible))
+			$designPtr->:=""
+		Else 
+			$designPtr->:="D/N: "+asDesignNumbers{$workLine}
+	End case 
+	
+	If (aStyle{$workLine}="")
+		$stylePtr->:=""
+	Else 
+		$stylePtr->:="Style: "+aStyle{$workLine}
+	End if 
+	
+	$fabricPtr->:=asFabric{$workLine}
+	$StitchPtr->:=aStitch{$workLine}
+	$ordernumber:=alPOOrder{$workline}
+	
+	Case of 
+		: ([DesignLines]RealPrice)
+			QUERY([Orders];[Orders]OrderNum=alPOOrder{$workline})
+			$pricePtr->:=String([Orders]Price;"###.00")
+			UNLOAD RECORD([Orders])
+		: (cbPrice=0)
+			$pricePtr->:=""
+		: (atPrice{$workline}="0")
+			$pricePtr->:=""
+		Else 
+			$pricePtr->:=DL_ProcessPrice (atPrice{$workLine})
+	End case 
+	
+	If (arMSRP{$workLine}>0.1)
+		$msrpPtr->:=String(arMSRP{$workLine};"###.00")
+	Else 
+		$msrpPtr->:=String(arMSRP{$workLine};"###.##")
+	End if 
+	
+	  //Counts returns to allow extra space for sizes
+	$c:=0
+	$i:=1
+	
+	For ($i;1;Length(atColor{$workLine}))
+		If (Substring(atColor{$workLine};$i;1)=Char(13))
+			$c:=$c+1
+		End if 
+	End for 
+	Dev_Trayce 
+	
+	If ([DesignLines]Stock)
+		QUERY([DesignLineIncluded];[DesignLineIncluded]PageNumber=[DLPages]PageNumber;*)
+		QUERY([DesignLineIncluded]; | ;[DesignLineIncluded]ItemNumber>$1;*)
+		QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey)
+		
+		$stripPO:=Substring($StitchPtr->;Position("PO";$StitchPtr->);20)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=Num($stripPO))
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		DL_PullColors (False)
+		$colorPtr->:=[DesignLineIncluded]Colors
+		
+		If (Application type>0)
+			If (Not([DesignLines]SketchesOnly))
+				QUERY([SpecPix];[SpecPix]OrderNumber=$ordernumber)
+				If (Records in selection([SpecPix])>0)
+					QUERY SELECTION([SpecPix];[SpecPix]LinePlan=True)
+					If (Records in selection([SpecPix])>0)
+						Picture_Get ($ordernumber+([SpecPix]SketchNumber*0.1);"B")
+						Pix_Delay 
+						$sketchPtr->:=<>vxSketch
+						UNLOAD RECORD([SpecPix])
+					End if 
+				End if 
+			End if 
+		End if 
+		
+	Else 
+		
+		$colorPtr->:=atColor{$workLine}
+		
+		If (asSize{$workLine}#"") & (vf8Up)
+			If ($c>=10)
+				$colorPtr->:=$colorPtr->+Char(13)+asSize{$workLine}
+			Else 
+				
+				$n:=1
+				For ($n;1;10-$c)
+					$colorPtr->:=$colorPtr->+Char(13)
+				End for 
+				$colorPtr->:=$colorPtr->+asSize{$workLine}
+			End if 
+		End if 
+	End if 
+	
+	If (Not(vf8Up))
+		$sizePtr->:=asSize{$workLine}
+	End if 
+Else 
+	$titlePtr->:=""
+	$sketchPtr->:=$empty
+	$designPtr->:=""
+	$stylePtr->:=""
+	$fabricPtr->:=""
+	$StitchPtr->:=""
+	$pricePtr->:=""
+	$colorPtr->:=""
+	$sizePtr->:=""
+End if 
+
+If (vfPrinting)
+	If (Not(vf8Up))
+		OBJECT SET FONT SIZE($sizePtr->;[DesignLines]TextSize)
+		OBJECT SET FONT($sizePtr->;[DesignLines]TextFont)
+	End if 
+	OBJECT SET FONT SIZE($titlePtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($titlePtr->;[DesignLines]TextFont)
+	
+	OBJECT SET FONT SIZE($designPtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($designPtr->;[DesignLines]TextFont)
+	
+	OBJECT SET FONT SIZE($stylePtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($stylePtr->;[DesignLines]TextFont)
+	
+	OBJECT SET FONT SIZE($fabricPtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($fabricPtr->;[DesignLines]TextFont)
+	
+	OBJECT SET FONT SIZE($StitchPtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($StitchPtr->;[DesignLines]TextFont)
+	
+	OBJECT SET FONT SIZE($pricePtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($pricePtr->;[DesignLines]TextFont)
+	
+	OBJECT SET FONT SIZE($colorPtr->;[DesignLines]TextSize)
+	OBJECT SET FONT($colorPtr->;[DesignLines]TextFont)
+End if 

@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_PICTURE($sketch)
+
+ARRAY PICTURE(aSketch;0)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY TEXT(asLDescript;0)
+ARRAY TEXT(asColors;0)
+ARRAY REAL(arMCol1;0)
+ARRAY LONGINT(alQuantity;0)
+ARRAY REAL(arMCol2;0)
+
+$i:=1
+FIRST RECORD([StockOrdersLines])
+For ($i;1;Records in selection([StockOrdersLines]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=[StockOrdersLines]CP_OrdID)
+	QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	
+	QUERY([SpecPix];[SpecPix]OrderNumber=[CP_OrderXRef]OrderNumber)
+	QUERY SELECTION([SpecPix];[SpecPix]LinePlan=True)
+	If (Records in selection([SpecPix])>0)
+		Picture_Get ([CP_OrderXRef]OrderNumber+([SpecPix]SketchNumber*0.1);"B")
+		Pix_Delay 
+		vxSketch:=<>vxSketch
+		APPEND TO ARRAY(aSketch;vxSketch)
+		UNLOAD RECORD([SpecPix])
+	Else 
+		APPEND TO ARRAY(aSketch;[Designs]Sketch)
+	End if 
+	APPEND TO ARRAY(asStyleNumbers;[StockOrdersLines]Style)
+	APPEND TO ARRAY(alOrders;[Orders]OrderNum)
+	APPEND TO ARRAY(asLDescript;[Designs]Description)
+	APPEND TO ARRAY(asColors;[StockOrdersLines]Color)
+	APPEND TO ARRAY(arMCol1;[StockOrdersLines]Price)
+	APPEND TO ARRAY(alQuantity;[StockOrdersLines]Quantity)
+	APPEND TO ARRAY(arMCol2;[StockOrdersLines]Ext)
+	NEXT RECORD([StockOrdersLines])
+End for 
+
+QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Designs])
+

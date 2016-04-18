@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([StyleNumberGen];[StyleNumberGen]NumberOnly=0)
+FIRST RECORD([StyleNumberGen])
+$i:=1
+For ($i;1;Records in selection([StyleNumberGen]))
+	[StyleNumberGen]NumberOnly:=Num(StripToNumber ([StyleNumberGen]StyleNumber))
+	SAVE RECORD([StyleNumberGen])
+	NEXT RECORD([StyleNumberGen])
+End for 
+ALERT("Done")

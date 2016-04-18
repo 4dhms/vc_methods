@@ -1,0 +1,7 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE RECORD([ComponentSheets])
+[ComponentSheets]HMSOrderNumber:=[Samples]SampleNumber*-1
+[ComponentSheets]CS_ID:=Sequence number([ComponentSheets])
+[ComponentSheets]SGPO:=[Samples]SampleNumber
+SAVE RECORD([ComponentSheets])
+  //◊vlOrderNumber:=[ComponentSheets]HMSOrderNumber

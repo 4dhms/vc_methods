@@ -1,0 +1,34 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY TEXT(asPages;0)
+ARRAY TEXT(asPageTitle;0)
+ARRAY LONGINT(alRecordKey;0)
+ARRAY LONGINT(alHistKey;0)
+ARRAY BOOLEAN(afDelete;0)
+ARRAY BOOLEAN(afPrint;0)
+ARRAY BOOLEAN(afSpecial;0)
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+
+ARRAY TEXT(asPages;Records in selection([DLPages]))
+ARRAY TEXT(asPageTitle;Records in selection([DLPages]))
+ARRAY LONGINT(alRecordKey;Records in selection([DLPages]))
+ARRAY LONGINT(alHistKey;Records in selection([DLPages]))
+ARRAY BOOLEAN(afDelete;Records in selection([DLPages]))
+ARRAY BOOLEAN(afPrint;Records in selection([DLPages]))
+ARRAY BOOLEAN(afSpecial;Records in selection([DLPages]))
+
+$i:=1
+ORDER BY([DLPages];[DLPages]PageNumber;>)
+FIRST RECORD([DLPages])
+For ($i;1;Records in selection([DLPages]))
+	alHistKey{$i}:=[DLPages]PageNumber
+	asPages{$i}:=[DLPages]PageTitle
+	alRecordKey{$i}:=$i
+	afPrint{$i}:=True
+	afSpecial{$i}:=[DLPages]Stock
+	NEXT RECORD([DLPages])
+End for 
+FIRST RECORD([DLPages])
+

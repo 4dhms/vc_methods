@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($order)
+C_LONGINT($i)
+
+
+Case of 
+	: (asSortOrder{asSortOrder}="PO Number") & (asSort=1)
+		ORDER BY([Orders];[Orders]OrderNum;>)
+	: (asSortOrder{asSortOrder}="Style Number") & (asSort=1)
+		ORDER BY([Orders];[Orders]StyleNumber;>)
+	: (asSortOrder{asSortOrder}="NY Cancel") & (asSort=1)
+		ORDER BY([Orders];[Orders]CancelDate;>)
+	: (asSortOrder{asSortOrder}="X Factory") & (asSort=1)
+		ORDER BY([Orders];[Orders]ShipDateFactory;>)
+	: (asSortOrder{asSortOrder}="Order Qty") & (asSort=1)
+		ORDER BY([Orders];[Orders]TotalOrderQuantity;>)
+	: (asSortOrder{asSortOrder}="PO Number")
+		ORDER BY([Orders];[Orders]OrderNum;<)
+	: (asSortOrder{asSortOrder}="Style Number")
+		ORDER BY([Orders];[Orders]StyleNumber;<)
+	: (asSortOrder{asSortOrder}="NY Cancel")
+		ORDER BY([Orders];[Orders]CancelDate;<)
+	: (asSortOrder{asSortOrder}="X Factory")
+		ORDER BY([Orders];[Orders]ShipDateFactory;<)
+	: (asSortOrder{asSortOrder}="Order Qty") & (asSort=1)
+		ORDER BY([Orders];[Orders]TotalOrderQuantity;>)
+		
+	: (asSortOrder>5)
+		If (Size of array(arMcol1)<1)
+			Report_VarianceArray 
+		End if 
+		
+		$i:=1
+		FIRST RECORD([Orders])
+		For ($i;1;Records in selection([Orders]))
+			Case of 
+				: (asSortOrder{asSortOrder}="Invoice Qty")
+					If (Find in array(alOrderVar;[Orders]OrderNum)<1)
+						ALERT(String([Orders]OrderNum)+"  "+String(Find in array(alOrderVar;[Orders]OrderNum)))
+					End if 
+					
+					[Orders]TempSort:=arMCol1{Find in array(alOrderVar;[Orders]OrderNum)}
+				: (asSortOrder{asSortOrder}="Difference")
+					[Orders]TempSort:=arMCol2{Find in array(alOrderVar;[Orders]OrderNum)}
+				: (asSortOrder{asSortOrder}="Projected Sales")
+					[Orders]TempSort:=arMCol3{Find in array(alOrderVar;[Orders]OrderNum)}
+				: (asSortOrder{asSortOrder}="Actual Sales")
+					[Orders]TempSort:=arMCol4{Find in array(alOrderVar;[Orders]OrderNum)}
+				: (asSortOrder{asSortOrder}="Difference")
+					[Orders]TempSort:=arMCol5{Find in array(alOrderVar;[Orders]OrderNum)}
+			End case 
+			SAVE RECORD([Orders])
+			NEXT RECORD([Orders])
+		End for 
+		If (asSort=1)
+			ORDER BY([Orders];[Orders]TempSort;>)
+		Else 
+			ORDER BY([Orders];[Orders]TempSort;<)
+		End if 
+End case 
+

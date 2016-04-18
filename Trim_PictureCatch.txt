@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfCatchFile)
+
+If (<>vfCatchFile)
+	<>vxSketch:=$1
+	CALL PROCESS(<>vlTrimLib)
+	<>vfCatchFile:=False
+End if 

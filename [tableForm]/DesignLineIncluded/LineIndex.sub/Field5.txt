@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to remove this garment?")
+If (ok=1)
+	CREATE SET([DesignLineIncluded];"garms")
+	REMOVE FROM SET([DesignLineIncluded];"garms")
+	DELETE RECORD([DesignLineIncluded])
+	USE SET("garms")
+	DL_Backgrounder 
+End if 
+DL_RecCount 

@@ -1,0 +1,55 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($gotoOrder)
+
+  //If (<>vlPlatform<3)
+
+If (Count parameters>0)
+	$gotoOrder:=True
+End if 
+  //p_FabOrder global procedure
+
+  //builds vendor list
+vfNewFOSys:=False
+
+Array_VendorTypes 
+p_VendorArray_Build 
+
+Closed:=False
+SET MENU BAR(17)
+
+Case of 
+	: (<>asVendorTypes{<>asVendorTypes}="Fabric")
+		QUERY([FabricOrders];[FabricOrders]POType=0)
+	: (<>asVendorTypes{<>asVendorTypes}="Button")
+		QUERY([FabricOrders];[FabricOrders]POType=1)
+	: (<>asVendorTypes{<>asVendorTypes}="Trim")
+		QUERY([FabricOrders];[FabricOrders]POType=2)
+	Else 
+		QUERY([FabricOrders];[FabricOrders]Void=False;*)
+End case 
+ORDER BY([FabricOrders];[FabricOrders]PONumber;>)
+
+
+  //End if 
+
+FORM SET OUTPUT([FabricOrders];"FabricOrderList")
+FORM SET INPUT([FabricOrders];"FabricOrderEntry")
+vlWinWd:=950
+vlWinHt:=610
+vlWinType:=4
+vsWinTitle:=""
+<>CloseBox:=True
+
+
+Center Window 
+SET WINDOW TITLE(<>asVendorTypes{<>asVendorTypes}+" Orders")
+AccessMode (->[FabricOrders];True)
+TheFile:=->[FabricOrders]
+If ($gotoOrder)
+	QUERY([FabricOrders];[FabricOrders]PONumber=$1)
+	MODIFY RECORD([FabricOrders];*)
+Else 
+	MODIFY SELECTION([FabricOrders];*)
+End if 
+CLOSE WINDOW
+<>FabOrdProcID:=0

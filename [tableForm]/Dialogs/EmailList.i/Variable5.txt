@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asVendors>0)
+	WinChoice ("Are you sure you want to replace the current email list with "+asVendors{asVendors}+"'s email list?")
+	If (ok=1)
+		C_LONGINT($i)
+		ARRAY TEXT(asSubCC;0)
+		$i:=1
+		
+		QUERY([Vendors];[Vendors]VendorName=asVendors{asVendors})
+		QUERY([VendorEmail];[VendorEmail]VendorKey=[Vendors]VendorKey)
+		QUERY SELECTION([VendorEmail];[VendorEmail]EmailAddress#"")
+		
+		
+		SELECTION TO ARRAY([VendorEmail]EmailAddress;asSubCC)
+		SORT ARRAY(asSubCC;>)
+		If (Find in array(asSubCC;[Vendors]PrimaryEmail)<1)
+			INSERT IN ARRAY(asSubCC;1;1)
+			asSubCC{1}:=[Vendors]PrimaryEmail
+		End if 
+		
+		UNLOAD RECORD([Vendors])
+		UNLOAD RECORD([VendorEmail])
+		CREATE RECORD([Changes])
+		If (<>vlOrderNumber>0)
+			[Changes]RevisionNumber:=[Orders]RevisionNumber
+			[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber*0.01)
+			[Changes]OrderNumber:=[Orders]OrderNum
+			[Changes]TableNum:=2
+		Else 
+			[Changes]RevisionNumber:=[Samples]RevisionNumber
+			[Changes]RevisionKey:=([Samples]SampleNumber+([Samples]RevisionNumber*0.01))*-1
+			[Changes]OrderNumber:=-1*[Samples]SampleNumber
+			[Changes]TableNum:=3
+		End if 
+		[Changes]RevDate:=Current date(*)
+		[Changes]RevTime:=Current time(*)
+		[Changes]Writer:=Current user
+		[Changes]ChangeKey:=Sequence number([Changes])
+		[Changes]Tag:="Replace to"
+		[Changes]FieldName:="Email List"
+		[Changes]NewChange:="Replaced "+asVendors{asVendors}
+		SAVE RECORD([Changes])
+	End if 
+	FORM GOTO PAGE(1)
+End if 

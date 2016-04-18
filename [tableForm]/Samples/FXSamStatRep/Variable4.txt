@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([Samples];"FXthing")
+If (Records in set("UserSet")=1)
+	USE SET("UserSet")
+	SET WINDOW TITLE("Sample Garments: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))
+	FORM SET INPUT([Samples];"FXSamStatRep")
+	MODIFY RECORD([Samples])
+	FORM SET INPUT([Samples];"SampleGarment.i")
+	USE SET("FXthing")
+	CLEAR SET("FXthing")
+Else 
+	ALERT("Please highlight a record first.")
+End if 
+

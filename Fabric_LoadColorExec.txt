@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+
+For ($i;1;Size of array(asCPNumbers))
+	QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+	QUERY SELECTION([FabPOLines];[FabPOLines]ColorPrint=asCPNumbers{$i};*)
+	QUERY SELECTION([FabPOLines]; & ;[FabPOLines]FabType=atDType{$i})
+	
+	If (Records in selection([FabPOLines])=0)
+		CREATE RECORD([FabPOLines])
+		[FabPOLines]FabOrderKey:=[FabricOrders]FabOrderKey
+		[FabPOLines]ColorPrint:=asCPNumbers{$i}
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		[FabPOLines]ColorName:=[ColorPrintNumber]CPName
+		[FabPOLines]LineID:=Sequence number([FabPOLines])
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[FabricOrders]ArticleNo)
+		[FabPOLines]UnitPrice:=[FabricLibrary]Unit Price
+		[FabPOLines]POUnit:=[FabricLibrary]UnitOfMeasure
+		[FabPOLines]POWidth:=[FabricLibrary]Width
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{$i})
+		[FabPOLines]FabType:=[CP_OrderXRef]CPType
+		[FabPOLines]Quantity:=[CP_OrderXRef]Quantity
+		[FabPOLines]LineExt:=[FabPOLines]Quantity*[FabPOLines]UnitPrice
+		SAVE RECORD([FabPOLines])
+	End if 
+End for 
+UNLOAD RECORD([CP_OrderXRef])

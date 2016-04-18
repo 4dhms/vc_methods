@@ -1,0 +1,44 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_DATE($start;$end)
+C_TEXT($factory)
+C_LONGINT($i)
+
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+$i:=1
+For ($i;1;Size of array($name))
+	Case of 
+		: ($name{$i}="factory")
+			$factory:=$value{$i}
+		: ($name{$i}="Xdate")
+			$start:=Date($value{$i})
+	End case 
+End for 
+
+Case of 
+	: ($factory="")
+		vtError:="Select Factory"
+		Web_Error (vtError)
+	: ($start=!00-00-00!)
+		vtError:="Select Date"
+		Web_Error (vtError)
+		
+	Else 
+		$end:=$start+7
+		
+		QUERY([Orders];[Orders]ShipDateFactory>=$start;*)
+		QUERY([Orders]; & ;[Orders]ShipDateFactory<$end;*)
+		QUERY([Orders]; & ;[Orders]Factory=$factory;*)
+		QUERY([Orders]; & ;[Orders]Cancelled=False)
+		If (Records in selection([Orders])=0)
+			vtError:="There are no orders for "+$factory+" between "+String($start)+" and "+String($end)
+			Web_Error (vtError)
+		Else 
+			ORDER BY([Orders];[Orders]ShipDateFactory;>;[Orders]StyleNumber;>)
+			WEB SEND FILE("testlist.html")
+		End if 
+End case 
+

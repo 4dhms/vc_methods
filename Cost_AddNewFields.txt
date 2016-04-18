@@ -1,0 +1,38 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfDCS)
+
+[CostSheets]PriceTerms:=<>vsTerms
+[CostSheets]SheetID:=Sequence number([CostSheets])
+vlOpenSheetID:=[CostSheets]SheetID
+[CostSheets]SortOrder:=vlSortRouter
+[CostSheets]SheetName:=asRouter{asRouter}
+If (Position("Actual";[CostSheets]SheetName)>0)
+	[CostSheets]KeepOpen:=True
+	If ([CostSheets]SheetName#"Actual A")
+		[CostSheets]UnitCostAirWC:=0
+		[CostSheets]IEUnitPrice:=0
+		[CostSheets]QuotaInvoice:=""
+		[CostSheets]QuotaInvAmt:=0
+		[CostSheets]QuotaPayDate:=!00-00-00!
+		[CostSheets]TCInvoice:=""
+		[CostSheets]TCInvoiceAmt:=0
+		[CostSheets]ActualUnitsShipped:=0
+		[CostSheets]UnitsSold:=0
+		[CostSheets]ActualShipDate:=!00-00-00!
+		[CostSheets]UnitCostAirWC:=0
+		[CostSheets]PayInvoice:=""
+		[CostSheets]PayAmt:=0
+		[CostSheets]CustomsEntryN:=""
+		[CostSheets]CustomsDate:=!00-00-00!
+		[CostSheets]PayDispute:=0
+		[CostSheets]InvPaidDate:=!00-00-00!
+		[CostSheets]DCS:=<>vfDCS
+	End if 
+End if 
+[CostSheets]SheetDate:=Current date(*)
+[CostSheets]Writer:=Current user
+[CostSheets]PriceTerms:=<>vsTerms
+If (Position("confirm";[CostSheets]SheetName)>0)
+	[CostSheets]FOBConfirmed:=True
+End if 
+SAVE RECORD([CostSheets])

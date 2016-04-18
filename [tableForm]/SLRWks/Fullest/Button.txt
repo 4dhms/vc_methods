@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ALL RECORDS([SLRWks])
+
+FIRST RECORD([SLRWks])
+CREATE EMPTY SET([SLRWks];"off")
+
+$i:=1
+For ($i;1;Records in selection([SLRWks]))
+	If ([SLRWks]SLRWkEnd<[SLRWks]SLRWkStart) | ([SLRWks]SLRWkStart=!00-00-00!)
+		ADD TO SET([SLRWks];"off")
+	End if 
+	NEXT RECORD([SLRWks])
+End for 
+USE SET("off")
+CLEAR SET("off")
+ALERT("done")

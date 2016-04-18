@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfDivision)
+
+Order_PrintMonthlyBookFM 
+If (Form event=On Printing Detail)
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	Picture_RestoreOnTheFly 
+End if 

@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asCustomers>0)
+	Case of 
+		: (Form event=On Double Clicked)
+			QUERY([Customers];[Customers]CustomerName=asCustomers{asCustomers})
+			QUERY([Contacts];[Contacts]CustomerKey=[Customers]CustomerKey)
+			ORDER BY([Contacts];[Contacts]Contact;>)
+			FORM SET INPUT([Customers];"Entry.i")
+			Center Window (900;650;4;"")
+			MODIFY RECORD([Customers];*)
+			CLOSE WINDOW
+			
+		: (Form event=On Clicked)
+			SAVE RECORD([Contacts])
+			QUERY([Customers];[Customers]CustomerName=asCustomers{asCustomers})
+			QUERY([Contacts];[Contacts]CustomerKey=[Customers]CustomerKey)
+			ORDER BY([Contacts];[Contacts]Contact;>)
+			vtCustomerAddress:=[Customers]DefaultAddress
+			vtCustomerNotes:=[Customers]NotesInternal
+	End case 
+End if 

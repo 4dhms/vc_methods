@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($order)
+
+Revise_Array 
+
+
+Case of 
+	: ([Orders]VSReorder=1)
+		zNo:=1
+		zYes:=0
+	: ([Orders]VSReorder=2)
+		zNo:=0
+		zYes:=1
+	Else 
+		zYes:=0
+		zNo:=0
+End case 
+
+
+OBJECT SET TITLE(bVS;"VS")
+$order:=[Orders]OrderNum
+vsFlag:=""
+
+If ([Orders]PODate=!00-00-00!) | ([Orders]POOpen)
+	<>Enter:=True
+Else 
+	<>Enter:=False
+End if 
+
+vfPO:=False
+  //Revise_FlagFields (◊Enter)
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]FabOrdType;>)
+

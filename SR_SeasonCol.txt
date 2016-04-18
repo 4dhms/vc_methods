@@ -1,0 +1,96 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+
+If (cbBreakout=1)
+	If (asSeasonA{asSeasonA}="Spring")
+		asSRseasonA{1}:="Spring "+String(alYearA{alYearA})
+		asSRseasonB{1}:=String(alYearA{alYearA}-1)
+		asSRseasonA{25}:="Spring Subtotal"
+		asSRseasonA{53}:="Fall Subtotal"
+		
+		asSRmonth{1}:="January"
+		asSRmonth{5}:="February"
+		asSRmonth{9}:="March"
+		asSRmonth{13}:="April"
+		asSRmonth{17}:="May"
+		asSRmonth{21}:="June"
+		
+		asSRseasonA{29}:="Fall "+String(alYearA{alYearA})
+		asSRseasonB{29}:=String(alYearA{alYearA}-1)
+		asSRmonth{29}:="July"
+		asSRmonth{33}:="August"
+		asSRmonth{37}:="September"
+		asSRmonth{41}:="October"
+		asSRmonth{45}:="November"
+		asSRmonth{49}:="December"
+		
+	Else 
+		asSRseasonA{1}:="Fall "+String(alYearA{alYearA})
+		asSRseasonB{1}:=String(alYearA{alYearA}-1)
+		asSRseasonA{25}:="Fall Subtotal"
+		asSRseasonA{53}:="Spring Subtotal"
+		asSRmonth{1}:="July"
+		asSRmonth{5}:="August"
+		asSRmonth{9}:="September"
+		asSRmonth{13}:="October"
+		asSRmonth{17}:="November"
+		asSRmonth{21}:="December"
+		
+		asSRseasonA{29}:="Spring "+String(alYearA{alYearA}+1)
+		asSRseasonB{29}:=String(alYearA{alYearA})
+		asSRmonth{29}:="January"
+		asSRmonth{33}:="February"
+		asSRmonth{37}:="March"
+		asSRmonth{41}:="April"
+		asSRmonth{45}:="May"
+		asSRmonth{49}:="June"
+	End if 
+	asSRseasonA{57}:="Total"
+Else 
+	If (asSeasonA{asSeasonA}="Spring")
+		asSRseasonA{1}:="Spring "+String(alYearA{alYearA})
+		asSRseasonB{1}:=String(alYearA{alYearA}-1)
+		asSRseasonA{7}:="Spring Subtotal"
+		asSRseasonA{14}:="Fall Subtotal"
+		
+		asSRmonth{1}:="January"
+		asSRmonth{2}:="February"
+		asSRmonth{3}:="March"
+		asSRmonth{4}:="April"
+		asSRmonth{5}:="May"
+		asSRmonth{6}:="June"
+		
+		asSRseasonA{8}:="Fall "+String(alYearA{alYearA})
+		asSRseasonB{8}:=String(alYearA{alYearA}-1)
+		asSRmonth{8}:="July"
+		asSRmonth{9}:="August"
+		asSRmonth{10}:="September"
+		asSRmonth{11}:="October"
+		asSRmonth{12}:="November"
+		asSRmonth{13}:="December"
+		
+	Else 
+		asSRseasonA{1}:="Fall "+String(alYearA{alYearA})
+		asSRseasonB{1}:=String(alYearA{alYearA}-1)
+		asSRseasonA{7}:="Fall Subtotal"
+		asSRseasonA{14}:="Spring Subtotal"
+		asSRmonth{1}:="July"
+		asSRmonth{2}:="August"
+		asSRmonth{3}:="September"
+		asSRmonth{4}:="October"
+		asSRmonth{5}:="November"
+		asSRmonth{6}:="December"
+		
+		asSRseasonA{8}:="Spring "+String(alYearA{alYearA}+1)
+		asSRseasonB{8}:=String(alYearA{alYearA})
+		asSRmonth{8}:="January"
+		asSRmonth{9}:="February"
+		asSRmonth{10}:="March"
+		asSRmonth{11}:="April"
+		asSRmonth{12}:="May"
+		asSRmonth{13}:="June"
+	End if 
+	asSRseasonA{15}:="Total"
+End if 

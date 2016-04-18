@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Dusha") | (Current user="Becky") | (Current user="Designer") | (Current user="Dominique") | (Current user="Mark A")
+	CP_BuildBP 
+End if 

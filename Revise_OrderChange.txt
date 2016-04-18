@@ -1,0 +1,24 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtOldData;vtNewData)
+Case of 
+	: (Form event=On Data Change)
+		If (<>vlOrderNumber>0)
+			If (Not(Is new record([Orders])))
+				If (Field name(Field(2;$1))="Factory")
+					
+					WinChoice ("Do you want to reset the Revision flag back to "+Char(34)+"Original order"+Char(34)+"? You will keep all the current information.")
+					If (ok=1)
+						<>vlRevisionNumber:=0
+						[Orders]RevisionNumber:=0
+						[Orders]RevisionKey:=[Orders]OrderNum
+					End if 
+				End if 
+				Revise_FlagFields (True)
+			End if 
+		Else 
+			If (Not(Is new record([Samples])))
+				Revise_SG_FlagFields 
+				
+			End if 
+		End if 
+End case 

@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	
+	ARRAY LONGINT(alOrders;0)
+	ARRAY REAL(arPrice;0)
+	ARRAY REAL(arAvgWt;0)
+	ARRAY LONGINT(alXColorKey;0)
+	ARRAY TEXT(asStyleNumbers;0)
+	ARRAY LONGINT(alXQty;0)
+	
+	ARRAY TEXT(asDivisions;0)
+	LIST TO ARRAY("Division Code No";asDivisions)
+	INSERT IN ARRAY(asDivisions;1;1)
+	asDivisions{1}:="Division"
+	asDivisions:=1
+	
+	Report_LoadArrays 
+	
+End if 

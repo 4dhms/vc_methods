@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtFootNote:=""
+OBJECT SET VISIBLE(atQueryText;False)
+OBJECT SET ENABLED(bPrint;False)
+SR_Init (False)

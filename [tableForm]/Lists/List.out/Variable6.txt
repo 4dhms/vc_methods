@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	SET WINDOW TITLE(String(Records in selection([Lists]))+" list items")
+Else 
+	WinPrompt ("Please highlight some records first.")
+End if 

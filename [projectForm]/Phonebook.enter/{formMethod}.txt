@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		If (vtPart1#"") & (User in group(Current user;"Phonebook"))
+			QUERY([Staff];[Staff]PBName=vtPart1)
+			OBJECT SET ENABLED(bDelete;True)
+			If ([Staff]Misc)
+				cbOther:=1
+			End if 
+		Else 
+			OBJECT SET ENABLED(bDelete;False)
+		End if 
+End case 

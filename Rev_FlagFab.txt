@@ -1,0 +1,46 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($color;$font)
+C_BOOLEAN($po)
+
+$po:=$1
+
+  //SET VISIBLE([OrdersFabricXRef]YarnSize;[OrdersFabricXRef]OrdType#"Self")
+OBJECT SET VISIBLE([FabricOrders]PONumber;[FabricOrders]PONumber#"")
+OBJECT SET VISIBLE([FabricOrders]VendorName;[OrdersFabricXRef]FabricOrderKey>0)
+OBJECT SET VISIBLE([FabricOrders]ReqDeliveryDate;[FabricOrders]ReqDeliveryDate#!00-00-00!)
+OBJECT SET VISIBLE([FabricOrders]FinalDelivery;[FabricOrders]FinalDelivery#!00-00-00!)
+OBJECT SET VISIBLE([FabricOrders]ShippedDate;Not([FabricOrders]ShippedDate=!00-00-00!))
+Case of 
+	: ($PO) & ([OrdersFabricXRef]RevStatus#0)
+		$color:=15
+		$font:=7
+	: ([OrdersFabricXRef]RevStatus=-1)
+		$color:=3
+		$font:=3
+	: ([OrdersFabricXRef]RevStatus=1)
+		$color:=5
+		$font:=3
+	Else 
+		$color:=15
+		$font:=0
+End case 
+
+OBJECT SET COLOR([OrdersFabricXRef]OrdType;-($color+(256*0)))
+
+OBJECT SET COLOR([OrdersFabricXRef]SolidPrint;-($color+(256*0)))
+  //FONT STYLE([OrderFabricXRef]SolidPrint;$font)
+
+OBJECT SET COLOR([OrdersFabricXRef]FabricName;-($color+(256*0)))
+OBJECT SET FONT STYLE([OrdersFabricXRef]FabricName;$font)
+
+OBJECT SET COLOR([OrdersFabricXRef]FiberContent;-($color+(256*0)))
+OBJECT SET FONT STYLE([OrdersFabricXRef]FiberContent;$font)
+
+OBJECT SET COLOR([OrdersFabricXRef]Treatment;-($color+(256*0)))
+OBJECT SET FONT STYLE([OrdersFabricXRef]Treatment;$font)
+
+OBJECT SET COLOR([OrdersFabricXRef]FabSupplier;-($color+(256*0)))
+OBJECT SET FONT STYLE([OrdersFabricXRef]FabSupplier;$font)
+
+OBJECT SET COLOR([OrdersFabricXRef]FabArtNo;-($color+(256*0)))
+OBJECT SET FONT STYLE([OrdersFabricXRef]FabArtNo;$font)

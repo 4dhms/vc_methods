@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($option)
+
+$option:="<OPTION>"
+  //For ($i;1;1)
+  //If ($i=5)  `& (◊vfFactory)
+$option:=$option+"<OPTION SELECTED>"
+  //Else 
+  //$option:=$option+"<OPTION>"
+  //End if 
+$option:=$option+"Factory"
+  //End for 
+$0:=Char(1)+$option
+
+

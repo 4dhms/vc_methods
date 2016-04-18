@@ -1,0 +1,65 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+
+CREATE SET([Costing];"FoundSheets")
+If (Records in selection([Costing])=0)
+	ALL RECORDS([Costing])
+End if 
+
+Case of 
+	: (vfSample)
+		$message:="Enter Sample Number:"
+	: (vfDesign)
+		$message:="Enter Design Number:"
+	: (vfStyle)
+		$message:="Enter Style Number:"
+	Else 
+		$message:="Enter HMS Number:"
+End case 
+
+WinFind ($message;9)
+
+<>vlOrderNumber:=Num(vsRequestString)
+If (cbSG=1)
+	<>vlOrderNumber:=<>vlOrderNumber*-1
+End if 
+
+If (OK=0)
+	USE SET("FoundSheets")
+	CLEAR SET("FoundSheets")
+Else 
+	If (vAddTo=1)
+		Case of 
+			: (vfDesign)
+				QUERY([Costing];[Costing]DesignNumber=vsRequestString)
+			: (vfStyle)
+				QUERY([Costing];[Costing]StyleNumber=vsRequestString)
+			Else 
+				QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+		End case 
+		CREATE SET([Costing];"FindOne")
+		UNION("FoundSheets";"FindOne";"FoundSheets")
+		CLOSE WINDOW
+		USE SET("FoundSheets")
+		CLEAR SET("FoundSheets")
+		SET WINDOW TITLE("Cost Sheets: "+String(Records in selection([Costing]))+" of "+String(Records in table([Costing])))
+	Else 
+		Case of 
+			: (vfDesign)
+				QUERY([Costing];[Costing]DesignNumber=vsRequestString)
+			: (vfStyle)
+				QUERY([Costing];[Costing]StyleNumber=vsRequestString)
+			Else 
+				QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+		End case 
+		CLEAR SET("FoundSheets")
+		CLOSE WINDOW
+		If (<>vlOrderNumber>0)
+			SET WINDOW TITLE("HMS Order: "+String(<>vlOrderNumber))
+		Else 
+			SET WINDOW TITLE("Sample Order: "+String(Abs(<>vlOrderNumber)))
+		End if 
+	End if 
+End if 
+
+

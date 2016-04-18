@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($ordernumber)
+
+If (cbSG=1)
+	$orderNumber:=Num(asOrderNumbers{asOrderNumbers})*-1
+Else 
+	$orderNumber:=Num(asOrderNumbers{asOrderNumbers})
+End if 
+
+WinChoice ("Are you sure you want to remove this order from the PO?")
+If (ok=1)
+	If (asCPNumbers{asCPNumbers}="")
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$ordernumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+		[OrdersFabricXRef]FabricOrderKey:=0
+		SAVE RECORD([OrdersFabricXRef])
+	Else 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$ordernumber)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=asCPNumbers{asCPNumbers})
+		[CP_OrderXRef]FabOrderKey:=0
+		SAVE RECORD([CP_OrderXRef])
+	End if 
+	DELETE FROM ARRAY(adPODate;asOrderNumbers;1)
+	DELETE FROM ARRAY(asStyleNumbers;asOrderNumbers;1)
+	DELETE FROM ARRAY(asDesignNumbers;asOrderNumbers;1)
+	DELETE FROM ARRAY(asTypeList;asOrderNumbers;1)
+	DELETE FROM ARRAY(asXFactory;asOrderNumbers;1)
+	DELETE FROM ARRAY(asCPNumbers;asOrderNumbers;1)
+	DELETE FROM ARRAY(alColorChange;asOrderNumbers;1)
+	DELETE FROM ARRAY(alStyleFab;asOrderNumbers;1)
+	DELETE FROM ARRAY(asOrderNumbers;asOrderNumbers;1)
+	
+	If ([FabricOrders]ReviseNumber>0)
+		CREATE RECORD([Changes])
+		[Changes]RevisionNumber:=[FabricOrders]ReviseNumber
+		[Changes]OrderNumber:=-1
+		[Changes]RevDate:=Current date(*)
+		[Changes]RevTime:=Current time(*)
+		[Changes]Writer:=Current user
+		[Changes]ChangeKey:=Sequence number([Changes])
+		[Changes]FabOrder:=[FabricOrders]PONumber
+		[Changes]FieldName:="Order removed"
+		[Changes]OldData:=""
+		If (cbSG=1)
+			[Changes]NewChange:="SG"+String(vlOrderNumber)
+		Else 
+			[Changes]NewChange:="PO"+String(vlOrderNumber)
+		End if 
+		SAVE RECORD([Changes])
+		UNLOAD RECORD([Changes])
+	End if 
+End if 

@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice;$i)
+C_TEXT($message)
+ARRAY TEXT($samples;0)
+
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+If (Records in selection([SpecLineSample])>0)
+	ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+	SELECTION TO ARRAY([SpecLineSample]ColumnHeader;$samples)
+	INSERT IN ARRAY($samples;1;1)
+	$samples{1}:=[SpecFactory]Colhead
+	$message:=""
+	
+	$i:=1
+	For ($i;1;Size of array($samples))
+		$message:=$message+$samples{$i}+";"
+	End for 
+	$message:=$message+"All Samples"
+End if 
+
+$choice:=Pop up menu($message)
+
+If ($choice=1)
+	  //do nothing, current record requests
+Else 
+	QUERY([SpecLineSample];[SpecLineSample]ColumnNumber=$choice-1)
+End if 

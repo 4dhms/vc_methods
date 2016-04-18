@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($1)
+C_TEXT($2)
+
+EXECUTE ON CLIENT("@";"Locked_LocalPO";$1;$2)

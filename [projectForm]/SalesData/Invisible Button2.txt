@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($year)
+C_TEXT(vsCustomer)
+C_TEXT(vsDivision)
+C_TEXT(vsStyleNumber)
+
+$year:=Num(vsSeason)
+
+If (vsSeason="Fall@")
+	vsSeason:="Spring "+String($year+1)
+Else 
+	vsSeason:="Fall "+String($year)
+End if 
+If (vsDivision#"") & (vsCustomer#"") & (vsStyleNumber#"")
+	SLR_Get 
+End if 

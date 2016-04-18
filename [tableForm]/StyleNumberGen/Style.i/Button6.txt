@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET ENTERABLE([StyleNumberGen]DesignNumber;True)
+GOTO OBJECT([StyleNumberGen]DesignNumber)

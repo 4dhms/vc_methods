@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCustomer)
+
+If (vsCustomer#"")
+	QUERY([CustomerList];[CustomerList]Customer=vsCustomer)
+	If (Records in selection([CustomerList])>0)
+		WinPrompt (vsCustomer+" already exists in the Customer List.")
+	Else 
+		CREATE RECORD([CustomerList])
+		[CustomerList]Customer:=vsCustomer
+		SAVE RECORD([CustomerList])
+		APPEND TO ARRAY(asCustomers;vsCustomer)
+		SORT ARRAY(asCustomers;>)
+	End if 
+	
+	vsCustomer:=""
+End if 

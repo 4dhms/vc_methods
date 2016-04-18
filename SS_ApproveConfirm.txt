@@ -1,0 +1,52 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$specs;$approvals)
+C_TEXT($message;$specText)
+
+ARRAY LONGINT(alMakeSheet;0)
+ARRAY LONGINT(alApproveSheet;0)
+
+$i:=1
+$specs:=0
+$approvals:=0
+
+For ($i;1;Size of array(afSpecSheet))
+	If (afSpecSheet{$i}) & (alOrders{$i}#[SpecFactory]OrderNumber)
+		INSERT IN ARRAY(alMakeSheet;1;1)
+		alMakeSheet{1}:=alOrders{$i}
+		$specs:=$specs+1
+	End if 
+	
+	If (afApproved{$i})
+		INSERT IN ARRAY(alApproveSheet;1;1)
+		alApproveSheet{1}:=alOrders{$i}
+		$approvals:=$approvals+1
+	End if 
+End for 
+
+If ($specs=1)
+	$specText:=" specsheet"
+Else 
+	$specText:=" specsheets"
+End if 
+
+Case of 
+	: ($specs>0) & ($approvals>0)
+		$message:="create "+String($specs)+$specText+" and"+Char(13)+"approve "+String($approvals)+" for production?"
+	: ($specs>0)
+		$message:="create "+String($specs)+$specText+"?"
+	: ($approvals>0)
+		$message:="approve "+String($approvals)+" for production?"
+End case 
+
+If ($specs+$approvals=0)
+	WinPrompt ("You have selected nothing new to process.")
+	$0:=False
+Else 
+	$message:="Do you want to"+Char(13)+$message
+	WinChoice ($message;"Yes";"No")
+	If (ok=1)
+		$0:=True
+	Else 
+		$0:=False
+	End if 
+End if 

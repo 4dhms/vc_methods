@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (cbAir+cbSea+cbLDP+cbFOB=0)
+		WinPrompt ("Select a method.")
+	: (b1+b2+b3=0)
+		WinPrompt ("Select a destination.")
+	Else 
+		ACCEPT
+End case 

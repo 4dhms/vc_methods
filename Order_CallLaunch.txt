@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vfUnload:=True
+ALERT(Current user+"  "+String($1)+"  "+String(Process state($1)))
+  //CALL PROCESS($1)

@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+CONFIRM("Check quantities: "+String(Records in selection([Orders])))
+If (ok=1)
+	CREATE EMPTY SET([Orders];"Bad")
+	$i:=1
+	FIRST RECORD([Orders])
+	
+	For ($i;1;Records in selection([Orders]))
+		ARRAY LONGINT($quan;0)
+		C_LONGINT($i;$total)
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]XrefID>0)
+		
+		SELECTION TO ARRAY([CP_OrderXRef]Quantity;$quan)
+		$total:=0
+		$n:=1
+		For ($n;1;Size of array($quan))
+			$total:=$total+$quan{$n}
+		End for 
+		If (Shift down)
+			ALERT(String($i)+"  "+String([Orders]OrderNum)+"  "+String([CP_OrderXRef]OrderNumber)+"  "+String($total)+"  "+String([Orders]TotalOrderQuantity))
+		End if 
+		
+		If ([Orders]TotalOrderQuantity#$total)
+			ADD TO SET([Orders];"Bad")
+			If (vfRev)
+				[Orders]TotalOrderQuantity:=$total
+				SAVE RECORD([Orders])
+			End if 
+		End if 
+		NEXT RECORD([Orders])
+	End for 
+	USE SET("Bad")
+	CLEAR SET("Bad")
+	SET WINDOW TITLE("Bad "+String(Records in selection([Orders])))
+	ALERT("Done")
+End if 

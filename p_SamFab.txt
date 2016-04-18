@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //p_SamFabOrdEnt global procedure
+  //
+Closed:=False
+SET MENU BAR(10)
+ALL RECORDS([SampleFabrics])
+FORM SET OUTPUT([SampleFabrics];"Output")
+FORM SET INPUT([SampleFabrics];"SamFabPO.i")
+
+vlWinWd:=600
+vlWinHt:=420
+vlWinType:=4
+vsWinTitle:=""
+<>CloseBox:=True
+
+Center Window (950;650;4;"")
+p_SetWndwSamF 
+AccessMode (->[SampleFabrics];True)
+TheFile:=->[SampleFabrics]
+MODIFY SELECTION([SampleFabrics];*)
+CLOSE WINDOW
+<>Fab OrdID:=0

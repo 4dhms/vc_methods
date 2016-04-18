@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($division)
+
+Case of 
+	: (Current user="Guest")
+		  //do nothing
+	: (Current user="Ed")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+	: (User in group(Current user;"DressesOnly"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="02@")
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		QUERY SELECTION([Orders];[Orders]OrderDivision="09@")
+	: (Current user="Prakash") | (Current user="Lorna")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="05@")
+	: (Current user="Mark")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="01-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="02-@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-@")
+		  //QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="08@")
+End case 
+
+$division:=Replace string(asDivisions{asDivisions};"_";" ")
+Case of 
+	: (asDivisions{asDivisions}="06-C&G + 07-Ts")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+	: (asDivisions{asDivisions}#"All@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision=$division)
+End case 
+
+CREATE SET([Orders];"Master")

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	SET WINDOW TITLE("Fabric Library: "+String(Records in selection([FabricLibrary]))+" of "+String(Records in table([FabricLibrary])))
+Else 
+	ALERT("Please highlight some records first.")
+End if 

@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (Shift down) & (Current user="Designer")
+	QUERY([Sizes];[Sizes]Step="Auto")
+	ARRAY LONGINT($keys;0)
+	DISTINCT VALUES([Sizes]SF_KeyNumber;$keys)
+	SORT ARRAY($keys;<)
+	
+	$i:=1
+	CREATE EMPTY SET([Orders];"ood")
+	For ($i;1;50)
+		QUERY([SpecFactory];[SpecFactory]SF_KeyNumber=$keys{$i})
+		QUERY([Orders];[Orders]OrderNum=[SpecFactory]OrderNumber)
+		
+		
+		ADD TO SET([Orders];"ood")
+	End for 
+	USE SET("ood")
+	SET WINDOW TITLE(String(Records in selection([Orders])))
+	ALERT("DONE")
+	
+	
+	
+Else 
+	$I:=1
+	FIRST RECORD([Orders])
+	
+	For ($i;1;Records in selection([Orders]))
+		QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+		  //QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		QUERY([Sizes];[Sizes]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		QUERY SELECTION([Sizes];[Sizes]Step="Auto")
+		
+		If (Records in selection([Sizes])>0)
+			ADD TO SET([Orders];"auto")
+		End if 
+		NEXT RECORD([Orders])
+	End for 
+	
+	USE SET("auto")
+	SET WINDOW TITLE(String(Records in selection([Orders])))
+	
+End if 

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([DesignLineIncluded]Name="")
+	WinPrompt ("Item must have a description.")
+Else 
+	SAVE RECORD([DesignLineIncluded])
+	UNLOAD RECORD([DesignLineIncluded])
+	CANCEL
+	CALL PROCESS(Current process)
+	CALL PROCESS(<>DLProc)
+End if 

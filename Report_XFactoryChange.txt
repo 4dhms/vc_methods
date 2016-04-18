@@ -1,0 +1,88 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$days)
+C_TIME($docref)
+C_DATE($old;$new;$d1;$d2)
+C_TEXT($datestamp;$path;$message)
+C_BOOLEAN($stop;$none;$nocancel)
+
+$d1:=Current date(*)
+$d2:=Current date(*)-7
+
+QUERY([Changes];[Changes]FieldName="ShipDateFactory";*)
+QUERY([Changes]; & ;[Changes]RevDate>=$d2;*)
+QUERY([Changes]; & ;[Changes]RevDate<$d1;*)
+QUERY([Changes]; & ;[Changes]OrderNumber>0)
+QUERY SELECTION([Changes];[Changes]OldData#"")
+QUERY SELECTION([Changes];[Changes]OldData#"00/00/00")
+
+ORDER BY([Changes];[Changes]RevDate;>)
+$none:=True
+$nocancel:=True
+
+If (Application type=5) | (Current user="Spooler")
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":XFactoryChange_"+$datestamp+".xls"
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	$docRef:=Create document("";"xls")
+	If (ok=0)
+		$stop:=True
+	End if 
+End if 
+
+FIRST RECORD([Changes])
+$i:=1
+SEND PACKET($docref;"Customer"+Char(9)+"Customer PO"+Char(9)+"Style"+Char(9)+"Order"+Char(9)+"Who"+Char(9)+"When"+Char(9)+"Previous XFactory"+Char(9)+"New XFactory"+Char(9)+"Difference"+Char(9)+"Old Cancel Date"+Char(9)+"New Cancel Date"+Char(13))
+
+For ($i;1;Records in selection([Changes]))
+	QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+	$old:=Date([Changes]OldData)
+	$new:=Date([Changes]NewChange)
+	$days:=$new-$old
+	If ($days<365) & ($days>28)
+		$none:=False
+		SEND PACKET($docref;[Orders]Customer+Char(9)+[Orders]CustPONumber+Char(9)+[Orders]StyleNumber+Char(9)+String([Orders]OrderNum)+Char(9)+[Orders]Order_Enterer+Char(9)+String([Changes]RevDate)+Char(9)+[Changes]OldData+Char(9)+[Changes]NewChange+Char(9)+String($days)+" days"+Char(13))
+	End if 
+	NEXT RECORD([Changes])
+End for 
+
+QUERY([Changes];[Changes]FieldName="CancelDate";*)
+QUERY([Changes]; & ;[Changes]RevDate>=$d2;*)
+QUERY([Changes]; & ;[Changes]RevDate<$d1;*)
+QUERY([Changes]; & ;[Changes]OrderNumber>0)
+QUERY SELECTION([Changes];[Changes]OldData#"00/00/00")
+
+$i:=1
+For ($i;1;Records in selection([Changes]))
+	QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+	$old:=Date([Changes]OldData)
+	$new:=Date([Changes]NewChange)
+	$days:=$new-$old
+	
+	If ($days<365) & ($days>28)
+		$nocancel:=False
+		SEND PACKET($docref;[Orders]Customer+Char(9)+[Orders]CustPONumber+Char(9)+[Orders]StyleNumber+Char(9)+String([Orders]OrderNum)+Char(9)+[Orders]Order_Enterer+Char(9)+String([Changes]RevDate)+Char(9)+" "+Char(9)+" "+Char(9)+String($days)+" days"+Char(9)+[Changes]OldData+Char(9)+[Changes]NewChange+Char(13))
+	End if 
+	NEXT RECORD([Changes])
+End for 
+
+CLOSE DOCUMENT($docref)
+
+If (Application type=5) | (Current user="Spooler") & (Not($stop))
+	ARRAY TEXT(asSubCC;2)
+	asSubCC{1}:="peter.goldberger@nubby.com"
+	asSubCC{2}:="phil@persinger.com"
+	
+	If ($none) & ($nocancel)
+		Mail_SimpleSend ("List";"None";"X Factory Change Report ("+String(Current date(*))+")";"There are no major schedule changes this week."+Char(13))
+	Else 
+		If ($none)
+			$message:="There are no XFactory changes, but there is a Cancel Date change."
+		Else 
+			$message:="Attached are the schedule changes for the week."
+		End if 
+		Mail_SimpleSend ("List";$path;"X Factory Change Report ("+String(Current date(*))+")";$message+Char(13))
+	End if 
+End if 
+

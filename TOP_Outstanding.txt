@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+WinChoice ("Do you want to search all open orders or selection?";"All";"Selection")
+If (ok=1)
+	QUERY([Orders];[Orders]CancelDate>Current date(*))
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	QUERY SELECTION([Orders];[Orders]AfterApproval#"Not required")
+End if 
+
+$i:=1
+FIRST RECORD([Orders])
+CREATE EMPTY SET([Orders];"out")
+For ($i;1;Records in selection([Orders]))
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+	If ([SpecFactory]Colhead="TOP@") | ([SpecLineSample]ColumnHeader="TOP@")
+		Case of 
+			: ([SpecFactory]Colhead="TOP@") & ([SpecFactory]Received=!00-00-00!)
+				ADD TO SET([Orders];"out")
+			: ([SpecLineSample]ColumnHeader="TOP@") & ([SpecLineSample]Received=!00-00-00!)
+				ADD TO SET([Orders];"out")
+			: ([SpecLineSample]ColHead2="TOP@") & ([SpecLineSample]Received2=!00-00-00!)
+				ADD TO SET([Orders];"out")
+		End case 
+	End if 
+	NEXT RECORD([Orders])
+End for 
+USE SET("out")
+CLEAR SET("out")
+ORDER BY([Orders];[Orders]OrderNum;<)
+SET WINDOW TITLE(String(Records in selection([Orders]))+" Outstanding TOP Samples")

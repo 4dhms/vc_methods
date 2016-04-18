@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$page;$item)
+C_DATE($cancel)
+C_BOOLEAN($soldout)
+
+$i:=1
+$item:=1
+$page:=1
+USE SET("DL")
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]SoldOut;>;[DesignLineIncluded]CancelDate;>;[DesignLineIncluded]StyleNumber;>)
+FIRST RECORD([DesignLineIncluded])
+$cancel:=[DesignLineIncluded]CancelDate
+$soldout:=[DesignLineIncluded]SoldOut
+
+For ($i;1;Records in selection([DesignLineIncluded]))
+	Case of 
+		: ([DesignLineIncluded]SoldOut#$soldout)
+			$soldout:=[DesignLineIncluded]SoldOut
+			$item:=1
+			$page:=$page+1
+		: ([DesignLineIncluded]CancelDate#$cancel) & (Not($soldout))
+			$cancel:=[DesignLineIncluded]CancelDate
+			$item:=1
+			$page:=$page+1
+		: ($item>12)
+			$item:=1
+			$page:=$page+1
+	End case 
+	
+	[DesignLineIncluded]ItemNumber:=$item
+	[DesignLineIncluded]PageNumber:=$page
+	SAVE RECORD([DesignLineIncluded])
+	$item:=$item+1
+	NEXT RECORD([DesignLineIncluded])
+End for 

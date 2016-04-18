@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+If ([Orders]KWCnS#[Designs]KWCnS) & ([Designs]KWCnS#"")
+	[Orders]KWCnS:=[Designs]KWCnS
+End if 
+Case of 
+	: ([Orders]KWCnS="Woven")
+		cbWoven:=1
+		cbKnit:=0
+		cbCutSew:=0
+	: ([Orders]KWCnS="Knit")
+		cbKnit:=1
+		cbCutSew:=0
+		cbWoven:=0
+	: ([Orders]KWCnS="CutSew")
+		cbKnit:=0
+		cbCutSew:=1
+		cbWoven:=0
+	Else 
+		cbCutSew:=0
+		cbKnit:=0
+		cbWoven:=0
+End case 
+
+rPetite:=0
+rMissy:=0
+rLarge:=0
+Case of 
+	: ([Orders]SizeCategory="Petite")
+		rPetite:=1
+	: ([Orders]SizeCategory="Missy")
+		rMissy:=1
+	: ([Orders]SizeCategory="Large")
+		rLarge:=1
+End case 

@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($users;0)
+APPEND TO ARRAY($users;"Designer")
+APPEND TO ARRAY($users;"Spenser")
+APPEND TO ARRAY($users;"Nubby")
+APPEND TO ARRAY($users;"Lou")
+APPEND TO ARRAY($users;"August")
+APPEND TO ARRAY($users;"Zoe")
+APPEND TO ARRAY($users;"John Mow")
+APPEND TO ARRAY($users;"Peter Li")
+APPEND TO ARRAY($users;"TC Li")
+
+
+Case of 
+	: (Find in array($users;Current user)<1)
+		WinPrompt ("See Spenser for access.")
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		WinPrompt ("This report is unavailable at this time.")
+	: (<>vlVarianceReport>0)
+		SHOW PROCESS(<>vlVarianceReport)
+		BRING TO FRONT(<>vlVarianceReport)
+	: (<>vlVarianceReport=0)
+		<>vlVarianceReport:=New process("Report_Variance";0;"Summary")
+	Else 
+		SHOW PROCESS(<>vlVarianceReport)
+		HIDE PROCESS(<>vlVarianceReport)
+		BRING TO FRONT(<>vlVarianceReport)
+End case 

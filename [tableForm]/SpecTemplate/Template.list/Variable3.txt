@@ -1,0 +1,80 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($needed;$i;$n;vlRemaining;$c)
+C_BOOLEAN($keepPrinting;$printline)
+
+QUERY([SpecTemplate];[SpecTemplate]KnitWoven="Woven";*)
+QUERY([SpecTemplate]; | ;[SpecTemplate]KnitWoven="Knit")
+ORDER BY([SpecTemplate];[SpecTemplate]KnitWoven;>;[SpecTemplate]Template;>)
+
+$c:=1
+FIRST RECORD([SpecTemplate])
+
+SET PRINT OPTION(Orientation option;2)
+SET PRINT OPTION(Mac spool file format option;0)
+
+vtPathName:=Select folder+"POMs.pdf"
+SET PRINT OPTION(Destination option;3;vtPathName)
+
+For ($c;1;Records in selection([SpecTemplate]))
+	QUERY([GarmentParts];[GarmentParts]GarmentPartKey=[SpecTemplate]GarmentPartKey)
+	QUERY([SpecTempBuilder];[SpecTempBuilder]TempKey=[SpecTemplate]TempKeyNumber)
+	
+	vlPage:=0
+	vlRemaining:=0
+	$keepPrinting:=True
+	vsNewGarmentPart:=[GarmentParts]GarmentPartName
+	If (Position("Knit";vsNewGarmentPart)<1) & (Position("Woven";vsNewGarmentPart)<1)
+		vsNewGarmentPart:=vsNewGarmentPart+" ("+[SpecTemplate]KnitWoven+")"
+	End if 
+	
+	$needed:=(Records in selection([SpecSheetLines])*15)+60
+	vlPage:=vlPage+1
+	vsPrintingHeader:="PAGE "+String(vlPage)
+	PAGE BREAK(>)
+	vlremaining:=575
+	PAGE SETUP([SpecTempBuilder];"Temp.header")
+	SET PRINT OPTION(Orientation option;2)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+	Print form([SpecTempBuilder];"Temp.header")
+	vlremaining:=vlremaining-86
+	$i:=0
+	$n:=Records in selection([SpecTempBuilder])
+	FIRST RECORD([SpecTempBuilder])
+	
+	While ($i<$n)
+		$printLine:=True
+		Case of 
+			: (vlremaining<19) & (vlremaining>0) & ($n>=$i)
+				$printLine:=False
+				vtLine:=""
+				vtTitle1:=Uppercase(vsNewGarmentPart)+" CONTINUED ON NEXT PAGE"
+				If ($keepPrinting)
+					SET PRINT OPTION(Orientation option;2)
+					SET PRINT OPTION(Destination option;3;vtPathName)
+					Print form([SpecSheetLines];"Comments.a")
+				End if 
+				vlremaining:=0
+			: (vlremaining<14)
+				vlremaining:=575
+				vlPage:=vlPage+1
+				vsPrintingHeader:="PAGE "+String(vlPage)
+				PAGE BREAK(>)
+				If ($keepPrinting)
+					SET PRINT OPTION(Orientation option;2)
+					Print form([SpecTempBuilder];"Temp.header")
+				End if 
+				vlremaining:=vlremaining-86
+		End case 
+		If ($printLine)
+			  //page setup([SpecSheetLines];"HeaderOne.p")
+			If ($keepPrinting)
+				SET PRINT OPTION(Orientation option;2)
+				Print form([SpecTempBuilder];"TempLine.o")
+				vlremaining:=vlremaining-14
+				NEXT RECORD([SpecTempBuilder])
+				$i:=$i+1
+			End if 
+		End if 
+	End while 
+	NEXT RECORD([SpecTemplate])
+End for 

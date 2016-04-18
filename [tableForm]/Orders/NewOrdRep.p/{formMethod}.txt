@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Printing Break)
+		OBJECT SET VISIBLE(*;"xFactory";Not(<>vfFactory))
+		OBJECT SET VISIBLE(*;"xDate";<>vfFactory)
+		OBJECT SET VISIBLE(*;"xDate1";<>vfFactory)
+		vlSubTotal:=Subtotal([Orders]TotalOrderQuantity)
+		vfReset:=True
+		
+	: (Form event=On Header)
+		If (<>asStartMonth=<>asEndMonth) & (<>asStartDay=<>asEndDay)
+			vtHeader:="Order Report  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asEndYear{<>asEndYear}+")"
+		Else 
+			vtHeader:="Order Report  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+" - "+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+		End if 
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String(Printing page)
+		OBJECT SET VISIBLE(*;"xFactory";Not(<>vfFactory))
+		OBJECT SET VISIBLE(*;"xDate";<>vfFactory)
+		OBJECT SET VISIBLE(*;"xDate1";<>vfFactory)
+		OBJECT SET VISIBLE([Orders]PODate;Not(<>vfFactory))
+		OBJECT SET VISIBLE([Orders]Factory;<>vfFactory)
+		
+	: (Form event=On Printing Detail)
+		vlOrderNumber:=[Orders]OrderNum
+		If (vfReset)
+			vlCount:=1
+			vfReset:=False
+		Else 
+			vlCount:=vlCount+1
+		End if 
+		
+		OBJECT SET VISIBLE([Orders]PODate;<>vfFactory)
+		OBJECT SET VISIBLE([Orders]OrderEntryDate;<>vfFactory)
+		OBJECT SET VISIBLE([Orders]Factory;Not(<>vfFactory))
+		Case of 
+			: ([Orders]Cancelled)
+				vsPOFlag:="CANCELLED"
+			: ([Orders]RevisionNumber>0)
+				vsPOFlag:="Revision "+String([Orders]RevisionNumber)
+			Else 
+				vsPOFlag:=""
+		End case 
+End case 

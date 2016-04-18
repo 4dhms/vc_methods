@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+  //[FabricOrders]InCount:=vlIn
+  //[FabricOrders]OutCount:=vlOut
+  //[FabricOrders]POExt:=vrPOExt
+FabPO_ChangedFieldList (2)
+SAVE RECORD([FabricOrders])
+
+$i:=1
+FIRST RECORD([FabPOLines])
+For ($i;1;Records in selection([FabPOLines]))
+	If ([FabPOLines]Changed)
+		FabPO_BDChange 
+	End if 
+	NEXT RECORD([FabPOLines])
+End for 
+
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([Orders])
+
+ACCEPT
+ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)
+  //UNLOAD RECORD([FabricOrders])

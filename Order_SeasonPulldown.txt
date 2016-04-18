@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ($1=1)
+	Case of 
+		: (Not(<>Enter))
+			WinPrompt ("This order can not be modified without revising it.")
+			If (Find in array(<>asSeasonName;[Orders]SeasonName)>0)
+				<>asSeasonName:=Find in array(<>asSeasonName;[Orders]SeasonName)
+			Else 
+				<>asSeasonName:=1
+			End if 
+		: (<>asSeasonName>1)
+			[Orders]SeasonName:=<>asSeasonName{<>asSeasonName}
+		Else 
+			[Orders]SeasonName:=""
+	End case 
+Else 
+	Case of 
+		: (Not(<>Enter))
+			WinPrompt ("This order can not be modified without revising it.")
+			If (Find in array(<>asSeasonYear;[Orders]SeasonYear)>0)
+				<>asSeasonYear:=Find in array(<>asSeasonYear;[Orders]SeasonYear)
+			Else 
+				<>asSeasonYear:=1
+			End if 
+		: (<>asSeasonYear>1)
+			[Orders]SeasonYear:=<>asSeasonYear{<>asSeasonYear}
+		Else 
+			[Orders]SeasonYear:=""
+	End case 
+End if 
+
+Order_RequiredFlag 

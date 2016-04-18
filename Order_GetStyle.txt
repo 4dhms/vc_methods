@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]StyleNumber=$1)
+QUERY SELECTION([Orders];[Orders]OrderNum#<>vlOrderNumber)
+QUERY SELECTION([Orders];[Orders]BrkdnCutRatio#"")
+
+DISTINCT VALUES([Orders]BrkdnCutRatio;<>asRangeTest)
+
+INSERT IN ARRAY(<>asRangeTest;1;1)
+<>asRangeTest{1}:="Return"

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asDivisions<1)
+	cbOrder:=0
+	WinChoice ("Select a division."+Char(13)+"Or do you what to see companywide numbers?";"Division";"Companywide")
+	If (ok=1)
+		vfAll:=False
+	Else 
+		vfAll:=True
+		Report_KWCS 
+	End if 
+Else 
+	vfAll:=False
+	Report_KWCS 
+End if 

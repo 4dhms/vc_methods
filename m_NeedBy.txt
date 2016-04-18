@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (<>vlNeedByProc>0)
+		SHOW PROCESS(<>vlNeedByProc)
+		BRING TO FRONT(<>vlNeedByProc)
+	: (<>vlNeedByProc=0)
+		<>vlNeedByProc:=New process("NeedBy_Lib";0;"Calendar")
+		SHOW PROCESS(<>vlNeedByProc)
+		BRING TO FRONT(<>vlNeedByProc)
+End case 

@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If (vtVendor#"")
+		asVendors:=Find in array(asVendors;vtVendor)
+	End if 
+	vsEMAddress:=""
+	Case of 
+		: (Current user="Designer") & (Shift down)
+			ARRAY TEXT(asSubCC;1)
+			asSubCC{1}:="phil@persinger.com"
+		: (Current user="Natasha")
+			ARRAY TEXT(asSubCC;0)
+	End case 
+	
+End if 

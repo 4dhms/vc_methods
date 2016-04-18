@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+DELETE FROM ARRAY(atCost0;$1;1)
+DELETE FROM ARRAY(atCost1;$1;1)
+DELETE FROM ARRAY(atCost2;$1;1)
+DELETE FROM ARRAY(atCost3;$1;1)
+DELETE FROM ARRAY(atCost4;$1;1)
+DELETE FROM ARRAY(atCost5;$1;1)
+DELETE FROM ARRAY(atCost6;$1;1)
+DELETE FROM ARRAY(atCost7;$1;1)
+DELETE FROM ARRAY(atCost8;$1;1)
+DELETE FROM ARRAY(atCost9;$1;1)
+DELETE FROM ARRAY(atCost10;$1;1)

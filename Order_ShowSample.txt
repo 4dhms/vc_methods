@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($preview)
+C_TEXT($sg)
+
+$sg:=Request("Preview Sample Number:";[Orders]SGPO)
+If (ok=1)
+	$preview:=New process("Sample_Preview";0;"PreviewSample";$sg)
+End if 

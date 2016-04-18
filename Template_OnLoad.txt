@@ -1,0 +1,40 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY TEXT(asSpareParts;0)
+ARRAY LONGINT(alSpareKeys;0)
+
+ALL RECORDS([ChineseDictionary])
+ORDER BY([ChineseDictionary];[ChineseDictionary]EnglishName;>)
+SELECTION TO ARRAY([ChineseDictionary]EnglishName;asSpareParts;[ChineseDictionary]LexKey;alSpareKeys)
+
+asTemplates:=Find in array(asTemplates;[SpecTemplate]Template)
+
+vlRowCount:=0
+Case of 
+	: ([SpecTemplate]KnitWoven="Knit")
+		cbKnit:=1
+	: ([SpecTemplate]KnitWoven="Woven")
+		cbWoven:=1
+	: ([SpecTemplate]KnitWoven="Cut & Sew")
+		cbCutSew:=1
+End case 
+
+
+If (Is new record([SpecTemplate]))
+	[SpecTemplate]TempKeyNumber:=Sequence number([SpecTemplate])
+	GOTO OBJECT([SpecTemplate]Template)
+	REDUCE SELECTION([SpecTempBuilder];0)
+Else 
+	QUERY([SpecTempBuilder];[SpecTempBuilder]TempKey=[SpecTemplate]TempKeyNumber)
+	$i:=1
+	FIRST RECORD([SpecTempBuilder])
+	For ($i;1;Records in selection([SpecTempBuilder]))
+		QUERY([ChineseDictionary];[ChineseDictionary]LexKey=[SpecTempBuilder]SpecLibKey)
+		[SpecTempBuilder]TempSpec:=[ChineseDictionary]EnglishName
+		SAVE RECORD([SpecTempBuilder])
+		NEXT RECORD([SpecTempBuilder])
+	End for 
+	
+	ORDER BY([SpecTempBuilder];[SpecTempBuilder]SortOrder;>)
+End if 
+

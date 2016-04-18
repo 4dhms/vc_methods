@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	<>vlOrderNumber:=[Orders]OrderNum
+	<>vlRevisionNumber:=[Orders]RevisionNumber
+	
+	If (vfIncomplete)
+		cbUnresolved:=1
+	Else 
+		cbUnresolved:=0
+	End if 
+	CS_StatSearch 
+End if 

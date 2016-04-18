@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($lead)
+C_BOOLEAN($dynamic)
+
+If (Form event=On Clicked)
+	$lead:=0
+	$lead:=Num(Request("Fixed Lead Time";"24"))
+	$dynamic:=False
+	
+	If ($lead>0)
+		QUERY([NeedByLib];[NeedByLib]Name=asFactories{asFactories})
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+		Case of 
+			: (Records in selection([NeedByLib])=0)
+				CREATE RECORD([NeedByLib])
+				[NeedByLib]Name:=asFactories{asFactories}
+				[NeedByLib]Leadtime:=$lead
+				[NeedByLib]Router:=2
+				[NeedByLib]LeadtimeSpecial:=$dynamic
+				SAVE RECORD([NeedByLib])
+				QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+				QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+				ORDER BY([NeedByLib];[NeedByLib]Name;>)
+				DELETE FROM ARRAY(asFactories;asFactories;1)
+			: (Locked([NeedByLib]))
+				WinPrompt (asFactories{asFactories}+" is locked. Configure leadtime later.")
+				QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+				QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+				ORDER BY([NeedByLib];[NeedByLib]Name;>)
+			Else 
+				[NeedByLib]Leadtime:=$lead
+				[NeedByLib]LeadtimeSpecial:=$dynamic
+				SAVE RECORD([NeedByLib])
+				QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+				QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+				ORDER BY([NeedByLib];[NeedByLib]Name;>)
+				DELETE FROM ARRAY(asFactories;asFactories;1)
+		End case 
+	End if 
+End if 

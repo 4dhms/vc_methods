@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+vlOldOrderNumber:=[Samples]SampleNumber*-1
+
+
+vtHistory:=""
+DUPLICATE RECORD([Samples])
+If ([Samples]SampleDivision="05-Cupio@") | ([Designs]DivisionCodeN="05-Cupio@") | ([Samples]SampleDivision="04-Cupio Dresses")
+	[Samples]DivisionOverride:=True
+	[Samples]SampleDivision:="03-Cupio"
+End if 
+[Samples]SampleReceived:=!00-00-00!
+[Samples]SampleNumber:=Num(PO_GetNumber ("Sample"))
+[Samples]SampleOrderDate:=Current date(*)
+[Samples]DueDate:=!00-00-00!
+[Samples]SortOrder:=0
+[Samples]ComponentSheet:=True
+[Samples]NewSGSystem:=True
+[Samples]OrderEnterer SG:=Current user
+[Samples]XFactoryReq:=!00-00-00!
+[Samples]PattComplete:=False
+[Samples]SewComplete:=False
+[Samples]LastCostSheet:=""
+[Samples]RevisionNumber:=0
+[Samples]RevisionKey:=0
+[Samples]ArchiveNot:=False
+[Samples]ReviseDate:=""
+[Samples]Revised:=False
+[Samples]SpecSheet:=False
+
+Case of 
+	: ([Samples]StyleNum="Multiple")
+		[Samples]StyleNum:=""
+	: (Length([Samples]StyleNum)>10)
+		WinPrompt ("Style number can not exceed seven (10) characters.")
+		[Samples]StyleNum:=Substring([Samples]StyleNum;1;10)
+End case 
+[Samples]MultipleStyles:=False
+SAVE RECORD([Samples])
+ONE RECORD SELECT([Samples])
+SET WINDOW TITLE("Duplicate Sample Order")
+
+vlDupeOrderNumber:=-1*[Samples]SampleNumber
+
+CS_Dupe 
+Dupe_FabricOrder 
+SG_FM_EntryOnLoad 
+
+

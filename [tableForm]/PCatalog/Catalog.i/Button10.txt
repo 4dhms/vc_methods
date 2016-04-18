@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+FIRST RECORD([PCPage])
+$i:=1
+For ($i;1;Records in selection([PCPage]))
+	[PCPage]PageNumber:=alSortList{$i}
+	SAVE RECORD([PCPage])
+	NEXT RECORD([PCPage])
+End for 
+
+QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+ORDER BY([PCPage];[PCPage]PageNumber;>)
+ARRAY LONGINT(alSortList;0)
+SELECTION TO ARRAY([PCPage]PageNumber;alSortList)

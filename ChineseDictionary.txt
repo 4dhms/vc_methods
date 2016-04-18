@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([ChineseDictionary];"Dictionary.i")
+FORM SET OUTPUT([ChineseDictionary];"Dictionary.o")
+ALL RECORDS([ChineseDictionary])
+
+Center Window (600;400;0;"")
+MODIFY SELECTION([ChineseDictionary];*)
+CLOSE WINDOW
+<>vlDictionary:=0

@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //Sales Entry procedure
+  //
+Case of 
+	: (<>DLProc>0)
+		SHOW PROCESS(<>DLProc)
+		BRING TO FRONT(<>DLProc)
+	: (<>DLProc=0)
+		<>DLProc:=New process("p_DesignLine";0;"DesignLine")
+	Else 
+		SHOW PROCESS(<>DLProc)
+		BRING TO FRONT(<>DLProc)
+End case 

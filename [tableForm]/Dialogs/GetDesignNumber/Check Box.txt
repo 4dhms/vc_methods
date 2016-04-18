@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cb1:=1
+cb2:=0
+cb3:=0
+cb4:=0

@@ -1,0 +1,28 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($t;$b)
+
+Case of 
+	: (<>vlPlatform=3)
+		$t:=60
+		$b:=510
+	: (Current user="Designer") & (Not(Macintosh command down))
+		$t:=50
+		$b:=520
+	Else 
+		$t:=50
+		$b:=500
+End case 
+
+  //If (<>vlPlatform<3) & (Not(Update_Confirm ))
+  //$b:=534
+  //ENABLE BUTTON(bUpdate)
+  //Else 
+  //DISABLE BUTTON(bUpdate)
+  //End if 
+
+
+Open window(10;$t;115;$b;8;"")
+DIALOG([Dashboard File];"SimpleDash")
+  //DIALOG("Dash")
+CLOSE WINDOW
+<>DashbID:=0

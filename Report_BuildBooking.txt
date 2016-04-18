@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE(vdStart;vdEnd)
+C_LONGINT($i;$weightedtot)
+C_TEXT(vsDivision;vsCustomer;vsFactory;vsStyleNumber)
+
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	Else 
+		QUERY([Orders];[Orders]PODate>=vdStart;*)
+		QUERY([Orders]; & ;[Orders]PODate<=vdEnd)
+		QUERY SELECTION([Orders];[Orders]Cancelled=False)
+		If (vsDivision#"")
+			QUERY SELECTION([Orders];[Orders]OrderDivision=vsDivision)
+		End if 
+		If (vsCustomer#"")
+			QUERY SELECTION([Orders];[Orders]Customer=vsCustomer)
+		End if 
+		If (vsFactory#"")
+			QUERY SELECTION([Orders];[Orders]Factory=vsFactory)
+		End if 
+		If (vsStyleNumber#"")
+			QUERY SELECTION([Orders];[Orders]StyleNumber=vsStyleNumber+"@")
+		End if 
+		
+		ORDER BY([Orders];[Orders]OrderNum;>)
+		SET WINDOW TITLE(String(Records in selection([Orders]))+" Orders")
+		
+		$i:=1
+		vlTotQty:=0
+		vlTotNetSales:=0
+		$weightedtot:=0
+		
+		For ($i;1;Records in selection([Orders]))
+			vlTotQty:=vlTotQty+[Orders]TotalOrderQuantity
+			vlTotNetSales:=vlTotNetsales+Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));2)
+			NEXT RECORD([Orders])
+		End for 
+		vrAvgPriceTot:=Round(vlTotNetSales/vlTotQty;2)
+End case 
+
+

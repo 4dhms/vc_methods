@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Display Detail)
+		OBJECT SET VISIBLE([CP_OrderXRef]Quantity;[CP_OrderXRef]Quantity>0)
+End case 

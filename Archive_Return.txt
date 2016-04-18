@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($diskName)
+C_TEXT($path)
+
+$diskName:=Get 4D folder
+$diskName:=Substring($diskName;1;Position(":";$diskName))
+$path:=$diskName+$1
+
+If (Test path name($path)=1)
+	DOCUMENT TO BLOB($path;vxMover)
+	If (Application type=0)
+		Archive_Catch (vxMover)
+	Else 
+		EXECUTE ON CLIENT($2;"Archive_Catch";vxMover)
+	End if 
+End if 

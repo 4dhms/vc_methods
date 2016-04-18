@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfEmail;vfPDF)
+
+If (vlPage=1) & (Application type#5) & (Not(vfEmail))
+	PRINT SETTINGS
+	If (ok=1)
+		$0:=True
+	Else 
+		$0:=False
+	End if 
+Else 
+	vsPrintingHeader:="PAGE "+String(vlPage)
+	$0:=True
+End if 
+
+If (vfPDF) | (vfEmail)
+	vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+	  //SET CURRENT PRINTER("PDF_Direct")
+	SET PRINT OPTION(Scale option;98)
+	SET PRINT OPTION(Orientation option;1)
+	SET PRINT OPTION(Mac spool file format option;0)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+End if 

@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($revA)
+C_TEXT($revB)
+C_LONGINT($r)
+
+$r:=[Orders]RevisionNumber
+$revA:="Revise "+String([Orders]RevisionNumber)
+$revB:="Revise "+String([Orders]RevisionNumber-1)
+
+If (User in group(Current user;"Revision")) & ([Orders]RevisionNumber>0)
+	WinChoice ("Are you sure you want to change the revision number from "+$revA+" to "+$revB+"?")
+	If (ok=1)
+		WinChoice ("Are you really really sure?";"No";"Yes")
+		If (ok=0)
+			[Orders]RevisionNumber:=[Orders]RevisionNumber-1
+			If ([Orders]RevisionNumber=0)
+				asPOv{Find in array(asPOv;$revA)}:="Original order"
+			Else 
+				asPOv{Find in array(asPOv;$revA)}:=$revB
+			End if 
+			[Orders]RevHistory:=Replace string([Orders]RevHistory;"Revision "+String($r);"Rev "+String($r))
+		End if 
+	End if 
+End if 

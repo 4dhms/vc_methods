@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$ordernumber)
+
+QUERY([Samples];[Samples]SpecSheet=True)
+
+$i:=1
+FIRST RECORD([Samples])
+For ($i;1;Records in selection([Samples]))
+	$ordernumber:=-1*[Samples]SampleNumber
+	
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=$ordernumber)
+	If (Records in selection([SpecFactory])=0)
+		[Samples]SpecSheet:=False
+		SAVE RECORD([Samples])
+	End if 
+	NEXT RECORD([Samples])
+End for 
+ALERT("Done")

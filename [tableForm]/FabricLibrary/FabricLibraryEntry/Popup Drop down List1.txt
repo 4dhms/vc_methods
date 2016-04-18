@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (atCost1>1) & (vlItem1>0)
+	ArtNo_Build 
+	OBJECT SET VISIBLE(vlItem2;True)
+	OBJECT SET VISIBLE(*;"Perc1";True)
+	OBJECT SET VISIBLE(atCost2;True)
+	If (vlItem1=0)
+		GOTO OBJECT(vlItem1)
+	Else 
+		GOTO OBJECT(vlItem2)
+	End if 
+End if 

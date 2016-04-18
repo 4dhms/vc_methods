@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([SampleFabrics];"SamFabPO.i")
+vlWinWd:=600
+vlWinHt:=420
+vlWinType:=8
+vsWinTitle:="New Record Sample Fabrics"
+
+ADD RECORD([SampleFabrics];*)
+p_SetWndwSamF 

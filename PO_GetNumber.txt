@@ -1,0 +1,157 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue;$done;$stop)
+C_TEXT($styletest)
+C_LONGINT($run)
+
+$continue:=False
+$done:=False
+
+AccessMode (->[NumberGenerator];True)
+ALL RECORDS([NumberGenerator])
+Repeat 
+	LOAD RECORD([NumberGenerator])
+Until (Not(Locked([NumberGenerator])))
+
+Case of 
+	: ($1="Sample")
+		[NumberGenerator]SampleNumber:=[NumberGenerator]SampleNumber+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]SampleNumber)
+	: ($1="Order")
+		[NumberGenerator]OrderNumber:=[NumberGenerator]OrderNumber+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]OrderNumber)
+	: ($1="Button")
+		[NumberGenerator]ButtonOrder:=[NumberGenerator]ButtonOrder+1
+		SAVE RECORD([NumberGenerator])
+		$0:="BN-"+String([NumberGenerator]ButtonOrder)
+	: ($1="Fabric")
+		[NumberGenerator]FabricOrder:=[NumberGenerator]FabricOrder+1
+		SAVE RECORD([NumberGenerator])
+		$0:="FB-"+String([NumberGenerator]FabricOrder)
+	: ($1="Trim")
+		[NumberGenerator]TrimOrder:=[NumberGenerator]TrimOrder+1
+		SAVE RECORD([NumberGenerator])
+		$0:="TR-"+String([NumberGenerator]TrimOrder)
+	: ($1="Solid")
+		[NumberGenerator]Solid:=[NumberGenerator]Solid+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]Solid)
+	: ($1="Print")
+		[NumberGenerator]Print:=[NumberGenerator]Print+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]Print)
+	: ($1="Embroidery")
+		[NumberGenerator]Embroidery:=[NumberGenerator]Embroidery+1
+		SAVE RECORD([NumberGenerator])
+		$0:="E"+String([NumberGenerator]Embroidery)
+	: ($1="Layout")
+		[NumberGenerator]Layout:=[NumberGenerator]Layout+1
+		SAVE RECORD([NumberGenerator])
+		$0:="L"+String([NumberGenerator]Layout)
+	: ($1="Yarn Dye Stripe")
+		[NumberGenerator]YarnDye:=[NumberGenerator]YarnDye+1
+		SAVE RECORD([NumberGenerator])
+		$0:="YD"+String([NumberGenerator]YarnDye)
+	: ($1="Novelty")
+		[NumberGenerator]Novelty:=[NumberGenerator]Novelty+1
+		SAVE RECORD([NumberGenerator])
+		$0:="NV"+String([NumberGenerator]Novelty)
+	: ($1="Article")
+		[NumberGenerator]ArticleSerial:=[NumberGenerator]ArticleSerial+1
+		SAVE RECORD([NumberGenerator])
+		$0:=Substring(String([NumberGenerator]ArticleSerial+1000);2;3)
+		
+	: ($1="Design1")
+		[NumberGenerator]DesignKey1:=[NumberGenerator]DesignKey1+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey1)
+	: ($1="Design2")
+		[NumberGenerator]DesignKey2:=[NumberGenerator]DesignKey2+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey2)
+	: ($1="Design3")
+		[NumberGenerator]DesignKey3:=[NumberGenerator]DesignKey3+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey3)
+	: ($1="Design4")
+		[NumberGenerator]DesignKey4:=[NumberGenerator]DesignKey4+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey4)
+	: ($1="Design5")
+		[NumberGenerator]DesignKey5:=[NumberGenerator]DesignKey5+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey5)
+	: ($1="Design6")
+		[NumberGenerator]DesignKey6:=[NumberGenerator]DesignKey6+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey6)
+	: ($1="Design7")
+		[NumberGenerator]DesignKey7:=[NumberGenerator]DesignKey7+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey7)
+	: ($1="Design8")
+		[NumberGenerator]DesignKey8:=[NumberGenerator]DesignKey8+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey8)
+	: ($1="Design9")
+		[NumberGenerator]DesignKey9:=[NumberGenerator]DesignKey9+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey9)
+	: ($1="DesignE")
+		[NumberGenerator]DesignKey11:=[NumberGenerator]DesignKey11+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey11)
+	: ($1="Design00")
+		[NumberGenerator]DesignKey00:=[NumberGenerator]DesignKey00+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey00)
+	: ($1="Design12")
+		[NumberGenerator]DesignKey12H:=[NumberGenerator]DesignKey12H+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]DesignKey12H)
+	: ($1="DesignM")
+		[NumberGenerator]DesignKey99:=[NumberGenerator]DesignKey99+1
+		SAVE RECORD([NumberGenerator])
+		$0:="M"+String([NumberGenerator]DesignKey00)
+	: ($1="Style")
+		If ([NumberGenerator]StyleNumber>99998)
+			[NumberGenerator]StyleNumber:=11110
+		Else 
+			[NumberGenerator]StyleNumber:=[NumberGenerator]StyleNumber+1
+		End if 
+		
+		<>vtStyleTest:="@"+String([NumberGenerator]StyleNumber)+"@"
+		
+		Repeat 
+			$run:=New process("PO_CheckStyle";0;"CheckStyle")
+			$stop:=False
+			Repeat 
+				Case of 
+					: (<>vtStyleTest="Crash")
+						$stop:=True
+					: (<>vtStyleTest="Good")
+						$stop:=True
+					: (Shift down)
+						$stop:=True
+				End case 
+			Until ($stop)
+			Case of 
+				: (<>vtStyleTest="Crash")
+					[NumberGenerator]StyleNumber:=[NumberGenerator]StyleNumber+1
+				: (Shift down)
+					$done:=True
+				Else 
+					$done:=True
+			End case 
+		Until ($done)
+		
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]StyleNumber)
+		
+	: ($1="Stock")
+		[NumberGenerator]StockOrder:=[NumberGenerator]StockOrder+1
+		SAVE RECORD([NumberGenerator])
+		$0:=String([NumberGenerator]StockOrder)
+End case 
+AccessMode (->[NumberGenerator];False)

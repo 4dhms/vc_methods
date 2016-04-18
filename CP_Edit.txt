@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtOrderChanges:=vtOrderChanges+"_Color"
+CP_GetInfo (asTypeList)
+
+If (ok=1)
+	CP_UpdateLine 
+End if 

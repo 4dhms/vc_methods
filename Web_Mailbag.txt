@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Web_UserField 
+vtDescription:="Send Status Report"
+QUERY([Staff];[Staff]UserName=vsWebUser)
+If (Records in selection([Staff])>0)
+	vtEmailAddress:=[Staff]EmailAddress
+End if 
+
+UNLOAD RECORD([Staff])
+
+vtTextBox:=Char(1)+"<textarea name=vtEmailAddress rows=5 wrap=VIRTUAL size=30>"+vtEmailAddress+"</textarea>"
+
+WEB SEND FILE("mailbag.html")

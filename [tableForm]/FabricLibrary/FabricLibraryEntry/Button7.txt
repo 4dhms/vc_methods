@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[FabricLibrary]ArticleNumber:="HMS"+PO_GetNumber ("Article")
+OBJECT SET VISIBLE(bGet;False)

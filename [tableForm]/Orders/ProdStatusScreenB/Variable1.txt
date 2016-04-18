@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+
+vfPDF:=False
+
+vfProdStatus:=False
+Order_StatusSetup 
+Dev_Trayce 
+
+If (ok=1)
+	If (Records in selection([Orders])>500)
+		WinChoice ("That's over 500 orders. Are you sure you want to use that much paper?")
+		If (ok=1)
+			$continue:=True
+		End if 
+	Else 
+		$continue:=True
+	End if 
+	
+	If ($continue)
+		If (rLong=1)
+			Order_PrtProdStatv2 
+		Else 
+			Order_PrtProdStat3 
+		End if 
+	End if 
+End if 
+
+
+UNLOAD RECORD([ComponentSheets])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([CS_Tracking])
+UNLOAD RECORD([CS_Lines])
+UNLOAD RECORD([CS_Status])

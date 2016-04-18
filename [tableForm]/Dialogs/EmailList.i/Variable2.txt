@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Size of array(asSubCC)>0)
+	ACCEPT
+Else 
+	WinPrompt ("You need at least one email address.")
+End if 
+
+
+  //C_BOOLEAN($stop)
+  //C_LONGINT($i)
+  //
+  //$stop:=False
+  //
+  //
+  //If (Size of array(asSubCC)>0)
+  //
+  //$i:=1
+  //For ($i;1;Size of array(asSubCC))
+  //If (asSubCC{$i}#"@nubby.com")
+  //QUERY([Vendors];[Vendors]VendorName=[Orders]Factory)
+  //If ([Vendors]PrimaryEmail=asSubCC{$i})
+  //  //good
+  //Else 
+  //QUERY([VendorEmail];[VendorEmail]EmailAddress=asSubCC{$i};*)
+  //QUERY([VendorEmail]; | ;[VendorEmail]EmailAddress=asSubCC{$i}+" ")
+  //RELATE ONE SELECTION([VendorEmail];[Vendors])
+  //ARRAY TEXT($vendors;0)
+  //SELECTION TO ARRAY([Vendors]VendorName;$vendors)
+  //If (Find in array($vendors;[Orders]Factory)<1) & (Not($stop))
+  //WinChoice (asSubCC{$i}+Char(13)+" is not in the Email Address List for "+Char(13)+Char(34)+[Orders]Factory+Char(34)+".";"Stop";"Allow it")
+  //If (ok=1)
+  //$stop:=True
+  //End if 
+  //End if 
+  //End if 
+  //End if 
+  //End for 
+  //UNLOAD RECORD([VendorEmail])
+  //UNLOAD RECORD([Vendors])
+  //
+  //If (Not($stop))
+  //ACCEPT
+  //End if 
+  //Else 
+  //WinPrompt ("You need at least one email address.")
+  //End if 

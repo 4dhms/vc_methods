@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (Records in selection([Orders])>5000)
+	WinPrompt ("That query will take over three business days. Make a smaller subset.")
+Else 
+	CREATE SET([Orders];"Scheduled")
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		Case of 
+			: ([Orders]Schedule Date>[Orders]ShipDateFactory)
+			: ([Orders]Schedule Date=!00-00-00!)
+			Else 
+				REMOVE FROM SET([Orders];"Scheduled")
+		End case 
+		NEXT RECORD([Orders])
+	End for 
+	USE SET("Scheduled")
+	CLEAR SET("Scheduled")
+	
+	p_SetWindowHMS 
+	
+End if 

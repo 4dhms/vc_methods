@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($article)
+
+$article:=Replace string(vsRequestString;"art# ";"@")
+$article:=Replace string($article;"#";"@")
+
+CREATE SET([Samples];"comp")
+QUERY([CS_Lines];[CS_Lines]ArticleNumber=$article)
+
+$i:=1
+FIRST RECORD([CS_Lines])
+
+For ($i;1;Records in selection([CS_Lines]))
+	QUERY([ComponentSheets];[ComponentSheets]CS_ID=[CS_Lines]CS_ID)
+	QUERY([Samples];[Samples]SampleNumber=Abs([ComponentSheets]HMSOrderNumber))
+	FIRST RECORD([Samples])
+	$n:=1
+	For ($n;1;Records in selection([Samples]))
+		ADD TO SET([Samples];"comp")
+		NEXT RECORD([Samples])
+	End for 
+	NEXT RECORD([CS_Lines])
+End for 
+
+USE SET("comp")
+CLEAR SET("comp")
+

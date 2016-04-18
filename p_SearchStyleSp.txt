@@ -1,0 +1,34 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global to search for style number in specs
+SAVE RECORD([Specs])
+CREATE SET([Specs];"DesPreSet")
+If (Records in selection([Specs])=0)
+	ALL RECORDS([Specs])
+Else 
+End if 
+WinFind ("Enter Style Number:")
+
+If (OK=0)
+	CLOSE WINDOW
+	USE SET("DesPreSet")
+	p_SetWndwSpecs 
+	CLEAR SET("DesPreSet")
+Else 
+	If (vAddTo=1)
+		QUERY([Specs];[Specs]Style Num=vsRequestString)
+		CREATE SET([Specs];"DesignSGSet")
+		UNION("DesPreSet";"DesignSGSet";"NewSGSet")
+		CLOSE WINDOW
+		CLEAR SET("DesSGSet")
+		CLEAR SET("DesPreSet")
+		USE SET("NewSGSet")
+		p_SetWndwSpecs 
+		CLEAR SET("NewSGSet")
+	Else 
+		QUERY([Specs];[Specs]Style Num=vsRequestString)
+		CLEAR SET("DesPreSet")
+		CLOSE WINDOW
+		p_SetWndwSpecs 
+	End if 
+End if 
+p_InptLaySpecs 

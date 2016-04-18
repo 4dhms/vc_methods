@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($used)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=0)
+
+If (Records in selection([DesignLineIncluded])=0)
+	WinPrompt ("There are no missing garments.")
+Else 
+	$i:=1
+	FIRST RECORD([DesignLineIncluded])
+	For ($i;1;Records in selection([DesignLineIncluded]))
+		Case of 
+			: (vDesign13="") & (Position("13";$used)<1)
+				[DesignLineIncluded]ItemNumber:=13
+				$used:=$used+"13 "
+			: (vDesign14="") & (Position("14";$used)<1)
+				[DesignLineIncluded]ItemNumber:=14
+				$used:=$used+"14 "
+			: (vDesign15="") & (Position("15";$used)<1)
+				[DesignLineIncluded]ItemNumber:=15
+				$used:=$used+"15 "
+			: (vDesign16="") & (Position("16";$used)<1)
+				[DesignLineIncluded]ItemNumber:=16
+				$used:=$used+"16 "
+			: (vDesign17="") & (Position("17";$used)<1)
+				[DesignLineIncluded]ItemNumber:=17
+				$used:=$used+"17 "
+			: (vDesign18="") & (Position("18";$used)<1)
+				[DesignLineIncluded]ItemNumber:=18
+				$used:=$used+"18 "
+			Else 
+				WinPrompt ("There are still some lost garments, but the clipboard is full.")
+		End case 
+		SAVE RECORD([DesignLineIncluded])
+		NEXT RECORD([DesignLineIncluded])
+	End for 
+	
+	DL_BuildPage (asPages;True)
+End if 

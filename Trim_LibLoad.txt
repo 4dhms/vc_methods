@@ -1,0 +1,70 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atCost1;0)
+ARRAY TEXT(atCost2;0)
+ARRAY TEXT(atCost3;0)
+C_LONGINT($i;$n)
+
+Case of 
+	: (Form event=On Outside Call)
+		vxSketch:=<>vxSketch
+		GET PICTURE FROM LIBRARY("empty.jpg";<>vxSketch)
+		
+	: (Form event=On Load)
+		ARRAY TEXT(atCost4;0)
+		ARRAY TEXT(atCost5;0)
+		ARRAY TEXT(atCols;0)
+		ARRAY DATE(adPODate;0)
+		ARRAY BOOLEAN(afReceived;0)
+		
+		
+		vsSubhead:="Base Fabric Builder"
+		
+		
+		LIST TO ARRAY("ArticleBuild";atCost1)
+		INSERT IN ARRAY(atCost1;1;1)
+		atCost1{1}:="Fiber List"
+		
+		COPY ARRAY(atCost1;atCost2)
+		COPY ARRAY(atCost1;atCost3)
+		COPY ARRAY(atCost1;atCost4)
+		COPY ARRAY(atCost1;atCost5)
+		atCost1:=1
+		atCost2:=1
+		atCost3:=1
+		atCost4:=1
+		atCost5:=1
+		vlItem1:=0
+		vlItem2:=0
+		vlItem3:=0
+		vlItem4:=0
+		vlItem5:=0
+		vsFiber1:=""
+		vsFlag:=""
+		vtHistory:=""
+		OBJECT SET VISIBLE(*;"xPerc1";False)
+		OBJECT SET VISIBLE(*;"xPerc2";False)
+		OBJECT SET VISIBLE(*;"xPerc3";False)
+		OBJECT SET VISIBLE(*;"xPerc4";False)
+		OBJECT SET VISIBLE(atCost2;False)
+		OBJECT SET VISIBLE(atCost3;False)
+		OBJECT SET VISIBLE(atCost4;False)
+		OBJECT SET VISIBLE(atCost5;False)
+		OBJECT SET VISIBLE(vlItem2;False)
+		OBJECT SET VISIBLE(vlItem3;False)
+		OBJECT SET VISIBLE(vlItem4;False)
+		OBJECT SET VISIBLE(vlItem5;False)
+		
+		If (Is new record([FabricLibrary]))
+			[FabricLibrary]FabricLibKey:=Sequence number([FabricLibrary])
+			[FabricLibrary]CreatedBy:=Current user
+			[FabricLibrary]CreationDate:=Current date(*)
+			[FabricLibrary]Type:=2
+			REDUCE SELECTION([OrdersFabricXRef];0)
+			OBJECT SET VISIBLE(atSub1;True)
+			GOTO OBJECT([FabricLibrary]ArticleNumber)
+		Else 
+			OBJECT SET VISIBLE(atSub1;False)
+			Picture_Get ([FabricLibrary]FabricLibKey;"R")
+		End if 
+		
+End case 

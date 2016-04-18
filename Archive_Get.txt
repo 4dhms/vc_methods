@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($fetch)
+
+<>vfCatchFile:=True
+$fetch:=Execute on server("Archive_Return";1064*64;"Return";$1;Current machine owner)

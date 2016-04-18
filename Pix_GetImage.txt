@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_LONGINT($run;$filesize)
+C_TEXT($path;$key)
+C_PICTURE($image)
+C_BLOB($pblob)
+C_POINTER($sketch)
+
+GET PICTURE FROM LIBRARY("empty.jpg";$image)
+
+vhDocRef:=Open document("")
+CLOSE DOCUMENT(vhDocRef)
+If (ok=1)
+	$filesize:=Get document size(Document)
+End if 
+
+Case of 
+	: (ok=1)
+		If (Get document size(Document)>200000) & (Current user#"Designer")
+			WinPrompt ("File is "+String(Round(Get document size(Document)/1000000;1))+" Mbs. This image is for quick reference only."+Char(13)+Char(13)+"Reduce to under 200 KB.")
+			$continue:=False
+		Else 
+			
+			  //CLOSE DOCUMENT(vhDocRef)
+			$path:=Document
+			
+			READ PICTURE FILE($path;$image)
+			vxSketch:=$image
+			
+			VARIABLE TO BLOB(vxSketch;$pblob)
+			
+			  //$pdfFolder:=PDF_FindFolder +":temp.jpg"
+			  //WRITE PICTURE FILE($pdfFolder;$image;"JPEG")
+			  //READ PICTURE FILE($pdfFolder;$image)
+			  //DOCUMENT TO BLOB($pdfFolder;$pblob)
+			
+			If (<>vlOrderNumber>0)
+				$key:="B"
+			Else 
+				$key:="S"
+			End if 
+			If (Application type=0)
+				Picture_ServerPut (Abs(<>vlOrderNumber)+($1*0.1);$key;$pblob)
+			Else 
+				$run:=Execute on server("Picture_ServerPut";32*1024;"PictureProc";Abs(<>vlOrderNumber)+($1*0.1);$key;$pblob)
+			End if 
+			$sketch:=Get pointer("vxSketch"+String($1))
+			$sketch->:=vxSketch
+		End if 
+End case 

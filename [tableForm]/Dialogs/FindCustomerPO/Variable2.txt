@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vsPOFlag#"")
+	INSERT IN ARRAY(asNames;Size of array(asNames)+1;1)
+	asNames{Size of array(asNames)}:=vsPOFlag
+	vsPOFlag:=""
+	GOTO OBJECT(vsPOFlag)
+End if 

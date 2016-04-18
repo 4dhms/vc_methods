@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($print10)
+C_LONGINT($i)
+ARRAY LONGINT(alTotals;0)
+ARRAY LONGINT(alGrandTotals;0)
+ARRAY LONGINT(alGrandTotals;10)
+
+Order_BuildPrintBD ([Orders]BDHeaderKey)
+vlBDGrandTot:=0
+vlPackTot:=0
+
+If ([Orders]BDHeaderKey>0) & (Size of array(alBDKey)>0)
+	PrintOrder_NewPage (630;"")
+	
+	If ([BreakDownLibrary]BDN8#"") | ([BreakDownLibrary]BDN9#"") | ([BreakDownLibrary]BDN10#"")
+		$print10:=True
+		Print form([Orders];"PrintOrder_Break10")
+	Else 
+		$print10:=False
+		Print form([Orders];"PrintOrder_Break7")
+	End if 
+	vlPrintedPixels:=vlPrintedPixels+24
+	$i:=1
+	vlPacks:=0
+	If (Size of array(asBDSelf)>0)
+		FIRST RECORD([OrdersBreakdowns])
+		  //
+		$i:=1
+		For ($i;1;Size of array(asBDSelf))
+			
+			PrintOrder_NewPage (650;"")
+			
+			Order_BDLine ($i)
+			Case of 
+				: (Not(vfContinue))
+					
+				: ($print10)
+					Print form([OrdersBreakdowns];"Breakdown10.p")
+					vlPrintedPixels:=vlPrintedPixels+24
+				Else 
+					Print form([OrdersBreakdowns];"Breakdown7.p")
+					vlPrintedPixels:=vlPrintedPixels+20
+			End case 
+			
+		End for 
+		
+		vlPrintedPixels:=vlPrintedPixels+6
+		Print form([Orders];"PrintOrder_3pt")
+		Print form([Orders];"PrintOrder_3pt")
+	End if 
+	vlPrintedPixels:=vlPrintedPixels+23
+	Print form([Orders];"PrintOrder_3pt")
+	Print form([Orders];"PrintOrder_3pt")
+	Print form([Orders];"PrintOrder_3pt")
+End if 

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlAddPartStatus)
+C_TEXT($searchString)
+WinFind ("Enter other Design Number:";4)
+
+If (ok=1)
+	vDesign1:=vsRequestString
+	If (vDesign1#"")
+		CREATE SET([SpecFactory];"ThisSpec")
+		$searchString:=StripToNumber (vDesign1)+"@"
+		
+		QUERY([SpecFactory];[SpecFactory]DesignNumber=$searchString)
+		QUERY SELECTION([SpecFactory];[SpecFactory]SF_KeyNumber>0)
+		ORDER BY([SpecFactory];[SpecFactory]SF_KeyNumber;>)
+		SS_DesignSetup 
+		USE SET("ThisSpec")
+		CLEAR SET("ThisSpec")
+		If (Size of array(asDesignNumbers)>0)
+			FORM GOTO PAGE(2)
+		Else 
+			WinPrompt ("There is no spec sheet for D/N:"+$searchString)
+			vDesign1:=""
+		End if 
+	End if 
+End if 

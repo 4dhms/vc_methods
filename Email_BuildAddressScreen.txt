@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asVendors;0)
+ARRAY TEXT(asSubCC;0)
+ALL RECORDS([VendorEmail])
+RELATE ONE SELECTION([VendorEmail];[Vendors])
+
+DISTINCT VALUES([Vendors]VendorName;asVendors)
+asVendors:=0

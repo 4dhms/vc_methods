@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Size of array(asColHeader)=0)
+	WinPrompt ("Select a size ratio")
+Else 
+	BD_PasteTemp 
+End if 

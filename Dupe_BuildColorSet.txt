@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($s)
+FIRST RECORD([CP_OrderXRef])
+
+$s:=1
+For ($s;1;Records in selection([CP_OrderXRef]))
+	ADD TO SET([CP_OrderXRef];"ColorWay")
+	NEXT RECORD([CP_OrderXRef])
+End for 

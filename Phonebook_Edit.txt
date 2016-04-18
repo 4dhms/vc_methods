@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Center Window (250;250;1;"")
+DIALOG("Phonebook.enter")
+CLOSE WINDOW
+

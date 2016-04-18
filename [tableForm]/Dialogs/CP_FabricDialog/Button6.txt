@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($combo;$i;$line)
+C_TEXT($message)
+$combo:=Num(vsCPType)
+
+If ($combo+1<Size of array(asOrderType))
+	$message:="This action will delete "+vsCPType+" from this order and renumber the following combos."+Char(13)+"Do you want to continue?"
+Else 
+	$message:="This action will delete "+vsCPType+" from this order."+Char(13)+"Do you want to continue?"
+End if 
+
+WinChoice ($message)
+If (ok=1)
+	$line:=asOrderType
+	alFabricColor{$line}:=16711690
+	$i:=1
+	For ($i;1;Size of array(asTypeList))
+		Case of 
+			: (asTypeList{$i}=asOrderType{$line})
+				alShadeFab{$i}:=16711690
+			: (alShadeFab{$i}=16711690)
+				  //leave alone
+			Else 
+				alShadeFab{$i}:=16777215
+		End case 
+	End for 
+	CANCEL
+	
+End if 
+

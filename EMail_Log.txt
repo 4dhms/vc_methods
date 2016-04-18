@@ -1,0 +1,24 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtFailureMessage)
+
+If ($2#0)
+	vfFailure:=True
+	CREATE RECORD([EMailLog])
+	[EMailLog]EMLogDate:=Current date(*)
+	[EMailLog]EMLogTime:=Current time(*)
+	If (Count parameters>3)
+		[EMailLog]EMLogDescription:=$3+"  "+$4+String($2)
+	Else 
+		[EMailLog]EMLogDescription:=$3+"  "+String($2)
+	End if 
+	[EMailLog]EMLogDescription:=[EMailLog]EMLogDescription+Char(13)+vtFailureMessage
+	[EMailLog]EMLogID:=Sequence number([EMailLog])
+	SAVE RECORD([EMailLog])
+	EXECUTE ON CLIENT([Spooler]MachineName;"Email_Fail";[Spooler]Genre+" "+String($2))
+End if 
+  //If ($3#"FTP@") | ($3#"Backup@")
+  //vtDescription:=$3
+  //Mail_SendAlert 
+  //End if 
+
+UNLOAD RECORD([EMailLog])

@@ -1,0 +1,56 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($size;$run)
+C_TIME(vhDocRef)
+C_TEXT($path)
+C_BLOB($pblob)
+C_TEXT($message)
+C_PICTURE($image)
+C_LONGINT($size)
+
+WinChoice ("How do you want to capture the image?";"From File";"Paste";"Not now")
+
+If (ok=1)
+	If (bChoice2=1)  //COPY
+		WinPrompt ("Not ready yet")
+	Else 
+		vhDocRef:=Open document("")
+		CLOSE DOCUMENT(vhDocRef)
+		If (ok=1)
+			$size:=Get document size(Document)
+			Case of 
+				: ($size>500000) & (Not(Shift down))
+					$message:="Picture is "+String(Int(Round($size/1000;0)))+"K."+Char(13)
+					$message:=$message+"Please keep your sketches under 500K."
+					
+					WinPrompt ($message)
+				Else 
+					CREATE RECORD([SpecPix])
+					[SpecPix]SF_KeyNumber:=[SpecFactory]SF_KeyNumber
+					[SpecPix]ImageNumber:=Sequence number([SpecPix])
+					SAVE RECORD([SpecPix])
+					
+					$path:=Document
+					
+					READ PICTURE FILE($path;$image)
+					  //COMPRESS PICTURE($image;"JPEG";500)
+					
+					  //$pdfFolder:=PDF_FindFolder +":temp.jpg"
+					  //WRITE PICTURE FILE($pdfFolder;$image;"JPEG")
+					  //READ PICTURE FILE($pdfFolder;$image)
+					VARIABLE TO BLOB($image;$pblob)
+					APPEND TO ARRAY(aSketch;$image)
+					APPEND TO ARRAY(atNote;"")
+					vlPixCount:=vlPixCount+1
+					
+					If (Table name(Current form table)#"SpecFactory")
+						vxSketch:=$image
+					End if 
+					$run:=Execute on server("Picture_ServerPut";32*1024;"PictureProc";[SpecPix]ImageNumber;"T";$pblob)
+					
+			End case 
+		End if 
+		Spec_GetPix 
+	End if 
+End if 
+
+

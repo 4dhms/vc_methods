@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asCPNumbers<2)
+		WinPrompt ("Select Color/Print")
+	: (asColorStatus<2)
+		WinPrompt ("Select Status")
+	Else 
+		ACCEPT
+End case 

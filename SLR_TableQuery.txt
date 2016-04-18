@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]StyleNumber=[SLRAcct]SLRStyleNumber)
+CREATE SET([Orders];"sn")
+QUERY SELECTION([Orders];[Orders]Customer=[SLRAcct]SLRAcct)
+
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+If ([Designs]ArchivedPict)
+	Picture_RestoreProc 
+End if 
+
+
+If (Records in selection([Orders])=1)
+	  //done
+Else 
+	USE SET("sn")
+	Case of 
+		: ([SLRAcct]SLRAcct="Lord & Taylor")
+			QUERY SELECTION([Orders];[Orders]Customer="L&T";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Lord & Taylor")
+		: ([SLRAcct]SLRAcct="Lord & Taylor Petite")
+			QUERY SELECTION([Orders];[Orders]Customer="L&T Petite")
+		: ([SLRAcct]SLRAcct="Lord & Taylor Large Sizes")
+			QUERY SELECTION([Orders];[Orders]Customer="L&T Woman")
+		: ([SLRAcct]SLRAcct="Bos Cov")
+			QUERY SELECTION([Orders];[Orders]Customer="Boscov")
+		: ([SLRAcct]SLRAcct="JC Penney")
+			QUERY SELECTION([Orders];[Orders]Customer="J@C@Penney")
+		: ([SLRAcct]SLRAcct="Dillard's Arizona")
+			QUERY SELECTION([Orders];[Orders]Customer="Dillard@AZ")
+		: ([SLRAcct]SLRAcct="Dillard's Florida")
+			QUERY SELECTION([Orders];[Orders]Customer="Dillard@FL@";*)
+			QUERY SELECTION([Orders]; & ;[Orders]Customer#"Dillard@FLA SHOP@")
+		: ([SLRAcct]SLRAcct="Dillard's Ft. Worth")
+			QUERY SELECTION([Orders];[Orders]Customer="Dillard@Worth";*)
+			QUERY SELECTION([Orders]; | ;[Orders]Customer="Dillard@FTW")
+		: ([SLRAcct]SLRAcct="Dillard's St. Louis")
+			QUERY SELECTION([Orders];[Orders]Customer="Dillard@St@L@")
+		: ([SLRAcct]SLRAcct="Dillard's Little Rock")
+			QUERY SELECTION([Orders];[Orders]Customer="Dillard@LTR")
+		: ([SLRAcct]SLRAcct="Macy's")
+			QUERY SELECTION([Orders];[Orders]Customer="Macy's")
+		Else 
+	End case 
+End if 
+
+If (Records in selection([Orders])=0)
+	USE SET("sn")
+End if 
+
+If (Records in selection([Orders])>1)
+	ARRAY TEXT($test;0)
+	SELECTION TO ARRAY([Orders]Customer;$test)
+	If (Find in array($test;[SLRAcct]SLRAcct)<1) & (Find in array($test;"Stock")>0)
+		QUERY SELECTION([Orders];[Orders]Customer="Stock")
+	End if 
+End if 
+FIRST RECORD([Orders])
+
+CLEAR SET("sn")
+
+
+

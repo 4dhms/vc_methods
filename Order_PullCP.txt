@@ -1,0 +1,53 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alFoundKeys;0)
+ARRAY LONGINT($selfkey;0)
+C_LONGINT($i;$s;$n;$ordernumber;$total)
+$orderNumber:=$1
+
+REDUCE SELECTION([CP_OrderXRef];0)
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$1;*)
+QUERY([OrdersFabricXRef]; & ;[OrdersFabricXRef]OrdType="Self")
+
+
+If (Records in selection([OrdersFabricXRef])>0)
+	$i:=1
+	QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+	CREATE EMPTY SET([CP_OrderXRef];"Colors")
+	DISTINCT VALUES([CP_OrderXRef]SelfKey;$selfkey)
+	
+	For ($i;1;Size of array($selfKey))
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkey{$i})
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]XrefID#0)
+		$n:=1
+		
+		FIRST RECORD([CP_OrderXRef])
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			ADD TO SET([CP_OrderXRef];"Colors")
+			If ([CP_OrderXRef]CPType="Self")
+				APPEND TO ARRAY(alFoundKeys;[CP_OrderXRef]SelfKey)
+			End if 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+	End for 
+	USE SET("Colors")
+	CLEAR SET("Colors")
+	Order_CP_Sort 
+	
+End if 
+
+$total:=0
+
+$i:=1
+$s:=1
+For ($i;1;Records in selection([CP_OrderXRef]))
+	If ([CP_OrderXRef]CPType="Self")
+		If ($1>0) & ([CP_OrderXRef]LineKey="")
+			[CP_OrderXRef]LineKey:=Char(64+$s)
+			SAVE RECORD([CP_OrderXRef])
+		End if 
+		$total:=$total+[CP_OrderXRef]Quantity
+		$s:=$s+1
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+

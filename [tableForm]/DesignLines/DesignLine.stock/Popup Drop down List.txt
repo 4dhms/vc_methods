@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[DesignLines]Division:=[DesignLines]Division+Char(13)+asXDivision{asXDivision}
+DELETE FROM ARRAY(asXDivision;asXDivision;1)
+SAVE RECORD([DesignLines])

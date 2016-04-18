@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$stylecount)
+C_POINTER($type;$order)
+
+If ([DesignLines]8Up)
+	$c:=8
+Else 
+	$c:=12
+End if 
+$stylecount:=0
+
+$i:=1
+FIRST RECORD([DesignLinkedPages])
+For ($i;1;Records in selection([DesignLinkedPages]))
+	$n:=1
+	For ($n;1;$c)
+		$type:=Field(116;$n+3)
+		$order:=Field(116;$n+15)
+		If ($type->=2) & ($order->#"")
+			$stylecount:=$stylecount+1
+		End if 
+	End for 
+	NEXT RECORD([DesignLinkedPages])
+End for 
+
+If ($stylecount=1)
+	vtOnHand:="1 Sample"
+Else 
+	vtOnHand:=String($stylecount)+" Samples"
+End if 

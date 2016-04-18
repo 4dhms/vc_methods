@@ -1,0 +1,301 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$buffer;$s;$r;$p)
+C_TEXT($rem;$line;$test1;$test2;$fabtrunk;$division;$title)
+C_BOOLEAN($done;$print;$break)
+vlPageTotal:=0
+vlGrandTotal:=0
+vtPDFName:="Status Report"
+vtSubjectLine:=vtTitle
+$print:=False
+Order_ReturnSort 
+
+$title:=vtTitle
+
+  //If (Find in array(asSortOrder;"Division")>0)
+  //WinChoice ("Do you want to break out divisions?")
+  //If (ok=1)
+$break:=True
+  //Else 
+  //$break:=False
+  //End if 
+  //End if 
+
+If (vfPDF)
+	vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+	  //ALERT(vtPathName)
+	  //SET CURRENT PRINTER("PDF_Direct")
+	SET PRINT OPTION(Scale option;100)
+	SET PRINT OPTION(Orientation option;1)
+	SET PRINT OPTION(Mac spool file format option;0)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+	$print:=True
+Else 
+	SET PRINT OPTION(Scale option;100)
+	SET PRINT OPTION(Orientation option;1)
+	PRINT SETTINGS
+	If (ok=1)
+		$print:=True
+	End if 
+End if 
+
+If ($print)
+	vlPrintedPixels:=20
+	vlPage:=1
+	vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Orders]))+" Orders   "+"Page "+String(vlPage)
+	Print form("Header1")
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		vlPageTotal:=vlPageTotal+[Orders]TotalOrderQuantity
+		vlGrandTotal:=vlGrandTotal+[Orders]TotalOrderQuantity
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]XrefID;>)
+		CREATE EMPTY SET([CP_OrderXRef];"color")
+		
+		If (vfMini)
+			$buffer:=62
+		Else 
+			$buffer:=62+(8*Records in selection([OrdersFabricXRef]))
+		End if 
+		
+		vtTitle:=$title
+		Order_PrintStatNewPage ($buffer)
+		vfDone:=False
+		If ($break)
+			If ($division#[Orders]OrderDivision)
+				$division:=[Orders]OrderDivision
+				vtTitle:=[Orders]OrderDivision
+				vsHeader:=""
+				Print form([Orders];"PrintOrder_Section")
+				vlPrintedPixels:=vlPrintedPixels+16
+			End if 
+		End if 
+		Print form([Orders];"PrintStat_Main")
+		vlPrintedPixels:=vlPrintedPixels+62
+		
+		If (Not(vfMini))
+			FIRST RECORD([OrdersFabricXRef])
+			$n:=1
+			For ($n;1;Records in selection([OrdersFabricXRef]))
+				If ([OrdersFabricXRef]FabricName="")
+					vtFullName:=[FabricOrders]ItemName
+				Else 
+					vtFullName:=[OrdersFabricXRef]FabricName
+					If ([OrdersFabricXRef]FiberContent#"")
+						vtFullName:=vtFullName+"  -  "+[OrdersFabricXRef]FiberContent
+					End if 
+					If ([OrdersFabricXRef]Treatment#"")
+						vtFullName:=vtFullName+" - "+[OrdersFabricXRef]Treatment
+					End if 
+					
+					If ([FabricOrders]VendorName#"")
+						vtVendor:=[FabricOrders]VendorName
+					Else 
+						vtVendor:=[OrdersFabricXRef]FabSupplier
+					End if 
+				End if 
+				If (Length(vtFullName)>55)
+					Print form([OrdersFabricXRef];"PrintStat_Fab2L")
+					vlPrintedPixels:=vlPrintedPixels+16
+				Else 
+					Print form([OrdersFabricXRef];"PrintStat_Fab")
+					vlPrintedPixels:=vlPrintedPixels+8
+				End if 
+				QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+				If ([FabricLibrary]SecondaryFabric#"")
+					vtFullname:=[FabricLibrary]SecondaryFabric+" - "+[FabricLibrary]SecondaryContent
+					Print form("StatusCompound")
+					vlPrintedPixels:=vlPrintedPixels+8
+				End if 
+				
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				If ([OrdersFabricXRef]Part#"")
+					Print form([OrdersFabricXRef];"Print_Part")
+					vlPrintedPixels:=vlPrintedPixels+10
+				End if 
+				$p:=1
+				FIRST RECORD([CP_OrderXRef])
+				For ($p;1;Records in selection([CP_OrderXRef]))
+					ADD TO SET([CP_OrderXRef];"color")
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+				NEXT RECORD([OrdersFabricXRef])
+			End for 
+			
+			Print form("Hairline")
+			
+			USE SET("color")
+			CLEAR SET("color")
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPOrdID>0)
+			ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]CPOrdID;>)
+			
+			vtTitle:=$title
+			Order_PrintStatNewPage (8*Records in selection([CP_OrderXRef]))
+			
+			FIRST RECORD([CP_OrderXRef])
+			$n:=1
+			For ($n;1;Records in selection([CP_OrderXRef]))
+				Print form([CP_OrderXRef];"PrintStat_Color")
+				vlPrintedPixels:=vlPrintedPixels+8
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			
+			vtRemaining:=""
+			
+			If (vfInternal)
+				$test1:=Replace string([Orders]ProdComments;Char(13);"";*)
+				$test2:=Replace string([Orders]Care Label;Char(13);"";*)
+				
+				$c:=80
+				  //If (Length($test1)<1)
+				  //vtRemaining:=""
+				ARRAY TEXT($cols;0)
+				  //Else 
+				$done:=False
+				  //ARRAY TEXT($cols;0)
+				  //vtRemaining:=[Orders]ProdComments
+				  //If (Length(vtRemaining)>0)
+				  //If (vtRemaining[[1]]=Char(13))
+				  //vtRemaining:=Substring(vtRemaining;2;9999)
+				  //End if 
+				  //vtRemaining:=Replace string(vtRemaining;Char(13)+Char(13);Char(13);*)
+				  //vtRemaining:=Replace string(vtRemaining;Char(10);Char(13);*)
+				  //vtRemaining:="Notes"+Char(13)+vtRemaining+Char(13)+Char(13)
+				  //End if 
+				  //End if 
+				
+				Order_StatusCom 
+				
+				If ([Orders]Care Label#"")
+					vtRemaining:=vtRemaining+Char(13)+"Care and Content Label"+Char(13)+[Orders]Care Label
+				End if 
+				
+				Repeat 
+					Case of 
+						: (Macintosh command down)
+							TRACE
+						: (Position(Char(13);vtRemaining;*)<1) & (Length(vtRemaining)<$c)
+							$n:=Length(vtRemaining)
+						: (vtRemaining[[1]]=Char(13))
+							$n:=1
+						: (Position(Char(13);vtRemaining;*)<$c) & (Position(Char(13);vtRemaining)>0)
+							$n:=Position(Char(13);vtRemaining;*)
+						: (Position(Char(10);vtRemaining;*)<1) & (Length(vtRemaining)<$c)
+							$n:=Length(vtRemaining)
+						: (vtRemaining[[1]]=Char(10))
+							$n:=1
+						: (Position(Char(10);vtRemaining;*)<$c) & (Position(Char(10);vtRemaining)>0)
+							$n:=Position(Char(10);vtRemaining;*)
+						: (Length(vtRemaining)<$c)
+							$n:=Length(vtRemaining)
+						: (Position(" ";vtRemaining;*)>$c) & (Position(Char(13);vtRemaining;*)>$c)
+							$n:=$c
+							
+						Else 
+							$s:=$c
+							Repeat 
+								$s:=$s-1
+							Until (vtRemaining[[$s]]=" ") | (vtRemaining[[$s]]=",") | (Shift down)
+							$n:=$s
+					End case 
+					
+					$line:=Substring(vtRemaining;1;$n)
+					vtRemaining:=Substring(vtRemaining;$n+1;9999)
+					
+					APPEND TO ARRAY($cols;$line)
+					
+					Case of 
+						: (Length(vtRemaining)=0)
+							$done:=True
+						: (Shift down)
+							$done:=True
+					End case 
+				Until ($done)
+				
+				  //pastes columns
+				$n:=Round(Size of array($cols)/2;0)
+				APPEND TO ARRAY($cols;"")
+				APPEND TO ARRAY($cols;"")
+				APPEND TO ARRAY($cols;"")
+				
+				vtTitle:=$title
+				Order_PrintStatNewPage (8*($n+1))
+				
+				  //vtPart1:="NOTES"
+				  //vtPart2:=""
+				  //Print form([Orders];"TwoColumn")
+				  //vlPrintedPixels:=vlPrintedPixels+8
+				  //
+				
+				$r:=1
+				If (Size of array($cols)>5)
+					For ($r;1;$n)
+						vtPart1:=$cols{$r}
+						If ($n+$r>Size of array($cols))
+							  //no more Column 2
+						Else 
+							If ($cols{$n+$r}=Char(13))
+								$n:=$n+1
+							End if 
+							
+							vtPart2:=$cols{$n+$r}
+						End if 
+						Print form([Orders];"TwoColumn")
+						vlPrintedPixels:=vlPrintedPixels+8
+					End for 
+				Else 
+					For ($r;1;Size of array($cols))
+						vtPart1:=$cols{$r}
+						Print form([Orders];"TwoColumn")
+						vlPrintedPixels:=vlPrintedPixels+8
+					End for 
+				End if 
+			End if 
+		End if 
+		
+		If (vfComponents)
+			<>vlOrderNumber:=[Orders]OrderNum
+			CS_GetStatLines 
+			If (Records in selection([CS_Lines])>0)
+				vtPart1:=""
+				vtPart2:=""
+				Print form([Orders];"TwoColumn")
+				vlPrintedPixels:=vlPrintedPixels+8
+				FIRST RECORD([CS_Lines])
+				$n:=1
+				Print form("Hairline")
+				
+				vtTitle:=$title
+				Order_PrintStatNewPage (12+(8*Records in selection([CS_Lines])))
+				Print form([Orders];"PrintStat_CSHead")
+				Print form("Hairline")
+				vlPrintedPixels:=vlPrintedPixels+12
+				
+				For ($n;1;Records in selection([CS_Lines]))
+					QUERY([CS_Status];[CS_Status]CS_LineKey=[CS_Lines]CS_LineKey)
+					ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)
+					Print form([CS_Lines];"CS_PrintStatLine")
+					vlPrintedPixels:=vlPrintedPixels+8
+					NEXT RECORD([CS_Lines])
+				End for 
+			End if 
+		End if 
+		NEXT RECORD([Orders])
+		vfDone:=True
+		
+	End for 
+	
+	vtPart1:=""
+	vtPart2:=""
+	Repeat 
+		Print form([Orders];"TwoColumn")
+		vlPrintedPixels:=vlPrintedPixels+8
+	Until (vlPrintedPixels>680) | (Shift down)
+	
+	vsPrintingHeader:="END"
+	Print form("Footer1")
+	
+	
+	PAGE BREAK
+End if 

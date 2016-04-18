@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		SeasonArrays 
+		asDivisions:=1
+		<>asSeasonName:=1
+		<>asSeasonYear:=1
+		vSeason:=""
+		vGroupName:=""
+		vDesign1:=""
+		vStyle:=""
+		vsCustomer:=""
+		CP_BuildDivArray (0)
+		asDivisions{1}:="Division"
+		asDivisions:=1
+		
+		vtStitch1:=""
+		vsFiber1:=""
+		vDesign1:=""
+		
+		Case of 
+			: (<>vlSource=2)
+				FORM GOTO PAGE(2)
+			: (<>vlSource=3)
+				CREATE RECORD([DesignLineIncluded])
+				[DesignLineIncluded]DesignLineIncKey:=String(-1*Sequence number([DesignLineIncluded]))
+				[DesignLineIncluded]DesignNumber:=[DesignLineIncluded]DesignLineIncKey
+				[DesignLineIncluded]DesignLineKey:=<>vlDLKey
+				[DesignLineIncluded]LineKey:=Sequence number([DesignLineIncluded])
+				SAVE RECORD([DesignLineIncluded])
+				FORM GOTO PAGE(3)
+			: (<>vlSource=4)
+				FORM GOTO PAGE(4)
+		End case 
+	: (Form event=On Outside Call)
+		CANCEL
+End case 

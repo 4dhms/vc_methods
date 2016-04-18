@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	If (cbAdd=1)
+		OBJECT SET VISIBLE(*;"xSecond";True)
+		OBJECT SET VISIBLE(*;"xSecond1";True)
+		OBJECT SET VISIBLE([FabricLibrary]SecondaryFabric;True)
+		OBJECT SET VISIBLE([FabricLibrary]SecondaryContent;True)
+		vsSubhead:="Compound Fabric Builder"
+	Else 
+		vsSubhead:="Base Fabric Builder"
+		[FabricLibrary]SecondaryFabric:=""
+		[FabricLibrary]SecondaryContent:=""
+	End if 
+End if 

@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($create)
+C_LONGINT($compOrderNumber)
+vfNew:=True
+asCompName:=0
+Dev_Trayce 
+
+If (Records in selection([ComponentSheets])=0)
+	If (<>vlOrderNumber<0)
+		WinChoice ("Do you want to create a component sheet for "+Char(13)+"Sample Order "+String(Abs(<>vlOrderNumber))+"?")
+		If (ok=1)
+			$create:=True
+			$compOrderNumber:=<>vlOrderNumber
+		Else 
+			vfCancel:=True
+			FORM GOTO PAGE(1)
+		End if 
+	Else 
+		If (<>vlOrderNumber>0)
+			WinChoice ("Do you want to create a component sheet"+Char(13)+"without a sample garment order?")
+			If (ok=1)
+				$create:=True
+				$compOrderNumber:=<>vlOrderNumber
+			Else 
+				vfCancel:=True
+				FORM GOTO PAGE(1)
+			End if 
+		Else 
+			$compOrderNumber:=-1*Abs(<>vlSGPO)
+		End if 
+	End if 
+	
+	vfNew:=True
+	asCompName:=0
+	
+	If ($create)
+		CREATE RECORD([ComponentSheets])
+		[ComponentSheets]HMSOrderNumber:=$compOrderNumber
+		[ComponentSheets]CS_ID:=Sequence number([ComponentSheets])
+		SAVE RECORD([ComponentSheets])
+		Comp_GetInfo 
+	End if 
+Else 
+	Comp_GetInfo 
+End if 

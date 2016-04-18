@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+		  //Empty order
+	: ([Orders]DesignNumber="") & ([Orders]StyleNumber="") & ([Orders]Factory="") & ([Orders]Customer="") & (Size of array(asOrderType)<1)
+		SAVE RECORD([Orders])
+		CANCEL
+	Else 
+		
+		If (Order_Update )
+			SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+			ACCEPT
+		End if 
+End case 

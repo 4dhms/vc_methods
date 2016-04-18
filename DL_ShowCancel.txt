@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;18)
+	If (cbCancel=0)
+		OBJECT SET VISIBLE(*;"xCancel"+String($i);False)
+	Else 
+		OBJECT SET VISIBLE(*;"xCancel"+String($i);afCancel{$i})
+	End if 
+End for 

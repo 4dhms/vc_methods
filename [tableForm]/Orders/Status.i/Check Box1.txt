@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbUnresolved=1)
+	vfIncomplete:=True
+Else 
+	vfIncomplete:=False
+End if 
+
+CS_StatSearch 

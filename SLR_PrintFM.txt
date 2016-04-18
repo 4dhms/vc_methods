@@ -1,0 +1,225 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfPrinting;vfPrint)
+C_BOOLEAN($show)
+C_LONGINT($color;$background;$fontstyle;$substyle;$i;$n)
+C_POINTER($wk)
+C_POINTER($cell)
+C_POINTER($cell1)
+C_POINTER($cell2)
+C_POINTER($cell3)
+C_POINTER($cell4)
+C_POINTER($cell5)
+C_POINTER($cell6)
+
+C_TEXT($style)
+If (zYes=1)
+	$show:=True
+Else 
+	$show:=False
+End if 
+
+If (Form event=On Printing Detail) | (Form event=On Display Detail)
+	QUERY([Designs];[Designs]DesignNum=[SLRReporter]DesignNumber)
+	  //If ([Designs]ArchivedPict)
+	  //Picture_RestoreProc 
+	  //End if 
+	  //[Designs]Description:=Uppercase([Designs]Description≤1≥)+Lowercase(Substring([Designs]Description;2;99))
+	
+	[SLRReporter]StyleNumber:=Uppercase([SLRReporter]StyleNumber)
+	$style:=[SLRReporter]StyleNumber
+	OBJECT SET VISIBLE(*;"at1";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at2";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at3";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at4";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at5";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at6";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at7";([SLRReporter]StyleNumber#"") & ([SLRReporter]Header>-1))
+	OBJECT SET VISIBLE(*;"at8";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at9";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at10";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at11";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"at12";([SLRReporter]StyleNumber#"") & ([SLRReporter]Header>-10))
+	OBJECT SET VISIBLE([SLRReporter]Total1;[SLRReporter]OHU1#0)
+	OBJECT SET VISIBLE([SLRReporter]Units1;[SLRReporter]OHU1#0)
+	OBJECT SET VISIBLE([SLRReporter]AUR1;[SLRReporter]OHU1#0)
+	OBJECT SET VISIBLE([SLRReporter]SOP1;[SLRReporter]OHU1#0)
+	OBJECT SET VISIBLE([SLRReporter]OHU1;[SLRReporter]OHU1#0)
+	OBJECT SET VISIBLE([SLRReporter]WOS1;[SLRReporter]OHU1+[SLRReporter]Units1>0)
+	OBJECT SET VISIBLE([SLRReporter]WkNumber1;[SLRReporter]Wk1#!00-00-00!)
+	
+	
+	OBJECT SET VISIBLE(*;"td1";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"td2";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"td3";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"td4";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	OBJECT SET VISIBLE(*;"td5";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+	
+	OBJECT SET VISIBLE([SLRReporter]MU_WTD;[SLRReporter]Header>-3)
+	OBJECT SET VISIBLE([SLRReporter]MU_MTD;[SLRReporter]Header>-3)
+	OBJECT SET VISIBLE([SLRReporter]MU_STD;[SLRReporter]Header>-3)
+	OBJECT SET VISIBLE([SLRReporter]MU_YTD;[SLRReporter]Header>-3)
+	OBJECT SET VISIBLE([SLRReporter]MU_LTD;[SLRReporter]Header>-3)
+	
+	
+	SLR_HideZeros (True)
+	
+	vsCustomer:=[SLRReporter]Customer
+	vsStyleNumber:=Uppercase([SLRReporter]StyleNumber)
+	
+	  //SET VISIBLE(vsCustomer;[SLRReporter]Header>0)
+	OBJECT SET VISIBLE(vsStyleNumber;[SLRReporter]Header>0)
+	
+	Case of 
+		: ([SLRReporter]Header=2)
+			OBJECT SET COLOR(*;"xBG";-(15+(256*15)))
+			$color:=0
+			$background:=15
+			$fontstyle:=1
+		: ([SLRReporter]Header=1)
+			OBJECT SET COLOR(*;"xBG";-(12+(256*12)))
+			$color:=15
+			$background:=12
+			$fontstyle:=1
+		: ([SLRReporter]Header=-2)
+			OBJECT SET COLOR(*;"xBG";-(Grey+(256*Grey)))
+			$color:=15
+			$background:=Grey
+			$fontstyle:=1
+		Else 
+			OBJECT SET COLOR(*;"xBG";-(0+(256*0)))
+			$color:=15
+			$background:=0
+			$fontstyle:=1
+	End case 
+	OBJECT SET VISIBLE([SLRReporter]LineItem;((zYes=1) & ([SLRReporter]Header>=0)))
+	
+	Case of 
+		: (vfDigest)
+			vsSubhead:=""
+		: ([SLRReporter]Header=-1)
+			$substyle:=5
+			vsSubHead:="Subtotal"
+		: ([SLRReporter]Header=-2)
+			$substyle:=5
+			vsSubHead:=""
+		Else 
+			$substyle:=0
+			vsSubHead:=""
+	End case 
+	
+	OBJECT SET VISIBLE(*;"xBG";([SLRReporter]Header>0) | ([SLRReporter]Header=-2))
+	OBJECT SET VISIBLE(*;"xBG1";[SLRReporter]Header=-1)
+	
+	OBJECT SET COLOR(vsStyleNumber;-($color+(256*$background)))
+	OBJECT SET COLOR(vsCustomer;-($color+(256*$background)))
+	
+	OBJECT SET COLOR([SLRReporter]WkNumber1;-($color+(256*$background)))
+	  //FONT STYLE([SLRReporter]WkNumber1;$fontstyle)
+	OBJECT SET VISIBLE([SLRReporter]WkNumber1;([SLRReporter]WkNumber1>0) & ([SLRReporter]Header#-2))
+	
+	$n:=1
+	For ($n;1;11)
+		$cell:=Get pointer("vlitem"+String($n))
+		$cell1:=Get pointer("vsUnits"+String($n))
+		$cell2:=Get pointer("vsUnits"+String($n+12))
+		$cell3:=Get pointer("vsDollars"+String($n))
+		$cell4:=Get pointer("vsDollars"+String($n+12))
+		$cell5:=Get pointer("vsChange"+String($n))
+		$cell6:=Get pointer("vsChange"+String($n+12))
+		
+		OBJECT SET COLOR($cell->;-($color+(256*$background)))
+		  //FONT STYLE($cell1->;$substyle)
+		  //FONT STYLE($cell2->;$substyle)
+		  //FONT STYLE($cell3->;$substyle)
+		  //FONT STYLE($cell4->;$substyle)
+		  //FONT STYLE($cell5->;$substyle)
+		  //FONT STYLE($cell6->;$substyle)
+		
+	End for 
+	
+	
+	
+	
+	OBJECT SET VISIBLE([SLRReporter]DesignNumber;[SLRReporter]Header#-2)
+	OBJECT SET VISIBLE(*;"xTotal";[SLRReporter]Header=-2)
+	  //SET VISIBLE([SLRReporter]LineItem;[SLRReporter]Header>=0)
+	
+	OBJECT SET VISIBLE([SLRReporter]Price;([SLRReporter]Price>0) & ([SLRReporter]Header>=-2) & (vfPrint=True))
+	
+	Case of 
+		: (vlRouter=1) & ([SLRReporter]Header=-3)
+			vsStyleNumber:="TOTAL"
+			vsCustomer:=[SLRReporter]Customer
+			OBJECT SET VISIBLE([SLRReporter]StyleNumber;vfByStyle=True)
+			  //OBJECT SET VISIBLE(vsStyleNumber;True)
+			OBJECT SET VISIBLE([SLRReporter]DesignNumber;[SLRReporter]Header>-2)
+			OBJECT SET VISIBLE([Designs]Description;False)
+		: ([SLRReporter]Header=-4)
+			vsCustomer:="GRAND TOTAL"
+			OBJECT SET VISIBLE([SLRReporter]DesignNumber;False)
+			OBJECT SET VISIBLE(vsCustomer;False)
+			OBJECT SET VISIBLE([SLRReporter]Customer;False)
+			OBJECT SET VISIBLE([SLRReporter]StyleNumber;False)
+			OBJECT SET VISIBLE([Designs]Description;False)
+		: (vlRouter=2) & ([SLRReporter]Header=-3)
+			vsStyleNumber:=[SLRReporter]StyleNumber
+			vsCustomer:="TOTAL"
+			OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+			OBJECT SET VISIBLE(vsCustomer;True)
+			OBJECT SET VISIBLE([SLRReporter]Customer;True)
+			OBJECT SET VISIBLE([Designs]Description;False)
+		: ([SLRReporter]Header=-4)
+			vsCustomer:="GRAND TOTAL"
+			OBJECT SET VISIBLE([SLRReporter]DesignNumber;False)
+			OBJECT SET VISIBLE(vsCustomer;True)
+			OBJECT SET VISIBLE(vsStyleNumber;False)
+			OBJECT SET VISIBLE([SLRReporter]Customer;False)
+			OBJECT SET VISIBLE([SLRReporter]StyleNumber;False)
+			OBJECT SET VISIBLE([Designs]Description;False)
+		Else 
+			OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+			OBJECT SET VISIBLE([Designs]Description;True)
+			OBJECT SET VISIBLE([SLRReporter]StyleNumber;True)
+	End case 
+	
+	If (vfByStyle)
+		OBJECT SET VISIBLE([Designs]Sketch;[SLRReporter]Header>-4)
+		OBJECT SET VISIBLE([Designs]Description;[SLRReporter]Header>-4)
+	Else 
+		OBJECT SET VISIBLE([Designs]Sketch;[SLRReporter]Header>-3)
+		OBJECT SET VISIBLE([Designs]Description;[SLRReporter]Header>-3)
+	End if 
+	OBJECT SET VISIBLE(vsCustomer;[SLRReporter]Header>-3)
+	OBJECT SET VISIBLE([SLRReporter]Customer;[SLRReporter]Header>-3)
+	
+	Case of 
+		: ([SLRReporter]Header=-3)
+			OBJECT SET VISIBLE(*;"xTotal";True)
+		: ([SLRReporter]Header=-2.5) & (vfByStyle)
+			OBJECT SET VISIBLE(*;"xTotal";True)
+		Else 
+			OBJECT SET VISIBLE(*;"xTotal";False)
+	End case 
+	
+	OBJECT SET VISIBLE(*;"xGrandTot";[SLRReporter]Header=-4)
+	  //
+	If (vfPrinting)
+		$i:=1
+		For ($i;1;11)
+			$wk:=Get pointer("vlItem"+String($i))
+			If ([SLRReporter]WkNumber1-($i)>0)
+				$wk->:=[SLRReporter]WkNumber1-($i)
+				OBJECT SET COLOR($wk->;-($color+(256*$background)))
+				  //FONT STYLE($wk->;$fontstyle)
+			Else 
+				$wk->:=0
+			End if 
+		End for 
+	End if 
+	
+	SLR_TDcalc 
+	
+	If (Records in selection([SLRReporter])>0) & (Not(vfPrinting))
+		SLR_ShowRange 
+	End if 
+End if 

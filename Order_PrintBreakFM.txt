@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$style)
+C_POINTER($pointerA)
+
+Case of 
+	: (Position("total";vsBDLetter)>0)
+		$style:=4
+	Else 
+		$style:=0
+End case 
+OBJECT SET FONT STYLE(vtLine;$style)
+OBJECT SET FONT STYLE(vsSubTot;$style)
+
+$n:=1
+For ($n;1;10)
+	$pointerA:=Get pointer("vlItem"+String(20+$n))
+	If ($pointerA->>0)
+		OBJECT SET FONT STYLE($pointerA->;$style)
+	Else 
+		OBJECT SET FONT STYLE($pointerA->;0)
+	End if 
+End for 

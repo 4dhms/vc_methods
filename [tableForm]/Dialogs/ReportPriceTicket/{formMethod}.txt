@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vfDetail:=False
+		vtTitle:=""
+		vdStart:=Current date(*)
+		vdEnd:=Current date(*)+120
+		vsCustomer:=""
+		vsFactory:=""
+		vdShipDateFact:=!00-00-00!
+End case 

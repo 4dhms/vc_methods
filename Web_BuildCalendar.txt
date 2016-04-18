@@ -1,0 +1,122 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_DATE($monday;$next;$today)
+C_LONGINT($i;$n)
+C_TEXT($todayText)
+C_TEXT($HTML;vtTable)
+
+$monday:=Date(vsMonday)
+$next:=$monday+7
+
+Web_GetUser 
+
+QUERY([Appts];[Appts]ApptDate>=$monday;*)
+QUERY([Appts]; & ;[Appts]ApptDate<$next)
+
+CREATE SET([Appts];"ThisWeek")
+
+$html:=Char(1)+"<html>"
+$html:=$html+"<title>Calendar</title>"
+$html:=$html+"<head>"
+$html:=$html+"<meta http-equiv=Content-Type content=text/html; charset=iso-8859-1>"
+$html:=$html+"</head>"
+$html:=$html+"<style type=text/css>"
+$html:=$html+"<!--"
+$html:=$html+".style1{"
+$html:=$html+"FONT-size: 12px;"
+$html:=$html+"FONT-family: Verdana, Arial, Helvetica, sans-serif;"
+$html:=$html+"}"
+$html:=$html+".style2{"
+$html:=$html+"FONT-size: 12px;"
+$html:=$html+"FONT-family: Verdana, Arial, Helvetica, sans-serif;"
+$html:=$html+"}"
+$html:=$html+".style3{"
+$html:=$html+"FONT-size: 10px;"
+$html:=$html+"FONT-family: Verdana, Arial, Helvetica, sans-serif;"
+$html:=$html+"font-weight: bold;"
+$html:=$html+"color: #000066;"
+$html:=$html+"}"
+$html:=$html+".style4{font-weight: bold; color: #CC0000;"
+$html:=$html+"FONT-size: 12px;"
+$html:=$html+"FONT-family: Verdana, Arial, Helvetica, sans-serif;"
+$html:=$html+"}"
+$html:=$html+".style5{font-weight: bold; color: #CC6600;"
+$html:=$html+"FONT-size: 12px;"
+$html:=$html+"FONT-family: Verdana, Arial, Helvetica, sans-serif;"
+$html:=$html+"}"
+$html:=$html+".style6{font-weight: bold; color: #339900;"
+$html:=$html+"FONT-size: 12px;"
+$html:=$html+"FONT-family: Verdana, Arial, Helvetica, sans-serif;"
+$html:=$html+"}"
+$html:=$html+"-->"
+$html:=$html+"</style>"
+$i:=1
+
+
+If (Records in selection([Appts])=0)
+	Web_Error ("There are no appointments in this week.")
+Else 
+	
+	$i:=1
+	If (Records in selection([Appts])>0)
+		$html:=$html+"<table width=1200 border=0>"
+		$n:=1
+		$html:=$html+"<tr>"
+		$html:=$html+"<th height=20 scope=row width=150><div align=left><span class=style3></span>"+"</div></th>"
+		$html:=$html+"<td width=48><div align=left><span class=style3>From</span></div></th>"
+		$html:=$html+"<td width=48><div align=left><span class=style3>To</span></div></td>"
+		$html:=$html+"<td width=200><div align=left><span class=style3>With</span></div></td>"
+		$html:=$html+"<td width=270><div align=left><span class=style3>For HMS</span></div></td>"
+		$html:=$html+"<td width=200><div align=left><span class=style3>Conflicts</span></div></td>"
+		$html:=$html+"<td width=200><div align=left><span class=style3>Notes</span></div></td>"
+		$html:=$html+"</tr>"
+		For ($i;1;5)
+			$today:=$monday+($i-1)
+			USE SET("ThisWeek")
+			QUERY SELECTION([Appts];[Appts]ApptDate=$today)
+			If (vsCalUser#"All")
+				$n:=1
+				FIRST RECORD([Appts])
+				CREATE SET([Appts];"Appts")
+				For ($n;1;Records in selection([Appts]))
+					QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey)
+					QUERY SELECTION([Attendees];[Attendees]Attendee=vsCalUser)
+					If (Records in selection([Attendees])=0)
+						REMOVE FROM SET([Appts];"Appts")
+					End if 
+					NEXT RECORD([Appts])
+				End for 
+				USE SET("Appts")
+				CLEAR SET("Appts")
+			End if 
+			
+			ORDER BY([Appts]ApptDate;>;[Appts]ApptStart;>;[Appts]ApptEnd;>)
+			For ($n;1;Records in selection([Appts]))
+				If ($n=1)
+					$todayText:=String($today;2)
+				Else 
+					$todayText:=""
+				End if 
+				
+				$html:=$html+"<tr>"
+				$html:=$html+"<td><div align=left><span class=style2><b>"+$todayText+"</b></span></div></td>"
+				$html:=$html+"<td><div align=left><span class=style2>"+String([Appts]ApptStart;2)+"</span></div></td>"
+				$html:=$html+"<td><div align=left><span class=style2>"+String([Appts]ApptEnd;2)+"</span></div></td>"
+				$html:=$html+"<td><div align=left><span class=style2>"+[Appts]ApptWith+"</span></div></td>"
+				$html:=$html+"<td><div align=left><span class=style2>"+[Appts]ApptGroup+"</span></div></td>"
+				$html:=$html+"<td><div align=left><span class=style2>"+[Appts]Conflicts+"</span></div></td>"
+				$html:=$html+"<td><div align=left><span class=style2>"+[Appts]Notes+"</span></div></td>"
+				NEXT RECORD([Appts])
+			End for 
+		End for 
+		$html:=$html+"</Table></center>"
+	End if 
+	
+	$html:=$html+"</body>"
+	$html:=$html+"</html>"
+	CLEAR SET("ThisWeek")
+	
+	vtTable:=$HTML
+	
+	WEB SEND FILE("calendar.html")
+	
+End if 

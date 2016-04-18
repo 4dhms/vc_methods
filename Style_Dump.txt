@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docref)
+C_TEXT($path;$format)
+
+ARRAY TEXT($stylelist;0)
+ARRAY TEXT($style;0)
+ARRAY DATE($cancel;0)
+
+ALL RECORDS([Orders])
+DISTINCT VALUES([Orders]StyleNumber;$stylelist)
+
+$i:=1
+For ($i;1;Size of array($stylelist))
+	QUERY([Orders];[Orders]StyleNumber=$stylelist{$i})
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	ORDER BY([Orders];[Orders]OrderNum;<)
+	
+	APPEND TO ARRAY($style;[Orders]StyleNumber)
+	APPEND TO ARRAY($cancel;[Orders]CancelDate)
+	
+End for 
+
+WinChoice ("Chose format:";"Excel";"Tab-separated")
+If (ok=1)
+	$format:="xls"
+Else 
+	$format:="txt"
+End if 
+
+$docref:=Create document("";$format)
+
+If (ok=1)
+	$path:=Document
+	
+	$i:=1
+	For ($i;1;Size of array($stylelist))
+		SEND PACKET($docref;$style{$i}+Char(9)+String($cancel{$i})+Char(13))
+	End for 
+	CLOSE DOCUMENT($docref)
+End if 
+
+SHOW ON DISK($path)
+

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($def)
+C_BOOLEAN($done)
+
+If (Form event=On Data Change)
+	If (Position(" ";vsSuffix)>0)
+		WinPrompt ("Design Number can not contain spaces.")
+		vsSuffix:=Replace string(vsSuffix;" ";"")
+	End if 
+	If (Find in array(asList2;vsSuffix)<1) & (Find in array(asList4;vsSuffix)<1) & (Find in array(asList6;vsSuffix)<1) & (Find in array(asList8;vsSuffix)<1)
+		Repeat 
+			$def:=Request("What does "+vsSuffix+" stand for?")
+			Case of 
+				: (ok=1) & ($def#"")
+					vtHistory:=vsSuffix+" = "+$def
+					$done:=True
+				: (ok=0)
+					vsDesignNumber:=""
+					vsSuffix:=""
+					CANCEL
+					$done:=True
+			End case 
+		Until ($done)
+	End if 
+End if 

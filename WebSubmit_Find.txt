@@ -1,0 +1,18 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsWebUser)
+C_TEXT(vsWebPassword)
+C_TEXT($router)
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+$router:=$value{Find in array($name;"vsFlag")}
+vsWebUser:=$value{Find in array($name;"vsWebUser")}
+vsWebSession:=$value{Find in array($name;"vsWebSession")}
+
+If ($router="Order")
+	WebSubmit_FindOrders 
+Else 
+	WebSubmit_FindSamples 
+End if 

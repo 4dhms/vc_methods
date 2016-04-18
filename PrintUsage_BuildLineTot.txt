@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(asList11)-2)
+	arMCol5{$i}:=arMCol1{$i}+arMCol2{$i}+arMCol3{$i}+arMCol6{$i}+arMCol7{$i}+arMCol8{$i}+arMCol9{$i}+arMCol12{$i}
+End for 
+
+arMCol5{20}:=Round(arMCol5{19}/arMCol5{4};0)
+arMCol5{21}:=Round(arMCol5{19}/(arMCol5{4}+arMCol5{5});0)

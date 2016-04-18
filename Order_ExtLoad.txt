@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+QUERY([Extensions];[Extensions]OrderNumber=[Orders]OrderNum)
+ORDER BY([Extensions];[Extensions]ExtNumber;<)
+
+$c:=Records in selection([Extensions])
+
+Case of 
+	: ($c=1)
+		vtExtension:="1 EXTENSION"
+	: ($c>1)
+		vtExtension:=String([Extensions]ExtNumber)+" EXTENSIONS"
+	Else 
+		vtExtension:="Get Extension"
+End case 
+

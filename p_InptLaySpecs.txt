@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Screen width=832)
+		FORM SET INPUT([Specs];"SpecsInptTall")
+	: (Screen width=624)
+		FORM SET INPUT([Specs];"SpecsInptTall")
+	: (Screen width>700)
+		FORM SET INPUT([Specs];"SpecsInptTall")
+	: (Screen height>600)
+		FORM SET INPUT([Specs];"SpecsInptTall")
+	: (Screen height<425)
+		FORM SET INPUT([Specs];"SpecsInptTall")
+	: (Screen height<500)
+		FORM SET INPUT([Specs];"SpecsInptTall")
+End case 

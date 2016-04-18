@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($baseDN)
+
+
+WinFind ("Enter HMS Order Number:";5)
+If (ok=1)
+	vsFlag:="From Production Order"
+	
+	Case of 
+		: (Records in selection([Costing])>0)
+			$baseDN:=Num(vsRequestString)
+			QUERY([Costing];[Costing]OrderNumber=$baseDN)
+			Cost_HList 
+		Else 
+	End case 
+End if 

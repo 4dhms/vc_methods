@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asDivisions>0)
+	REDUCE SELECTION([SLRWks];0)
+	vsDivision:=asDIvisions{asDIvisions}
+End if 

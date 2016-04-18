@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;$i)
+C_POINTER($col)
+C_TEXT($header;$test)
+C_TEXT($step)
+
+$line:=asPOM
+
+$i:=1
+For ($i;1;10)
+	$col:=Get pointer("asList"+String($i))
+	If ($step="") & ($col->{$line}#"")
+		$step:=$col->{$line}
+	End if 
+End for 
+
+If ($step#"")
+	WinChoice ("Do you want to replace all the steps in Line "+String($line)+" with "+$step+"?")
+	If (ok=1)
+		$i:=1
+		For ($i;1;10)
+			$header:="Header"+String($i+1)
+			$test:=OBJECT Get title(*;$header)
+			If ($test="@->")
+				$col:=Get pointer("asList"+String($i))
+				$col->{$line}:=$step
+				APPEND TO ARRAY(atProcessed;String($i)+":"+String($line))
+			End if 
+		End for 
+	End if 
+End if 
+
+

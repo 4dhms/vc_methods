@@ -1,0 +1,42 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($rem)
+C_LONGINT($c)
+C_BOOLEAN($done)
+
+$rem:=Replace string($1;" ,";",")
+$rem:=Replace string($rem;"  ";" ")
+$rem:=Replace string($rem;" .";" ")
+$rem:=Replace string($rem;" )";" ")
+$rem:=Replace string($rem;"( ";" ")
+$rem:=Replace string($rem;" "+Char(13);Char(13);*)
+$rem:=Replace string($rem;Char(10);Char(13);*)
+
+
+If (Length($rem)<$2)
+	$c:=Length($rem)
+Else 
+	$c:=$2
+End if 
+
+Repeat 
+	Case of 
+		: (Position(Char(13);$rem;*)<$c) & (Position(Char(13);$rem;*)>0)
+			$c:=Position(Char(13);$rem;*)
+			$done:=True
+		: ($rem[[$c]]=Char(10))
+			$done:=True
+		: ($c=Length($rem))
+			$done:=True
+		: ($rem[[$c]]=" ")
+			$done:=True
+		: ($rem[[$c]]="-")
+			$done:=True
+		: ($rem[[$c]]="/")
+			$done:=True
+		Else 
+			$c:=$c+1
+	End case 
+Until ($done)
+
+$0:=Substring($rem;1;$c)
+vtRemaining:=Substring($rem;$c+1;32000)

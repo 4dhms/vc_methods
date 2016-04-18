@@ -1,0 +1,78 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($process)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+C_LONGINT($line)
+C_BOOLEAN(vfShowCode)
+
+vtOrderChanges:=vtOrderChanges+"_Fabric"
+$line:=$1
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{$line})
+
+If (Locked([CP_OrderXRef]))
+	LOCKED BY([CP_OrderXRef];$process;$user;$session;$processName)
+	WinPrompt ("You cannot change this color/print. The record is being used by "+$user+" in process: "+$processname)
+Else 
+	OBJECT SET VISIBLE(bClear;True)
+	
+	If ($line=0)
+		vsCPType:="Self"
+		vsCPNumber:=""
+		vsCPName:=""
+		vsCPStatus:="Added"
+		vdCPStatusDate:=Current date(*)
+		vtCarton:=""
+		vlColorkey:=0
+	Else 
+		vlColorkey:=alColorKey{$line}
+		vsCPType:=asTypeList{$line}
+		  //vtFabPO:=asFabPO{$line}
+		If (vsCPType="Self") & (vfShowCode)
+			vtColorCode:=asCC{$line}
+		Else 
+			vtColorCode:=""
+		End if 
+		vsCPNumber:=asCPNumbers{$line}
+		vsCPName:=asCPColorName{$line}
+		vtMillNumber:=asMillNumber{$line}
+		vtThreadColor:=atThreadColor{$line}
+		If (<>vlOrderNumber>0)
+			vtCarton:=asCarton{$line}
+		Else 
+			vtCarton:=asCPStyleNum{$line}
+		End if 
+		
+		If (asColorStatus{$line}="") & (adStatusDate{$line}=!00-00-00!)
+			vsCPStatus:=""
+			vdCPStatusDate:=!00-00-00!
+		Else 
+			vsCPStatus:=asColorStatus{$line}
+			vdCPStatusDate:=adStatusDate{$line}
+		End if 
+		
+		Case of 
+			: ([Samples]MultipleStyles)
+				vtMultiStyleNumber:=asCPStyleNum{$line}
+			Else 
+				vtMultiStyleNumber:=""
+		End case 
+	End if 
+	
+	If (asTypeList{$line}="Self")
+		vlCPQuantity:=alCQty{$line}
+		OBJECT SET VISIBLE(*;"xQuantity";True)
+	Else 
+		vdRecvdDate:=!00-00-00!
+		vlCPQuantity:=0
+		OBJECT SET VISIBLE(*;"xQuantity";False)
+	End if 
+	
+	vlLine:=$line
+	<>CloseBox:=True
+	Center Window (300;195;1984;"")
+	DIALOG([Dialogs];"CP_ColorDialog")
+	CLOSE WINDOW
+End if 
+UNLOAD RECORD([CP_OrderXRef])

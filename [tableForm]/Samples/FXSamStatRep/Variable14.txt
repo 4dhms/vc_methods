@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfInternal:=True
+vfVisible:=False
+vfComponents:=False
+vfStatus:=False
+vfIssues:=False
+vfAll:=False
+vfPDF:=False
+vfPrinting:=False
+vfUnapproved:=False
+
+Center Window (250;500;1;"")
+DIALOG([Dialogs];"ProductionStatus.win")
+CLOSE WINDOW
+
+
+If (ok=1)
+	FORM SET OUTPUT([Samples];"PrtFXsamREP")
+	PAGE SETUP([Samples];"PrtFXsamREP")
+	Print_Selection (->[Samples])
+	FORM SET OUTPUT([Samples];"FXSamStatRep")
+End if 

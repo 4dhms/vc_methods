@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+OBJECT SET TITLE(bQueue;"Queue")
+OBJECT SET TITLE(bLog;"Log")
+OBJECT SET ENABLED(bSetup;False)
+OBJECT SET ENABLED(bQueue;True)
+FORM GOTO PAGE(1)

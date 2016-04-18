@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (c1+c2+c3+c4>0)
+	REDUCE SELECTION([SLRReporter];0)
+End if 

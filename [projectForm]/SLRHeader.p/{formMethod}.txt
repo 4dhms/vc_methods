@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	vsPrintingHeader:="Printed: "+String(Current date(*))+"  Page "+String(vlPage)+" of "+String(vlCount)
+	If (Not(vfLegal))
+		vsHeader:=vsPrintingHeader
+	Else 
+		
+	End if 
+	
+	OBJECT SET VISIBLE(*;"xLine";([SLRReporter]Header<1) | (zNo=1))
+	
+	OBJECT SET VISIBLE(vtTitle9;vfLegal)
+End if 

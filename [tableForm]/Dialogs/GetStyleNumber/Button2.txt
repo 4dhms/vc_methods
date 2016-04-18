@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;<>GetStyleNumber)
+$i:=1
+CREATE SET([StyleNumberGen];"Style")
+
+<>vsStyleNumber:=vsPrefix+vsStyleNumber+vsSuffix
+QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=<>vsStyleNumber)
+QUERY SELECTION([StyleNumberGen];[StyleNumberGen]StyleNumber#"")
+
+Case of 
+	: (Length(<>vsStyleNumber)>10)
+		WinPrompt ("Style number can not exceed ten (10) characters.")
+	: (Records in selection([StyleNumberGen])>0)
+		WinPrompt ([StyleNumberGen]StyleNumber+"  "+String(Records in selection([StyleNumberGen]))+"  "+<>vsStyleNumber+" already exists in the style book.")
+	: (<>vsDesignNumber="")
+		WinPrompt ("Enter design number.")
+	Else 
+		
+		For ($i;1;vlStyleNumberCount)
+			OBJECT SET ENABLED(bGet;True)
+			OBJECT SET ENABLED(bNext;True)
+			CREATE RECORD([StyleNumberGen])
+			If (vlStyleNumberCount=1)
+				[StyleNumberGen]StyleNumber:=<>vsStyleNumber
+			Else 
+				[StyleNumberGen]StyleNumber:=aStyle{$i}
+			End if 
+			[StyleNumberGen]StyleSerial:=Sequence number([StyleNumberGen])
+			[StyleNumberGen]DesignNumber:=<>vsDesignNumber
+			[StyleNumberGen]Primary Customer:=<>vsCustomer
+			[StyleNumberGen]StyleNumberCreator:=Current user
+			[StyleNumberGen]StyleNumberDate:=Current date(*)
+			[StyleNumberGen]StyleNumberTime:=Current time(*)
+			SAVE RECORD([StyleNumberGen])
+			ADD TO SET([StyleNumberGen];"Style")
+		End for 
+		CANCEL
+End case 
+USE SET("Style")
+CLEAR SET("Style")

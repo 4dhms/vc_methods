@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($path)
+If ([Samples]DesignNum#"")
+	$choice:=Pop up menu("Larger View;Edit Design;Get Sketch;Move to Desktop;Close Menu")
+	
+	Case of 
+		: ($choice=1) | ($choice=2)
+			FORM SET INPUT([Designs];"Design Info Ent")
+			MODIFY RECORD([Designs];*)
+			
+		: ($choice=3)
+			QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+			If (Records in selection([Designs])=1)
+				Sketch_Get 
+			Else 
+				ALERT("There isn't a related design entered yet in design library.")
+			End if 
+		: ($choice=4)
+			$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+			
+			If (Table(Current form table)=27)
+				$path:=$path+[ColorPrintNumber]CPNumber+".jpg"
+			Else 
+				$path:=$path+[Designs]DesignNum+".jpg"
+			End if 
+			vtPathName:=$path
+			WRITE PICTURE FILE(vtPathName;[Designs]Sketch;"JPEG")
+	End case 
+End if 

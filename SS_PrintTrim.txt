@@ -1,0 +1,77 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;vlremaining;$needed)
+C_TEXT($partName)
+C_BOOLEAN($keepPrinting)
+
+QUERY([CS_Lines];[CS_Lines]OrderNumber=<>vlOrderNumber;*)
+QUERY([CS_Lines]; & ;[CS_Lines]SpecSheet=True)
+$keepPrinting:=True
+
+If (Records in selection([CS_Lines])>0)
+	CREATE SET([CS_Lines];"TrimSet")
+	
+	For ($c;1;Size of array(asPart))
+		Case of 
+			: ($c=1)
+				$partName:=[SpecFactory]Part1
+			: ($c=2)
+				$partName:=[SpecFactory]Part2
+			: ($c=3)
+				$partName:=[SpecFactory]Part3
+		End case 
+		QUERY([SpecTemplate];[SpecTemplate]Template=$partName)
+		QUERY([GarmentParts];[GarmentParts]GarmentPartKey=[SpecTemplate]GarmentPartKey)
+		vsNewGarmentPart:="Components ("+[GarmentParts]GarmentPartName+")"
+		
+		USE SET("TrimSet")
+		QUERY SELECTION([CS_Lines];[CS_Lines]PartNumber=$c)
+		ORDER BY([CS_Lines];[CS_Lines]CS_Sort;>)
+		$needed:=(Records in selection([CS_Lines])*22)+60
+		If (vlremaining-$needed<1)
+			vlPage:=vlPage+1
+			vsPrintingHeader:="PAGE "+String(vlPage)
+			PAGE BREAK(>)
+			vlremaining:=575
+			PAGE SETUP([SpecSheetLines];"Trim.header")
+			If ($keepPrinting)
+				Print form([SpecSheetLines];"Trim.header")
+				vlremaining:=vlremaining-86
+			End if 
+		Else 
+			PAGE SETUP([SpecSheetLines];"Trim.subhead")
+			If ($keepPrinting)
+				Print form([SpecSheetLines];"Trim.subhead")
+				vlremaining:=vlremaining-36
+			End if 
+		End if 
+		
+		$i:=1
+		For ($i;1;Records in selection([CS_Lines]))
+			If (vlremaining<22)
+				vlremaining:=575
+				vlPage:=vlPage+1
+				vsPrintingHeader:="PAGE "+String(vlPage)
+				vsNewGarmentPart:="Components ("+vsNewGarmentPart+" continued)"
+				PAGE BREAK(>)
+				PAGE SETUP([SpecSheetLines];"Trim.header")
+				If ($keepPrinting)
+					Print form([SpecSheetLines];"Trim.header")
+					vlremaining:=vlremaining-86
+				End if 
+			Else 
+				PAGE SETUP([SpecSheetLines];"HeaderOne.p")
+				If ($keepPrinting)
+					Print form([CS_Lines];"SpecPrint.p")
+					vlremaining:=vlremaining-22
+					NEXT RECORD([CS_Lines])
+				End if 
+			End if 
+		End for 
+	End for 
+End if 
+
+If ($keepPrinting)
+	$0:=True
+Else 
+	$0:=False
+End if 

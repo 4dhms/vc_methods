@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vtDateFlag:=[Orders]ShipInfo+" on "+String([Orders]ShipDateFactory)
+		
+	: (Form event=On Close Box) | (Form event=On Unload)
+		
+End case 

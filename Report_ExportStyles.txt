@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$p;$c;$s)
+C_TIME($docref)
+C_TEXT($line)
+ARRAY TEXT($style;0)
+
+SELECTION TO ARRAY([Orders]StyleNumber;$style)
+
+$docref:=Create document("";"txt")
+$i:=1
+$n:=Int(Size of array($style)/30)
+$p:=Size of array($style)%30
+$c:=1
+
+If ($n>0)
+	For ($i;1;$n)
+		$line:=""
+		$s:=1
+		For ($s;1;30)
+			If ($s=30)
+				$line:=$line+$style{$c}
+			Else 
+				$line:=$line+$style{$c}+"|"
+			End if 
+			$c:=$c+1
+		End for 
+		SEND PACKET($docref;$line+Char(10))
+	End for 
+End if 
+
+$s:=1
+For ($s;1;$p)
+	If ($s=$p)
+		$line:=$line+$style{$c}
+	Else 
+		$line:=$line+$style{$c}+"|"
+	End if 
+	$c:=$c+1
+End for 
+SEND PACKET($docref;$line+Char(13))
+asCustomers:=1
+
+CLOSE DOCUMENT($docref)

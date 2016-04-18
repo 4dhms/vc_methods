@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (OBJECT Get visible(*;"xCompound"))
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+	WinPrompt ([FabricLibrary]SecondaryFabric+Char(13)+[FabricLibrary]SecondaryContent)
+End if 

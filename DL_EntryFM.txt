@@ -1,0 +1,112 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		Picture_BatchRestore 
+		ARRAY TEXT(asSource;3)
+		asSource{1}:="Line Source"
+		asSource{2}:="Sample Garments"
+		asSource{3}:="Design Library"
+		asSource:=1
+		OBJECT SET VISIBLE([DesignLines]8UpH;[DesignLines]8Up)
+		vsCustomer:=""
+		SET WINDOW TITLE([DesignLines]Line+"   "+[DesignLines]Season+"  "+[DesignLines]Title)
+		ARRAY TEXT(asDLGroupChoice;0)
+		ARRAY TEXT(asSortOrder;0)
+		ARRAY LONGINT(alSGOrder;0)
+		LIST TO ARRAY("DlGroups";asDLGroupChoice)
+		COPY ARRAY(asDLGroupChoice;asSortOrder)
+		If ([DesignLines]GroupChoice="")
+			asDLGroupChoice:=1
+			[DesignLines]GroupChoice:=asDlGroupChoice{1}
+		Else 
+			asDLGroupChoice:=Find in array(asDLGroupChoice;[DesignLines]GroupChoice)
+		End if 
+		
+		COPY ARRAY(asDLGroupChoice;asSGOrder)
+		DELETE FROM ARRAY(asSGOrder;Find in array(asSGOrder;"Line Group");1)
+		INSERT IN ARRAY(asSGOrder;2;2)
+		asSGOrder{1}:="Sort order"
+		asSGOrder{2}:="Group"
+		asSGOrder{3}:="Season"
+		asSortOrder{1}:="No sort"
+		If ([DesignLines]SortOrder="")
+			asSortOrder:=1
+			[DesignLines]SortOrder:=asSortOrder{1}
+		Else 
+			asSortOrder:=Find in array(asSortOrder;[DesignLines]SortOrder)
+		End if 
+		
+		
+		vfPrinting:=False
+		ARRAY TEXT(asFonts;0)
+		FONT LIST(asFonts)
+		
+		vGroupName:=""
+		vSeason:=""
+		vDesign1:=""
+		vStyle:=""
+		
+		If ([DesignLines]DesignLineKey=0)  //new record
+			[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+			[DesignLines]DLCreationDate:=Current date(*)
+			[DesignLines]DLCreator:=Current user
+			[DesignLines]LineSize:=18
+			[DesignLines]LineFont:="Helvetica"
+			[DesignLines]SeasonSize:=18
+			[DesignLines]SeasonFont:="Helvetica"
+			[DesignLines]TitleSize:=18
+			[DesignLines]TitleFont:="Helvetica"
+			[DesignLines]TextFont:="Helvetica"
+			[DesignLines]PubdateFont:="Helvetica"
+			[DesignLines]TextSize:=8
+			[DesignLines]PubDateSize:=14
+			[DesignLines]GroupChoice:="No grouping"
+			WinChoice ("Choose format:";"12 Up";"8 Up";"One Design")
+			If (ok=1)
+				If (bChoice2=1)
+					[DesignLines]8Up:=True
+				Else 
+				End if 
+			Else 
+				[DesignLines]OnePerPage:=True
+			End if 
+		End if 
+		  //If (cbSampleRoom=1)
+		  //[DesignLines]SampleRoom:=True
+		  //End if 
+		
+		  //If ([DesignLines]SampleRoom)
+		  //GOTO PAGE(4)
+		  //Else 
+		FORM GOTO PAGE(1)
+		  //End if 
+		
+		RELATE MANY([DesignLines]DesignLineKey)
+		DL_CheckDescriptions 
+		DL_SortOrder 
+		DL_RecCount 
+		DL_ApplyFont 
+		UNLOAD RECORD([DesignLineIncluded])
+		
+		
+	: (Form event=On Unload)
+		ARRAY TEXT(asColor1;0)
+		ARRAY TEXT(asColor2;0)
+		ARRAY TEXT(asColor3;0)
+		ARRAY TEXT(asColor4;0)
+		SET WINDOW TITLE("")
+		UNLOAD RECORD([DesignLineIncluded])
+		UNLOAD RECORD([DesignLines])
+		UNLOAD RECORD([DLPages])
+		
+		
+	: (Form event=On Outside Call)
+		If (Records in selection([DesignLineIncluded])>0)
+			[DesignLines]BuildStatus:=2
+			SAVE RECORD([DesignLines])
+		End if 
+		
+		RELATE MANY([DesignLines]DesignLineKey)
+		DL_RecCount 
+		
+End case 

@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load) | (Form event=On Data Change)
+	If (Form event=On Load)
+		SET MENU BAR(6)
+		<>asSeasonYear:=1
+		<>asSeasonName:=1
+		If (Is new record([SampleFabrics]))
+			[SampleFabrics]SampleFab PO Nu:=Sequence number([SampleFabrics])
+			[SampleFabrics]Designer:=Current user
+			  //If (Current user="Designer") & (Shift down)
+			  //FORM GOTO PAGE(3)
+			  //Else 
+			  //FORM GOTO PAGE(1)
+			  //End if 
+		Else 
+			Case of 
+				: (Find in array(<>asSeasonName;[SampleFabrics]SeasonName)<1)
+					<>asSeasonName:=1
+				Else 
+					<>asSeasonName:=Find in array(<>asSeasonName;[SampleFabrics]SeasonName)
+			End case 
+			Case of 
+				: (Find in array(<>asSeasonYear;[SampleFabrics]SeasonYear)<1)
+					<>asSeasonYear:=1
+				Else 
+					<>asSeasonYear:=Find in array(<>asSeasonYear;[SampleFabrics]SeasonYear)
+			End case 
+			
+			If ([SampleFabrics]Designer="0")
+				[SampleFabrics]Designer:=""
+			End if 
+			FORM GOTO PAGE(SampFab_Router )
+		End if 
+		GOTO OBJECT(vsEmpty)
+		If (Form event=On Load) & ([SampleFabrics]Printed) & (Not([SampleFabrics]Revised)) & (Current user#"Designer")
+			WinChoice ("Are you revising this Purchase Order?")
+			If (ok=1)
+				[SampleFabrics]Revised:=True
+			End if 
+		End if 
+		SampFabrics_Trigger 
+		OBJECT SET VISIBLE(*;"xRevised";[SampleFabrics]Revised)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate1;[SampleFabrics]LineDate1#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate2;[SampleFabrics]LineDate2#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate3;[SampleFabrics]LineDate3#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate4;[SampleFabrics]LineDate4#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate5;[SampleFabrics]LineDate5#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate6;[SampleFabrics]LineDate6#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate7;[SampleFabrics]LineDate7#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate8;[SampleFabrics]LineDate8#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate9;[SampleFabrics]LineDate9#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate10;[SampleFabrics]LineDate10#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate11;[SampleFabrics]LineDate11#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate12;[SampleFabrics]LineDate12#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate13;[SampleFabrics]LineDate13#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate14;[SampleFabrics]LineDate14#!00-00-00!)
+		OBJECT SET VISIBLE([SampleFabrics]LineDate15;[SampleFabrics]LineDate15#!00-00-00!)
+		
+	End if 
+End if 

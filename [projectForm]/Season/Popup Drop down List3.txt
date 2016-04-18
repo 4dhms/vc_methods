@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asSeasonName>1)
+	OBJECT SET VISIBLE(bFind;True)
+End if 
+vsFlag:=""

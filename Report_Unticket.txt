@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_DATE($range)
+C_TIME($docref)
+C_TEXT($message)
+C_BOOLEAN($continue)
+C_TEXT($path)
+C_TEXT($datestamp)
+
+$range:=Current date(*)-7
+
+ARRAY TEXT(asSubCC;0)
+APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+
+QUERY([Changes];[Changes]FieldName="PriceTicket";*)
+QUERY([Changes]; & ;[Changes]RevDate>=$range)
+QUERY SELECTION([Changes];[Changes]NewChange="False")
+ORDER BY([Changes];[Changes]OrderNumber;>)
+
+If (Records in selection([Changes])=0)
+	If (Application type=5) | (Current user="Spooler")
+		Mail_SimpleSend ("List";"None";"Ticket Box Report ("+String(Current date(*))+")";"Noone has unchecked the Price Ticket Box this week.")
+	Else 
+		WinPrompt ("Noone has unchecked"+Char(13)+"the Price Ticket Box this week.")
+	End if 
+Else 
+	If (Application type=5) | (Current user="Spooler")
+		$datestamp:=Replace string(String(Current date(*));"/";"_")
+		$path:=PDF_FindFolder +":TicketBox_"+$datestamp+".xls"
+		$path:=Replace string($path;"__";"_")
+		$docRef:=Create document($path;"xls")
+		$continue:=True
+	Else 
+		$docRef:=Create document("";"xls")
+		If (ok=1)
+			$path:=Document
+			$continue:=True
+		End if 
+	End if 
+	
+	If ($continue)
+		
+		SEND PACKET($docRef;"PO"+Char(9))
+		SEND PACKET($docRef;"Style"+Char(9))
+		SEND PACKET($docRef;"Design"+Char(9))
+		SEND PACKET($docRef;"Unchecked by"+Char(9))
+		SEND PACKET($docRef;"On"+Char(9))
+		SEND PACKET($docRef;"At"+Char(13))
+		
+		$i:=1
+		FIRST RECORD([Changes])
+		For ($i;1;Records in selection([Changes]))
+			QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+			SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+			SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+			SEND PACKET($docRef;[Orders]DesignNumber+Char(9))
+			SEND PACKET($docRef;[Changes]Writer+Char(9))
+			SEND PACKET($docRef;String([Changes]RevDate)+Char(9))
+			SEND PACKET($docRef;String([Changes]RevTime)+Char(13))
+			NEXT RECORD([Changes])
+		End for 
+		CLOSE DOCUMENT($docRef)
+		If (Application type=5) | (Current user="Spooler")
+			
+			Mail_SimpleSend ("List";$path;"Ticket Box Report ("+String(Current date(*))+")";"Attached is the new status report on Pre-Carton and DC Info.")
+		Else 
+			SHOW ON DISK($path)
+		End if 
+	End if 
+End if 
+

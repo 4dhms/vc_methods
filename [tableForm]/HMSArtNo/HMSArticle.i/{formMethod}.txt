@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Close Detail)
+		If (vfRemove)
+			vfRemove:=False
+			WinChoice ("Are you sure you want to remove this supplier from the list?")
+			If (ok=1)
+				QUERY([HMSArtNoRelated];[HMSArtNoRelated]HANkey=[HMSArtNo]HANkey)
+				QUERY SELECTION([HMSArtNoRelated];[HMSArtNoRelated]Vendor=True)
+				QUERY SELECTION([HMSArtNoRelated];[HMSArtNoRelated]VendorKey=vlOldKey)
+				DELETE RECORD([HMSArtNoRelated])
+				Fab_RelatedArtNos 
+			End if 
+		End if 
+		
+		
+	: (Form event=On Load)
+		CREATE SET([HMSArtNo];"AN")
+		
+		ARRAY TEXT(atCost1;0)
+		ARRAY TEXT(atCost2;0)
+		ARRAY TEXT(atCost3;0)
+		ARRAY TEXT(atCost4;0)
+		ARRAY TEXT(atCost5;0)
+		ARRAY TEXT(asList1;0)
+		ARRAY TEXT(asVendors;0)
+		
+		ALL RECORDS([Vendors])
+		QUERY([Vendors];[Vendors]VendorName#"")
+		SELECTION TO ARRAY([Vendors]VendorName;asVendors)
+		SORT ARRAY(asVendors;>)
+		COPY ARRAY(asVendors;asList1)
+		
+		LIST TO ARRAY("ArticleBuild";atCost1)
+		INSERT IN ARRAY(atCost1;1;1)
+		atCost1{1}:="Fiber List"
+		
+		COPY ARRAY(atCost1;atCost2)
+		COPY ARRAY(atCost1;atCost3)
+		COPY ARRAY(atCost1;atCost4)
+		COPY ARRAY(atCost1;atCost5)
+		atCost1:=1
+		atCost2:=1
+		atCost3:=1
+		atCost4:=1
+		atCost5:=1
+		vlItem1:=0
+		vlItem2:=0
+		vlItem3:=0
+		vlItem4:=0
+		vlItem5:=0
+		vtYarnSize:=""
+		vtWeight:=""
+		vsFlag:=""
+		vtVendor:=""
+		
+		If (Is new record([HMSArtNo]))
+			vsFabric:=""
+			vsFiber:=""
+			FORM GOTO PAGE(2)
+		Else 
+			Fab_RelatedArtNos 
+			GOTO OBJECT(vtVendor)
+			OBJECT SET VISIBLE(*;"xRestrict";[HMSArtNo]Restricted#"")
+			
+		End if 
+End case 

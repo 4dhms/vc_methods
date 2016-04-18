@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+C_POINTER($fieldptr)
+C_BOOLEAN($new)
+
+  //TRACE
+
+$n:=1
+For ($n;1;10)
+	$new:=False
+	Case of 
+		: ($n=9)
+			$fieldptr:=->[PCPage]Print9
+		: ($n=10)
+			$fieldptr:=->[PCPage]Print10
+		Else 
+			$fieldptr:=Field(61;$n+1)
+	End case 
+	
+	
+	If ($fieldptr->#"")
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$fieldptr->)
+		
+		Case of 
+			: (Records in selection([ColorPrintNumber])=0)
+				$new:=True
+			: ([ColorPrintNumber]Division=[PCatalog]Division) & ([ColorPrintNumber]SeasonName=[PCatalog]SeasonName) & ([ColorPrintNumber]SeasonYear=[PCatalog]SeasonYear)
+				  //perfecto
+				If ([ColorPrintNumber]Droplet) | ([ColorPrintNumber]Dropped)
+					[ColorPrintNumber]Droplet:=False
+					[ColorPrintNumber]Dropped:=False
+					SAVE RECORD([ColorPrintNumber])
+				End if 
+				
+			Else 
+				QUERY([CP_Customers];[CP_Customers]CPNumber=$fieldptr->)
+				QUERY SELECTION([CP_Customers];[CP_Customers]Division=[PCatalog]Division;*)
+				QUERY SELECTION([CP_Customers]; & ;[CP_Customers]SeasonName=[PCatalog]SeasonName;*)
+				QUERY SELECTION([CP_Customers]; & ;[CP_Customers]SeasonYear=[PCatalog]SeasonYear)
+				
+				If (Records in selection([CP_Customers])=0)
+					$new:=True
+				Else 
+					If ([ColorPrintNumber]Dropped)
+						[ColorPrintNumber]Dropped:=False
+						SAVE RECORD([ColorPrintNumber])
+					End if 
+				End if 
+		End case 
+		
+		If ($new)
+			CREATE RECORD([CP_Customers])
+			[CP_Customers]CPNumber:=$fieldptr->
+			[CP_Customers]Customer:=[PCatalog]Customer
+			[CP_Customers]Division:=[PCatalog]Division
+			[CP_Customers]SeasonName:=[PCatalog]SeasonName
+			[CP_Customers]SeasonYear:=[PCatalog]SeasonYear
+			SAVE RECORD([CP_Customers])
+		End if 
+	End if 
+End for 
+
+UNLOAD RECORD([ColorPrintNumber])
+UNLOAD RECORD([CP_Customers])
+

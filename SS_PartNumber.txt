@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($0)
+
+Case of 
+	: (pOne=1)
+		$0:=1
+	: (pTwo=1)
+		$0:=2
+	: (pThree=1)
+		$0:=3
+End case 

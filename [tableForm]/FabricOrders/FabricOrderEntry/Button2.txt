@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+$i:=1
+$c:=Size of array(asCPNumbers)
+For ($i;1;Size of array(asCPNumbers))
+	If (afListBox4{$c-($i-1)}=True)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{$c-($i-1)})
+		[CP_OrderXRef]FabOrderKey:=[FabricOrders]FabOrderKey
+		SAVE RECORD([CP_OrderXRef])
+		
+	Else 
+		DELETE FROM ARRAY(asCPNumbers;$c-($i-1);1)
+		DELETE FROM ARRAY(asCPColorName;$c-($i-1);1)
+		DELETE FROM ARRAY(alPOOrder;$c-($i-1);1)
+		DELETE FROM ARRAY(asStyleNumbers;$c-($i-1);1)
+		DELETE FROM ARRAY(alUnits;$c-($i-1);1)
+		DELETE FROM ARRAY(alColorKey;$c-($i-1);1)
+	End if 
+End for 
+
+Fabric_LoadColorExec 
+
+QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+If ([FabricOrders]POType=0)
+	Fabric_CleanUpNumber 
+End if 
+FORM GOTO PAGE(4)

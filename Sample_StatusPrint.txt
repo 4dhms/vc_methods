@@ -1,0 +1,174 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$buffer;$p;$order)
+C_TEXT($division)
+C_BOOLEAN($print;$short)
+
+vlPageTotal:=0
+vlGrandTotal:=0
+vtPDFName:="Status Report"
+vtSubjectLine:=vtTitle
+$print:=False
+
+  //WinChoice ("Do you want to print the long or short form?";"Short";"Long")
+  //If (ok=1)
+  //$short:=True
+  //Else 
+$short:=False
+  //End if 
+
+If (vfPDF)
+	vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+	  //ALERT(vtPathName)
+	  //SET CURRENT PRINTER("PDF_Direct")
+	SET PRINT OPTION(Scale option;100)
+	SET PRINT OPTION(Orientation option;1)
+	SET PRINT OPTION(Mac spool file format option;0)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+	$print:=True
+Else 
+	SET PRINT OPTION(Scale option;100)
+	SET PRINT OPTION(Orientation option;1)
+	If (ok=1)
+		$print:=True
+	End if 
+End if 
+
+If ($print)
+	If ($short)
+		vtTitle:=asDivisions{asDivisions}+"  "+asSearchSeason{1}+" "
+		If (Size of array(asSearchSeason)>1)
+			vtTitle:=vtTitle+" et al. "
+		End if 
+		
+		If (asFactories>1)
+			vtTitle:=vtTitle+" ("+asFactories{asFactories}+") "
+		End if 
+		If (vdStart#!00-00-00!)
+			vtTitle:=vtTitle+String(vdStart)+" - "+String(vdEnd)
+		End if 
+		
+		FORM SET OUTPUT([Samples];"StatusDigest.p")
+		PRINT SELECTION([Samples])
+		
+	Else 
+		PRINT SETTINGS
+		
+		vlPrintedPixels:=20
+		vlPage:=1
+		vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Samples]))+" Samples   "+"Page "+String(vlPage)
+		ORDER BY([Samples];[Samples]SampleDivision;>;[Samples]SeasonYear;>;[Samples]SeasonName;>;[Samples]StyleNum;>)
+		vtTitle:=Request("Report Title:")
+		If (ok=0) | (vtTitle="")
+			vtTitle:="Sorted by Division / Season / Style Number"
+		End if 
+		Print form("Header1")
+		
+		$i:=1
+		FIRST RECORD([Samples])
+		For ($i;1;Records in selection([Samples]))
+			$order:=-1*[Samples]SampleNumber
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+			ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]XrefID;>)
+			CREATE EMPTY SET([CP_OrderXRef];"color")
+			
+			$buffer:=62+(8*Records in selection([OrdersFabricXRef]))
+			
+			Order_PrintStatNewPage ($buffer)
+			vfDone:=False
+			If ($division#[Samples]SampleDivision)
+				$division:=[Samples]SampleDivision
+				vtTitle:=[Samples]SampleDivision
+				vsHeader:=""
+				Print form([Orders];"PrintOrder_Section")
+				vlPrintedPixels:=vlPrintedPixels+16
+			End if 
+			Print form([Samples];"StatusPrint")
+			vlPrintedPixels:=vlPrintedPixels+62
+			
+			FIRST RECORD([OrdersFabricXRef])
+			$n:=1
+			For ($n;1;Records in selection([OrdersFabricXRef]))
+				Print form([OrdersFabricXRef];"PrintStat_Fab")
+				vlPrintedPixels:=vlPrintedPixels+8
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				$p:=1
+				FIRST RECORD([CP_OrderXRef])
+				For ($p;1;Records in selection([CP_OrderXRef]))
+					ADD TO SET([CP_OrderXRef];"color")
+					NEXT RECORD([CP_OrderXRef])
+				End for 
+				NEXT RECORD([OrdersFabricXRef])
+			End for 
+			
+			Print form("Hairline")
+			
+			USE SET("color")
+			CLEAR SET("color")
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPOrdID>0)
+			ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]CPOrdID;>)
+			
+			Order_PrintStatNewPage (8*Records in selection([CP_OrderXRef]))
+			
+			FIRST RECORD([CP_OrderXRef])
+			$n:=1
+			For ($n;1;Records in selection([CP_OrderXRef]))
+				Print form([CP_OrderXRef];"PrintStat_Color")
+				vlPrintedPixels:=vlPrintedPixels+8
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			
+			<>vlOrderNumber:=[Samples]SampleNumber*-1
+			  //-----------------------------------------------------
+			If (1=2)
+				CS_GetStatLines 
+				If (Records in selection([CS_Lines])>0)
+					vtPart1:=""
+					vtPart2:=""
+					Print form([Orders];"TwoColumn")
+					vlPrintedPixels:=vlPrintedPixels+8
+					FIRST RECORD([CS_Lines])
+					$n:=1
+					Print form("Hairline")
+					
+					Order_PrintStatNewPage (12+(8*Records in selection([CS_Lines])))
+					Print form([Orders];"PrintStat_CSHead")
+					Print form("Hairline")
+					vlPrintedPixels:=vlPrintedPixels+12
+					
+					For ($n;1;Records in selection([CS_Lines]))
+						QUERY([CS_Status];[CS_Status]CS_LineKey=[CS_Lines]CS_LineKey)
+						ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)
+						Print form([CS_Lines];"CS_PrintStatLine")
+						vlPrintedPixels:=vlPrintedPixels+8
+						NEXT RECORD([CS_Lines])
+					End for 
+				End if 
+				
+				  //Comments
+				If ([Samples]CommtsSamGar#"")
+					Print form("Hairline")
+					Print form([Samples];"StatusComments")
+					Print form("Hairline")
+					Print_TwoColumnComment ([Samples]CommtsSamGar)
+				End if 
+			End if 
+			NEXT RECORD([Samples])
+			vfDone:=True
+			
+		End for 
+		
+		  //vtPart1:=""
+		  //vtPart2:=""
+		  //Repeat 
+		  //Print form([Orders];"TwoColumn")
+		  //vlPrintedPixels:=vlPrintedPixels+8
+		  //Until (vlPrintedPixels>680) | (Shift down)
+		  //
+		  //vsPrintingHeader:="END"
+		  //Print form("Footer1")
+		
+		
+		PAGE BREAK
+	End if 
+End if 
+

@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asDivisions>1)
+	ARRAY TEXT(asFactories;0)
+	QUERY([Samples];[Samples]SampleDivision=asDivisions{asDivisions})
+	DISTINCT VALUES([Samples]SamGarFactry;asFactories)
+	SORT ARRAY(asFactories;>)
+	OBJECT SET VISIBLE(asFactories;True)
+	INSERT IN ARRAY(asFactories;1;1)
+	asFactories{1}:="Factory"
+	asFactories:=1
+	If (FORM Get current page=2)
+		REDUCE SELECTION([Samples];0)
+	End if 
+End if 

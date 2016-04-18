@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asCustomers<1)
+	WinPrompt ("Select Customer.")
+Else 
+	FORM SET OUTPUT([Contacts];"Contacts.print")
+	PAGE SETUP([Contacts];"Contacts.print")
+	Print_Selection (->[Contacts])
+End if 

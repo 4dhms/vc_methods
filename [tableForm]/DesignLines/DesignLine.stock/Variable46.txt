@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsQOrderNumber;vsQStyle;vsQDesign)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+Case of 
+	: (vsQOrderNumber#"")
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]OrderNumber=Num(vsQOrderNumber))
+	: (vsQStyle#"")
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]StyleNumber=vsQStyle)
+	: (vsQDesign#"")
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]DesignNumber=vsQDesign)
+End case 

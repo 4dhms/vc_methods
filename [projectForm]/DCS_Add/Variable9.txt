@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (vrCCostPrice>0)
+		vrCCostTotal:=Round(vrCCostCount*vrCCostPrice;2)
+	End if 
+End if 

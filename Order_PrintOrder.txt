@@ -1,0 +1,78 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_BOOLEAN($print)
+Order_PrintLoadHeader (True)
+vsPrintingFooter:=""
+
+SAVE RECORD([Orders])
+vsPrintingfooter:=""
+
+If (vPrint=0)
+	Center Window (300;120;1;"")
+	DIALOG([Dashboard File];"PrtOrder")
+	CLOSE WINDOW
+	OBJECT SET ENABLED(bPrint;True)
+	If (ok=1)
+		$print:=True
+	End if 
+Else 
+	If (vPrint>20)
+		$print:=True
+	End if 
+End if 
+
+If ($print)
+	
+	If (vPrint=21) | (vPrint=22)
+		vfPO:=True
+	Else 
+		vfPO:=False
+	End if 
+	
+	vlLastPage:=1
+	vlPage:=1
+	vlRecCount:=1
+	vGroupName:=""
+	
+	If (vfPO)
+		If ([Orders]POOpen)
+			If (vPrint=21) | (vPrint=11)
+				$message:="Are you sending this PO to the Factory?"+Char(13)
+			Else 
+				$message:="Are you sending thse POs to the Factory?"+Char(13)
+			End if 
+			$message:=$message+"Once you send this PO"+Char(13)+"changes will be marked as revisions."
+			$message:=$message+Char(13)+Char(13)+"Do you want to continue?"
+			WinChoice ($message;"To Factory";"Not yet")
+			
+			If (ok=1)
+				If (vPrint=21) | (vPrint=11)
+					[Orders]POOpen:=False
+					SAVE RECORD([Orders])
+				Else 
+					APPLY TO SELECTION([Orders];[Orders]POOpen:=False)
+				End if 
+			End if 
+		End if 
+	End if 
+	
+	If (vPrint=21) | (vPrint=11)
+		vtPDFName:="PO"+String([Orders]OrderNum)
+	Else 
+		vtPDFName:="POs"
+		ORDER BY([Orders];[Orders]OrderNum;>)
+	End if 
+	  //CREATE SET([Orders];"Printed")
+	
+	Order_PrintProcess 
+	
+	  //USE SET("Printed")
+	  //CLEAR SET("Printed")
+End if 
+
+If (vPrint=12) | (vPrint=22)
+	CANCEL
+End if 
+
+vPrint:=0
+

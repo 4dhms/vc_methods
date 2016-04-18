@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	Notes_Capture (->atCost1{atCost1};atCost0{atCost1})
+End if 

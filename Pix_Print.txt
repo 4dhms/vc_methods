@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Picture size(vxSketch1)>1600) | (Picture size(vxSketch2)>1600)
+	If ($1=1)
+		PrintOrder_NewPage (0;"")
+		
+		vxSketch11:=vxSketch1
+		vxSketch12:=vxSketch2
+		vtField22:=vtField11
+		vtField24:=vtField12
+	Else 
+		vxSketch11:=vxSketch3
+		vxSketch12:=vxSketch4
+		vtField22:=vtField13
+		vtField24:=vtField14
+	End if 
+	Print form("PixPrint")
+	vlPrintedPixels:=vlPrintedPixels+278
+End if 

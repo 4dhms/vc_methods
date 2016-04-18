@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$nextyear;$thisyear)
+C_TEXT($season)
+
+$thisyear:=Year of(Current date(*))
+$nextyear:=Year of(Current date(*))+1
+
+WinChoice ("Which season?";"Spring";"Summer")
+If (ok=1)
+	$season:="Spring"
+Else 
+	$season:="Summer"
+End if 
+If ($season="Spring")
+	WinChoice ("Which year?";String($thisyear);String($nextyear))
+	If (ok=1)
+	Else 
+		$thisyear:=$nextyear
+	End if 
+End if 
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkYear=$thisyear)
+If ($season="spring")
+	QUERY SELECTION([SLRWkLibrary];[SLRWkLibrary]WkMonth<=6)
+Else 
+	QUERY SELECTION([SLRWkLibrary];[SLRWkLibrary]WkMonth>=7)
+End if 
+
+ARRAY DATE($weeks;0)
+SELECTION TO ARRAY([SLRWkLibrary]WkEnd;$weeks)
+
+CREATE SET([SLRSeasonPlan];"sp")
+
+For ($i;1;Size of array($weeks))
+	CREATE RECORD([SLRSeasonPlan])
+	[SLRSeasonPlan]SLRCustKey:=[SLRCustomers]SLRCustKey
+	[SLRSeasonPlan]WkEnd:=$weeks{$i}
+	[SLRSeasonPlan]WkNumber:=$i
+	[SLRSeasonPlan]Season:=$season
+	SAVE RECORD([SLRSeasonPlan])
+	ADD TO SET([SLRSeasonPlan];"sp")
+End for 
+USE SET("sp")
+CLEAR SET("sp")
+ORDER BY([SLRSeasonPlan];[SLRSeasonPlan]WkEnd;<)

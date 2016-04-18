@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[SLRReporter]AUR1:=Round([SLRReporter]Total1/[SLRReporter]Units1;2)
+[SLRReporter]AUR2:=Round([SLRReporter]Total2/[SLRReporter]Units2;2)
+[SLRReporter]AUR3:=Round([SLRReporter]Total3/[SLRReporter]Units3;2)
+[SLRReporter]AUR4:=Round([SLRReporter]Total4/[SLRReporter]Units4;2)
+[SLRReporter]AUR5:=Round([SLRReporter]Total5/[SLRReporter]Units5;2)
+[SLRReporter]AUR6:=Round([SLRReporter]Total6/[SLRReporter]Units6;2)
+
+[SLRReporter]SOP2:=Round(([SLRReporter]Units2/([SLRReporter]Units2+[SLRReporter]OHU2)*100);1)
+[SLRReporter]SOP3:=Round(([SLRReporter]Units3/([SLRReporter]Units3+[SLRReporter]OHU3)*100);1)
+[SLRReporter]SOP4:=Round(([SLRReporter]Units4/([SLRReporter]Units4+[SLRReporter]OHU4)*100);1)
+[SLRReporter]SOP5:=Round(([SLRReporter]Units5/([SLRReporter]Units5+[SLRReporter]OHU5)*100);1)
+[SLRReporter]SOP6:=Round(([SLRReporter]Units6/([SLRReporter]Units6+[SLRReporter]OHU6)*100);1)
+
+[SLRReporter]TotMTDAvg:=Round([SLRReporter]TotMTDAmt/[SLRReporter]TotMTDUnit;2)
+[SLRReporter]TotSTDAvg:=Round([SLRReporter]TotSTDAmt/[SLRReporter]TotSTDUnit;2)
+[SLRReporter]TotYTDAvg:=Round([SLRReporter]TotYTDAmt/[SLRReporter]TotYTDUnit;2)
+[SLRReporter]TotLTDAvg:=Round([SLRReporter]TotLTDAmt/[SLRReporter]TotLTDUnit;2)
+
+[SLRReporter]WOS1:=String(Round([SLRReporter]OHU1/[SLRReporter]Units1;0))
+[SLRReporter]WOS2:=String(Round([SLRReporter]OHU2/[SLRReporter]Units2;0))
+[SLRReporter]WOS3:=String(Round([SLRReporter]OHU3/[SLRReporter]Units3;0))
+[SLRReporter]WOS4:=String(Round([SLRReporter]OHU4/[SLRReporter]Units4;0))
+[SLRReporter]WOS5:=String(Round([SLRReporter]OHU5/[SLRReporter]Units5;0))
+[SLRReporter]WOS6:=String(Round([SLRReporter]OHU6/[SLRReporter]Units6;0))

@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($qtyTot)
+C_REAL($netTot;$netnetTot;$netProfit;$netnetProfit)
+<>vtMessage:="Breaking down by category"
+<>vlCounter:=0
+EMail_SendingProc 
+
+vlReportQuantBD:=0
+vrRptNetSalesBD:=0
+vrRptNetProfitBD:=0
+vrRptNetNetSalesBD:=0
+vrRptNetNetProfitBD:=0
+vrRptSpecDiscBD:=0
+vrRptAvgNetMarkupBD:=0
+vrRptAvgNetNetMarkupBD:=0
+USE SET("SalesReport")
+
+If (vfAll)
+	vsSubhead:="All Divisions"
+Else 
+	vsSubhead:=asDivisions{asDivisions}
+	QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+End if 
+vtFootnote:=""
+vlRouter:=4
+Report_SalesArray 
+
+Report_SalesScreenSub (3)
+
+$qtyTot:=alBDQuantity{1}+alBDQuantity{2}+alBDQuantity{3}+alBDQuantity{4}
+$netTot:=arBDNetSales{1}+arBDNetSales{2}+arBDNetSales{3}+arBDNetSales{4}
+$netnetTot:=arBDNetNetSales{1}+arBDNetNetSales{2}+arBDNetNetSales{3}+arBDNetNetSales{4}
+$netProfit:=arBDNetProfit{1}+arBDNetProfit{2}+arBDNetProfit{3}+arBDNetProfit{4}
+$netnetProfit:=arBDNetNetProfit{1}+arBDNetNetProfit{2}+arBDNetNetProfit{3}+arBDNetNetProfit{4}
+
+vsQtyRatio:=String(Round((alBDQuantity{1}/$qtyTot)*100;0))
+vsQtyRatio:=vsQtyRatio+"/"+String(Round((alBDQuantity{2}/$qtyTot)*100;0))
+vsQtyRatio:=vsQtyRatio+"/"+String(Round((alBDQuantity{3}/$qtyTot)*100;0))
+vsQtyRatio:=vsQtyRatio+"/"+String(Round((alBDQuantity{4}/$qtyTot)*100;0))+"%"
+
+vsNetRatio:=String(Round((arBDNetSales{1}/$netTot)*100;0))
+vsNetRatio:=vsNetRatio+"/"+String(Round((arBDNetSales{2}/$netTot)*100;0))
+vsNetRatio:=vsNetRatio+"/"+String(Round((arBDNetSales{3}/$netTot)*100;0))
+vsNetRatio:=vsNetRatio+"/"+String(Round((arBDNetSales{4}/$netTot)*100;0))+"%"
+
+vsNetProfitRatio:=String(Round((arBDNetProfit{1}/$netProfit)*100;0))
+vsNetProfitRatio:=vsNetProfitRatio+"/"+String(Round((arBDNetProfit{2}/$netProfit)*100;0))
+vsNetProfitRatio:=vsNetProfitRatio+"/"+String(Round((arBDNetProfit{3}/$netProfit)*100;0))
+vsNetProfitRatio:=vsNetProfitRatio+"/"+String(Round((arBDNetProfit{4}/$netProfit)*100;0))+"%"
+
+vsNetNetProfitRatio:=String(Round((arBDNetNetProfit{1}/$NetNetProfit)*100;0))
+vsNetNetProfitRatio:=vsNetNetProfitRatio+"/"+String(Round((arBDNetNetProfit{2}/$NetNetProfit)*100;0))
+vsNetNetProfitRatio:=vsNetNetProfitRatio+"/"+String(Round((arBDNetNetProfit{3}/$NetNetProfit)*100;0))
+vsNetNetProfitRatio:=vsNetNetProfitRatio+"/"+String(Round((arBDNetNetProfit{4}/$NetNetProfit)*100;0))+"%"
+
+vsNetNetRatio:=String(Round((arBDNetNetSales{1}/$netnetTot)*100;0))
+vsNetNetRatio:=vsNetNetRatio+"/"+String(Round((arBDNetNetSales{2}/$netnetTot)*100;0))
+vsNetNetRatio:=vsNetNetRatio+"/"+String(Round((arBDNetNetSales{3}/$netnetTot)*100;0))
+vsNetNetRatio:=vsNetNetRatio+"/"+String(Round((arBDNetNetSales{4}/$netnetTot)*100;0))+"%"
+
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+LISTBOX SELECT ROW(SALESLIST;Size of array(asDivisions)+1)
+FORM GOTO PAGE(4)
+

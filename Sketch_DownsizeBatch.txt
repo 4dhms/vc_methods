@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($w;$h;$i;$scale1;$scale2;$scale)
+C_REAL($size)
+C_TEXT($path)
+
+FIRST RECORD([Designs])
+QUERY([Designs];[Designs]PictureSIze>50000)
+CONFIRM(String(Records in selection([Designs])))
+If (ok=1)
+	
+	For ($i;1;Records in selection([Designs]))
+		
+		vxSketch:=[Designs]Sketch
+		
+		PICTURE PROPERTIES(vxSketch;$w;$h)
+		If ($w>480) | ($h>480)
+			$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+			
+			$path:=$path+"temp.jpg"
+			vtPathName:=$path
+			WRITE PICTURE FILE(vtPathName;[Designs]Sketch;"JPEG")
+			Repeat 
+			Until (Test path name($path)=1) | (Shift down)
+			
+			READ PICTURE FILE($path;vxSketch)
+			$size:=Picture size(vxSketch)
+			
+			PICTURE PROPERTIES(vxSketch;$w;$h)
+			
+			$scale1:=Round(480/$w;2)
+			$scale2:=Round(480/$h;2)
+			
+			If ($scale1<$scale2)
+				$scale:=$scale1
+			Else 
+				$scale:=$scale2
+			End if 
+			
+			TRANSFORM PICTURE(vxSketch;Scale;$scale;$scale)
+			
+			If (Picture size(vxSketch)<[Designs]PictureSIze)
+				[Designs]Sketch:=vxSketch
+				[Designs]PictureSIze:=Picture size(vxSketch)
+				
+				SAVE RECORD([Designs])
+			End if 
+		End if 
+		NEXT RECORD([Designs])
+		
+	End for 
+End if 
+
+ALERT("Done")

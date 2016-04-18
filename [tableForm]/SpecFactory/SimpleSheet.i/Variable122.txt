@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($sketch1;$sketch2;$sketch3;$sketch4)
+C_TEXT($text1;$text2;$text3;$text4)
+
+$sketch1:=vxSketch1
+$text1:=vtTextField1
+$sketch2:=vxSketch2
+$text2:=vtTextField2
+$sketch3:=vxSketch3
+$text3:=vtTextField3
+$sketch4:=vxSketch4
+$text4:=vtTextField4
+
+SS_PrintButton 
+
+vxSketch1:=$sketch1
+vtTextField1:=$text1
+vxSketch2:=$sketch2
+vtTextField2:=$text2
+vxSketch3:=$sketch3
+vtTextField3:=$text3
+vxSketch4:=$sketch4
+vtTextField4:=$text4

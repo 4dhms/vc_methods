@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vfPrintTrim:=False
+vfPrintGrade:=False
+vfPrintComments:=False
+vtVendor:=[SpecFactory]Factory
+If (vtVendor="")
+	vtVendor:=<>vsFactory
+End if 
+SAVE RECORD([SpecFactory])
+Case of 
+	: (FORM Get current page=1)
+		vfPrintComments:=True
+	: (FORM Get current page=2)
+		vfPrintTrim:=True
+	: (FORM Get current page=3)
+		vfPrintGrade:=True
+End case 
+
+vfPrintSpec:=True
+
+vfPDF:=True
+Center Window (200;150;1;"")
+DIALOG([Dialogs];"SpecPrintDialog.i")
+CLOSE WINDOW
+Email_Confirm ("Spec";"Specsheet")
+
+
+vfPDF:=False

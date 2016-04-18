@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($path)
+C_POINTER($sketch)
+
+$choice:=Pop up menu("Get Image;Move to Desktop;Delete;Close Menu")
+
+Case of 
+	: ($choice=1)
+		Design_LabelPic 
+		
+	: ($choice=2)
+		$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+		$path:=$path+"Label_"+[Designs]DesignNum+".jpg"
+		WRITE PICTURE FILE($path;vxSketch;"JPEG")
+		[Designs]LabelPict:=True
+		
+		  //: ($choice=4)
+		  //WinChoice ("Are you sure you want to delete this image?")
+		  //If (ok=1)
+		  //GET PICTURE FROM LIBRARY("empty.jpg";$sketch->)
+		  //QUERY([SpecPix];[SpecPix]OrderNumber=<>vlOrderNumber)
+		  //QUERY SELECTION([SpecPix];[SpecPix]SketchNumber=$1)
+		  //DELETE RECORD([SpecPix])
+		  //Rev_LogEvent ("Image "+String($1)+" deleted")
+		  //End if 
+End case 

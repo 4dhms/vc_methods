@@ -1,0 +1,145 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$key;$newkey;$page;$n;$c;$newpage)
+C_TEXT($pagename;$strip)
+C_BOOLEAN($done)
+
+QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+CREATE RECORD([DesignLines])
+[DesignLines]DLCreationDate:=Current date(*)
+[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+[DesignLines]DLCreator:="Stock Plan"
+[DesignLines]Stock:=True
+[DesignLines]TextSize:=9
+[DesignLines]TextFont:="Helvetica"
+[DesignLines]Pubdate:=Current date(*)
+[DesignLines]Season:="Today's shopping list ("+String(Current date(*))+")"
+[DesignLines]Title:=[Customers]CustomerName
+[DesignLines]Line:=[Contacts]Contact
+SAVE RECORD([DesignLines])
+$newkey:=[DesignLines]DesignLineKey
+$newpage:=0
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=[StockOrders]TempID)
+
+[StockOrders]Print:=False
+SAVE RECORD([StockOrders])
+
+$i:=1
+CREATE EMPTY SET([DesignLineIncluded];"lines")
+CREATE EMPTY SET([DLPages];"pages")
+
+FIRST RECORD([StockOrdersLines])
+For ($i;1;Records in selection([StockOrdersLines]))
+	QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[StockOrdersLines]DLKey)
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=[StockOrdersLines]SONumber)
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=[StockOrdersLines]CP_OrdID)
+	ADD TO SET([DesignLineIncluded];"lines")
+	QUERY([DLPages];[DLPages]DLItemKey=[StockOrdersLines]DLKey)
+	QUERY SELECTION([DLPages];[DLPages]PageNumber=[StockOrdersLines]CP_OrdID)
+	
+	ADD TO SET([DLPages];"pages")
+	NEXT RECORD([StockOrdersLines])
+End for 
+
+ARRAY TEXT($heads;0)
+
+USE SET("pages")
+$i:=1
+ORDER BY([DLPages];[DLPages]PageNumber;>)
+FIRST RECORD([DLPages])
+For ($i;1;Records in selection([DLPages]))
+	If (Find in array($heads;[DLPages]PageTitle)<1)
+		APPEND TO ARRAY($heads;[DLPages]PageTitle)
+	End if 
+	NEXT RECORD([DLPages])
+End for 
+
+$i:=1
+For ($i;1;Size of array($heads))
+	USE SET("pages")
+	QUERY SELECTION([DLPages];[DLPages]PageTitle=$heads{$i})
+	ORDER BY([DLPages];[DLPages]PageNumber;>)
+	
+	CREATE EMPTY SET([DesignLineIncluded];"thispage")
+	FIRST RECORD([DLPages])
+	$c:=1
+	For ($c;1;Records in selection([DLPages]))
+		USE SET("lines")
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=[DLPages]PageNumber)
+		
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]ItemNumber;>)
+		FIRST RECORD([DesignLineIncluded])
+		$n:=1
+		For ($n;1;Records in selection([DesignLineIncluded]))
+			ADD TO SET([DesignLineIncluded];"thispage")
+			NEXT RECORD([DesignLineIncluded])
+		End for 
+		NEXT RECORD([DLPages])
+	End for 
+	
+	
+	USE SET("thispage")
+	CLEAR SET("thispage")
+	
+	ARRAY LONGINT($pagelist;0)
+	ARRAY LONGINT($itemlist;0)
+	ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;>;[DesignLineIncluded]ItemNumber;>)
+	
+	SELECTION TO ARRAY([DesignLineIncluded]PageNumber;$pagelist;[DesignLineIncluded]ItemNumber;$itemlist)
+	
+	$n:=13
+	$c:=1
+	$done:=False
+	
+	Repeat 
+		If ($n>12)
+			USE SET("pages")
+			FIRST RECORD([DLPages])
+			
+			$n:=1
+			$newpage:=$newpage+1
+			DUPLICATE RECORD([DLPages])
+			[DLPages]DLItemKey:=$newkey
+			[DLPages]NewPageNumber:=$newpage
+			[DLPages]PageNumber:=$newpage
+			[DLPages]PageTitle:=$heads{$i}
+			SAVE RECORD([DLPages])
+		End if 
+		
+		USE SET("pages")
+		QUERY SELECTION([DLPages];[DLPages]PageNumber=$pagelist{$c})
+		USE SET("lines")
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=$pagelist{$c})
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=$itemlist{$c})
+		
+		Case of 
+			: ($c>Size of array($pagelist))
+				$done:=True
+			: (Shift down)
+				$done:=True
+			: (Records in selection([DesignLineIncluded])>0)
+				DUPLICATE RECORD([DesignLineIncluded])
+				[DesignLineIncluded]DesignLineKey:=$newkey
+				[DesignLineIncluded]PageNumber:=$newpage
+				[DesignLineIncluded]NewPageNumber:=$newpage
+				[DesignLineIncluded]ItemNumber:=$n
+				SAVE RECORD([DesignLineIncluded])
+				$c:=$c+1
+		End case 
+		If ($c>Size of array($pagelist))
+			$done:=True
+		End if 
+		$n:=$n+1
+	Until ($done)
+End for 
+
+Stock_PrintLine 
+
+UNLOAD RECORD([StockOrders])
+UNLOAD RECORD([StockOrdersLines])
+UNLOAD RECORD([DesignLineIncluded])
+UNLOAD RECORD([DLPages])
+UNLOAD RECORD([DesignLines])
+
+

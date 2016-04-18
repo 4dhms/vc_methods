@@ -1,0 +1,186 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;vlPage;$n)
+C_POINTER($dnPtr;$snPtr;$descPtr;$picPtr;$pullPtr;$colorPtr)
+C_TEXT($strip;$html;vsWebUser;vsWebSession;$param;$photopath)
+C_BOOLEAN($myline;$photo;$line5;$line9)
+
+  //web_stockmylinenext
+
+If ($1="M@")
+	$myline:=True
+Else 
+	$myline:=False
+End if 
+  //vsWebSession:=Substring($1;Position("[";$1)+1;99)
+
+$param:=Substring($1;3;201)
+
+vlKey:=Num(Substring($param;1;Position("_";$param)-1))
+vlBuyerKey:=Num(Substring($param;Position("+";$param)+1;10))
+$strip:=Substring($param;Position("_";$param)+1;40)
+vlPage:=Num(Substring($strip;1;Position("_";$strip)-1))
+$strip:=Substring($param;Position("_";$param)+1;40)
+$strip:=Substring($strip;Position("_";$strip)+1;40)
+vlCount:=Num(Substring($strip;1;Position("+";$strip)-1))
+
+  //Repeat 
+  //QUERY([DLPages];[DLPages]DLItemKey=vlkey)
+  //QUERY SELECTION([DLPages];[DLPages]pagenumber=vlPage)
+  //If ([DLPages]Stock)
+  //Else 
+  //vlPage:=vlPage+1
+  //End if 
+  //Until (vlPage>=vlCount) | ([DLPages]Stock)
+  //
+QUERY([DesignLines];[DesignLines]DesignLineKey=vlkey)
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=vlkey)
+
+QUERY([DLPages];[DLPages]DLItemKey=vlkey)
+  //QUERY SELECTION([DLPages];[DLPages]Stock=True)
+
+ORDER BY([DLPages];[DLPages]PageNumber;<)
+
+If ([DesignLines]PageCount#[DLPages]PageNumber)
+	[DesignLines]PageCount:=[DLPages]PageNumber
+	SAVE RECORD([DesignLines])
+End if 
+
+QUERY([DLPages];[DLPages]DLItemKey=vlkey)
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=vlkey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=vlPage)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]SoldOut=False)
+
+If (Records in selection([DesignLineIncluded])<1)
+	vlPage:=vlPage+1
+End if 
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=vlkey)
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]PageNumber=vlPage)
+
+ARRAY LONGINT($linecheck;0)
+SELECTION TO ARRAY([DesignLineIncluded]ItemNumber;$linecheck)
+
+If (Find in array($linecheck;5)>0) | (Find in array($linecheck;6)>0) | (Find in array($linecheck;7)>0) | (Find in array($linecheck;8)>0)
+	$line5:=True
+Else 
+	$line5:=False
+End if 
+
+If (Find in array($linecheck;9)>0) | (Find in array($linecheck;10)>0) | (Find in array($linecheck;11)>0) | (Find in array($linecheck;12)>0)
+	$line9:=True
+Else 
+	$line9:=False
+End if 
+
+QUERY SELECTION([DLPages];[DLPages]PageNumber=vlPage)
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;>;[DesignLineIncluded]ItemNumber;>)
+
+vtTitle:=[DLPages]PageTitle
+
+$i:=1
+  //$n:=1
+FIRST RECORD([DesignLineIncluded])
+For ($i;1;12)
+	$descPtr:=Get pointer("vtField"+String($i))
+	  //If ([DesignLineIncluded]ItemNumber=$i)
+	QUERY([Designs];[Designs]DesignNum=[DesignLineIncluded]DesignNumber)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[DesignLineIncluded]OrderNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	zYes:=1
+	DL_PullColors (True)
+	
+	QUERY([SpecPix];[SpecPix]OrderNumber=[DesignLineIncluded]OrderNumber)
+	QUERY SELECTION([SpecPix];[SpecPix]LinePlan=True)
+	If (Records in selection([SpecPix])>0)
+		$photo:=True
+		$photopath:=String([DesignLineIncluded]OrderNumber+([SpecPix]SketchNumber*0.1))
+	Else 
+		$photo:=False
+	End if 
+	
+	QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+	QUERY SELECTION([StockOrdersLines];[StockOrdersLines]CP_OrdID=vlPage)
+	QUERY SELECTION([StockOrdersLines];[StockOrdersLines]SONumber=$i)
+	
+	  //ALERT(String($i)+"  "+[DesignLineIncluded]Colors)
+	If ([DesignLineIncluded]ItemNumber=$i)
+		
+		If ([DesignLineIncluded]OrderNumber>0) & ([DesignLineIncluded]Colors#"")  //& (vfShow)
+			$HTML:=Char(1)
+			$HTML:=$HTML+"<table width =225>"
+			If ($myLine)
+				$HTML:=$HTML+"<tr><td width=100 valign=top align=center>"
+			Else 
+				$HTML:=$HTML+"<tr><td width=100 valign=top align=center><a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]"+$param+"?stock="+String([DesignLineIncluded]OrderNumber)+">"
+			End if 
+			If ($photo)
+				$HTML:=$HTML+"<IMG SRC=/4DCGI/PHOTO_"+$photopath+" width=100 height=100></a></td>"
+			Else 
+				$HTML:=$HTML+"<IMG SRC=/4DCGI/DESIGN_"+[DesignLineIncluded]DesignNumber+" width=100 height=100></a></td>"
+			End if 
+			Case of 
+				: ($myline) & (Records in selection([StockOrdersLines])>0)
+					$HTML:=$HTML+"<td width=100 valign=top class=style2><strong>"+Uppercase([DesignLineIncluded]StyleNumber)+"</strong>"
+				: ($myline)
+					$HTML:=$HTML+"<td width=100 valign=top class=style2><strong><a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?addcell="+String(vlPage)+"!"+String($i)+"!"+$param+">"
+					$HTML:=$HTML+Uppercase([DesignLineIncluded]StyleNumber)+"</a></strong>"
+				Else 
+					$HTML:=$HTML+"<td width=100 valign=top class=style2><strong>"+[DesignLineIncluded]StyleNumber+" </strong>"
+			End case 
+			
+			  //If ($myline)
+			  //$HTML:=$HTML+"<label><input type=checkbox name=cb"+String($i)+" id=cb"+String($i)+"></label><br>"
+			  //Else 
+			$HTML:=$HTML+"<br>"
+			  //End if 
+			$HTML:=$HTML+"MSRP: "+String([DesignLineIncluded]MSRP;"###.00")+"<br>"
+			If ([DesignLineIncluded]Price="")
+				$HTML:=$HTML+"Line: "+String(Num([DesignLineIncluded]MSRP)/2;"###.00")
+			Else 
+				$HTML:=$HTML+"Line: "+String(Num([DesignLineIncluded]Price);"###.00")
+			End if 
+			  //$HTML:=$HTML+"<br>"+String(vlPage)+"  "+String(vlCount)
+			  //SELECTED
+			
+			If (Records in selection([StockOrdersLines])>0)
+				$HTML:=$HTML+"<br><br>Selected"
+			End if 
+			
+			$HTML:=$HTML+"</td></tr></table>"
+			
+			$HTML:=$HTML+"<table width =200>"
+			$HTML:=$HTML+"<tr><td valign=top span class=style2>"+Replace string([DesignLineIncluded]Colors;Char(13);"<br>")+"</span></td><tr></table>"
+			NEXT RECORD([DesignLineIncluded])
+		Else 
+			$html:=Char(1)
+		End if 
+	Else 
+		$html:=Char(1)
+	End if 
+	$descPtr->:=$HTML
+	$n:=$n+1
+End for 
+
+Web_UserField 
+
+vtHTML:=Char(1)
+If ($line5)
+	vtHTML:=vtHTML+"<tr><td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField5--></td>"
+	vtHTML:=vtHTML+"<td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField6--></td>"
+	vtHTML:=vtHTML+"<td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField7--></td>"
+	vtHTML:=vtHTML+"<td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField8--></td></tr>"
+End if 
+
+If ($line9)
+	vtHTML:=vtHTML+"<tr><td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField9--></td>"
+	vtHTML:=vtHTML+"<td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField10--></td>"
+	vtHTML:=vtHTML+"<td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField11--></td>"
+	vtHTML:=vtHTML+"<td valign="+Char(34)+"top"+Char(34)+" class="+Char(34)+"style2"+Char(34)+"><!--4DVAR vtField12--></td></tr>"
+End if 
+
+
+If ($myline)
+	WEB SEND FILE("myline.html")
+Else 
+	WEB SEND FILE("catalog.html")
+End if 

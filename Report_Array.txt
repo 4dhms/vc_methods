@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asReports;22)
+
+<>asReports{1}:="Reports"
+<>asReports{2}:="Usage Stats"
+<>asReports{3}:="Sample Season Estimate Report"
+<>asReports{4}:=""
+<>asReports{5}:="Sales Projection Report"
+<>asReports{6}:="Susan's Report"
+<>asReports{7}:="Projected GP Report"
+<>asReports{8}:="Retail Price Report"
+<>asReports{9}:="Booking Report"
+<>asReports{10}:="Sales Projection vs Actual"
+<>asReports{11}:=""
+<>asReports{12}:="Component Status Report"
+<>asReports{13}:="Unapproved Quota"
+<>asReports{14}:="Unapproved Samples"
+<>asReports{15}:=""
+<>asReports{16}:="Order Report"
+<>asReports{17}:="Price Ticket Report"
+<>asReports{18}:="New Order Summary"
+<>asReports{19}:="Shipments Report"
+<>asReports{20}:="Marmax DC & Pre-Carton Report"
+<>asReports{21}:=""
+<>asReports{22}:="Sample Tracker"
+
+

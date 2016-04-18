@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asStyleNumbers;0)
+REDUCE SELECTION([SLRReporter];0)
+nav1:=0
+nav2:=0
+c1:=0
+c2:=0
+c3:=0
+c4:=0
+ARRAY TEXT(asCustomers;0)
+SLR_Range 

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbUnresolved=1)
+	QUERY([Orders];[Orders]FlagChange=True)
+Else 
+	ALL RECORDS([Orders])
+End if 
+ORDER BY([Orders];[Orders]OrderNum;<)

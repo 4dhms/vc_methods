@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldptr)
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Get last field number(17))
+	If (Is field number valid(17;$i))
+		$fieldptr:=Field(17;$i)
+		If ($i<2) | ($i=30) | ($i=3)
+			OBJECT SET ENTERABLE($fieldptr->;False)
+		Else 
+			$fieldptr:=Field(17;$i)
+			OBJECT SET ENTERABLE($fieldptr->;$1)
+		End if 
+	End if 
+End for 
+

@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfOutside)
+
+If (Form event=On Printing Detail)
+	If (vfOutside)
+		  //OBJECT SET VISIBLE([SpecLineSample]ColumnHeader;False)
+		OBJECT SET VISIBLE([SpecLineSample]ColHead2;False)
+		  //OBJECT SET VISIBLE([SpecLineSample]Received;False)
+		OBJECT SET VISIBLE([SpecLineSample]Received2;False)
+		  //OBJECT SET VISIBLE([SpecLineSample]SubmitDue;False)
+		OBJECT SET VISIBLE([SpecLineSample]SubmitDue2;False)
+	Else 
+		OBJECT SET VISIBLE([SpecLineSample]Received;[SpecLineSample]Received#!00-00-00!)
+		OBJECT SET VISIBLE([SpecLineSample]Received2;[SpecLineSample]Received2#!00-00-00!)
+		OBJECT SET VISIBLE([SpecLineSample]SubmitDue;[SpecLineSample]SubmitDue#!00-00-00!)
+		OBJECT SET VISIBLE([SpecLineSample]SubmitDue2;[SpecLineSample]SubmitDue2#!00-00-00!)
+	End if 
+	
+	vsSize:=[SpecFactory]Size
+	vsSource:=[SpecFactory]PatternSource
+	<>vsFactory:=[SpecFactory]Factory
+	vsRec1:=""
+	vsRec2:=""
+	
+	vsPrint1H:=[SpecFactory]Colhead
+	vsPrint1D:=String([SpecFactory]Submit)
+	If ([SpecFactory]Received#!00-00-00!)
+		vsRec1:="Rec: "+Char(13)+String([SpecFactory]Received)
+	End if 
+	vsPrint2H:=[SpecLineSample]ColumnHeader
+	vsPrint2D:=String([SpecLineSample]SubmitDue)
+	If ([SpecLineSample]Received#!00-00-00!)
+		vsRec2:="Rec: "+Char(13)+String([SpecLineSample]Received)
+	End if 
+	vsPrintingHeader:="Page "+String(vlPage)
+	If (vfPDF)
+		OBJECT SET COLOR(*;"xBox";-(2+(256*2)))
+	Else 
+		OBJECT SET COLOR(*;"xBox";-(14+(256*14)))
+	End if 
+End if 

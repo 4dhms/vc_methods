@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cbKnit:=1
+cbWoven:=0
+cbCutSew:=0
+
+If (vsCategory="")
+	vsCategory:="Knit"
+End if 
+
+If (<>asGradeCat>1) & (cbKnit+cbWoven+cbCutSew>0)
+	Grade_PopSteps 
+End if 

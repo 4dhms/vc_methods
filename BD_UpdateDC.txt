@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$linecount)
+C_DATE($cancel)
+C_REAL($price)
+C_TEXT($thiscustomer)
+
+ARRAY TEXT($customers;0)
+
+$i:=1
+For ($i;1;Size of array(asBDCustomers))
+	If (asBDCustomers{$i}#"") & (Find in array($customers;asBDCustomers{$i})<1)
+		APPEND TO ARRAY($customers;asBDCustomers{$i})
+	End if 
+End for 
+
+QUERY([DC];[DC]OrderNumber=[Orders]OrderNum)
+CREATE SET([DC];"dc")
+ORDER BY([DC];[DC]DCLine;<)
+$linecount:=[DC]DCLine
+
+$i:=1
+For ($i;1;Size of array($customers))
+	USE SET("dc")
+	QUERY SELECTION([DC];[DC]Customer=$customers{$i})
+	$linecount:=$linecount+1
+	
+	If (Records in selection([DC])>0)
+		WinPrompt ($customers{$i}+" has an existing entry in the DC."+Char(13)+"You need to manually edit changes and additions.")
+	Else 
+		If ($customers{$i}#"")
+			WinChoice ("Do you want to create a DC line for "+$customers{$i}+"?")
+			If (ok=1)
+				$cancel:=Date(Request("Enter Cancel Date:";String([Orders]CancelDate)))
+				If (ok=1)
+					$price:=Num(Request("Enter Price:";String([Orders]Price;"##0.00")))
+					If (ok=1)
+						$n:=1
+						$thiscustomer:=$customers{$i}
+						
+						For ($n;1;Size of array(asBDCustomers))
+							QUERY([Lists];[Lists]ListName="DC";*)
+							QUERY([Lists]; & ;[Lists]ListItem=$thiscustomer)
+							
+							If (asBDCustomers{$n}=$thiscustomer)
+								CREATE RECORD([DC])
+								[DC]CancelDate:=$cancel
+								[DC]Count:=alBDPackTot{$n}
+								[DC]CPOrdID:=alBDSelfKeys{$n}
+								[DC]CreateDate:=Current date(*)
+								[DC]Customer:=$thiscustomer
+								[DC]ReportCustomer:=[Lists]ListCode
+								[DC]DCLine:=$linecount
+								[DC]OrderNumber:=[Orders]OrderNum
+								[DC]Price:=$price
+								SAVE RECORD([DC])
+								UNLOAD RECORD([Lists])
+							End if 
+						End for 
+					End if 
+				End if 
+			End if 
+		End if 
+	End if 
+End for 
+
+CLEAR SET("dc")
+UNLOAD RECORD([DC])

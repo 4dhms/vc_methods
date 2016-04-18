@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbNY=1)
+	cbLA:=0
+	cbOther:=0
+	Rev_AirSea ("NY")
+End if 
+Order_AirSeaBuild 

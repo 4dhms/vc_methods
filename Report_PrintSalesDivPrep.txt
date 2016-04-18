@@ -1,0 +1,39 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([ReportGenerator];"Report")
+
+Case of 
+	: ($1=1)
+		For ($i;1;Size of array(asBDDivisions))
+			QUERY([ReportGenerator];[ReportGenerator]Report_Date<Current date(*))
+			FIRST RECORD([ReportGenerator])
+			If (Records in selection([ReportGenerator])=0)
+				CREATE RECORD([ReportGenerator])
+			End if 
+			[ReportGenerator]Report_Date:=Current date(*)
+			[ReportGenerator]Factory:=asBDDivisions{$i}
+			[ReportGenerator]Quantity:=alBDQuantity{$i}
+			[ReportGenerator]NetSales:=arBDNetSales{$i}
+			[ReportGenerator]NetProfit:=arBDNetProfit{$i}
+			[ReportGenerator]SpecialDiscount:=arBDSpecialDiscount{$i}
+			[ReportGenerator]NetNetSales:=arBDNetNetSales{$i}
+			[ReportGenerator]NetNetProfit:=arBDNetNetProfit
+			[ReportGenerator]AvgNetMarkup:=arBDAvgNetMarkup{$i}
+			[ReportGenerator]AvgNetNetMarkup:=arBDAvgNetNetMarkup{$i}
+			SAVE RECORD([ReportGenerator])
+			ADD TO SET([ReportGenerator];"Report")
+		End for 
+		vlReportQuant:=vlReportQuantBD
+		vrRptNetSales:=vrRptNetSalesBD
+		vrRptNetProfit:=vrRptNetProfitBD
+		vrRptSpecDisc:=vrRptSpecDiscBD
+		vrRptNetNetSales:=vrRptNetNetSalesBD
+		vrRptNetNetProfit:=vrRptNetNetProfitBD
+		vrRptAvgNetMarkup:=vrRptAvgNetMarkupBD
+		vrRptAvgNetNetMarkup:=vrRptAvgNetNetMarkupBD
+End case 
+USE SET("Report")
+CLEAR SET("Report")
+Report_PrintSalesDivNew 

@@ -1,0 +1,4 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+QUERY([Samples];[Designs]DivisionCodeN="5-Color FX";*)
+QUERY([Samples]; | ;[Designs]DivisionCodeN="05-@")
+p_SetWndwSpecs 

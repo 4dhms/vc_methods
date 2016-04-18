@@ -1,0 +1,187 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$pTot;$pbuild;$line;$packs;$total)
+C_BOOLEAN($fail;$continue)
+C_TEXT($colortest)
+$fail:=False
+
+QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+  //new breakdown
+If (Size of array(alDCNumber)>0)  //process DCs
+	
+	  //test completion
+	For ($i;1;Size of array(alBDPackTot))
+		$pTot:=alBDPackTot{$i}
+		$pbuild:=0
+		$n:=1
+		For ($n;1;Size of array(alDCLine))
+			If (alDCLine{$n}=$i)
+				$pbuild:=$pbuild+alDCQty{$n}
+			End if 
+		End for 
+		
+		Case of 
+			: (Current user="Designer") & (Shift down)
+				  //Testing
+				
+			: (Find in array(alDCLine;$i)<1)
+				$fail:=True
+				WinPrompt ("Line "+String($i)+" not processed")
+			: ($pbuild>$pTot)
+				$fail:=True
+				WinPrompt ("Line "+String($i)+" over by "+String($pBuild-$pTot))
+			: ($pbuild<$pTot)
+				$fail:=True
+				WinPrompt ("Line "+String($i)+" under by "+String($pTot-$pBuild))
+		End case 
+		
+	End for 
+	If ($fail)  //& (Find in array(alDCListKey;0)<1)
+		WinChoice ("Distribution does not reconcile.";"I'll fix it";"Override")
+		If (ok=0)
+			$fail:=False
+			$0:=True
+		End if 
+	End if 
+	
+	If (Not($fail))
+		$i:=1
+		For ($i;1;Size of array(alDCLine))
+			$total:=0
+			$line:=alDCLine{$i}
+			$packs:=alDCQty{$i}/alBDPack{$line}
+			
+			QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+			QUERY SELECTION([DC_Spreads];[DC_Spreads]DCKey=alDCkeys{alDCNumber{$i}})
+			
+			If (Records in selection([DC_Spreads])=0)
+				CREATE RECORD([DC_Spreads])
+				[DC_Spreads]DCKey:=alDCKeys{alDCNumber{$i}}
+				[DC_Spreads]DCSheetKey:=Sequence number([DC_Spreads])
+				[DC_Spreads]OrderNumber:=[Orders]OrderNum
+				[DC_Spreads]CustPO:=asDClinePO{$i}
+				[DC_Spreads]Dept:=asDCdept{alDCNumber{$i}}
+				SAVE RECORD([DC_Spreads])
+			End if 
+			
+			If (alDCListKey{$i}=0)
+				CREATE RECORD([DC_SpreadLines])
+				[DC_SpreadLines]LineNumber:=alDCLine{$i}
+				[DC_SpreadLines]DCSheetKey:=[DC_Spreads]DCSheetKey
+				[DC_SpreadLines]ColorNumber:=asBDSelf{$line}
+				[DC_SpreadLines]Note:=asDCNote{$i}
+				[DC_SpreadLines]ColorCode:=asBDColorCode{$line}
+				[DC_SpreadLines]DCLineKey:=Sequence number([DC_SpreadLines])
+				[DC_SpreadLines]DCpo:=asDClinePO{$i}
+				
+				If (alBD1{$line}>0)
+					[DC_SpreadLines]Sz1:=String(alBD1{$line}*$packs)
+					$total:=alBD1{$line}*$packs
+				End if 
+				If (alBD2{$line}>0)
+					[DC_SpreadLines]Sz2:=String(alBD2{$line}*$packs)
+					$total:=$total+(alBD2{$line}*$packs)
+				End if 
+				If (alBD3{$line}>0)
+					[DC_SpreadLines]Sz3:=String(alBD3{$line}*$packs)
+					$total:=$total+(alBD3{$line}*$packs)
+				End if 
+				If (alBD4{$line}>0)
+					[DC_SpreadLines]Sz4:=String(alBD4{$line}*$packs)
+					$total:=$total+(alBD4{$line}*$packs)
+				End if 
+				If (alBD5{$line}>0)
+					[DC_SpreadLines]Sz5:=String(alBD5{$line}*$packs)
+					$total:=$total+(alBD5{$line}*$packs)
+				End if 
+				If (alBD6{$line}>0)
+					[DC_SpreadLines]Sz6:=String(alBD6{$line}*$packs)
+					$total:=$total+(alBD6{$line}*$packs)
+				End if 
+				If (alBD7{$line}>0)
+					[DC_SpreadLines]Sz7:=String(alBD7{$line}*$packs)
+					$total:=$total+(alBD7{$line}*$packs)
+				End if 
+				If (alBD8{$line}>0)
+					[DC_SpreadLines]Sz8:=String(alBD8{$line}*$packs)
+					$total:=$total+(alBD8{$line}*$packs)
+				End if 
+				If (alBD9{$line}>0)
+					[DC_SpreadLines]Sz9:=String(alBD9{$line}*$packs)
+					$total:=$total+(alBD9{$line}*$packs)
+				End if 
+				If (alBD10{$line}>0)
+					[DC_SpreadLines]Sz10:=String(alBD10{$line}*$packs)
+					$total:=$total+(alBD10{$line}*$packs)
+				End if 
+				[DC_SpreadLines]ColorCode:=asBDColorCode{$line}
+				
+				[DC_SpreadLines]Total:=String($total;"###,###")
+				SAVE RECORD([DC_SpreadLines])
+			End if 
+		End for 
+		  //reorders
+		QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=[DC_Spreads]DCSheetKey)
+		CREATE SET([DC_SpreadLines];"order")
+		$i:=1
+		For ($i;1;Records in selection([DC_SpreadLines]))
+			QUERY([DC_SpreadLines];[DC_SpreadLines]DCLineKey=alDCListKey{$i})
+			[DC_SpreadLines]SortOrder:=$i
+			SAVE RECORD([DC_SpreadLines])
+			NEXT RECORD([DC_SpreadLines])
+		End for 
+		CLEAR SET("order")
+		
+		ACCEPT
+		UNLOAD RECORD([DC_Spreads])
+		
+		$continue:=True
+	Else 
+		$continue:=True
+	End if 
+End if 
+
+Case of 
+	: (Size of array(alCtnKey)=0)
+		$continue:=True
+	: (Size of array(alCtnKey)>0) & (vlRemaining=0)
+		$i:=1
+		ARRAY TEXT($color;0)
+		ARRAY LONGINT($qty;0)
+		
+		For ($i;1;Size of array(asCtnColor))
+			$colortest:=Substring(asCtnColor{$i};1;Position(" ";asCtnColor{$i})-1)
+			
+			If (Find in array($color;$colortest)<1)
+				APPEND TO ARRAY($color;$colortest)
+				APPEND TO ARRAY($qty;0)
+			End if 
+		End for 
+		
+		For ($i;1;Size of array($color))
+			$n:=1
+			For ($n;1;Size of array(asCtnColor))
+				If (Position($color{$i};asCtnColor{$n})=1)
+					$qty{$i}:=$qty{$i}+alCtnQty{$n}
+				End if 
+			End for 
+		End for 
+		
+		
+		$i:=1
+		For ($i;1;Size of array($color))
+			Case of 
+				: (alBDPackTot{Find in array(asBDSelf;$color{$i}+"@")}<$qty{$i})
+					$continue:=False
+					WinPrompt ($color{$i}+" is over by "+String($qty{$i}-alBDPackTot{Find in array(asBDSelf;$color{$i}+"@")}))
+				: (alBDPackTot{Find in array(asBDSelf;$color{$i}+"@")}>$qty{$i})
+					$continue:=False
+					WinPrompt ($color{$i}+" is under by "+String(alBDPackTot{Find in array(asBDSelf;$color{$i}+"@")}-$qty{$i}))
+				Else 
+					$continue:=True
+			End case 
+		End for 
+	Else 
+		$continue:=True
+End case 
+
+$0:=$continue

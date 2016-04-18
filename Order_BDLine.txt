@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$rowTotal)
+C_POINTER($pointerA;$pointerB;$pointerC)
+
+If ($1>0)
+	vsSubhead:=asBDSelf{$1}
+	
+	$rowTotal:=0
+	$n:=1
+	For ($n;1;10)
+		$pointerA:=Get pointer("vlItem"+String($n))
+		$pointerB:=Get pointer("vlItem"+String(20+$n))
+		$pointerC:=Get pointer("alBD"+String($n))
+		If (Position("Total";asBDLetter{$1})>0)
+			$pointerA->:=0
+			$pointerB->:=$pointerC->{$1}
+			alGrandTotals{$n}:=alGrandTotals{$n}+$pointerC->{$1}
+		Else 
+			$pointerA->:=$pointerC->{$1}
+			$pointerB->:=$pointerA->*alBDStores{$1}
+			$rowTotal:=$rowTotal+$pointerB->
+			  //If (Find in array(asBDLetter;"Total@")<1)
+			  //alGrandTotals{$n}:=alGrandTotals{$n}+$pointerB->
+			  //End if 
+		End if 
+	End for 
+	
+	
+	
+	Case of 
+		: (Position("otal";asBDSelf{$1})>0)
+			vtLine:="Total "+String(vlPackTot)+" pack(s)"
+			vsSubTot:=String(Util_Array_Sum (->alTotals);"###,###.###")
+			ARRAY LONGINT(alTotals;0)
+		: (Position("Total";asBDLetter{$1})>0)
+			vtLine:=String(vlPacks)+" pack(s)"
+			vsSubTot:=String(Util_Array_Sum (->alTotals);"###,###.###")
+			vlPacks:=0
+			ARRAY LONGINT(alTotals;0)
+		Else 
+			vsSubTot:=String($rowTotal;"###,###.###")
+			vlPacks:=vlPacks+alBDStores{$1}
+			vlPackTot:=vlPackTot+alBDStores{$1}
+			vtLine:=String(alBDStores{$1})+" pack(s) of "+String(alBDPack{$1})
+			APPEND TO ARRAY(alTotals;$rowTotal)
+	End case 
+	vsBDLetter:=asBDLetter{$1}
+Else 
+	$n:=1
+	For ($n;1;10)
+		$pointerA:=Get pointer("vlItem"+String($n))
+		$pointerA->:=0
+		$pointerB:=Get pointer("vlItem"+String(20+$n))
+		$pointerB->:=alGrandTotals{$n}
+	End for 
+	
+	
+	vsBDLetter:=""
+	vsSubHead:=""
+	vtLine:="GRAND TOTAL"
+	vsSubTot:=String(vlBDGrandTot;"###,###.###")
+	
+End if 
+

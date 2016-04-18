@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (b1=1)
+	vfDetail:=True
+Else 
+	vfDetail:=False
+End if 

@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Appts])
+UNLOAD RECORD([Attendees])
+UNLOAD RECORD([Appts])
+ACCEPT

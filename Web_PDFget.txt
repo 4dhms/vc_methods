@@ -1,0 +1,6 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+
+$path:="/PDFs/"+$1
+
+WEB SEND HTTP REDIRECT($path;*)

@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($process;$i)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+
+FIRST RECORD([Orders])
+$i:=1
+For ($i;1;Records in selection([Orders]))
+	If (Locked([Orders]))
+		LOCKED BY([Orders];$process;$user;$session;$processName)
+		ALERT($user+"  "+$session+"  "+$processname)
+	End if 
+	NEXT RECORD([Orders])
+End for 

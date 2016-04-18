@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbBlock=1) & (Not([DesignLines]8Up))
+	WinChoice ("Printing All Color Ways will include only eight styles per page.";"I know";"Don't do it")
+	If (ok=1)
+		[DesignLines]8Up:=True
+	Else 
+		cbBlock:=0
+	End if 
+End if 

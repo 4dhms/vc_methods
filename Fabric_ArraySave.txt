@@ -1,0 +1,107 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$proc)
+C_TEXT($user)
+C_TEXT($sessionUser;$procName)
+ARRAY TEXT(asComboOld;0)
+ARRAY TEXT(asComboNew;0)
+
+COPY ARRAY(asOrderType;asComboOld)
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+CREATE SET([OrdersFabricXRef];"Fabs")
+vfKill:=False
+
+
+If (Size of array(asOrderType)>0)
+	$i:=1
+	For ($i;1;Size of array(asOrderType))
+		
+		USE SET("Fabs")
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType=asOrderType{$i})
+		If (Records in selection([OrdersFabricXRef])>1)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]XrefID=alxrefkeys{$i})
+		End if 
+		
+		Case of 
+			: (Locked([OrdersFabricXRef]))
+				LOCKED BY([OrdersFabricXRef];$proc;$user;$sessionUser;$procName)
+				WinPrompt ("The record for "+asOrderType{$i}+" is being used by "+$user+" in process: "+$procName+". Changes will not be saved.")
+			: (Not(Is record loaded([OrdersFabricXRef]))) & (alXRefKeys{$i}#0)
+				WinPrompt ("The Fabric Table is not loaded. Changes will not be saved."+Char(13)+"Please try again.")
+			Else 
+				
+				Case of 
+					: (alFabricColor{$i}=16711690)
+						QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=alXrefKeys{$i})
+						vtOldData:=[OrdersFabricXRef]OrdType+"  ("+[OrdersFabricXRef]FabricName+")"
+						vtNewData:=""
+						Rev_LogEvent ([OrdersFabricXRef]OrdType+" deleted")
+						vfKill:=True
+						
+						DELETE RECORD([OrdersFabricXRef])
+						
+					: (alXRefKeys{$i}=0)
+						CREATE RECORD([OrdersFabricXRef])
+						[OrdersFabricXRef]OrdType:=asOrderType{$i}
+						[OrdersFabricXRef]SolidPrint:=asSolidPrint{$i}
+						[OrdersFabricXRef]FabricName:=asFabric{$i}
+						[OrdersFabricXRef]FiberContent:=asFiber{$i}
+						[OrdersFabricXRef]Treatment:=asTreatment{$i}
+						[OrdersFabricXRef]FabArtNo:=atArtNumber{$i}
+						[OrdersFabricXRef]FabCode:=Fabric_ArtCode ([OrdersFabricXRef]FabArtNo)
+						[OrdersFabricXRef]FabSupplier:=asFabSpler{$i}
+						[OrdersFabricXRef]Part:=asGarPart{$i}
+						[OrdersFabricXRef]Usage:=arUsage{$i}
+						[OrdersFabricXRef]Consumed:=arActual{$i}
+						[OrdersFabricXRef]XrefID:=10000+Sequence number([OrdersFabricXRef])
+						[OrdersFabricXRef]FabOrdType:=Num(asOrderType{$i})
+						[OrdersFabricXRef]OrderNumber:=<>vlOrderNumber
+						[OrdersFabricXRef]Gauge:=asGauge{$i}
+						[OrdersFabricXRef]YarnSize:=asYarnSize{$i}
+						SAVE RECORD([OrdersFabricXRef])
+						alXrefKeys{$i}:=[OrdersFabricXRef]XrefID
+					Else 
+						vlKeyNumber:=alXrefKeys{$i}
+						vsFabColor:="Fabric"
+						Rev_KSChange (asOrderType{$i}+" Fabric Type";[OrdersFabricXRef]SolidPrint;asSolidPrint{$i};->[OrdersFabricXRef]SolidPrint;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Fabric";[OrdersFabricXRef]FabricName;asFabric{$i};->[OrdersFabricXRef]FabricName;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Fiber";[OrdersFabricXRef]FiberContent;asFiber{$i};->[OrdersFabricXRef]FiberContent;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Treatment";[OrdersFabricXRef]Treatment;asTreatment{$i};->[OrdersFabricXRef]Treatment;->[OrdersFabricXRef])
+						  //CONFIRM(asOrderType{$i})
+						  //If (ok=0)
+						  //TRACE
+						  //End if 
+						
+						Rev_KSChange (asOrderType{$i}+" Article";[OrdersFabricXRef]FabArtNo;atArtNumber{$i};->[OrdersFabricXRef]FabArtNo;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Supplier";[OrdersFabricXRef]FabSupplier;asFabSpler{$i};->[OrdersFabricXRef]FabSupplier;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Part";[OrdersFabricXRef]Part;asGarPart{$i};->[OrdersFabricXRef]Part;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Usage";String([OrdersFabricXRef]Usage);String(arUsage{$i});->[OrdersFabricXRef]Usage;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Actual";String([OrdersFabricXRef]Consumed);String(arActual{$i});->[OrdersFabricXRef]Consumed;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" Gauge";[OrdersFabricXRef]Gauge;asGauge{$i};->[OrdersFabricXRef]Gauge;->[OrdersFabricXRef])
+						Rev_KSChange (asOrderType{$i}+" YarnSize";[OrdersFabricXRef]YarnSize;asYarnSize{$i};->[OrdersFabricXRef]YarnSize;->[OrdersFabricXRef])
+						
+				End case 
+		End case 
+	End for 
+	
+	
+	If (vfKill)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo@")
+		Order_Fab_Sort 
+		$i:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($i;1;Records in selection([OrdersFabricXRef]))
+			
+			If ([OrdersFabricXRef]FabOrdType#$i)
+				[OrdersFabricXRef]FabOrdType:=$i
+				[OrdersFabricXRef]OrdType:="Combo "+String($i)
+				SAVE RECORD([OrdersFabricXRef])
+			End if 
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+	End if 
+	SELECTION TO ARRAY([OrdersFabricXRef]OrdType;asComboNew)
+End if 
+UNLOAD RECORD([OrdersFabricXRef])
+

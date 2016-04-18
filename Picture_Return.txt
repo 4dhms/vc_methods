@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($folderpath;$subfolder;$path)
+
+GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+
+$path:=Substring(Application file;1;Position(":";Application file))+"4D Images:"+String(Int(Num($1)/100))+":"
+
+Case of 
+	: ($2="spec")
+		$path:=Replace string($path;"4D Sketches";"4D Images")
+		$path:=$path+"T"+String($1)+".jpg"
+	: ($1=-1)  //pull design
+		$folderpath:=Substring(Application file;1;Position(":";Application file))+"4D Sketches:"
+		$subfolder:=$folderpath+Substring($2;1;2)+":"
+		$subfolder:=$subfolder+Substring($2;1;5)+":"
+		$path:=$subfolder+$2+".jpg"
+		
+	: ($2="B") | ($2="S")
+		$path:=$path+$2+Replace string(String($1);".";"_")+".jpg"
+	Else 
+		$path:=$path+$2+String($1)+".jpg"
+End case 
+
+If (Test path name($path)=1)
+	READ PICTURE FILE($path;vxSketch)
+	
+Else 
+	GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+End if 
+<>vfCatchFile:=False
+
+Case of 
+	: (Application type=0)
+		<>vxSketch:=vxSketch
+	: ($2="R")
+		EXECUTE ON CLIENT($3;"Trim_PictureCatch";vxSketch)
+	: ($2="spec")  //specsheet
+		EXECUTE ON CLIENT($3;"Pix_Catch";vxSketch)
+	: ($1=-1)  //design
+		EXECUTE ON CLIENT($3;"Pix_Catch";vxSketch)
+	: ($2="B") | ($2="S")
+		EXECUTE ON CLIENT($3;"Pix_Catch";vxSketch)
+	Else 
+		EXECUTE ON CLIENT($3;"Picture_Catch";vxSketch)
+End case 
+GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)

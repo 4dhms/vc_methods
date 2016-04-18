@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (<>vsDesignNumber="")
+		vsFlag:="ENTER DESIGN NUMBER"
+	: (vlStyleNumberCount=1)
+		vsStyleNumber:=PO_GetNumber ("Style")
+		vsSuffix:=""
+		OBJECT SET ENABLED(bValidate;True)
+		OBJECT SET ENABLED(bGet;False)
+		OBJECT SET ENABLED(bNext;False)
+		FORM GOTO PAGE(2)
+	: (vlStyleNumberCount>25)
+		WinPrompt ("The system will only generate up to 25 style numbers at one time.")
+	: (vlStyleNumberCount>1)
+		WinChoice ("Are you sure you want to create "+String(vlStyleNumberCount)+" new style numbers?")
+		If (ok=1)
+			ARRAY TEXT(AStyle;vlStyleNumberCount)
+			$i:=1
+			For ($i;1;vlStyleNumberCount)
+				vsStyleNumber:=PO_GetNumber ("Style")
+				aStyle{$i}:=vsStyleNumber
+			End for 
+			OBJECT SET ENABLED(bValidate;True)
+			OBJECT SET ENABLED(bGet;False)
+			OBJECT SET ENABLED(bNext;False)
+			vsStyleNumber:=aStyle{1}
+			FORM GOTO PAGE(4)
+		End if 
+End case 

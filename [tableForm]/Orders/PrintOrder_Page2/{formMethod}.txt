@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	vsPrintingHeader:="Printed "+String(Current date(*))+" "+String(Current time(*);"HH;MM")+"  Page "+String(vlPage)
+	If (vfPO)
+		OBJECT SET VISIBLE(*;"xInt1";False)
+		OBJECT SET VISIBLE(*;"xInt2";False)
+	Else 
+		OBJECT SET VISIBLE(*;"xInt1";True)
+		OBJECT SET VISIBLE(*;"xInt2";True)
+	End if 
+End if 

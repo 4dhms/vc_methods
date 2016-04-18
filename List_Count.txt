@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY LONGINT($numbers;0)
+ARRAY TEXT($names;0)
+
+LIST OF CHOICE LISTS($numbers;$names)
+
+$i:=1
+For ($i;1;Size of array($names))
+	QUERY([Lists];[Lists]ListName=$names{$i})
+	QUERY SELECTION([Lists];[Lists]UserName="")
+	If (Records in selection([Lists])>200)
+		ALERT($names{$i}+"  "+String(Records in selection([Lists])))
+	End if 
+End for 
+
+ALERT("Done")

@@ -1,0 +1,134 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSubCC;0)
+C_TEXT($datestamp;$path)
+C_TIME($docref)
+C_DATE($start;$end)
+C_BOOLEAN($continue;$send)
+C_LONGINT($i)
+
+$start:=Current date(*)-14
+$end:=Current date(*)+42
+
+QUERY([Orders];[Orders]CancelDate>=$start;*)
+QUERY([Orders]; & ;[Orders]CancelDate<=$end)
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Customer="EME Sweaters";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Mark's@Warehouse@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Catco@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="TABI";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="WADOS@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Manteaux Manteaux";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Simons";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Le Chateau";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="J.C. Retail@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Serena Fashion@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Trade Secret";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="BJ's@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="@Shopping Channel@Canada@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="The shopping channel")
+
+ORDER BY([Orders];[Orders]ShipDateFactory;>;[Orders]OrderNum;>)
+
+If (Application type=5) | (Current user="Spooler")
+	$continue:=True
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":Credit Approval_"+$datestamp+".xls"
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	$start:=Date(Request("Date range start:";String($start)))
+	$end:=Date(Request("Date range end:";String($end)))
+	
+	Case of 
+		: ($start=!00-00-00!)
+			WinPrompt ("Invalid Start date.")
+		: ($end=!00-00-00!)
+			WinPrompt ("Invalid End date.")
+		: (ok=1)
+			$continue:=True
+			$docRef:=Create document("";"xls")
+	End case 
+End if 
+
+If ($continue)
+	SEND PACKET($docRef;"PO"+Char(9))
+	SEND PACKET($docRef;"Style"+Char(9))
+	SEND PACKET($docRef;"Design"+Char(9))
+	SEND PACKET($docRef;"Factory"+Char(9))
+	SEND PACKET($docRef;"Customer"+Char(9))
+	SEND PACKET($docRef;"Cust PO"+Char(9))
+	SEND PACKET($docRef;"X Factory"+Char(9))
+	SEND PACKET($docRef;"Actual"+Char(9))
+	SEND PACKET($docRef;"Cancel Date"+Char(9))
+	SEND PACKET($docRef;"Quantity"+Char(9))
+	SEND PACKET($docRef;"Credit Approval"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		If ([Orders]Customer="Catco@") | ([Orders]Customer="BJ@")
+			Case of 
+				: ([Orders]ShipFOB)
+					$send:=True
+				: ([Orders]ShipLDP) & ([Orders]OtherShip#"")
+				Else 
+					$send:=False
+			End case 
+		Else 
+			$send:=True
+		End if 
+		
+		If ($send)
+			SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+			SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+			SEND PACKET($docRef;[Orders]DesignNumber+Char(9))
+			SEND PACKET($docRef;[Orders]Factory+Char(9))
+			SEND PACKET($docRef;[Orders]Customer+Char(9))
+			SEND PACKET($docRef;[Orders]CustPONumber+Char(9))
+			SEND PACKET($docRef;String([Orders]ShipDateFactory)+Char(9))
+			If ([Orders]ActualDeliveryDate=!00-00-00!)
+				SEND PACKET($docRef;Char(9))
+			Else 
+				SEND PACKET($docRef;String([Orders]ActualDeliveryDate)+Char(9))
+			End if 
+			SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+			SEND PACKET($docRef;String([Orders]TotalOrderQuantity;"###,###,##0")+Char(9))
+			If ([Orders]CreditOK)
+				SEND PACKET($docRef;String([Orders]CreditOKDate)+Char(13))
+			Else 
+				SEND PACKET($docRef;Char(13))
+			End if 
+		End if 
+		NEXT RECORD([Orders])
+		UNLOAD RECORD([Designs])
+	End for 
+	CLOSE DOCUMENT($docRef)
+End if 
+UNLOAD RECORD([Orders])
+
+If (Application type=5) | (Current user="Spooler")
+	  //ARRAY TEXT(asSubCC;13)
+	ARRAY TEXT(asSubCC;0)
+	APPEND TO ARRAY(asSubCC;"tcli@nubby.com")
+	APPEND TO ARRAY(asSubCC;"natalies@nubby.com")
+	APPEND TO ARRAY(asSubCC;"dusha@nubby.com")
+	APPEND TO ARRAY(asSubCC;"peter.goldberger@nubby.com")
+	APPEND TO ARRAY(asSubCC;"spenser@nubby.com")
+	APPEND TO ARRAY(asSubCC;"claudia@nubby.com")
+	APPEND TO ARRAY(asSubCC;"sandie.fung@nubby.com")
+	APPEND TO ARRAY(asSubCC;"ginger@nubby.com")
+	APPEND TO ARRAY(asSubCC;"silia@nubby.com")
+	APPEND TO ARRAY(asSubCC;"shukyee.taylor@nubby.com")
+	APPEND TO ARRAY(asSubCC;"ruby@nubby.com")
+	APPEND TO ARRAY(asSubCC;"jin@nubby.com")
+	APPEND TO ARRAY(asSubCC;"christine@nubby.com")
+	APPEND TO ARRAY(asSubCC;"elaine@nubby.com")
+	APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+	APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+	
+	Mail_SimpleSend ("List";$path;"Credit Approval Report ("+String(Current date(*))+")";"Attached is the new credit approval report."+Char(13))
+	
+End if 
+
+
+

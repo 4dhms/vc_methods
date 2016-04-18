@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([FabricOrders];[FabricOrders]FabOrderKey=$1)
+If (Records in selection([FabricOrders])=0)
+	<>vtFBPO:="none"
+Else 
+	<>vtFBPO:=[FabricOrders]PONumber
+End if 

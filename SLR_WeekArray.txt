@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY DATE(adWeeks;0)
+C_DATE($start;$end)
+
+$start:=Current date(*)-180
+$end:=Current date(*)
+
+QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart>$start;*)
+QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkStart<$end)
+
+SELECTION TO ARRAY([SLRWkLibrary]WkEnd;adWeeks)
+SORT ARRAY(adWeeks;<)
+adWeeks:=0
+
+
+

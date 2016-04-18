@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+
+vfTrim:=False
+
+FabOrder_BuildArt (0)
+
+QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+
+Case of 
+	: (<>vlOrderNumber>0) & ([FabricLibrary]Restricted#"") & ([FabricLibrary]Restricted#[Orders]OrderDivision)
+		WinPrompt ("Article # "+vsArt+Char(13)+"is restricted to division"+Char(13)+[FabricLibrary]Restricted)
+		vsArt:=""
+		vsArt:=""
+		vtFabric:=""
+		vsFiber:=""
+		vtSupplier:=""
+		vsTreatment:=""
+		vtGauge:=""
+		vtYarnSize:=""
+		
+	: (<>vlOrderNumber<0) & ([FabricLibrary]Restricted#"") & ([FabricLibrary]Restricted#[Samples]SampleDivision)
+		WinPrompt ("Article # "+vsArt+Char(13)+"is restricted to division"+Char(13)+[FabricLibrary]Restricted)
+		vsArt:=""
+		vsArt:=""
+		vtFabric:=""
+		vsFiber:=""
+		vtSupplier:=""
+		vsTreatment:=""
+		vtGauge:=""
+		vtYarnSize:=""
+		
+	: (vsArt="TBD")
+		OBJECT SET ENTERABLE(vtFabric;True)
+		OBJECT SET ENTERABLE(vsFiber;True)
+	: (vsArt="HMS@") & (<>vfHMSTest)
+		QUERY([HMSArtNo];[HMSArtNo]HANumber=vsArt)
+		If (Records in selection([HMSArtNo])>0)
+			vsArt:=[HMSArtNo]HANumber
+			vtFabric:=[FabricLibrary]FabricName
+			vsFiber:=[FabricLibrary]FiberContent
+			vtSupplier:=[FabricLibrary]Supplier
+			$done:=True
+		End if 
+		  //Else 
+		  //QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+		  //If (Records in selection([FabricLibrary])=0) & ([Orders]OrderEntryDate>!05/26/2011!)
+		  //WinPrompt ("Article number "+vsArt+" does not exist in the Fabric Library.")
+		  //vsArt:=""
+		  //Else 
+		  //Case of 
+		  //: ([FabricLibrary]HMSANkey=0)
+		  //vtFabric:=[FabricLibrary]FabricName
+		  //vsFiber:=[FabricLibrary]FiberContent
+		  //vtSupplier:=[FabricLibrary]Supplier
+		  //: (<>vfHMSTest)
+		  //QUERY([HMSArtNo];[HMSArtNo]HANkey=[FabricLibrary]HMSANkey)
+		  //If (Records in selection([HMSArtNo])=1)
+		  //WinPrompt (vsArt+" has been updated to "+[HMSArtNo]HANumber+".")
+		  //vsArt:=[HMSArtNo]HANumber
+		  //QUERY([FabricLibrary];[FabricLibrary]HMSANkey=[HMSArtNo]HANkey)
+		  //vtFabric:=[FabricLibrary]FabricName
+		  //vsFiber:=[FabricLibrary]FiberContent
+		  //vtSupplier:=[FabricLibrary]Supplier
+		  //End if 
+		  //Else 
+		  //OBJECT SET ENTERABLE(vtFabric;False)
+		  //OBJECT SET ENTERABLE(vsFiber;False)
+		  //End case 
+		  //End if 
+End case 
+
+
+  //QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+
+  //If (Records in selection([FabricLibrary])>0) & ([FabricLibrary]SupplierInfo#"")
+  //vtSupplier:=[FabricLibrary]Supplier
+  //End if 
+
+
+  //vtSupplier:=[FabricLibrary]Supplier
+

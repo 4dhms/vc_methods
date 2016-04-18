@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vlPageRouter:=1
+vlColSlider:=[SpecFactory]SampleCol
+ARRAY LONGINT(alSpecLineKey;0)
+ARRAY TEXT(asSpecLineTol;0)
+SELECTION TO ARRAY([SpecSheetLines]SpecLineKey;alSpecLineKey;[SpecSheetLines]Tolerance;asSpecLineTol)
+
+ARRAY TEXT(asGradeTemps;0)
+ALL RECORDS([SpecGradeTempLib])
+SELECTION TO ARRAY([SpecGradeTempLib]TempName;asGradeTemps)
+SORT ARRAY(asGradeTemps;>)
+INSERT IN ARRAY(asGradeTemps;1;1)
+asGradeTemps{1}:="Templates"
+asGradeTemps:=1
+
+SS_Init 
+SS_Sizing 
+Grade_FindSteps 
+FORM GOTO PAGE(2)

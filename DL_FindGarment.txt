@@ -1,0 +1,96 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($started)
+C_TEXT($char)
+C_TEXT($extra)
+C_TEXT(vDesign1;vGroupName;vStyle;vsCustomer)
+
+If (asDivisions>1) & (vDesign1="") & (vGroupName="") & (vStyle="") & (vsCustomer="")  //division only
+	$char:=Substring(asDivisions{asDivisions};1;Position("-";asDivisions{asDivisions}))+"@"
+	Case of 
+		: (Position("-";$char)=3) & ($char[[1]]="0")
+			$extra:=Substring($char;2;99)
+			QUERY([Designs];[Designs]DivisionCodeN=$char;*)
+			QUERY([Designs]; | ;[Designs]DivisionCodeN=$extra)
+		: (Position("-";$char)=2)
+			$extra:="0"+$char
+			QUERY([Designs];[Designs]DivisionCodeN=$char;*)
+			QUERY([Designs]; | ;[Designs]DivisionCodeN=$extra)
+		Else 
+			QUERY([Designs];[Designs]DivisionCodeN=$char)
+	End case 
+	QUERY([Designs];[Designs]DivisionCodeN=$char)
+	If (<>asSeasonName>1)
+		QUERY SELECTION([Designs];[Designs]SeasonName=<>asSeasonName{<>asSeasonName})
+	End if 
+	If (<>asSeasonYear>1)
+		QUERY SELECTION([Designs];[Designs]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+	End if 
+	
+	RELATE MANY SELECTION([Samples]DesignNum)
+	CREATE SET([Samples];"fromd")
+	
+	QUERY([Samples];[Samples]SampleDivision=$char)
+	If (<>asSeasonName>1)
+		QUERY SELECTION([Samples];[Samples]SeasonName=<>asSeasonName{<>asSeasonName})
+	End if 
+	If (<>asSeasonYear>1)
+		QUERY SELECTION([Samples];[Samples]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+	End if 
+	CREATE SET([Samples];"fromS")
+	UNION("fromD";"fromS";"fromS")
+	USE SET("fromS")
+	CLEAR SET("fromS")
+	CLEAR SET("fromD")
+	
+	
+Else 
+	If (vDesign1#"")
+		QUERY([Samples];[Samples]DesignNum=vDesign1;*)
+		$started:=True
+	End if 
+	
+	Case of 
+		: ($started) & (vStyle#"")
+			QUERY([Samples]; & ;[Samples]StyleNum=vStyle;*)
+		: (vStyle#"")
+			$started:=True
+			QUERY([Samples];[Samples]StyleNum=vStyle;*)
+	End case 
+	
+	If ($started) & (vDesign1="")
+		QUERY([Samples]; & ;[Samples]Retired=vSeason;*)
+	End if 
+End if 
+
+
+Case of 
+	: ($started) & (vsCustomer#"")
+		QUERY([Samples]; & ;[Samples]Customer=vsCustomer;*)
+	: (vsCustomer#"")
+		QUERY([Samples];[Samples]Customer=vsCustomer;*)
+		$started:=True
+End case 
+
+Case of 
+	: ($started) & (vGroupName#"")
+		QUERY([Samples]; & ;[Samples]Group=vGroupName;*)
+	: (vGroupName#"")
+		QUERY([Samples];[Samples]Group=vGroupName;*)
+End case 
+
+QUERY SELECTION([Samples];[Samples]DesignNum#"")
+QUERY SELECTION([Samples];[Samples]Void=False)
+
+Case of 
+	: (Records in selection([Samples])>500)
+		vsFlag:="Item count exceeds 500,"+Char(13)+"limit search."
+	: (Records in selection([Samples])>0)
+		FORM SET OUTPUT([Samples];"SGSourceList")
+		FORM SET INPUT([Samples];"NoLoad")
+		SET WINDOW TITLE("Sample Garments ("+String(Records in selection([Samples]))+")")
+		DISPLAY SELECTION([Samples];*)
+		  //GOTO PAGE(5)
+	Else 
+		vsFlag:="No items for that query."
+End case 
+

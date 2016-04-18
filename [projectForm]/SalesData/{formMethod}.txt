@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsStyleNumber)
+
+Case of 
+	: (Form event=On Load)
+		vfNew:=False
+		ARRAY TEXT(asSeasonName;0)
+		ARRAY TEXT(asDivisions;0)
+		LIST TO ARRAY("Division Code No";asDivisions)
+		ARRAY TEXT(asDCCustomer;0)
+		LIST TO ARRAY("Customers Sales";asCustomers)
+		vsDIvision:=""
+		vtTitle:=""
+		REDUCE SELECTION([SLRAcct];0)
+		OBJECT SET ENABLED(bAccept;True)
+		OBJECT SET VISIBLE(*;"xReorder";[SLRAcct]Reorder>0)
+		
+	: (Form event=On Unload)
+		If (Records in set("colors")>0)
+			CLEAR SET("colors")
+		End if 
+		<>vlSLRENter:=0
+End case 

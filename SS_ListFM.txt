@@ -1,0 +1,42 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($orderNumber;$color)
+
+Case of 
+	: (Form event=On Load)
+		CREATE SET([SpecFactory];"FactSheets")
+	: (Form event=On Display Detail)
+		Case of 
+			: (Record number([SpecFactory])<0)
+				vsFlag:=""
+				vsDesignNumber:=""
+				vsStyleNumber:=""
+				vsOrderNumber:=""
+				$color:=0
+			: ([SpecFactory]OrderNumber<0)
+				$orderNumber:=-1*[SpecFactory]OrderNumber
+				vsFlag:="Sample"
+				QUERY([Samples];[Samples]SampleNumber=$orderNumber)
+				QUERY SELECTION([Samples];[Samples]Void=False)
+				vsDesignNumber:=[Samples]DesignNum
+				vsStyleNumber:=[Samples]StyleNum
+				vsOrderNumber:=String(Abs([SpecFactory]OrderNumber))
+				$color:=9
+				UNLOAD RECORD([Samples])
+			: ([SpecFactory]OrderNumber>0)
+				vsFlag:="Order"
+				QUERY([Orders];[Orders]OrderNum=[SpecFactory]OrderNumber)
+				vsDesignNumber:=[Orders]DesignNumber
+				vsStyleNumber:=[Orders]StyleNumber
+				vsOrderNumber:=String(Abs([SpecFactory]OrderNumber))
+				$color:=5
+				UNLOAD RECORD([Orders])
+			Else 
+				vsDesignNumber:="No open Order"
+				vsStyleNumber:=""
+				vsOrderNumber:=String([SpecFactory]SF_KeyNumber)
+				vsFlag:="Sheet No"
+				$color:=13
+		End case 
+		OBJECT SET COLOR(vsFlag;-($color+(256*0)))
+		OBJECT SET COLOR(vsOrderNumber;-($color+(256*0)))
+End case 

@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$c)
+C_TEXT($path)
+
+$i:=1
+$c:=1
+For ($i;1;Size of array(asTypeList))
+	If (Num(asTypeList{$i})>$c)
+		$c:=Num(asTypeList{$i})
+	End if 
+End for 
+
+WinChoice ("Select format:";"Excel";"Text")
+If (ok=1)
+	$docref:=Create document("";"xls")
+Else 
+	$docref:=Create document("";"txt")
+End if 
+$path:=Document
+
+If (ok=1)
+	SEND PACKET($docref;"Self"+Char(9))
+	
+	$i:=1
+	For ($i;1;$c)
+		SEND PACKET($docref;"Combo "+String($i)+Char(9))
+	End for 
+	SEND PACKET($docref;"PO"+Char(13))
+	
+	$i:=1
+	For ($i;1;Size of array(asTypeList))
+		If ($i>1) & (asTypeList{$i}="Self")
+			SEND PACKET($docref;String(alOrders{$i})+Char(13))
+		End if 
+		SEND PACKET($docref;asCPNumbers{$i}+" "+asCPColorName{$i}+Char(9))
+	End for 
+	
+	SEND PACKET($docref;String(alOrders{Size of array(asTypeList)})+Char(13))
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 

@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=1)
+		Order_SaveBDPrep 
+		Order_CheckStyle 
+		OBJECT SET VISIBLE(*;"xConflict";[Orders]SizeRangeConflict)
+		OBJECT SET VISIBLE(*;"xConflict1";[Orders]SizeRangeConflict)
+		
+	: (FORM Get current page=2)
+		Order_DC_Save 
+	: (FORM Get current page=4)
+		If (DC_SpreadSave )
+			Ctn_Save 
+		End if 
+End case 
+ACCEPT

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($test)
+
+$test:=Execute on server("Cspan_AutoReport";64*1032;"Cspan")

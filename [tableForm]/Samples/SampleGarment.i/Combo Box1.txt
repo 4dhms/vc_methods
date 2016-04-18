@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[Samples]SGStatus:=asSGStatus-1
+If (asSGStatus{asSGStatus}="Received")
+	[Samples]SampleReceived:=Current date(*)
+End if 

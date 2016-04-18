@@ -1,0 +1,41 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+C_LONGINT($n)
+C_TEXT($line)
+
+$n:=110
+
+Repeat 
+	Case of 
+		: (Shift down)
+			TRACE
+		: (Position(Char(13);vtNewText;*)<$n)
+			$n:=Position(Char(13);vtNewText;*)
+			$done:=True
+		: (Length(vtNewText)<$n)
+			$done:=True
+		: (Length(vtNewText)<=$n) & (Position(Char(13);vtNewText;*)<1)
+			$n:=Length(vtNewText)
+			$done:=True
+		: (vtNewText[[$n]]=Char(13))
+			$done:=True
+		: (Length(vtNewText)<=110)
+			$n:=Length(vtNewText)
+			$done:=True
+		: (vtNewText[[$n]]=" ") | (vtNewText[[$n]]=Char(13))
+			$done:=True
+		Else 
+			$n:=$n-1
+	End case 
+	
+Until ($done)
+
+If (Length(vtNewText)<=110) & (Position(Char(13);vtNewText;*)<1)
+	$line:=vtNewText
+	vtNewText:=""
+Else 
+	$line:=Substring(vtNewText;1;$n)
+	vtNewText:=Substring(vtNewText;$n+1;9999)
+End if 
+
+$0:=$line

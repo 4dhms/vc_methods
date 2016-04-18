@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vsContact#"")
+	QUERY([Contacts];[Contacts]Contact=vsContact+"@")
+	Case of 
+		: (Records in selection([Contacts])=0)
+			WinPrompt ("There is no customer called "+vsCustomer+".")
+		: (Records in selection([Contacts])>1)
+			ARRAY TEXT(asCustomers;0)
+			RELATE ONE SELECTION([Contacts];[Customers])
+			SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+			SORT ARRAY(asCustomers;>)
+		Else 
+			If (Size of array(asCustomers)<Records in table([Customers]))
+				ARRAY TEXT(asCustomers;0)
+				ALL RECORDS([Customers])
+				SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+				SORT ARRAY(asCustomers;>)
+			End if 
+			QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+			asCustomers:=Find in array(asCustomers;[Customers]CustomerName)
+	End case 
+End if 
+vsContact:=""
+vsCustomer:=""

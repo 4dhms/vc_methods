@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cb1;cb2;cb3)
+C_DATE(vdStart;vdEnd)
+
+Case of 
+	: (Form event=On Load)
+		REDUCE SELECTION([Samples];0)
+		
+		ARRAY TEXT(asFactories;0)
+		ARRAY TEXT(asSearchSeason;0)
+		vlRecCount:=0
+		GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+		vtDescription:=""
+		FORM GOTO PAGE(vlRouter)
+End case 
+

@@ -1,0 +1,23 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+  //this routine was written because of anamolous behavior in DISTINCT VALUES
+  //in 2004 upgrade
+
+ARRAY LONGINT(alPartNumber;0)
+ARRAY LONGINT($builder;0)
+C_LONGINT($i)
+
+SELECTION TO ARRAY([SpecSheetLines]PartNumber;$builder)
+$i:=1
+For ($i;1;3)
+	If (Find in array($builder;$i)>0)
+		INSERT IN ARRAY(alPartNumber;1;1)
+		alPartNumber{1}:=$i
+	End if 
+End for 
+
+If (Size of array(alPartNumber)>2) | (Size of array(alPartNumber)<1)
+	OBJECT SET ENABLED(bAdd1;False)
+Else 
+	OBJECT SET ENABLED(bAdd1;True)
+End if 
+

@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+ARRAY TEXT(asXDivision;0)
+LIST TO ARRAY("Division Code No";asXDivision)
+
+$i:=1
+$n:=1
+
+For ($i;1;Size of array(asXDivision))
+	If (Position(asXDivision{$n};[DesignLines]Division)>0)
+		DELETE FROM ARRAY(asXDivision;$n;1)
+	Else 
+		$n:=$n+1
+	End if 
+End for 
+
+[DesignLines]Division:=Replace string([DesignLines]Division;Char(13)+Char(13);Char(13))

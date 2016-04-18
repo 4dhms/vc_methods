@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_LONGINT($thisSheetKey;$oldKey)
+ARRAY LONGINT(alNewSpecLineKeys;0)
+$thisSheetKey:=[SpecFactory]SF_KeyNumber
+vlCloneRouter:=3
+
+SS_GrabSameDesign 
+
+If (ok=1)
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=Num(asSGOrder{asSGOrder}))
+	$oldKey:=[SpecFactory]SF_KeyNumber
+	vfCloneHistory:=False
+	$continue:=SS_CloneSpecs ($oldKey;$thisSheetKey)
+Else 
+	Grade_Save 
+	SS_Sizing 
+	FORM GOTO PAGE(3)
+End if 
+If ($continue)
+	SS_BuildSize 
+End if 
+

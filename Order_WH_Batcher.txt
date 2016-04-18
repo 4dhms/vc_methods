@@ -1,0 +1,59 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfRetail)
+C_LONGINT($i)
+C_TEXT($procDate)
+C_TEXT($message)
+C_TEXT($prompt)
+C_LONGINT($i;$proc)
+C_TEXT($user)
+C_TEXT($sessionUser;$procName)
+
+If (Current user="Arsenio") | (Current user="Ken") | (Current user="Elaine Yang") | (Current user="Lin Li") | (Current user="Joseph") | (Current user="Designer") | (Current user="Claudia Chang") | (Current user="TC Li") | (Current user="David")
+	If (Records in selection([Orders])>500)
+		WinPrompt ("You can not batch process more than 500 numbers.")
+	Else 
+		CREATE SET([Orders];"prev")
+		$procDate:=Request("Date will be:";String(Current date(*));"Yes";"No")
+		If (ok=1)
+			$message:=Request("Enter wharehouse note:")
+			If (ok=1)
+				$prompt:="Are you sure you want to update "+String(Records in selection([Orders]))+" with Ticket Sent, "+$procDate
+				$prompt:=$prompt+" and "+$message+"?"
+				WinChoice ($prompt;"Yes";"No")
+				If (ok=1)
+					WinChoice ("Are you really sure?";"No";"Yes")
+					If (ok=0)
+						FIRST RECORD([Orders])
+						$i:=1
+						For ($i;1;Records in selection([Orders]))
+							If ([Orders]PriceTicket) | ([Orders]Price_Tckt_Sent#"")
+							Else 
+								If (Locked([Orders]))
+									LOCKED BY([Orders];$proc;$user;$sessionUser;$procName)
+									WinPrompt ("PO #: "+String([Orders]OrderNum)+" is being used by "+$user+" and can not be processed at this time.")
+								Else 
+									[Orders]PriceTicket:=True
+									[Orders]Price_Tckt_Sent:=$procDate
+									[Orders]WHNotes:=$message+Char(13)+[Orders]WHNotes
+									If (vfRetail)
+										[Orders]WHNotes:=[Orders]WHNotes+"Retail: "+String([Orders]RetailPrice;"###.00")
+									End if 
+									
+									SAVE RECORD([Orders])
+									REMOVE FROM SET([Orders];"prev")
+								End if 
+							End if 
+							NEXT RECORD([Orders])
+						End for 
+						USE SET("prev")
+						CLEAR SET("prev")
+						If (Records in selection([Orders])>0)
+							WinPrompt ("These orders have been processed before or were locked.")
+						End if 
+					End if 
+				End if 
+			End if 
+		End if 
+	End if 
+End if 
+

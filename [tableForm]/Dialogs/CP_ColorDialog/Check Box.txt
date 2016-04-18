@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbCrec=0)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{asTypeList})
+	[CP_OrderXRef]ReceivedColor:=False
+	[CP_OrderXRef]CPStatus:="UnRecd"
+	SAVE RECORD([CP_OrderXRef])
+	CP_Outstanding 
+	UNLOAD RECORD([CP_OrderXRef])
+End if 

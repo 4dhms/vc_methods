@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($key;$i)
+C_TEXT($test)
+
+ARRAY TEXT($season;0)
+
+$key:=Num(Request("Enter key:"))
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$key)
+
+$i:=1
+FIRST RECORD([DesignLineIncluded])
+For ($i;1;Records in selection([DesignLineIncluded]))
+	QUERY([Orders];[Orders]OrderNum=[DesignLineIncluded]OrderNumber)
+	$test:=[Orders]SeasonName+" "+[Orders]SeasonYear
+	If (Find in array($season;$test)<1)
+		APPEND TO ARRAY($season;$test)
+	End if 
+	NEXT RECORD([DesignLineIncluded])
+End for 
+
+CONFIRM(String(Size of array($season)))
+If (ok=0)
+	TRACE
+End if 
+
+$i:=1
+For ($i;1;Size of array($season))
+	ALERT($season{$i})
+End for 

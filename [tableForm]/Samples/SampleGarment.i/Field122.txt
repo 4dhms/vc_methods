@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]ShipAir)
+	If ([CostSheets]FreightBOAT>0)
+		[CostSheets]FreightOldBoat:=[CostSheets]FreightBOAT
+	End if 
+	If ([CostSheets]FreightOldAir>0)
+		[CostSheets]FreightAIR:=[CostSheets]FreightOldAir
+	End if 
+	[CostSheets]ShipSea:=False
+	[CostSheets]ShipLDP:=False
+	Cost_ShipChange ("air")
+End if 
+Cost_FreightToggle 
+Cost_EntryCalculate 

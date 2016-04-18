@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT(vtOrderChanges;$test1;$test2;$thread)
+
+$i:=1
+For ($i;1;Size of array(alFabricChange))
+	
+	QUERY([Changes];[Changes]RecordKey=alXrefkeys{$i})
+	QUERY SELECTION([Changes];[Changes]FabPrint="Fabric")
+	If (Records in selection([Changes])=0)
+		alFabricChange{$i}:=0
+	Else 
+		alFabricChange{$i}:=16711690
+		alFabricSelf{$i}:=3
+	End if 
+End for 
+
+ARRAY LONGINT(alColorChange;0)
+ARRAY LONGINT(alColorChange;Size of array(alColorKey))
+$i:=1
+For ($i;1;Size of array(alColorChange))
+	QUERY([Changes];[Changes]RecordKey=alColorKey{$i})
+	QUERY SELECTION([Changes];[Changes]FabPrint="Color@")
+	If (<>vlOrderNumber>0)
+		QUERY SELECTION([Changes];[Changes]RevisionNumber=[Orders]RevisionNumber)
+	Else 
+		QUERY SELECTION([Changes];[Changes]RevisionNumber=[Samples]RevisionNumber)
+	End if 
+	Case of 
+		: (Records in selection([Changes])>0)
+			alColorChange{$i}:=16711690
+			alStyleFab{$i}:=3
+			  //: (alColorKey{$i}=0)
+			  //ALERT("Line "+String($i)+" is damaged."+Char(13)+"Recreate the Self & related Combos (if any)."+Char(13)+"Then delete damaged lines.")
+			  //alShadeFab{$i}:=16711690
+	End case 
+	If (asTypeList{$i}="Self") & (asSolidPrint{1}="Print")
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=asCPNumbers{$i})
+		$thread:=[ColorPrintNumber]ThreadColor
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$thread)
+		If (Records in selection([ColorPrintNumber])=0)
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=StripToNumber (Replace string($thread;"#";"")))
+		End if 
+		$test1:=StripToNumber ([ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName)
+		$test2:=StripToNumber (atThreadColor{$i})
+		$test1:=Replace string($test1;"#";"")
+		$test2:=Replace string($test2;"#";"")
+		If ($test1#$test2) | ($test2="")
+			alStyleFab{$i}:=7
+		End if 
+	End if 
+End for 
+

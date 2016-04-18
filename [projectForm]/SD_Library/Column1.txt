@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked)
+		QUERY([SpecialDuty];[SpecialDuty]SDName=atGarmentLib{atGarmentLib})
+		vrDutyEntry:=[SpecialDuty]SDuty
+		vsPart1:=[SpecialDuty]HTS
+		vtDescription:=[SpecialDuty]SDNote
+		vsPart:=[SpecialDuty]SDName
+	: (Form event=On Double Clicked)
+		If (atGarmentLib>0)
+			Case of 
+				: (atGarmentLib{atGarmentLib}="No")
+					  //do nothing
+				: (atGarmentLib{atGarmentLib}="Add New")
+					vrDutyEntry:=0
+					vsPart1:=""
+					vtDescription:=""
+					FORM GOTO PAGE(2)
+				Else 
+					QUERY([SpecialDuty];[SpecialDuty]SDName=atGarmentLib{atGarmentLib})
+					vrDutyEntry:=[SpecialDuty]SDuty
+					vsPart1:=[SpecialDuty]HTS
+					vtDescription:=[SpecialDuty]SDNote
+					vsPart:=[SpecialDuty]SDName
+					OBJECT SET VISIBLE(bDelete;atGarmentLib>2)
+					FORM GOTO PAGE(2)
+			End case 
+		End if 
+End case 

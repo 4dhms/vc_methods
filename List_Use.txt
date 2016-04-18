@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (FORM Get current page=2)
+		If (vtContent#"")
+			vtReturn:=vtContent
+			CREATE RECORD([Lists])
+			[Lists]ArticleNumber:=vsArticle
+			Case of 
+				: (Position("Cable & Gauge";vsList3Name)>0)
+					[Lists]Division:="Cable & Gauge"
+				: (Position("Cupio";vsList3Name)>0)
+					[Lists]Division:="Cable & Gauge"
+			End case 
+			Case of 
+				: (cbKnit=1)
+					[Lists]KWCS:="Knit"
+				: (cbWoven=1)
+					[Lists]KWCS:="Woven"
+				: (cbCutSew=1)
+					[Lists]KWCS:="CutSew"
+			End case 
+			[Lists]ListItem:=vtContent
+			[Lists]ListName:="Fiber"
+			[Lists]UserName:=Current user
+			SAVE RECORD([Lists])
+			
+		Else 
+			vtReturn:=atListContents{atListContents}
+			vsArticle:=atListArt{atListArt}
+		End if 
+		ACCEPT
+		
+	: (vtAddToList#"")
+		
+		If (Find in array(atListContents;vtAddToList)>0)
+			WinPrompt (vtAddtoList+" is already on your list.")
+		Else 
+			CREATE RECORD([Lists])
+			[Lists]ListName:=vsList1Name
+			[Lists]ListItem:=vtAddToList
+			[Lists]UserName:=Current user
+			
+			If (vsList1Name="Fabric@")
+				Case of 
+					: (cbKnit=1)
+						[Lists]KWCS:="Knit"
+					: (cbWoven=1)
+						[Lists]KWCS:="Woven"
+					: (cbCutSew=1)
+						[Lists]KWCS:="CutSew"
+				End case 
+			End if 
+			
+			SAVE RECORD([Lists])
+			
+			INSERT IN ARRAY(atListContents;1;1)
+			atListContents{1}:=vtAddtoList
+			vtReturn:=vtAddToList
+			ACCEPT
+			
+		End if 
+		
+	: (atListContents>0)
+		ACCEPT
+	Else 
+		WinPrompt ("Select list item.")
+End case 

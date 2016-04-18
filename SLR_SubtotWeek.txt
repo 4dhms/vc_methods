@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($subweek;0;Size of array(adDates))
+ARRAY LONGINT($totweek;0;Size of array(adDates))
+ARRAY LONGINT($grandweek;0;Size of array(adDates))
+ARRAY LONGINT($subweek;3;Size of array(adDates))
+ARRAY LONGINT($totweek;3;Size of array(adDates))
+ARRAY LONGINT($grandweek;3;Size of array(adDates))
+C_LONGINT($c;$s;$i)
+C_REAL($header)
+
+$c:=1
+$i:=1
+For ($i;1;Size of array(asTableSpec))
+	$header:=Num(asTableSpec{$i}{6})
+	Case of 
+		: ($header=2)
+			ARRAY LONGINT($totweek;0;0)
+			ARRAY LONGINT($totweek;3;Size of array(adDates))
+			ARRAY LONGINT($subweek;0;0)
+			ARRAY LONGINT($subweek;3;Size of array(adDates))
+		: ($header>=0)
+			ARRAY LONGINT($subweek;0;0)
+			ARRAY LONGINT($subweek;3;Size of array(adDates))
+	End case 
+	$s:=1
+	For ($s;1;Size of array(adDates))
+		Case of 
+			: ($header=-1)
+				alTablePop{$c}{$s}:=$subweek{1}{$s}
+				alTablePop{$c+1}{$s}:=$subweek{2}{$s}
+				alTablePop{$c+2}{$s}:=$subweek{3}{$s}
+			: ($header=-2) | ($header=-2.5)
+				alTablePop{$c}{$s}:=$totweek{1}{$s}
+				alTablePop{$c+1}{$s}:=$totweek{2}{$s}
+				If (vfByStyle)
+					alTablePop{$c+2}{$s}:=$subweek{3}{$s}
+				Else 
+					alTablePop{$c+2}{$s}:=$totweek{3}{$s}
+				End if 
+			: ($header=-3)
+				alTablePop{$c}{$s}:=$grandweek{1}{$s}
+				alTablePop{$c+1}{$s}:=$grandweek{2}{$s}
+				If (vfByStyle)
+					alTablePop{$c+2}{$s}:=$totweek{3}{$s}
+				Else 
+					alTablePop{$c+2}{$s}:=$grandweek{3}{$s}
+				End if 
+		End case 
+		
+		If ($header>=0)
+			$subweek{1}{$s}:=$subweek{1}{$s}+alTablePop{$c}{$s}
+			$subweek{2}{$s}:=$subweek{2}{$s}+alTablePop{$c+1}{$s}
+			$subweek{3}{$s}:=$subweek{3}{$s}+alTablePop{$c+2}{$s}
+			$totweek{1}{$s}:=$totweek{1}{$s}+alTablePop{$c}{$s}
+			$totweek{2}{$s}:=$totweek{2}{$s}+alTablePop{$c+1}{$s}
+			$totweek{3}{$s}:=$totweek{3}{$s}+alTablePop{$c+2}{$s}
+			$grandweek{1}{$s}:=$grandweek{1}{$s}+alTablePop{$c}{$s}
+			$grandweek{2}{$s}:=$grandweek{2}{$s}+alTablePop{$c+1}{$s}
+			$grandweek{3}{$s}:=$grandweek{3}{$s}+alTablePop{$c+2}{$s}
+		End if 
+	End for 
+	$c:=$c+4
+End for 

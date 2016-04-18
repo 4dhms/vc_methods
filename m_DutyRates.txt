@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlDuty)
+
+Case of 
+	: (<>vlDuty=0)
+		<>vlDuty:=New process("Cost_Quota";0;"DutyRates";1)
+	Else 
+		SHOW PROCESS(<>vlDuty)
+		BRING TO FRONT(<>vlDuty)
+End case 

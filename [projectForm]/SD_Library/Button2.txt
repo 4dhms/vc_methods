@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you show you want to delete "+vsPart+"?";"Yes";"No")
+If (ok=1)
+	WinChoice ("This action will permanently delete "+vsPart+".";"Stop";"Continue")
+	If (ok=0)
+		DELETE RECORD([SpecialDuty])
+	End if 
+End if 
+CANCEL

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<IMG SRC=<!--4dvar vtGetPicture--> width=250 height 300 align=center>"
+
+vtPullPicture:=$HTML

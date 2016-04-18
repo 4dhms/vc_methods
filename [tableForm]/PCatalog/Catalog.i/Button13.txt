@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this chart?")
+If (ok=1)
+	WinChoice ("This will be permentant.";"Stop";"Continue")
+	If (ok=0)
+		CREATE SET([PCatalog];"prints")
+		DELETE RECORD([PCatalog])
+		CANCEL
+		USE SET("prints")
+		CLEAR SET("prints")
+	End if 
+End if 

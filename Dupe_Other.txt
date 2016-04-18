@@ -1,0 +1,24 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([CS_Other];[CS_Other]OrderNumber=vlOldOrderNumber)
+
+If (Records in selection([CS_Other])>0)
+	ARRAY LONGINT($alOtherKeys;Records in selection([CS_Other]))
+	
+	$i:=1
+	FIRST RECORD([CS_Other])
+	For ($i;1;Size of array($alOtherKeys))
+		$alOtherKeys{$i}:=Record number([CS_Other])
+		NEXT RECORD([CS_Other])
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($alOtherKeys))
+		GOTO RECORD([CS_Other];$alOtherKeys{$i})
+		DUPLICATE RECORD([CS_Other])
+		[CS_Other]OrderNumber:=vlDupeOrderNumber
+		[CS_Other]CSOKey:=Sequence number([CS_Other])
+		SAVE RECORD([CS_Other])
+	End for 
+End if 

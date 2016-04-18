@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($revised;0)
+ARRAY LONGINT($all;0)
+C_POINTER($fieldptr)
+C_LONGINT($i;$c;$n)
+
+APPEND TO ARRAY($all;5)
+APPEND TO ARRAY($all;7)
+APPEND TO ARRAY($all;9)
+APPEND TO ARRAY($all;12)
+APPEND TO ARRAY($all;15)
+APPEND TO ARRAY($all;16)
+APPEND TO ARRAY($all;17)
+APPEND TO ARRAY($all;18)
+APPEND TO ARRAY($all;29)
+APPEND TO ARRAY($all;32)
+APPEND TO ARRAY($all;33)
+
+
+$i:=1
+$c:=Length([FabricOrders]ChangedFields)/3
+$n:=1
+
+For ($i;1;$c)
+	APPEND TO ARRAY($revised;Num(Substring([FabricOrders]ChangedFields;$n;3)))
+	$n:=$n+3
+End for 
+
+$i:=1
+For ($i;1;Size of array($all))
+	$fieldptr:=Field(17;$all{$i})
+	If ($1=1)  //show changes
+		If (Find in array($revised;$all{$i})>0)
+			OBJECT SET FONT STYLE($fieldptr->;3)
+			OBJECT SET COLOR($fieldptr->;-(3+(256*0)))
+		Else 
+			OBJECT SET FONT STYLE($fieldptr->;0)
+			OBJECT SET COLOR($fieldptr->;-(15+(256*0)))
+		End if 
+	Else   //log changes
+		If (Old($fieldptr->)#$fieldptr->)
+			Rev_FabricOrderChange (String($all{$i}))
+		End if 
+	End if 
+End for 

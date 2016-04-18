@@ -1,0 +1,38 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //p_DesInfoEntry global procedure
+
+Closed:=False
+SET MENU BAR(3)
+ALL RECORDS([Designs])
+FORM SET OUTPUT([Designs];"List Des Info E")
+<>CloseBox:=True
+
+FORM SET INPUT([Designs];"Design Info Ent")
+
+If (Screen width<940) | (Shift down)
+	
+	If (User in group(Current user;"Restricted"))
+		Center Window (780;580;8;"";"WincBox")
+	Else 
+		<>CloseBox:=False
+		Center Window (780;580;4;"")
+	End if 
+Else 
+	If (User in group(Current user;"Restricted"))
+		Center Window (940;580;8;"";"WincBox")
+	Else 
+		<>CloseBox:=False
+		Center Window (940;580;4;"")
+	End if 
+End if 
+
+p_SetWndDesLib 
+AccessMode (->[Designs];True)
+TheFile:=->[Designs]
+If (Screen width<940)
+	MODIFY SELECTION([Designs];*)
+Else 
+	MODIFY SELECTION([Designs];*)
+End if 
+CLOSE WINDOW
+<>DesProcID:=0

@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($varPtr;$countPtr;$keyPtr)
+C_LONGINT($i;$line)
+C_REAL(vrPrice)
+
+QUERY([DC];[DC]OrderNumber=vlOrderNumber)
+$line:=Records in selection([DC])+1
+
+$i:=1
+For ($i;1;10)
+	$varPtr:=Get pointer("vlItem"+String($i))
+	$countPtr:=Get pointer("vlItem"+String($i+10))
+	$keyPtr:=Get pointer("vlItem"+String($i+20))
+	
+	If ($varPtr->#0)
+		CREATE RECORD([DC])
+		[DC]CancelDate:=vdCancel
+		[DC]Count:=$varPtr->
+		[DC]CPOrdID:=$keyPtr->
+		[DC]DCLine:=$line
+		[DC]Customer:=vsCustomer
+		[DC]OrderNumber:=vlOrderNumber
+		[DC]Price:=vrPrice
+		[DC]Note:=vtNote
+		[DC]CreateDate:=Current date(*)
+		SAVE RECORD([DC])
+	End if 
+End for 
+UNLOAD RECORD([DC])
+
+QuikDCInit (False)

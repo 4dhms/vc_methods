@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+ALL RECORDS([Samples])
+Open window(245;74;610;244;1988;"")
+FORM SET OUTPUT([Samples];"ListSamGar")
+DISPLAY SELECTION([Samples])
+CLOSE WINDOW
+<>SamListID:=0

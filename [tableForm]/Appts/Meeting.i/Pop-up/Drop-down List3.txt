@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asEndHour>19)
+	WinPrompt ("Good luck."+Char(13)+"That meeting doesn't end until "+asEndHour{asEndHour}+" AM.")
+End if 
+If (asEndHour<asStHour)
+	WinPrompt ("Meeting cannot end before it begins."+Char(13)+"Newton's 17th Law of Temporality.")
+	asEndHour:=0
+Else 
+	Cal_SetPM 
+End if 

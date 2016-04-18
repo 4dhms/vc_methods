@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BLOB($blob)
+C_PICTURE($xThumb)
+C_TEXT($photopath)
+
+
+QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$1)
+QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+QUERY([SpecPix];[SpecPix]OrderNumber=[CP_OrderXRef]OrderNumber)
+QUERY SELECTION([SpecPix];[SpecPix]LinePlan=True)
+If (Records in selection([SpecPix])>0)
+	$photopath:=String([SpecPix]OrderNumber+([SpecPix]SketchNumber*0.1))
+	Web_GetPhoto ($photopath)
+Else 
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	CREATE THUMBNAIL([Designs]Sketch;$xThumb;200;200;6)
+	PICTURE TO GIF($xThumb;$blob)
+	WEB SEND BLOB($blob;"image/gif")
+End if 

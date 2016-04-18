@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //p_FabOrder global procedure
+
+  //builds vendor list
+
+SET MENU BAR(17)
+vfNewFOSys:=True
+
+QUERY([FabricOrders];[FabricOrders]POType=0)
+ORDER BY([FabricOrders];[FabricOrders]PONumber;>)
+
+
+FORM SET OUTPUT([FabricOrders];"FabricOrderList")
+FORM SET INPUT([FabricOrders];"FO.i")
+
+Center Window (950;650;4;"")
+
+SET WINDOW TITLE(<>asVendorTypes{<>asVendorTypes}+" Orders")
+AccessMode (->[FabricOrders];True)
+TheFile:=->[FabricOrders]
+MODIFY SELECTION([FabricOrders];*)
+CLOSE WINDOW
+<>FabOrdProcID:=0

@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this line"+Char(13)+"Style #: "+asStyleNumbers{asStyleNumbers}+"?")
+If (ok=1)
+	QUERY([SampleTrack];[SampleTrack]TrackId=alTrackId{alTrackId})
+	DELETE RECORD([SampleTrack])
+	
+	DELETE FROM ARRAY(asEnterer;alTrackId;1)
+	DELETE FROM ARRAY(atLDescript;alTrackId;1)
+	DELETE FROM ARRAY(asDiv;alTrackId;1)
+	DELETE FROM ARRAY(asStyleNumbers;alTrackId;1)
+	DELETE FROM ARRAY(asColor1;alTrackId;1)
+	DELETE FROM ARRAY(asCustomers;alTrackId;1)
+	DELETE FROM ARRAY(adDateOut;alTrackId;1)
+	DELETE FROM ARRAY(adDateIn;alTrackId;1)
+	DELETE FROM ARRAY(asBDNotes;alTrackId;1)
+	DELETE FROM ARRAY(alTrackId;alTrackId;1)
+	CANCEL
+End if 

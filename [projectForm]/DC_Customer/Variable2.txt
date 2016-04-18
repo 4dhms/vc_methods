@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtDCCustomer;$return)
+
+If (Form event=On After Keystroke)
+	ARRAY TEXT(asXCustomer;0)
+	
+	$return:=Get edited text+"@"
+	QUERY([Lists];[Lists]ListName="DC")
+	QUERY SELECTION([Lists];[Lists]ListItem=$return)
+	
+	SELECTION TO ARRAY([Lists]ListItem;asXCustomer)
+	SORT ARRAY(asXCustomer;>)
+	If (Size of array(asXCustomer)=1)
+		LISTBOX SELECT ROW(afListBox1;1)
+	End if 
+End if 

@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style)
+
+Case of 
+	: (Form event=On Printing Detail)
+		[CP_OrderXRef]StyleNumber:=Replace string([CP_OrderXRef]StyleNumber;"Style number: ";"")
+		
+		OBJECT SET VISIBLE([CP_OrderXRef]StyleNumber;([Samples]MultipleStyles) & ([CP_OrderXRef]StyleNumber#"0") & ([CP_OrderXRef]CPType="Self"))
+		OBJECT SET VISIBLE([ChineseHeads]_Self;[CP_OrderXRef]CPType="Self")
+		
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+		OBJECT SET VISIBLE([ColorPrintNumber]CPName;[ColorPrintNumber]CPNumber#"")
+		
+		If ([CP_OrderXRef]CPType="Self")
+			OBJECT SET COLOR([CP_OrderXRef]Quantity;-(15+(256*0)))
+			OBJECT SET COLOR(*;"xLineA";-(15+(256*0)))
+			$style:=1
+		Else 
+			OBJECT SET COLOR([CP_OrderXRef]Quantity;-(0+(256*0)))
+			OBJECT SET COLOR(*;"xLineA";-(0+(256*0)))
+			$style:=0
+		End if 
+		Rev_FlagColor (True)
+		  //FONT STYLE([CP_OrderXRef]XCPNumber;$style)
+		  //FONT STYLE([ColorPrintNumber]CPName;$style)
+End case 
+

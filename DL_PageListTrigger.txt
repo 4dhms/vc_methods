@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (alHistkey>0)
+	$i:=1
+	For ($i;1;19)
+		OBJECT SET VISIBLE(*;"x"+String($i);False)
+		OBJECT SET VISIBLE(*;"g"+String($i);False)
+	End for 
+	DL_BuildPage (alHistKey{alHistKey};True)
+End if 

@@ -1,0 +1,5 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asContacts;0)
+QUERY([Customers];[Customers]CustomerName=[Appts]ApptWith)
+RELATE MANY([Customers]CustomerKey)
+SELECTION TO ARRAY([Contacts]Contact;asContacts)

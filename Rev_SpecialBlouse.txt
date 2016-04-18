@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($oldrev)
+
+$oldrev:=Old([Orders]RevisionNumber)
+
+If ([Orders]RevisionNumber=$oldrev)
+	<>vlRevisionNumber:=[Orders]RevisionNumber+1
+	vtOldData:="Rev "+String([Orders]RevisionNumber)
+	vtNewData:="Blouse rev "+String([Orders]RevisionNumber+1)
+	Rev_LogEvent ("New Revision")
+	vfNewRecord:=True
+	<>Enter:=True
+	[Orders]POOpen:=True
+	[Orders]RevisionNumber:=[Orders]RevisionNumber+1
+	[Orders]RevisionKey:=[Orders]OrderNum+(0.01*[Orders]RevisionNumber)
+	[Orders]NotPrinted:=True
+	
+	ARRAY TEXT(asPOv;1)
+	asPOv{1}:="Revision "+String([Orders]RevisionNumber)
+	asPOv:=1
+	
+	[Orders]Cancelled:=False
+	Revise_FlagFields (<>Enter)
+End if 

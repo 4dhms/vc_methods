@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($year)
+C_BOOLEAN($check)
+
+$year:=Num([ColorPrintNumber]SeasonYear)
+
+Case of 
+	: ($year=2013) & ([ColorPrintNumber]SeasonName="Resort")
+		$check:=False
+	: ($year>=2013)
+		$check:=True
+	Else 
+		$check:=False
+End case 
+
+
+If ($check)
+	QUERY([PCPage];[PCPage]Print1=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print2=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print3=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print4=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print5=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print6=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print7=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print8=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print9=[ColorPrintNumber]CPNumber;*)
+	QUERY([PCPage]; | ;[PCPage]Print10=[ColorPrintNumber]CPNumber)
+	
+	If (Records in selection([PCPage])=0)
+		[ColorPrintNumber]Dropped:=True
+	Else 
+		[ColorPrintNumber]Dropped:=False
+	End if 
+	
+	UNLOAD RECORD([PCPage])
+End if 

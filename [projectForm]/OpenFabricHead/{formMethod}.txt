@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	OBJECT SET VISIBLE(*;"xText4";Not(vfMini))
+	OBJECT SET VISIBLE(*;"xText5";Not(vfMini))
+	OBJECT SET VISIBLE(*;"xText6";Not(vfMini))
+	OBJECT SET VISIBLE(*;"xText7";Not(vfMini))
+End if 

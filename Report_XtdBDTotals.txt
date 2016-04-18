@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+C_REAL($netmu;$netnetmu)
+
+$c:=$1+1
+Report_BDArrayInit ($c)
+ARRAY LONGINT(alStyle;$c)
+
+alBDStyle{$c}:=1
+asBDDivisions{$c}:="Totals"
+alBDQuantity{$c}:=Util_Array_Sum (->alBDQuantity)
+alBDGrossSales{$c}:=Util_Array_Sum (->alBDGrossSales)
+alBDDiscAmt{$c}:=Util_Array_Sum (->alBDDiscAmt)
+alBDCost{$c}:=Util_Array_Sum (->alBDCost)
+arBDNetSales{$c}:=Util_Array_Sum (->arBDNetSales)
+arBDNetProfit{$c}:=Util_Array_Sum (->arBDNetProfit)
+arBDSpecialDiscount{$c}:=Util_Array_Sum (->arBDSpecialDiscount)
+arBDNetNetSales{$c}:=Util_Array_Sum (->arBDNetNetSales)
+arBDNetNetProfit{$c}:=Util_Array_Sum (->arBDNetNetProfit)
+
+$netMU:=Round((arBDNetProfit{$c}/arBDNetSales{$c})*100;1)
+$netNetMU:=Round((arBDNetNetProfit{$c}/arBDNetNetSales{$c})*100;1)
+
+arBDAvgNetMarkup{$c}:=$netMU
+arBDAvgNetNetMarkup{$c}:=$netNetMU

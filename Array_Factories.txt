@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asFactories;0)
+
+QUERY([Factories];[Factories]FactoryName#"")
+ORDER BY([Factories];[Factories]FactoryName;>)
+SELECTION TO ARRAY([Factories]FactoryName;<>asFactories)
+INSERT IN ARRAY(<>asFactories;1;1)
+<>asFactories{1}:="ADD FACTORY"

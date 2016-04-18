@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+
+If (Form event=On Double Clicked) & (User in group(Current user;"Phonebook"))
+	$c:=asList1
+	
+	vtPart1:=asList1{$c}
+	vtPart2:=asList2{$c}
+	vtPart3:=asList3{$c}
+	vtPart4:=asList4{$c}
+	
+	Phonebook_Edit 
+End if 

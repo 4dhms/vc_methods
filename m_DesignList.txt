@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global for Design List entry
+Case of 
+	: (<>DesListID=0)
+		<>DesListID:=New process("p_DesignList";0;"Design List")
+	Else 
+		SHOW PROCESS(<>DesListID)
+		BRING TO FRONT(<>DesListID)
+End case 

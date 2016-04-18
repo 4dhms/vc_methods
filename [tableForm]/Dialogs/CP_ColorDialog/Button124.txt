@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtThreadColor)
+
+If (vtThreadColor="Enter Color Number") | (vtThreadColor="") & (vsCPType="Self") & (asSolidPrint{1}="Print")
+	vtThreadColor:="Enter Color Number"
+	GOTO OBJECT(vtThreadColor)
+	  //WinPrompt ("You must specify a Thread Color for Self Prints.")
+Else 
+	
+	Case of 
+		: (Position("-";vsCPNumber)>0) & (asTypeList{asTypeList}="Self") & (asSolidPrint{1}="solid")
+			WinPrompt ("This is a print."+Char(13)+"Correct the fabric information in the Color/Print Library.")
+		: (Position("-";vsCPNumber)<1) & (asTypeList{asTypeList}="Self") & (asSolidPrint{1}="print")
+			WinPrompt ("This is a solid color."+Char(13)+"Correct the fabric information.")
+	End case 
+	
+	If (vsCPNumber#"")
+		vsCPNumber:=Uppercase(vsCPNumber)
+		vfNewFabric:=False
+		vtOrderChanges:=vtOrderChanges+"_Color"
+		ACCEPT
+	End if 
+End if 

@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$orderNumber)
+
+$i:=1
+FIRST RECORD([Samples])
+
+For ($i;1;Records in selection([Samples]))
+	$orderNumber:=-1*[Samples]SampleNumber
+	[Samples]LastCostSheet:=""
+	
+	QUERY([Costing];[Costing]OrderNumber=$orderNumber)
+	If (Records in selection([Costing])>0)
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		If (Records in selection([CostSheets])>0)
+			ORDER BY([CostSheets];[CostSheets]SheetID;<)
+			[Samples]LastCostSheet:=[CostSheets]SheetName
+		End if 
+	End if 
+	SAVE RECORD([Samples])
+	NEXT RECORD([Samples])
+End for 
+

@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($fail)
+C_TEXT($test;$char)
+
+$fail:=False
+$test:=$1
+
+If ($test[[1]]#"S") & ($test[[1]]#"F")
+	$fail:=True
+Else 
+	$char:=$test[[2]]
+	If ($char#"0") & ($char#"1") & ($char#"2") & ($char#"3") & ($char#"4") & ($char#"5") & ($char#"6") & ($char#"7") & ($char#"8") & ($char#"9")
+		$fail:=True
+	Else 
+		$char:=$test[[4]]
+		If ($char="0") | ($char="1") | ($char="2") | ($char="3") | ($char="4") | ($char="5") | ($char="6") | ($char="7") | ($char="8") | ($char="9")
+			$fail:=True
+		Else 
+			$char:=$test[[5]]
+			If ($char="0") | ($char="1") | ($char="2") | ($char="3") | ($char="4") | ($char="5") | ($char="6") | ($char="7") | ($char="8") | ($char="9")
+				$fail:=True
+			End if 
+		End if 
+	End if 
+End if 
+
+$0:=$fail

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([PCatalog])
+WinChoice ("Do you want to update the Library?")
+ACCEPT
+
+If (ok=1)
+	CP_NumbersUpdate 
+End if 
+

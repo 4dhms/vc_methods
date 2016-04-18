@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($hz;0)
+ARRAY TEXT($sz;0)
+ARRAY TEXT($dom;0)
+ARRAY TEXT($vn;0)
+
+LIST TO ARRAY("FactoriesHZ";$hz)
+LIST TO ARRAY("FactoriesSZ";$sz)
+LIST TO ARRAY("FactoriesDomestic";$dom)
+LIST TO ARRAY("FactoriesVietNam";$vn)
+
+Case of 
+	: (Find in array($hz;[Orders]Factory)>0)
+		[Orders]HZGroup:=True
+		[Orders]SZGroup:=False
+		[Orders]DomesticGroup:=False
+		[Orders]VietnamGroup:=False
+		
+	: (Find in array($sz;[Orders]Factory)>0)
+		[Orders]HZGroup:=False
+		[Orders]SZGroup:=True
+		[Orders]DomesticGroup:=False
+		[Orders]VietnamGroup:=False
+		
+	: (Find in array($dom;[Orders]Factory)>0)
+		[Orders]HZGroup:=False
+		[Orders]SZGroup:=False
+		[Orders]DomesticGroup:=True
+		[Orders]VietnamGroup:=False
+		
+	: (Find in array($vn;[Orders]Factory)>0)
+		[Orders]HZGroup:=False
+		[Orders]SZGroup:=False
+		[Orders]DomesticGroup:=False
+		[Orders]VietnamGroup:=True
+		
+	Else 
+		[Orders]HZGroup:=False
+		[Orders]SZGroup:=False
+		[Orders]DomesticGroup:=False
+		[Orders]VietnamGroup:=False
+End case 

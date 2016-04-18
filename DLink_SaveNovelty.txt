@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($nov;$part)
+C_TEXT($key)
+C_LONGINT($order)
+
+$key:=[DesignLinkedPages]Novelty
+If ($key="")
+	$key:="000000000000"
+End if 
+
+$nov:=Get pointer("cb"+String($1))
+$part:=Get pointer("vsPart"+String($1))
+
+If ($nov->=1)
+	$key:=Change string($key;"1";$1)
+	$order:=Num($part->)
+	
+	If ($part->="S@")
+		$order:=$order*-1
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 1")
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 1")
+		If (Records in selection([OrdersFabricXRef])=0)
+			$nov->:=0
+			WinPrompt ("This order has no Combo")
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		End if 
+	Else 
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	End if 
+Else 
+	$key:=Change string($key;"0";$1)
+End if 
+
+[DesignLinkedPages]Novelty:=$key
+SAVE RECORD([DesignLinkedPages])

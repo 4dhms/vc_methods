@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	DELETE FROM ARRAY(asXStyleNumbers;asXStyleNumbers;1)
+End if 

@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+CREATE EMPTY SET([OrdersBreakdowns];"clear")
+FIRST RECORD([OrdersBreakdowns])
+For ($i;1;Records in selection([OrdersBreakdowns]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=[OrdersBreakdowns]SelfKey)
+	If (Records in selection([CP_OrderXRef])=0)
+		ADD TO SET([OrdersBreakdowns];"clear")
+	End if 
+	NEXT RECORD([OrdersBreakdowns])
+End for 
+
+SET WINDOW TITLE(String(Records in selection([OrdersBreakdowns])))

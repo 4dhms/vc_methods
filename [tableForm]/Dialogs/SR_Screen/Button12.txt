@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($users;0)
+APPEND TO ARRAY($users;"Mark")
+APPEND TO ARRAY($users;"Susan")
+APPEND TO ARRAY($users;"Sara Wingate")
+APPEND TO ARRAY($users;"Ed")
+APPEND TO ARRAY($users;"Michael")
+APPEND TO ARRAY($users;"Larry")
+APPEND TO ARRAY($users;"Brad")
+APPEND TO ARRAY($users;"Theresa")
+APPEND TO ARRAY($users;"Nick")
+APPEND TO ARRAY($users;"Lou")
+APPEND TO ARRAY($users;"Sharon")
+APPEND TO ARRAY($users;"Spenser")
+APPEND TO ARRAY($users;"Nubby")
+APPEND TO ARRAY($users;"August")
+APPEND TO ARRAY($users;"Michelle")
+APPEND TO ARRAY($users;"Designer")
+
+If (Records in set("Master")>0)
+	If (Find in array($users;Current user)>0)
+		WinChoice ("Select spreadsheet:";"Simple";"By Month")
+		If (ok=1)
+			SR_Excel 
+		Else 
+			SR_BreakSpreadsheet 
+		End if 
+	Else 
+		SR_Excel 
+	End if 
+Else 
+	WinPrompt ("This is nothing to report.")
+End if 

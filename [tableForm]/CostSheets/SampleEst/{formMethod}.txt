@@ -1,0 +1,94 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($day;$month;vlRecordNumber)
+C_TEXT($year)
+C_DATE($lastBiz)
+
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asSortOrder;7)
+		ARRAY LONGINT(alRecordNumber;0)
+		asSortOrder{1}:="Sort order"
+		asSortOrder{2}:="By Style Number"
+		asSortOrder{3}:="By Design Number"
+		asSortOrder{4}:="By Sea Up"
+		asSortOrder{5}:="By Sea Down"
+		asSortOrder{6}:="By Air Up"
+		asSortOrder{7}:="By Air Down"
+		asSortOrder:=1
+		<>asSeasonName:=1
+		<>asSeasonYear:=1
+		
+		
+		Case of 
+			: (<>asStartMonth>0)
+				  //do nothing
+			: (Month of(Current date(*))=11)
+				<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+				<>asStartMonth:=11
+				<>asEndMonth:=11
+				<>asEndYear:=<>asStartYear+1
+			: (Month of(Current date(*))=12)
+				<>asStartYear:=Size of array(<>asStartYear)
+				<>asStartMonth:=12
+				<>asEndMonth:=12
+				<>asEndYear:=<>asStartYear
+			Else 
+				<>asStartMonth:=Month of(Current date(*))
+				<>asEndMonth:=<>asStartMonth
+				<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+				<>asEndYear:=<>asStartYear
+		End case 
+		<>asStartDay:=1
+		<>asEndDay:=1
+		Array_BuildDays ("Start";<>asStartMonth)
+		Array_BuildDays ("End";<>asEndMonth)
+		
+		If (Day number(Current date(*)-1)=2)
+			$lastBiz:=Current date(*)-3
+		Else 
+			$lastBiz:=Current date(*)-1
+		End if 
+		$day:=Day of($lastBiz)
+		$month:=Month of($lastBiz)
+		$year:=String(Year of($lastBiz))
+		<>asStartMonth:=$month
+		<>asStartDay:=$day
+		<>asStartYear:=Find in array(<>asStartYear;$year)
+		<>asEndMonth:=$month
+		<>asEndDay:=$day
+		<>asEndYear:=Find in array(<>asStartYear;$year)
+	: (Form event=On Display Detail)
+		vlOrderNumber:=Abs([Costing]OrderNumber)
+		vtNotes:=""
+		If ([CostSheets]Details#"")
+			vtNotes:=vtNotes+[CostSheets]Details+Char(13)
+		End if 
+		If ([CostSheets]MiscNotes#"")
+			vtNotes:=vtNotes+[CostSheets]MiscNotes+Char(13)
+		End if 
+		If ([CostSheets]ShipNotes#"")
+			vtNotes:=vtNotes+[CostSheets]ShipNotes+Char(13)
+		End if 
+		If ([CostSheets]NYMiscNotes#"")
+			vtNotes:=vtNotes+[CostSheets]NYMiscNotes+Char(13)
+		End if 
+		  //If ([CostSheets]FOBNotes#"")
+		  //vtNotes:=vtNotes+[CostSheets]FOBNotes+Char(13)
+		  //End if 
+		If ([CostSheets]SpecialNotes#"")
+			vtNotes:=vtNotes+[CostSheets]SpecialNotes+Char(13)
+		End if 
+		
+		Case of 
+			: (asSortOrder{asSortOrder}#"@Style@") & (asSortOrder{asSortOrder}#"@Design@")
+				OBJECT SET VISIBLE(*;"xDivide";False)
+			: (Size of array(alRecordNumber)>0)
+				OBJECT SET VISIBLE(*;"xDivide";Find in array(alRecordNumber;[CostSheets]SheetID)>0)
+			Else 
+				OBJECT SET VISIBLE(*;"xDivide";False)
+		End case 
+		
+		
+	: (Form event=On Unload)
+		<>vlSampleEstReport:=0
+End case 

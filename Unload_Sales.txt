@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([Costing])
+UNLOAD RECORD([CostSheets])
+UNLOAD RECORD([ComponentSheets])
+UNLOAD RECORD([ShippingDocs])

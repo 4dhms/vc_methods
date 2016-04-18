@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([Costing])
+SAVE RECORD([CostSheets])
+If (Records in set("ThisSheet")>0)
+	USE SET("ThisSheet")
+Else 
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+End if 
+
+If (asSheetNames=1) & (User in group(Current user;"DeleteCost"))
+	OBJECT SET VISIBLE(bRemove;True)
+Else 
+	OBJECT SET VISIBLE(bRemove;False)
+End if 
+
+
+QUERY SELECTION([CostSheets];[CostSheets]SheetName=$1)
+
+If ([CostSheets]DCS)
+	DCS_BuildArray 
+	Case of 
+		: (FORM Get current page#10) & (<>vlOrderNumber>0)
+			FORM GOTO PAGE(10)
+		: (FORM Get current page#8) & (<>vlOrderNumber<0)
+	End case 
+Else 
+	Case of 
+		: (FORM Get current page=9) & (<>vlOrderNumber>0)
+		: (FORM Get current page=8) & (<>vlOrderNumber>0)
+		: (FORM Get current page=5) & (<>vlOrderNumber<0)
+		: (FORM Get current page=6) & (<>vlOrderNumber<0)
+		: (<>vlOrderNumber>0)
+			FORM GOTO PAGE(8)
+		Else 
+			FORM GOTO PAGE(5)
+	End case 
+	Cost_EntryOnLoad 
+End if 

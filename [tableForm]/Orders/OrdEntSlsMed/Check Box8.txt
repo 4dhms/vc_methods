@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbCostLA=1)
+	cbCostNY:=0
+	cbCostOther:=0
+	[CostSheets]OtherShip:="LA"
+	Cost_ShipChange ("LA")
+End if 

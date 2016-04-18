@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsWebSession)
+
+vsWebSession:=Replace string($1;"/";"")
+
+QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+[StockOrders]Print:=True
+SAVE RECORD([StockOrders])
+UNLOAD RECORD([StockOrders])
+vsWebSession:=String(Tickcount)
+vsWebUser:="stock"
+WebStock 

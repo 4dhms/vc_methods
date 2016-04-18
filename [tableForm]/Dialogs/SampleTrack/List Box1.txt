@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($right;$left;$top;$bottom;$y;$x;$z)
+
+If (Form event=On Double Clicked)
+	GET WINDOW RECT($left;$top;$right;$bottom)
+	GET MOUSE($x;$y;$z;*)
+	QUERY([SampleTrack];[SampleTrack]TrackId=alTrackId{alTrackId})
+	
+	FORM SET INPUT([SampleTrack];"Track.i")
+	READ WRITE([SampleTrack])
+	Open window($left+20;$y-10;$right-20;$y+50;1;"")
+	MODIFY RECORD([SampleTrack];*)
+	CLOSE WINDOW
+End if 

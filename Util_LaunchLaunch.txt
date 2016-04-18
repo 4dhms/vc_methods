@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($launch)
+
+$launch:=Execute on server("Util_LaunchGetRes";1064*64;"ScreenRes")

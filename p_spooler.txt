@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vtMessage:="Standing by"
+<>vlStoredServer:=0
+<>vfSpoolerRunning:=False
+<>pathBreak:=":"
+<>vfDevelopment:=False
+<>done:=True
+
+Center Window (300;200;1984;"")
+DIALOG("Spooler")
+CLOSE WINDOW
+<>vlSpoolerProc:=0

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	ARRAY TEXT(asSampleTypes;0)
+	ARRAY TEXT(asEnterer;0)
+	LIST TO ARRAY("Order Enter";asEnterer)
+	LIST TO ARRAY("Sample Type";asSampleTypes)
+	INSERT IN ARRAY(asEnterer;1;1)
+	asEnterer{1}:="Order_Enterer"
+	asEnterer:=1
+	asSampleTypes:=Find in array(asSampleTypes;"Ad@Sample")
+	vsPart1:=""
+	vsPart2:=""
+	vsPart3:=""
+	vsPart4:=""
+	vsPart5:=""
+	vsPart6:=""
+	vsPart7:=""
+	vsPart8:=""
+	vsPart9:=""
+	vsPart10:=""
+	Sample_ArrowInit 
+End if 

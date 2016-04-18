@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Designs];[Designs]DesignNum=[DesignLineIncluded]DesignNumber)
+[DesignLineIncluded]Name:=[Designs]Description
+[DesignLineIncluded]Fiber:=[Designs]Fabric
+[DesignLineIncluded]Stitch:=[Designs]Stitch

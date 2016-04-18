@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+CREATE EMPTY SET([Orders];"specd")
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	QUERY([SpecFactory];[SpecFactory]OrderNumber=[Orders]OrderNum)
+	QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+	QUERY SELECTION([SpecLineSample];[SpecLineSample]ColumnHeader#"TOP Sample")
+	QUERY SELECTION([SpecFactory];[SpecFactory]Colhead#"Top Sample")
+	
+	If (Records in selection([SpecFactory])>0) | (Records in selection([SpecLineSample])>0)
+		ADD TO SET([Orders];"specd")
+	End if 
+	NEXT RECORD([Orders])
+End for 
+UNLOAD RECORD([SpecFactory])
+
+USE SET("specd")
+CLEAR SET("specd")
+ORDER BY([Orders];[Orders]OrderNum;<)

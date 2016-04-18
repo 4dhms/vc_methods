@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //$1 Head
+  //$2 Router
+  //1 and 2 get Color or Print number
+  //3 = Search HMS by Division
+  //4 =Search HMS by Fiber Content
+  //5 =Self/Combo linking
+  //6=Sample Garments ->Group
+  //7=Sample Garments -> Season
+  //10=From Color Print System
+  //11 = Add Solid
+  //12 = Add print
+  //13 = Find CP
+  //14 = get vendor email address
+  //15 = Subset Solid or Print
+  //16 = PO Vendor email
+  //17 = Button Status
+  //19 = speedpost factory
+  //20 = Factory
+  //22 Factory Spec Sheet
+  //23 Garment Part List
+  //24 Factory change batch
+
+vsFindSubhead:=$1
+vlRouter:=$2
+
+Center Window (300;120;1;"")
+DIALOG([Dialogs];"FindWithList")
+CLOSE WINDOW

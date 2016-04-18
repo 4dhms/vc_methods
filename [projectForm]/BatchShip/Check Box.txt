@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+If (cb1=1)
+	cb1:=0
+	$i:=1
+	For ($i;1;Size of array(asEnterer))
+		If (afShipping{$i}=True)
+			asEnterer{$i}:=vsEntryNumber
+			afBatchList{$i}:=True
+		End if 
+	End for 
+End if 

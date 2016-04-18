@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+If (SG_Mandatories )
+	SAVE RECORD([Samples])
+	If (FORM Get current page=8)
+		DCS_Print 
+	Else 
+		
+		OBJECT SET ENABLED(bCancelSample;True)
+		OBJECT SET ENABLED(bDupe;True)
+		vfEmail:=False
+		
+		vsPrintingFooter:=""
+		vtFullName:=""
+		
+		SG_NewPrintButton 
+	End if 
+	
+End if 
+

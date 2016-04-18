@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search for description in Speedpost
+SAVE RECORD([Speedpost Form])
+vDesc:=Request("Find description:")
+If (OK=1)
+	QUERY([Speedpost Form];[Speedpost Form]Description 1="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 2="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 3="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 4="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 5="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 6="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 7="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 8="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 9="@"+vDesc+"@";*)
+	QUERY([Speedpost Form]; | ;[Speedpost Form]Description 10="@"+vDesc+"@")
+End if 
+SET WINDOW TITLE("Speedpost Forms: "+String(Records in selection([Speedpost Form]))+" of "+String(Records in table([Speedpost Form])))

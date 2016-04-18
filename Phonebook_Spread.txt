@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TIME($docref)
+
+ARRAY TEXT($col1;0)
+ARRAY TEXT($col2;0)
+ARRAY TEXT($col3;0)
+ARRAY TEXT($col4;0)
+
+QUERY([Staff];[Staff]PhoneBook=True)
+QUERY SELECTION([Staff];[Staff]Misc=False)
+ORDER BY([Staff];[Staff]PBName;>)
+
+SELECTION TO ARRAY([Staff]PBName;$col1;[Staff]PBDept;$col2;[Staff]PBExt;$col3;[Staff]PBmail;$col4)
+
+APPEND TO ARRAY($col1;"")
+APPEND TO ARRAY($col2;"")
+APPEND TO ARRAY($col3;"")
+APPEND TO ARRAY($col4;"")
+
+APPEND TO ARRAY($col1;"Misc")
+APPEND TO ARRAY($col2;"")
+APPEND TO ARRAY($col3;"")
+APPEND TO ARRAY($col4;"")
+
+QUERY([Staff];[Staff]Misc=True)
+QUERY SELECTION([Staff];[Staff]PhoneBook=False)
+ORDER BY([Staff];[Staff]PBName;>)
+
+$i:=1
+For ($i;1;Records in selection([Staff]))
+	APPEND TO ARRAY($col1;[Staff]PBName)
+	APPEND TO ARRAY($col2;[Staff]PBDept)
+	APPEND TO ARRAY($col3;[Staff]PBExt)
+	APPEND TO ARRAY($col4;[Staff]PBmail)
+	NEXT RECORD([Staff])
+End for 
+
+If (Size of array($col1)%2=1)
+	APPEND TO ARRAY($col1;"")
+	APPEND TO ARRAY($col2;"")
+	APPEND TO ARRAY($col3;"")
+	APPEND TO ARRAY($col4;"")
+End if 
+
+$c:=Size of array($col1)/2
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	$i:=1
+	For ($i;1;$c)
+		SEND PACKET($docref;$col1{$i}+Char(9)+$col2{$i}+Char(9)+$col3{$i}+Char(9)+$col4{$i}+Char(9)+Char(9))
+		SEND PACKET($docref;$col1{$c+$i}+Char(9)+$col2{$c+$i}+Char(9)+$col3{$c+$i}+Char(9)+$col4{$c+$i}+Char(13))
+	End for 
+	
+	CLOSE DOCUMENT($docref)
+End if 

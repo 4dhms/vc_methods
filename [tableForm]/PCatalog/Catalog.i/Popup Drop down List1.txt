@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asSeasonName>1)
+	[PCatalog]SeasonName:=asSeasonName{asSeasonName}
+Else 
+	[PCatalog]SeasonName:=""
+End if 

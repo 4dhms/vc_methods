@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //new record for HMS Orders by sales dept
+  //
+<>vlDesignKey:=0
+<>vsDesignNumber:=""
+
+CREATE SET([Orders];"Orders")
+p_NewRcdSales 
+ADD TO SET([Orders];"Orders")
+USE SET("Orders")
+CLEAR SET("Orders")
+ORDER BY([Orders];[Orders]OrderEntryDate;<)
+
+

@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+$i:=1
+ARRAY TEXT(asSubCC;0)
+APPEND TO ARRAY(asSubCC;"anthony.arias@nubby.com")
+  //APPEND TO ARRAY(asSubCC;"phil@nubby.com")
+  //APPEND TO ARRAY(asSubCC;"sandy.yang@nubby.com")
+
+$message:="HMS Order: "+String([Orders]OrderNum)+Char(13)
+$message:=$message+"Style No: "+[Orders]StyleNumber+Char(13)
+$message:=$message+"Design No: "+[Orders]DesignNumber+Char(13)
+$message:=$message+"QTY Changed from: "+String([CP_OrderXRef]Quantity)+" to "+String(alCQty{$i})+Char(13)
+$message:=$message+"Customer: "+[Orders]Customer+Char(13)
+$message:=$message+"Cancel Date: "+String([Orders]CancelDate)+Char(13)
+$message:=$message+"Changed By: "+Current user+Char(13)
+$message:=$message+"Date: "+String(Current date(*))+Char(13)
+$message:=$message+"Time: "+String(Current time(*))+Char(13)+Char(13)
+$message:=$message+"Note: this message was generated automatically"+Char(13)
+
+Mail_SimpleSend ("List";"None";"PO "+String([Orders]OrderNum)+" QTY Change";$message)

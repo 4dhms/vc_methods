@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Unload)
+		UNLOAD RECORD([ColorPrintNumber])
+		
+	: (Form event=On Load)
+		SeasonArrayLocal 
+		vsCPNumber:=""
+		ARRAY LONGINT(alSortList;0)
+		If (Is new record([PCatalog]))
+			[PCatalog]CreationDate:=Current date(*)
+			[PCatalog]CreatedBy:=Current user
+			[PCatalog]PCKey:=Sequence number([PCatalog])
+			REDUCE SELECTION([PCPage];0)
+			asSeasonName:=1
+			asSeasonYear:=1
+		Else 
+			asSeasonName:=Find in array(asSeasonName;[PCatalog]SeasonName)
+			asSeasonYear:=Find in array(asSeasonYear;[PCatalog]SeasonYear)
+			QUERY([PCPage];[PCPage]PCKey=[PCatalog]PCKey)
+			ORDER BY([PCPage];[PCPage]PageNumber;>)
+			
+			SELECTION TO ARRAY([PCPage]PageNumber;alSortList)
+			SORT ARRAY(alSortList;>)
+			
+			If (Current user="Dominique") | (Current user="Liz") | (Current user="Designer")
+				OBJECT SET VISIBLE(bDel;True)
+				OBJECT SET VISIBLE(bDelete;True)
+			Else 
+				OBJECT SET VISIBLE(bDel;False)
+				OBJECT SET VISIBLE(bDelete;False)
+			End if 
+		End if 
+End case 
+

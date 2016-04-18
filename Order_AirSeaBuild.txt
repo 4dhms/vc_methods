@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($airsea)
+
+Case of 
+	: ([Orders]ShipAir)
+		[Orders]ShipSea:=False
+		[Orders]ShipLDP:=False
+		[Orders]ShipFOB:=False
+		$airsea:="Air to "
+	: ([Orders]ShipSea)
+		[Orders]ShipAir:=False
+		[Orders]ShipLDP:=False
+		[Orders]ShipFOB:=False
+		$airsea:="Sea to "
+	: ([Orders]ShipLDP)
+		[Orders]ShipAir:=False
+		[Orders]ShipSea:=False
+		[Orders]ShipFOB:=False
+		$airsea:="LDP at "
+	: ([Orders]ShipFOB)
+		[Orders]ShipAir:=False
+		[Orders]ShipSea:=False
+		[Orders]ShipLDP:=False
+		$airsea:="FOB to "
+	Else 
+		$airsea:=""
+End case 
+
+Case of 
+	: ([Orders]ShipLDP) & ([Orders]CnF)
+		$airsea:="LDP C+F"
+	: (cbNY=1)
+		[Orders]OtherShip:=""
+		$airsea:=$airsea+"NY"
+	: (cbLA=1)
+		[Orders]OtherShip:=""
+		$airsea:=$airsea+"LA"
+	: ([Orders]OtherShip#"")
+		$airsea:=$airsea+[Orders]OtherShip
+	Else 
+		$airsea:=$airsea
+End case 
+
+[Orders]ShipInfo:=$airsea
+
+Order_RequiredFlag 
+
+OBJECT SET VISIBLE([Orders]CnF;([Orders]ShipLDP=True) | ([CostSheets]ShipLDP=True))
+

@@ -1,0 +1,43 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($selected;$refNum;$parent)
+
+C_TEXT($name)
+
+C_TEXT($itemText)
+C_LONGINT($orderNumber)
+$selected:=Selected list items(hlSheets)
+GET LIST ITEM(hlSheets;$selected;$refNum;$itemText)
+$parent:=List item parent(hlSheets;$refNum)
+
+If ($parent>0)
+	OBJECT SET ENABLED(bNameOk;True)
+	
+	$orderNumber:=Num(Substring($itemText;Position("(";$itemText)+1;10))
+	vlRecordNumber:=$refNum
+	
+	ARRAY TEXT(asRouter;0)
+	GOTO RECORD([CostSheets];vlRecordNumber)
+	QUERY([Costing];[Costing]SheetNumber=[CostSheets]SheetNumber)
+	
+	If (<>vfDCS)
+		APPEND TO ARRAY(asRouter;"DCS Estimate 1")
+		APPEND TO ARRAY(asRouter;"DCS Original Quote")
+		APPEND TO ARRAY(asRouter;"DCS Confirmed 1")
+		APPEND TO ARRAY(asRouter;"DCS Actual A")
+	Else 
+		$name:="Fr: "
+		If (cbSG=1)
+			$name:=$name+"> SG"
+		End if 
+		If ([Costing]OrderNumber#0)
+			$name:=$name+String([Costing]OrderNumber)+" "+$itemText
+		End if 
+		
+		APPEND TO ARRAY(asRouter;$name)
+		asRouter:=1
+	End if 
+Else 
+	  // depreciated DISABLE BUTTON(bNameOK)
+	OBJECT SET ENABLED(bNameOK;False)
+End if 
+

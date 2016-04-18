@@ -1,0 +1,85 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsCurrentTab)
+
+
+If (FORM Get current page>6)
+	SAVE RECORD([Costing])
+	SAVE RECORD([CostSheets])
+End if 
+If (User in group(Current user;"SuperCostSheets"))
+	vrTestPrice:=0
+	vfTestPrice:=False
+	OBJECT SET VISIBLE(cbChange;True)
+	cbChange:=0
+Else 
+	OBJECT SET VISIBLE(cbChange;False)
+End if 
+Case of 
+	: (Form event=On Load) | (Form event=On Clicked)
+		If (Form event=On Clicked)
+			  //atPages:=Find in array(atPages;vsCurrentTab)
+			  //If (vsCurrentTab="")
+			vsCurrentTab:=atPages{atPages}
+		End if 
+		
+		If (<>vlOrderNumber<0)
+			Case of 
+				: (atPages{atPages}="Pix") | (vsCurrentTab="Pix")
+					FORM GOTO PAGE(2)
+				: (atPages{atPages}="Cost@") | (vsCurrentTab="Cost@") | (atPages{atPages}="DCS") | (vsCurrentTab="DCS")
+					Cost_Tab 
+					
+				: (atPages{atPages}="Fab")
+					FORM GOTO PAGE(1)
+				: (atPages{atPages}="Cmpnts")
+					FORM GOTO PAGE(3)
+				: (atPages{atPages}="Hist")
+					GetHistory 
+					FORM GOTO PAGE(4)
+			End case 
+		Else 
+			Case of 
+				: (atPages{atPages}="Pix")
+					FORM GOTO PAGE(2)
+				: (atPages{atPages}="WH@") & (User in group(Current user;"Warehouse")) & (Current user#"Jason Kinard")
+					FORM GOTO PAGE(11)
+				: (atPages{atPages}="Cost@") | (vsCurrentTab="Cost@") | (atPages{atPages}="DCS") | (vsCurrentTab="DCS")
+					Cost_Tab 
+				: (atPages{atPages}="Fab")
+					FORM GOTO PAGE(1)
+				: (atPages{atPages}="PO")
+					  //If (User in group(Current user;"PO"))
+					vsCurrentTab:="PO"
+					QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+					If (Records in selection([Costing])=0)
+						REDUCE SELECTION([CostSheets];0)
+					Else 
+						QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+					End if 
+					ORDER BY([CostSheets];[CostSheets]SheetID;<)
+					  //PO_SetDate 
+					FORM GOTO PAGE(3)
+					  //Else 
+					  //WinPrompt ("You are not in the Purchase Order group.")
+					  //vsCurrentTab:="Fab"
+					  //FORM GOTO PAGE(1)
+					  //End if 
+				: (atPages{atPages}="UpDt")
+					Order_ExtLoad 
+					FORM GOTO PAGE(4)
+				: (atPages{atPages}="Cmpnts")
+					
+					If (Records in selection([ComponentSheets])>0)
+						FORM GOTO PAGE(5)
+					End if 
+					
+				: (atPages{atPages}="Hist")
+					GetHistory 
+					FORM GOTO PAGE(6)
+				: (atPages{atPages}="Test")
+					FORM GOTO PAGE(7)
+				Else 
+					FORM GOTO PAGE(1)
+			End case 
+		End if 
+End case 

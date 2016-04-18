@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([Specs];"clearSet")
+USE SET("clearSet")
+CLEAR SET("clearSet")

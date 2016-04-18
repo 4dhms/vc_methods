@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (Count parameters>0)
+	If ($1=0)
+		vsGetPointer:="vsArt"
+		vfFabPO:=False
+	Else 
+		vsGetPointer:="vsArt"+String($1)
+		vfFabPO:=True
+	End if 
+Else 
+	vsGetPointer:=""
+End if 
+
+FORM SET INPUT([Dialogs];"ArticleBuilder")
+Center Window (650;300;5;"")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW

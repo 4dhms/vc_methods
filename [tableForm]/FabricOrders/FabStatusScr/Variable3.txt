@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([FabricOrders])
+ALL RECORDS([FabricOrders])
+SET WINDOW TITLE("Fabric Orders: "+String(Records in selection([FabricOrders]))+" of "+String(Records in table([FabricOrders])))

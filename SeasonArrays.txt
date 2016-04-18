@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asSeasonName;0)
+ARRAY TEXT(<>asSeasonYear;0)
+LIST TO ARRAY("Season Name";<>asSeasonName)
+If (<>asSeasonName{1}#"")
+	INSERT IN ARRAY(<>asSeasonName;1;1)
+End if 
+<>asSeasonName{1}:="Season"
+LIST TO ARRAY("Year";<>asSeasonYear)
+If (<>asSeasonYear{1}#"")
+	INSERT IN ARRAY(<>asSeasonYear;1;1)
+End if 
+<>asSeasonYear{1}:="Year"

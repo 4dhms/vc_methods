@@ -1,0 +1,23 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($key)
+
+If ($1="-999@")
+	vtCustomer:=Substring($1;5;100)
+	vtTextField1:=Replace string(vtCustomer;"_";" ")
+	WEB SEND FILE("newcontact.html")
+Else 
+	QUERY([Contacts];[Contacts]ContactID=Num($1))
+	QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+	vsUser:=[Contacts]Contact
+	vtContactKey:=String([Contacts]ContactID)
+	vtCustomer:=[Customers]CustomerName
+	vtCustomerAddress:=[Customers]DefaultAddress
+	vtShipTo:=[Customers]ShipTo
+	
+	Web_StockOrderOpen 
+	Web_StockVarLookUp 
+	
+	QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+	ORDER BY([StockOrdersLines];[StockOrdersLines]SOKey;<)
+	WEB SEND FILE("stockorder.html")
+End if 

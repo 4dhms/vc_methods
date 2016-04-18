@@ -1,0 +1,40 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$subtot)
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="combo@")
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"Prints")
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+	$c:=1
+	FIRST RECORD([CP_OrderXRef])
+	For ($c;1;Records in selection([CP_OrderXRef]))
+		ADD TO SET([CP_OrderXRef];"Prints")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+USE SET("Prints")
+CLEAR SET("Prints")
+
+$i:=1
+$subtot:=0
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	If ([CP_OrderXRef]CPType="Self")
+		$subtot:=$subtot+[CP_OrderXRef]Quantity
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+vlSubtotal:=$subtot
+[Orders]TotalOrderQuantity:=vlSubtotal
+UNLOAD RECORD([OrdersFabricXRef])
+
+  //______________________
+  //______________________
+  //Cost_UpdateOrder 
+  //______________________
+  //______________________

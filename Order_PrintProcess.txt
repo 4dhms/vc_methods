@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SET PRINT OPTION(Scale option;100)
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+
+If (vPrint=12) | (vPrint=22)
+	Order_PrintMany 
+Else 
+	vlPage:=0
+	Order_Print 
+	PAGE BREAK
+End if 

@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (Not([Orders]NYFabNOT)) & (Not([Orders]NYFabSupply))
+	WinChoice ("NY supply fabric?")
+	If (ok=1)
+		[Orders]NYFabSupply:=True
+		[Orders]NYFabNOT:=False
+		[Orders]FabricSupplied:="NY Supply Fabric"
+	Else 
+		[Orders]NYFabSupply:=False
+		[Orders]NYFabNOT:=True
+	End if 
+End if 

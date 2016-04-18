@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([ReturnStores])
+FORM SET INPUT([RMA];"RMA.in")
+ADD RECORD([RMA];*)

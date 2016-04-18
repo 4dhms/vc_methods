@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vsKey="")
+	CREATE RECORD([DL_Custom])
+	[DL_Custom]CustomKey:=String(Sequence number([DL_Custom]))
+	SAVE RECORD([DL_Custom])
+Else 
+	QUERY([DL_Custom];[DL_Custom]CustomKey=vsKey)
+End if 
+

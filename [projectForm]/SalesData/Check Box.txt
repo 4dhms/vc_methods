@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbClose=1)
+	vdWeekOne:=!00-00-00!
+	OBJECT SET VISIBLE(vdWeekOne;False)
+	vsStyleNumber:=""
+End if 

@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($typenum;0)
+ARRAY TEXT($type;0)
+C_LONGINT($i)
+C_BOOLEAN($run)
+
+$i:=1
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+SELECTION TO ARRAY([CP_OrderXRef]CPType;$type;[CP_OrderXRef]SortOrder;$typenum)
+
+For ($i;1;Size of array($type))
+	If ($typenum{$i}+1#$i)
+		$run:=True
+	End if 
+End for 
+
+If ($run)
+	$i:=1
+	FIRST RECORD([CP_OrderXRef])
+	
+	For ($i;1;Records in selection([CP_OrderXRef]))
+		If ([CP_OrderXRef]CPType="Zipper")
+			[CP_OrderXRef]SortOrder:=99
+		Else 
+			[CP_OrderXRef]SortOrder:=Num([CP_OrderXRef]CPType)
+		End if 
+		SAVE RECORD([CP_OrderXRef])
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+End if 
+
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)

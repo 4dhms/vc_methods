@@ -1,0 +1,109 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;vlremaining)
+C_LONGINT($subKey)
+C_BOOLEAN($keepPrinting)
+$keepPrinting:=True
+vlRemaining:=0
+$subKey:=[SpecFactory]SF_KeyNumber*-1
+QUERY([Sizes];[Sizes]SF_KeyNumber=$subKey)
+
+vsSize1:=[Sizes]Size1
+vsSize2:=[Sizes]Size2
+vsSize3:=[Sizes]Size3
+vsSize4:=[Sizes]Size4
+vsSize5:=[Sizes]Size5
+vsSize6:=[Sizes]Size6
+vsSize7:=[Sizes]Size7
+vsSize8:=[Sizes]Size8
+vsSize9:=[Sizes]Size9
+vsSize10:=[Sizes]Size10
+vsSize11:=[Sizes]Size11
+vsSize12:=[Sizes]Size12
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+CREATE SET([SpecSheetLines];"PrintLines")
+
+QUERY([Sizes];[Sizes]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+
+If (Records in selection([Sizes])>0)
+	CREATE SET([Sizes];"PrintSet")
+	vsNewGarmentPart:="Measurement Grading"
+	
+	$i:=1
+	FIRST RECORD([Sizes])
+	For ($i;1;Records in selection([Sizes]))
+		USE SET("PrintLines")
+		QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SpecLineKey=[Sizes]SpecLineKey)
+		If ([SpecSheetLines]DeletedLine)
+			REMOVE FROM SET([Sizes];"PrintSet")
+		End if 
+		NEXT RECORD([Sizes])
+	End for 
+	USE SET("PrintLines")
+	CLEAR SET("PrintLines")
+	
+	USE SET("PrintSet")
+	ORDER BY([Sizes];[Sizes]SortOrder;>)
+	FIRST RECORD([Sizes])
+	
+	$i:=1
+	
+	Repeat 
+		If (vlremaining<36)  //(vlremaining-$needed<1) &
+			vlPage:=vlPage+1
+			vsPrintingHeader:="PAGE "+String(vlPage)
+			PAGE BREAK(>)
+			vlremaining:=780
+			  //`page setup([SpecSheetLines];"HeaderOne.p")
+			If ($keepPrinting)
+				Print form([SpecSheetLines];"GradeHeadSimple.i")
+				vlremaining:=vlremaining-186
+				vlPage:=-1*vlPage
+				SS_PrintFabric 
+				vlPage:=Abs(vlPage)
+				Print form([SpecSheetLines];"GradingCols")
+				
+			End if 
+		End if 
+		
+		If (vlremaining<14)
+			vlremaining:=780
+			vlPage:=vlPage+1
+			vsPrintingHeader:="PAGE "+String(vlPage)
+			vsNewGarmentPart:="Measurement Grading (continued)"
+			PAGE BREAK(>)
+			  //PAGE SETUP([SpecSheetLines];"Header.grading")
+			If ($keepPrinting)
+				If (vfSimple)
+					Print form([SpecSheetLines];"GradeHeadSimple.i")
+					vlremaining:=vlremaining-18
+				Else 
+					Print form([SpecSheetLines];"Header.grading")
+					vlremaining:=vlremaining-86
+				End if 
+			End if 
+			
+		Else 
+			QUERY([SpecSheetLines];[SpecSheetLines]SpecLineKey=[Sizes]SpecLineKey)
+			If ($keepPrinting)
+				If (vfSimple)
+					Print form([Sizes];"PrintSimpleLine.o")
+				Else 
+					Print form([Sizes];"PrintGradeLine.o")
+				End if 
+				vlremaining:=vlremaining-15
+				NEXT RECORD([Sizes])
+			End if 
+		End if 
+	Until (End selection([Sizes]))
+	
+End if 
+
+
+If ($keepPrinting)
+	$0:=True
+Else 
+	$0:=False
+End if 
+CLEAR SET("PrintSet")
+

@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:="Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		QUERY([Designs];[Designs]DesignNum=[Digest]DesignNumber)
+		QUERY([Orders];[Orders]OrderNum=[Digest]OrderNumber)
+	: (Form event=On Unload)
+		UNLOAD RECORD([Orders])
+End case 
+

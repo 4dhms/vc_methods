@@ -1,0 +1,56 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($orderNumber)
+C_LONGINT($fieldType)
+ARRAY LONGINT($recordSet;0)
+ARRAY TEXT(asSubCC;0)
+ARRAY TEXT(asSortOrder;0)
+ARRAY TEXT(asPages;0)
+vfPDF:=True
+
+EMail_Pointers ([Spooler]Genre)
+<>vtMailFrom:=[Spooler]ReturnAddress
+
+GET FIELD PROPERTIES(vpnumberPtr;$fieldType)
+
+If ($fieldType=8) | ($fieldType=9)
+	$orderNumber:=String(vpnumberPtr->)
+Else 
+	$orderNumber:=vpnumberPtr->
+End if 
+
+BLOB TO VARIABLE([Spooler]AddressListBlob;asSubCC)
+
+BLOB TO VARIABLE([Spooler]OrderArrayBlob;$recordSet)
+
+If (BLOB size([Spooler]SortArray)>0)
+	If ([Spooler]Genre="DP@")
+		BLOB TO VARIABLE([Spooler]SortArray;asSortOrder)
+	Else 
+		BLOB TO VARIABLE([Spooler]SortArray;asSortOrder)
+	End if 
+End if 
+
+CREATE SET FROM ARRAY(vptablePtr->;$recordSet;"MailSet")
+FIRST RECORD([Designs])
+USE SET("MailSet")
+CLEAR SET("MailSet")
+
+SP_MailBuild 
+
+UNLOAD RECORD([FabricLibrary])
+UNLOAD RECORD([Spooler])
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([Designs])
+UNLOAD RECORD(vptablePtr->)
+UNLOAD RECORD([DesignLines])
+UNLOAD RECORD([DLPages])
+UNLOAD RECORD([DesignLineIncluded])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([CP_OrderXRef])
+UNLOAD RECORD([DC_Spreads])
+UNLOAD RECORD([DC_SpreadLines])
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([CostSheets])
+UNLOAD RECORD([RMA])
+UNLOAD RECORD([ReturnStores])

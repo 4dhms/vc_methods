@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Fabric Order entry
+
+Case of 
+	: (<>CPFamilyID=0)
+		<>CPFamilyID:=New process("p_CPFamily";0;"CPFamily")
+	Else 
+		SHOW PROCESS(<>CPFamilyID)
+		BRING TO FRONT(<>CPFamilyID)
+End case 
+
+  //

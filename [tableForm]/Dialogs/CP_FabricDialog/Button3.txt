@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+$continue:=True
+  //this is for future use
+If (vsCPType="Self") & (1=2)
+	If (vsArt="TBD")
+		
+	Else 
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsArt)
+		If ([FabricLibrary]FabricName#vtFabric)
+			WinPrompt ("Fabric should be "+[FabricLibrary]FabricName)
+			vtFabric:=[FabricLibrary]FabricName
+			$continue:=False
+		End if 
+		If ([FabricLibrary]FiberContent#vsFiber)
+			WinPrompt ("Fiber content should be "+[FabricLibrary]FiberContent)
+			vsFiber:=[FabricLibrary]FiberContent
+			$continue:=False
+		End if 
+	End if 
+End if 
+
+If ($continue)
+	Case of 
+		: (FORM Get current page=3)
+			  //Zipper
+			ACCEPT
+			
+		: (vsCPType="Combo@") & (vsPart="")
+			WinPrompt ("Enter garment part.")
+		: (vtFabric="")
+			WinPrompt ("Select Fabric")
+		: (asSorP{asSorP}="Select@")
+			WinChoice ("Enter fabric type:";"Solid";"Print";"Embroidery";"Layout";"Yarn Dye")
+			Case of 
+				: (ok=1) & (bChoice4=1)
+					asSorP:=5
+				: (ok=1) & (bChoice3=1)
+					asSorP:=4
+				: (ok=1) & (bChoice2=1)
+					asSorP:=3
+				: (ok=1)
+					asSorP:=2
+				Else 
+					asSorP:=6
+			End case 
+			ACCEPT
+			
+		Else 
+			ACCEPT
+	End case 
+End if 

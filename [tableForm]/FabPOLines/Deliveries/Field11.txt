@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($print)
+If (Form event=On Data Change)
+	If (Position(" ";[FabPOLines]ColorPrint)>0)
+		$print:=Substring([FabPOLines]ColorPrint;1;Position(" ";[FabPOLines]ColorPrint)-1)
+	Else 
+		$print:=[FabPOLines]ColorPrint
+	End if 
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$print)
+	If ([FabPOLines]ColorName="")
+		[FabPOLines]ColorName:=[ColorPrintNumber]CPName
+	End if 
+	
+	Case of 
+		: (Records in selection([ColorPrintNumber])=0)
+			WinPrompt ("Warning:"+Char(13)+$print+" is not in the Color/Print Library.")
+			
+		: (Records in selection([ColorPrintNumber])>0)
+			If ([ColorPrintNumber]Warning#"")
+				WinPrompt ("Warning: "+[ColorPrintNumber]Warning)
+			End if 
+			If ([ColorPrintNumber]Mill#"")
+				WinPrompt ("Mill: "+[ColorPrintNumber]Mill)
+			End if 
+	End case 
+	If ([FabPOLines]FabType="")
+		[FabPOLines]FabType:="Self"
+	End if 
+	If ([FabricOrders]ReviseNumber>0) | ([FabricOrders]POSent)
+		[FabPOLines]Changed:=True
+	End if 
+End if 

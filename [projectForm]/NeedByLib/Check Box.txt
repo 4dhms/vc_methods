@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (cbUpdate=1)
+	WinChoice ("Are you sure you want to check all the price ticket boxes?")
+	If (ok=1)
+		$i:=1
+		FIRST RECORD([Orders])
+		For ($i;1;Records in selection([Orders]))
+			If (Locked([Orders]))
+				WinPrompt ("PO "+String([Orders]OrderNum)+" is locked and cannot be updated at this time."+Char(13)+Char(13)+"Make a  note of this.")
+			Else 
+				[Orders]PriceTicket:=True
+				SAVE RECORD([Orders])
+			End if 
+			NEXT RECORD([Orders])
+		End for 
+	End if 
+End if 

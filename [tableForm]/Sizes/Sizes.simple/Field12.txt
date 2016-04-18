@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($col)
+C_TEXT($catagory;$message)
+
+SAVE RECORD([Sizes])
+SS_AnchorPointer 
+If (Form event=On Mouse Enter)
+	If (Shift down) & ([Sizes]Step="Auto")
+		Case of 
+			: (pOne=1)
+				$catagory:=[SpecFactory]KnitWoven1
+			: (pTwo=1)
+				$catagory:=[SpecFactory]KnitWoven2
+			: (pThree=1)
+				$catagory:=[SpecFactory]KnitWoven3
+		End case 
+		
+		vtGradeRange:=""
+		
+		$i:=1
+		For ($i;1;10)
+			$col:=Get pointer("vsSize"+String($i))
+			Case of 
+				: ($col->#"") & (vtGradeRange="")
+					vtGradeRange:=$col->
+				: ($col->#"")
+					vtGradeRange:=vtGradeRange+"-"+$col->
+			End case 
+		End for 
+		QUERY([Steps];[Steps]Range=vtGradeRange;*)
+		QUERY([Steps]; & ;[Steps]POM=[SpecSheetLines]OtherDescription;*)
+		QUERY([Steps]; & ;[Steps]Category=$catagory)
+		ORDER BY([Steps];[Steps]Column;>)
+		
+		ARRAY TEXT($steps;0)
+		SELECTION TO ARRAY([Steps]Step;$steps)
+		$message:=""
+		$i:=1
+		For ($i;1;Size of array($steps))
+			$message:=$message+$steps{$i}
+			If ($i<Size of array($steps))
+				$message:=$message+" - "
+			End if 
+		End for 
+		WinPrompt ($message)
+	End if 
+End if 

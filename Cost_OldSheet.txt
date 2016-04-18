@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+
+Case of 
+	: (Not([Orders]CostSheet))
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		If (Records in selection([Costing])>0)
+			WinPrompt ("There is a new style cost sheet for this order.")
+		Else 
+			FORM GOTO PAGE(5)
+		End if 
+	Else 
+		WinPrompt ("This order supports the new cost sheet system.")
+End case 

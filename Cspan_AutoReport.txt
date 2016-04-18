@@ -1,0 +1,109 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($sales;0)
+ARRAY TEXT($factories;0)
+ARRAY TEXT($pdflist;0)
+ARRAY TEXT($sendto;0)
+ARRAY TEXT($subject;0)
+C_TEXT($body)
+C_TEXT($1)
+C_LONGINT($i;$errorcode;$n)
+C_DATE(vdStart;vdEnd)
+
+vdStart:=Current date(*)-7
+vdEnd:=Current date(*)+90
+
+QUERY([Orders];[Orders]Cancelled>=False;*)
+QUERY([Orders]; & ;[Orders]CancelDate>=vdStart;*)
+QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+QUERY SELECTION([Orders];[Orders]RetailPrice#0)
+QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+
+  //THIS IS FOR THE TESTING
+QUERY SELECTION([Orders];[Orders]Customer="Macy@")
+QUERY SELECTION([Orders];[Orders]Factory#"")
+
+
+CREATE SET([Orders];"found")
+
+SET PRINT OPTION(Scale option;100)
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+
+Case of 
+	: ($1="ticket")
+		$body:="Attached it the incomplete ticket report."+Char(13)+Char(13)
+		DISTINCT VALUES([Orders]Salesperson;$sales)
+		FORM SET OUTPUT([Orders];"Report_TicketA")
+		<>vfFactory:=False
+		$i:=1
+		For ($i;1;Size of array($sales))
+			APPEND TO ARRAY($subject;"Incomplete order report")
+			USE SET("found")
+			QUERY SELECTION([Orders];[Orders]Salesperson=$sales{$i})
+			If (Records in selection([Orders])>0)
+				QUERY([Staff];[Staff]UserName=$sales{$i})
+				If ([Staff]EmailAddress#"")
+					APPEND TO ARRAY($sendto;[Staff]EmailAddress)
+					ORDER BY([Orders];[Orders]Customer;>;[Orders]Factory;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+					ACCUMULATE([Orders]Customer)
+					BREAK LEVEL(1)
+					PAGE SETUP([Orders];"Report_TicketA")
+					vtTitle:=$sales{$i}+"'s No Ticket Report as of "+String(Current date(*))
+					vtPathName:=PDF_FindFolder +":"+$sales{$i}+"'s No Ticket Report.pdf"
+					APPEND TO ARRAY($pdflist;vtPathName)
+					
+					SET PRINT OPTION(Destination option;3;vtPathName)
+					PRINT SELECTION([Orders];*)
+				End if 
+			End if 
+		End for 
+	: ($1="retail")
+		$body:="This is a test of the factory retail price email."+Char(13)+Char(13)
+		DISTINCT VALUES([Orders]Factory;$factories)
+		FORM SET OUTPUT([Orders];"Report_TicketB")
+		<>vfFactory:=True
+		$i:=1
+		For ($i;1;Size of array($factories))
+			APPEND TO ARRAY($subject;$factories{$i}+" retail test")
+			USE SET("found")
+			QUERY SELECTION([Orders];[Orders]Factory=$factories{$i})
+			If (Records in selection([Orders])>0)
+				  //OFF FOR TESTING
+				
+				$n:=1
+				FIRST RECORD([Orders])
+				For ($n;1;Records in selection([Orders]))
+					  //[Orders]Priceticket=True)
+					  //[Orders]Price_Tckt_Sent=current date(*))
+					[Orders]WHNotes:=[Orders]WHNotes+Char(13)+"Factory retail price tested "+String(Current date(*))
+					SAVE RECORD([Orders])
+					NEXT RECORD([Orders])
+				End for 
+				
+				
+				ORDER BY([Orders];[Orders]Customer;>;[Orders]Customer;>;[Orders]CancelDate;>;[Orders]OrderNum;>)
+				ACCUMULATE([Orders]Factory)
+				BREAK LEVEL(1)
+				PAGE SETUP([Orders];"Report_TicketB")
+				vtTitle:=$factories{$i}+"'s Retail Price Report as of "+String(Current date(*))
+				vtPathName:=PDF_FindFolder +":"+$factories{$i}+"'s Retail Report.pdf"
+				APPEND TO ARRAY($pdflist;vtPathName)
+				
+				SET PRINT OPTION(Destination option;3;vtPathName)
+				PRINT SELECTION([Orders];*)
+				  //End if 
+			End if 
+		End for 
+End case 
+
+CLEAR SET("found")
+
+$errorcode:=IT_MacTCPInit 
+
+$i:=1
+For ($i;1;Size of array($pdflist))
+	Mail_SimpleSend ("phil@persinger.com";$pdflist{$i};$subject{$i};$body)
+End for 
+
+UNLOAD RECORD([Orders])

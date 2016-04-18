@@ -1,0 +1,59 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$line)
+C_TEXT($message)
+C_BOOLEAN($continue)
+
+
+If (Current user#"Marisol") & (Current user#"Peter G") & (Current user#"Ricky") & (Current user#"Designer") & (<>vlOrderNumber>0) & ([Orders]UPC=1) & ([Orders]PODate#!00-00-00!)
+	WinPrompt ("UPC exists. You can not delete."+Char(13)+Char(13)+"Contact Peter G.")
+Else 
+	
+	ARRAY LONGINT($colorKeys;0)
+	$message:="This action will immediately delete this self and all related combos from this or"+"der."+Char(13)+"Do you want to continue?"
+	$line:=asTypeList
+	vtOrderChanges:=vtOrderChanges+"_Color"
+	
+	WinChoice ($message)
+	
+	If (ok=1)
+		$continue:=True
+		$i:=1
+		For ($i;1;Size of array(asOrderType))
+			Case of 
+				: ($line+($i-1)>Size of array(asTypeList))
+					$continue:=False
+					
+				: ($i>Size of array(asTypeList))
+					$continue:=False
+				: ($i>1) & (asTypeList{$line+($i-1)}="Self")
+					$continue:=False
+			End case 
+			If ($continue)
+				APPEND TO ARRAY($colorkeys;alColorKey{$line+($i-1)})
+			End if 
+		End for 
+		
+		$i:=1
+		For ($i;1;Size of array($colorkeys))
+			
+			If ($colorkeys{$i}#0)
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$colorkeys{$i})
+				If ([CP_OrderXRef]OrderNumber=<>vlOrderNumber)
+					vtOldData:=[CP_OrderXRef]CPType+" ("+[CP_OrderXRef]CPNumber+")"
+					vtNewData:=""
+					Rev_LogEvent ("Color deleted")
+					DELETE RECORD([CP_OrderXRef])
+				End if 
+			End if 
+		End for 
+		CP_DeleteLine ($line;Size of array($colorkeys))
+		If (<>vlOrderNumber>0)
+			[Orders]TotalOrderQuantity:=Orders_ArrayQuantity 
+		Else 
+			[Samples]SGQuantity:=Orders_ArrayQuantity 
+			CP_Outstanding 
+		End if 
+		CANCEL
+	End if 
+End if 
+

@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docref)
+
+$docref:=Create document("";"txt")
+If (ok=1)
+	ORDER BY([DC];[DC]OrderNumber;>;[DC]ReportCustomer;>)
+	
+	$i:=1
+	FIRST RECORD([DC])
+	For ($i;1;Records in selection([DC]))
+		SEND PACKET($docref;String([DC]OrderNumber)+Char(9)+[DC]ReportCustomer+Char(9)+String([DC]Count)+Char(13))
+		NEXT RECORD([DC])
+	End for 
+	
+	CLOSE DOCUMENT($docref)
+End if 

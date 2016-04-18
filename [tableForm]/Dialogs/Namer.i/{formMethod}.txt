@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfDCS)
+
+Case of 
+	: (Form event=On Load)
+		If (asSheetNames{1}="No costsheet")
+			Cost_RouterArray ([Costing]SheetNumber;<>vlOrderNumber)
+			OBJECT SET ENABLED(bNameOk;False)
+		Else 
+			cbNew:=1
+			OBJECT SET ENABLED(bNameOk;True)
+			OBJECT SET VISIBLE(hlSheets;False)
+		End if 
+		vsRequestString:=""
+		vfCancel:=False
+		vlOrderNumber:=<>vlOrderNumber
+		vlCostSheet:=[Costing]SheetNumber
+		vsRequestString:=""
+		OBJECT SET VISIBLE(bPreview;False)
+		OBJECT SET VISIBLE(bBack;False)
+		
+		If (Find in array(asSheetNames;"@Estimate@")>0) | (Find in array(asSheetNames;"@Confirm@")>0) | (Find in array(asSheetNames;"@Actual@")>0) | (Find in array(asSheetNames;"fr@")>0)
+			If (Size of array(asRouter)=1)
+				asRouter:=1
+			End if 
+			vsFlag:="Name New Sheet"
+			OBJECT SET VISIBLE(*;"xFavorites";cbFavorites=1)
+			FORM GOTO PAGE(2)
+		End if 
+		Case of 
+			: (<>vfDCS)
+				OBJECT SET VISIBLE(bPreview;False)
+			: (User in group(Current user;"SuperCostsheets"))
+				OBJECT SET VISIBLE(bPreview;True)
+			: (<>vfDCS)
+				OBJECT SET VISIBLE(bPreview;False)
+			Else 
+				OBJECT SET VISIBLE(bPreview;False)
+		End case 
+End case 

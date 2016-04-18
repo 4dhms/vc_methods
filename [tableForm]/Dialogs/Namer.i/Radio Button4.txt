@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($baseDN)
+
+
+WinFind ("Enter Sample Order Number:";5)
+If (ok=1)
+	$baseDN:=Num(vsRequestString)
+	vsFlag:="From Sample Order"
+	$baseDN:=$baseDN*-1
+	QUERY([Costing];[Costing]OrderNumber=$baseDN)
+	If (Records in selection([Costing])>0)
+		Cost_HList 
+	Else 
+	End if 
+End if 

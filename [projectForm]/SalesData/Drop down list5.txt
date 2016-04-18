@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+
+$message:=String(adDateIn{alItemNumber})+"  "+String(alMissing{alItemNumber})+"  "+String(arMCol2{alItemNumber})+"  "+String(alOnHand{alItemNumber})
+
+WinPrompt ($message)

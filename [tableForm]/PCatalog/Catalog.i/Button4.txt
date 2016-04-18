@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([PCatalog])
+If (<>asSeasonName=1) | (<>asSeasonYear=1)
+	WinPrompt ("Select a season.")
+Else 
+	
+	QUERY([ColorPrintNumber];[ColorPrintNumber]SeasonName=<>asSeasonName{<>asSeasonName};*)
+	QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]SeasonYear=<>asSeasonYear{<>asSeasonYear})
+	
+	If ([PCatalog]Division#"")
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Division=[PCatalog]Division)
+	End if 
+	
+	If ([PCatalog]Customer#"")
+		QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Customer=[PCatalog]Customer)
+	End if 
+	
+	PrintCat_Selection 
+	
+End if 

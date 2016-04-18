@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders])
+SET WINDOW TITLE("HMS Orders(Sorted): "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))

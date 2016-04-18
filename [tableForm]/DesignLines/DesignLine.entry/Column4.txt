@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice;$i;$c;$custom)
+C_TEXT($message)
+
+$c:=asXStyle
+
+QUERY([Orders];[Orders]StyleNumber=asXStyle{$c};*)
+QUERY([Orders]; & ;[Orders]DesignNumber=asXDesign{$c})
+
+ARRAY LONGINT($orders;0)
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+SORT ARRAY($orders;<)
+
+$message:=""
+
+$i:=1
+For ($i;1;Size of array($orders))
+	If ($i>1)
+		$message:=$message+";"
+	End if 
+	$message:=$message+String($orders{$i})
+End for 
+$message:=$message+";Another;Cancel"
+
+$choice:=Pop up menu($message)
+
+Case of 
+	: ($choice-1=Size of array($orders))
+		$custom:=Num(Request("PO Number:"))
+		QUERY([Orders];[Orders]OrderNum=$custom)
+		If (Records in selection([Orders])=0)
+			WinPrompt (String($custom)+" is not an order.")
+		Else 
+			alXOrder{$c}:=$custom
+		End if 
+	: ($choice<=Size of array($orders))
+		alXOrder{$c}:=$orders{$choice}
+End case 
+
+If (alXOrder{$c}>0)
+	alShadeFab{$c}:=16777215
+Else 
+	alShadeFab{$c}:=16711690
+End if 

@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	vfGroup:=False
+	vsStyleNumber:=""
+	vsCustomer:=""
+	Sample_TrackInit 
+	ALL RECORDS([SampleTrack])
+	ORDER BY([SampleTrack];[SampleTrack]DateOut;>;[SampleTrack]DateIn;>;[SampleTrack]Store;>)
+	
+	SELECTION TO ARRAY([SampleTrack]SentBy;asEnterer;[SampleTrack]Description;atLDescript;[SampleTrack]Division;asDiv)
+	SELECTION TO ARRAY([SampleTrack]StyleNumber;asStyleNumbers;[SampleTrack]Color;asColor1;[SampleTrack]Store;asCustomers)
+	SELECTION TO ARRAY([SampleTrack]DateOut;adDateOut;[SampleTrack]DateIn;adDateIn;[SampleTrack]Notes;asBDNotes;[SampleTrack]TrackId;alTrackId)
+	If (Current user="Sara Wingate") | (Current user="Designer")
+		OBJECT SET VISIBLE(bDelete;True)
+	Else 
+		OBJECT SET VISIBLE(bDelete;False)
+	End if 
+	
+	LISTBOX SELECT ROW(tracklist;Size of array(asStyleNumbers)+1)
+End if 

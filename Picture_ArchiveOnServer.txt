@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($archive)
+
+$archive:=Execute on server("Picture_Archive";92*1064;"Archive")

@@ -1,0 +1,36 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style;$color)
+C_BOOLEAN($po)
+$po:=$1
+
+Case of 
+	: ($po) & ([CP_OrderXRef]TempSelfKey#0)
+		$style:=3
+		$color:=15
+	: ([CP_OrderXRef]TempSelfKey=-1)
+		$style:=3
+		$color:=3
+	: ([CP_OrderXRef]TempSelfKey=1)
+		$style:=3
+		$color:=5
+	: ([CP_OrderXRef]CPType="self")
+		$style:=1
+		$color:=15
+	Else 
+		  // SET COLOR([CP_OrderXRef]Quantity;-(0+(256*0)))
+		$style:=0
+		$color:=15
+End case 
+  //lines
+
+OBJECT SET COLOR(*;"xLine";-(0+(256*0)))
+
+OBJECT SET FONT STYLE([CP_OrderXRef]CPType;$style)
+OBJECT SET COLOR([CP_OrderXRef]CPType;-($color+(256*0)))
+OBJECT SET FONT STYLE([CP_OrderXRef]CPNumber;$style)
+OBJECT SET FONT STYLE([ColorPrintNumber]CPName;$style)
+
+OBJECT SET COLOR([CP_OrderXRef]CPNumber;-($color+(256*0)))
+OBJECT SET COLOR([ColorPrintNumber]CPName;-($color+(256*0)))
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)

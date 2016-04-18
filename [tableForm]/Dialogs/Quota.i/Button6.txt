@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docref)
+
+$docref:=Create document("";"xls")
+SEND PACKET($docref;"Type"+Char(9)+"Category"+Char(9)+"Description"+Char(9)+"Duty %"+Char(9)+"HTS Code"+Char(13))
+
+$i:=1
+For ($i;1;Size of array(asDutyType))
+	SEND PACKET($docref;asDutyType{$i}+Char(9)+<>asCategory{$i}+Char(9))
+	SEND PACKET($docref;asNames{$i}+Char(9)+String(arDutyRates{$i};"##0.00")+Char(9)+asHTSCode{$i}+Char(13))
+End for 
+CLOSE DOCUMENT($docref)

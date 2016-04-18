@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this profile?";"No";"Yes")
+If (ok=0)
+	DELETE RECORD([Customers])
+	CANCEL
+End if 

@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbLP4=1)
+	cbLP2:=0
+	cbLP1:=0
+	cbLP3:=0
+End if 

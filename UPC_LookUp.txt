@@ -1,0 +1,87 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asColors;0)
+ARRAY TEXT(asSizes;0)
+ARRAY TEXT(asColorCodes;0)
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+ARRAY TEXT(asCPColorName;0)
+
+If (Find in array(asXStyleNumbers;"")>0)
+	DELETE FROM ARRAY(asXStyleNumbers;Find in array(asXStyleNumbers;"");1)
+End if 
+
+If (Size of array(asXStyleNumbers)>0)
+	$i:=1
+	$c:=Size of array(asXStyleNumbers)
+	For ($i;1;$c)
+		Case of 
+			: ($c=1)
+				QUERY([UPCCodes];[UPCCodes]StyleNumber=asXStyleNumbers{1})
+			: ($i=1)
+				QUERY([UPCCodes];[UPCCodes]StyleNumber=asXStyleNumbers{1};*)
+			: ($i=$c)
+				QUERY([UPCCodes]; | ;[UPCCodes]StyleNumber=asXStyleNumbers{$i})
+			Else 
+				QUERY([UPCCodes]; | ;[UPCCodes]StyleNumber=asXStyleNumbers{$i};*)
+		End case 
+	End for 
+	
+	If (Records in selection([UPCCodes])=0)
+		ALERT("UPC code information has not been entered for "+asXStyleNumbers{1}+".")
+	Else 
+		
+		$i:=1
+		FIRST RECORD([UPCCodes])
+		For ($i;1;Records in selection([UPCCodes]))
+			If ([UPCCodes]Size="12@oct")
+				[UPCCodes]Size:="10/12"
+			End if 
+			
+			Case of 
+				: ([UPCCodes]Size="XS")
+					[UPCCodes]SortOrder:=2
+				: ([UPCCodes]Size="S")
+					[UPCCodes]SortOrder:=3
+				: ([UPCCodes]Size="M")
+					[UPCCodes]SortOrder:=4
+				: ([UPCCodes]Size="L")
+					[UPCCodes]SortOrder:=5
+				: ([UPCCodes]Size="XL")
+					[UPCCodes]SortOrder:=6
+			End case 
+			SAVE RECORD([UPCCodes])
+			NEXT RECORD([UPCCodes])
+		End for 
+		UNLOAD RECORD([UPCCodes])
+		ORDER BY([UPCCodes];[UPCCodes]StyleNumber;>;[UPCCodes]Color;>;[UPCCodes]SortOrder;>)
+		
+		SELECTION TO ARRAY([UPCCodes]StyleNumber;asStyleNumbers;[UPCCodes]Color;asColors;[UPCCodes]NRFColor;asList1;[UPCCodes]Size;asSizes;[UPCCodes]NRFSize;asList2;[UPCCodes]UPC;asColorCodes)
+		ARRAY TEXT(asCPColorName;Size of array(asStyleNumbers))
+		
+		If (cbAll=1)
+			UPC_NRFColor 
+			vsStyleNumber:=""
+			GOTO OBJECT(vsStyleNumber)
+		Else 
+			vsStyleNumber1:=vsStyleNumber
+			vsStyleNumber:=""
+			ARRAY TEXT(asXColors;0)
+			DISTINCT VALUES([UPCCodes]Color;asXColors)
+			SORT ARRAY(asXColors;>)
+			FORM GOTO PAGE(2)
+		End if 
+		
+		QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{1})
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		If (Records in selection([Designs])>0)
+			vxSketch:=[Designs]Sketch
+			vtDescription:=[Designs]Description
+			UNLOAD RECORD([Orders])
+			UNLOAD RECORD([Designs])
+		End if 
+		LISTBOX SELECT ROW(afListBox1;1)
+	End if 
+End if 

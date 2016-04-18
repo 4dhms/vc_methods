@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($q4)
+
+ARRAY TEXT(asTempList;0)
+
+$q4:=Substring([Orders]KWCnS;1;3)+"@"
+
+QUERY([SpecTemplate];[SpecTemplate]KnitWoven=$q4)
+SELECTION TO ARRAY([SpecTemplate]Template;asTempList)
+SORT ARRAY(asTempList;>)
+INSERT IN ARRAY(asTempList;1;1)
+asTempList{1}:="Reset Tolerance"
+asTempList:=1

@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Display Detail)
+		If (Is new record([CostSheets]))
+			OBJECT SET VISIBLE(vrRptNetProfit;False)
+			OBJECT SET VISIBLE(vrRptNetNetProfit;False)
+			OBJECT SET VISIBLE(*;"xCushion";User in group(Current user;"SuperCostsheets"))
+			OBJECT SET VISIBLE(*;"xCushion1";User in group(Current user;"SuperCostsheets"))
+			OBJECT SET VISIBLE([CostSheets]Cushion;User in group(Current user;"SuperCostsheets"))
+			OBJECT SET VISIBLE([CostSheets]DutyActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+			OBJECT SET VISIBLE([CostSheets]DutyAmountActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+		Else 
+			If ([CostSheets]ShipAir)
+				vrNetProfit1:=[CostSheets]NetTotalProfitAir
+				vrNetNetProfit1:=[CostSheets]NetNetTotalProfitAir
+			Else 
+				vrNetProfit1:=[CostSheets]NetTotalProfitSea
+				vrNetNetProfit1:=[CostSheets]NetNetTotalProfitSea
+			End if 
+		End if 
+End case 

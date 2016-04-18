@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($range)
+C_LONGINT($i)
+C_BOOLEAN($deepspace)
+
+WinChoice ("Inactive range";"6 Months";"Deep Space")
+If (ok=1)
+	$deepspace:=False
+Else 
+	$deepspace:=True
+End if 
+
+If ($deepspace)
+	$range:=Current date(*)-365
+Else 
+	$range:=Current date(*)-180
+End if 
+
+QUERY([Designs];[Designs]DesEntryDate<$range)
+QUERY SELECTION([Designs];[Designs]ArchivedPict=False)
+
+$i:=1
+FIRST RECORD([Designs])
+CREATE EMPTY SET([Designs];"archive")
+For ($i;1;Records in selection([Designs]))
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+	QUERY SELECTION([Orders];[Orders]CancelDate>$range)
+	QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum)
+	QUERY SELECTION([Samples];[Samples]SampleOrderDate>$range)
+	If (Records in selection([Orders])=0) & (Records in selection([Samples])=0)
+		ADD TO SET([Designs];"archive")
+	End if 
+	NEXT RECORD([Designs])
+End for 
+USE SET("archive")
+CLEAR SET("archive")
+SET WINDOW TITLE("Archive "+String(Records in selection([Designs]))+" designs")
+
+C_LONGINT($i;$tot)
+
+FIRST RECORD([Designs])
+$i:=1
+$tot:=0
+
+For ($i;1;Records in selection([Designs]))
+	[Designs]PictureSIze:=Picture size([Designs]Sketch)
+	$tot:=$tot+Picture size([Designs]Sketch)
+	  //SAVE RECORD([Designs])
+	NEXT RECORD([Designs])
+End for 
+ALERT(String($tot;"###,###,###,###"))
+

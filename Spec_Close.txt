@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>SpecProcID>0)
+	<>Done:=True
+	CALL PROCESS(<>SpecProcID)
+End if 
+

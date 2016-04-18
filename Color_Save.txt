@@ -1,0 +1,232 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($process)
+C_TEXT($user;vtPONote)
+C_TEXT($session)
+C_TEXT($processname)
+C_BOOLEAN(vfKill;$update)
+C_LONGINT($i;$c;$selfkey)
+C_LONGINT(cbMultiStyles)
+$i:=1
+  //$c:=Size of array(asTypeList)
+$c:=Size of array(alColorKey)
+
+For ($i;1;$c)
+	
+	vlKeyNumber:=alColorKey{$i}
+	vsFabColor:="Color"
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{$i})
+	
+	  //----------------------Error control------------------------
+	If (Locked([CP_OrderXRef]))
+		LOCKED BY([CP_OrderXRef];$process;$user;$session;$processName)
+		WinPrompt (asCPNumbers{$i}+" will not be saved. The record is being used by "+$user+" in process: "+$processname)
+	Else 
+		If (Records in selection([CP_OrderXRef])>1)
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber=<>vlOrderNumber)
+		End if 
+		
+		Case of 
+			: (alShadeFab{$i}=16711690) & (alSelfKey{$i}#0)
+				vtOldData:=[CP_OrderXRef]CPType+" ("+[CP_OrderXRef]CPNumber+")"
+				vtNewData:=""
+				Rev_LogEvent ("Color deleted")
+				DELETE RECORD([CP_OrderXRef])
+				
+			: (alSelfKey{$i}=0) & (alShadeFab{$i}#16711690)
+				CREATE RECORD([CP_OrderXRef])
+				[CP_OrderXRef]CPNumber:=asCPNumbers{$i}
+				If (asTypeList{$i}="Zipper")
+					[CP_OrderXRef]Status:=atThreadColor{$i}
+				End if 
+				
+				Case of 
+					: (<>vlOrderNumber>0)
+						[CP_OrderXRef]Carton:=asCarton{$i}
+					: (asTypeList{$i}="Zipper")
+						[CP_OrderXRef]Carton:=asCPStyleNum{$i}
+					: ([Samples]MultipleStyles) | (cbMultiStyles=1)
+						[CP_OrderXRef]StyleNumber:=asCPStyleNum{$i}
+				End case 
+				
+				[CP_OrderXRef]Quantity:=alCQty{$i}
+				[CP_OrderXRef]CPOrdID:=Sequence number([CP_OrderXRef])
+				[CP_OrderXRef]CPType:=asTypeList{$i}
+				[CP_OrderXRef]CreateDate:=Current date(*)
+				[CP_OrderXRef]XrefID:=alXrefKeys{Find in array(asOrderType;[CP_OrderXRef]CPType)}
+				[CP_OrderXRef]CPStatus:=asColorStatus{$i}
+				[CP_OrderXRef]CPStatusDate:=adStatusDate{$i}
+				[CP_OrderXRef]LineKey:=asCPLetter{$i}
+				[CP_OrderXRef]OrderNumber:=<>vlOrderNumber
+				
+				If (asTypeList{$i}="Self")
+					[CP_OrderXRef]SelfKey:=[CP_OrderXRef]CPOrdID
+					$selfkey:=[CP_OrderXRef]SelfKey
+					[CP_OrderXRef]OrderNumber:=<>vlOrderNumber
+				Else 
+					[CP_OrderXRef]SelfKey:=$selfkey
+				End if 
+				SAVE RECORD([CP_OrderXRef])
+				
+				alSelfKey{$i}:=[CP_OrderXRef]SelfKey
+				alCPXref{$i}:=[CP_OrderXRef]XrefID
+				alColorKey{$i}:=[CP_OrderXRef]CPOrdID
+				
+				  //Case of 
+				  //: (<>vlRevisionNumber>0)
+				vsCPNumber:=[CP_OrderXRef]CPNumber
+				[CP_OrderXRef]TempSelfKey:=1
+				If (asCPNumbers{$i}#"")
+					Rev_LogEvent (asTypeList{$i}+" color added ("+asCPNumbers{$i}+")")
+				End if 
+				  //End case 
+				SAVE RECORD([CP_OrderXRef])
+				
+			: (alColorKey{$i}=0) | (Records in selection([CP_OrderXRef])=0) & (alShadeFab{$i}#16711690)
+				CREATE RECORD([CP_OrderXRef])
+				[CP_OrderXRef]CPNumber:=asCPNumbers{$i}
+				If (asTypeList{$i}="Zipper")
+					[CP_OrderXRef]Status:=atThreadColor{$i}
+				End if 
+				[CP_OrderXRef]Quantity:=alCQty{$i}
+				[CP_OrderXRef]CPOrdID:=Sequence number([CP_OrderXRef])
+				[CP_OrderXRef]CPType:=asTypeList{$i}
+				[CP_OrderXRef]XrefID:=alXrefKeys{Find in array(asOrderType;[CP_OrderXRef]CPType)}
+				[CP_OrderXRef]SelfKey:=alSelfKey{$i}
+				[CP_OrderXRef]CPStatus:=asColorStatus{$i}
+				[CP_OrderXRef]CPStatusDate:=adStatusDate{$i}
+				[CP_OrderXRef]LineKey:=asCPLetter{$i}
+				If (<>vlOrderNumber>0)
+					[CP_OrderXRef]Carton:=asCarton{$i}
+				Else 
+					[CP_OrderXRef]Carton:=asCPStyleNum{$i}
+				End if 
+				[CP_OrderXRef]OrderNumber:=<>vlOrderNumber
+				If ([Samples]MultipleStyles) | (cbMultiStyles=1)
+					[CP_OrderXRef]StyleNumber:=asCPStyleNum{$i}
+				End if 
+				SAVE RECORD([CP_OrderXRef])
+				
+				alSelfKey{$i}:=[CP_OrderXRef]SelfKey
+				alCPXref{$i}:=[CP_OrderXRef]XrefID
+				alColorKey{$i}:=[CP_OrderXRef]CPOrdID
+				  //Case of 
+				  //: (<>vlRevisionNumber>0)
+				vsCPNumber:=[CP_OrderXRef]CPNumber
+				[CP_OrderXRef]TempSelfKey:=1
+				
+				If (asCPNumbers{$i}#"")
+					Rev_LogEvent (asTypeList{$i}+" color added ("+asCPNumbers{$i}+")")
+				End if 
+				  //End case 
+				SAVE RECORD([CP_OrderXRef])
+			Else 
+				If (vfKill)
+					QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+					
+					If ([CP_OrderXRef]CPType#[OrdersFabricXRef]OrdType)
+						[CP_OrderXRef]CPType:=[OrdersFabricXRef]OrdType
+						SAVE RECORD([CP_OrderXRef])
+					End if 
+				End if 
+				  //fix lower case
+				If ([CP_OrderXRef]CPNumber#"")
+					If (Character code([CP_OrderXRef]CPNumber[[1]])>96) & (Character code([CP_OrderXRef]CPNumber[[1]])<123)
+						[CP_OrderXRef]CPNumber:=Uppercase([CP_OrderXRef]CPNumber[[1]])+Substring([CP_OrderXRef]CPNumber;2;50)
+					End if 
+				End if 
+				
+				Rev_KSChange (asTypeList{$i}+" Color/Print Number ";[CP_OrderXRef]CPNumber;asCPNumbers{$i};->[CP_OrderXRef]CPNumber;->[CP_OrderXRef])
+				Rev_KSChange (asTypeList{$i}+" Approval Status ";[CP_OrderXRef]CPStatus;asColorStatus{$i};->[CP_OrderXRef]CPStatus;->[CP_OrderXRef])
+				Rev_KSChange (asTypeList{$i}+" Status Date ";String([CP_OrderXRef]CPStatusDate);String(adStatusDate{$i});->[CP_OrderXRef]CPStatusDate;->[CP_OrderXRef])
+				If (<>vlOrderNumber>0)
+					Rev_KSChange (asTypeList{$i}+" Carton # ";[CP_OrderXRef]Carton;asCarton{$i};->[CP_OrderXRef]Carton;->[CP_OrderXRef])
+				Else 
+					Rev_KSChange (asTypeList{$i}+" Carton # ";[CP_OrderXRef]Carton;asCPStyleNum{$i};->[CP_OrderXRef]Carton;->[CP_OrderXRef])
+				End if 
+				
+				Case of 
+					: (afCCOverride{$i}) & (<>vlOrderNumber>0) & ([CP_OrderXRef]ColorCodeOverride=False)
+						[CP_OrderXRef]ColorCodeOverride:=True
+						Rev_KSChange (asTypeList{$i}+" Color Code Override";[CP_OrderXRef]ColorCode;asCC{$i};->[CP_OrderXRef]ColorCodeNew;->[CP_OrderXRef])
+					: (Not(afCCOverride{$i})) & (<>vlOrderNumber>0) & ([CP_OrderXRef]ColorCodeOverride=True)
+						[CP_OrderXRef]ColorCodeOverride:=False
+						Rev_KSChange (asTypeList{$i}+" Cancel Override";[CP_OrderXRef]ColorCode;asCC{$i};->[CP_OrderXRef]ColorCodeNew;->[CP_OrderXRef])
+				End case 
+				
+				If ([Samples]MultipleStyles)
+					Rev_KSChange (asTypeList{$i}+" Style Number ";[CP_OrderXRef]StyleNumber;asCPStyleNum{$i};->[CP_OrderXRef]StyleNumber;->[CP_OrderXRef])
+				End if 
+				
+				If (asTypeList{$i}="Self")
+					  // Anthony write email hook to Sandy Yang
+					If (vtPONote#"")
+						If ([CP_OrderXRef]Quantity#alCQty{$i})
+							Order_MailQTYChange 
+						End if 
+					End if 
+					
+					Rev_KSChange (asTypeList{$i}+" Quantity";String([CP_OrderXRef]Quantity);String(alCQty{$i});->[CP_OrderXRef]Quantity;->[CP_OrderXRef])
+					
+					
+					
+					
+				End if 
+				If ([Samples]MultipleStyles) | (cbMultiStyles=1)
+					[CP_OrderXRef]StyleNumber:=asCPStyleNum{$i}
+				End if 
+				
+				Case of 
+					: (asTypeList{$i}="Self")  //& (asSolidPrint{1}="Print")
+						[CP_OrderXRef]ThreadColor:=atThreadColor{$i}
+						SAVE RECORD([CP_OrderXRef])
+					: (asTypeList{$i}="Zipper")
+						[CP_OrderXRef]Status:=atThreadColor{$i}
+						SAVE RECORD([CP_OrderXRef])
+					: (atThreadColor{$i}#"")
+						[CP_OrderXRef]ThreadColor:=atThreadColor{$i}
+						SAVE RECORD([CP_OrderXRef])
+				End case 
+				SAVE RECORD([CP_OrderXRef])
+		End case 
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alColorKey{$i})
+		If (asColorStatus{$i}#[CP_OrderXRef]CPStatus) | (adStatusDate{$i}#[CP_OrderXRef]CPStatusDate)
+			CREATE RECORD([FabricStatus])
+			[FabricStatus]LibraryKey:=alColorKey{$i}
+			[FabricStatus]StatusDate:=adStatusDate{$i}
+			[FabricStatus]Status:=asColorStatus{$i}
+			[FabricStatus]Approver:=Current user
+			[FabricStatus]StatusKey:=Sequence number([FabricStatus])
+			SAVE RECORD([FabricStatus])
+		End if 
+	End if 
+End for 
+UNLOAD RECORD([CP_OrderXRef])
+
+Case of 
+	: (<>vlOrderNumber>0) & (Find in array(asCC;"")>0) & (ColorCode_Show )
+		$i:=1
+		$update:=False
+		For ($i;1;Size of array(asTypeList))
+			Case of 
+				: (asTypeList{$i}="Self") & (asCC{$i}#"")
+					ColorCode_CheckNumber (asCC{$i};asCPNumbers{$i})
+				: (asTypeList{$i}="Self") & (asCC{$i}="")
+					$update:=True
+			End case 
+			
+		End for 
+		
+		If ($update)
+			ColorCode_ByLine 
+		End if 
+		
+	: ([Samples]SampleOrderDate>!2008-09-07!)
+		
+End case 
+UNLOAD RECORD([CP_OrderXRef])
+
+
+vfKill:=False
+

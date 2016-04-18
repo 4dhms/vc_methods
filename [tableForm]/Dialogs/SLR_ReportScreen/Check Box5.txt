@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Records in selection([SLRReporter])=0)
+		
+	: (cbDigest=0)
+		OBJECT SET VISIBLE(*;"Rebuild1";True)
+		vfDigest:=False
+		REDUCE SELECTION([SLRReporter];0)
+	Else 
+		cbStyle:=0
+		cbCustomer:=1
+		vfDigest:=True
+		SLR_Sort (1)
+End case 
+
+

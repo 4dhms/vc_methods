@@ -1,0 +1,36 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c)
+C_TEXT($list)
+
+ARRAY TEXT($item;0)
+FIRST RECORD([Lists])
+
+$list:=[Lists]ListName
+
+QUERY([Lists];[Lists]ListName=$list)
+QUERY SELECTION([Lists];[Lists]UserName="")
+$c:=Records in selection([Lists])
+
+CREATE SET([Lists];"dupe")
+
+$i:=1
+For ($i;1;Records in selection([Lists]))
+	If (Find in array($item;[Lists]ListItem)<1)
+		APPEND TO ARRAY($item;[Lists]ListItem)
+		REMOVE FROM SET([Lists];"dupe")
+	End if 
+	NEXT RECORD([Lists])
+End for 
+
+USE SET("dupe")
+CLEAR SET("dupe")
+$n:=Records in selection([Lists])
+
+SORT ARRAY($item;>)
+ARRAY TO LIST($item;$list)
+
+ALERT($list+"  "+String($c)+" - "+String($n)+" = "+String($c-$n))
+
+
+
+

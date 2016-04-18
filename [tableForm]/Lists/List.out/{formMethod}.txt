@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	cbKnit:=0
+	cbWoven:=0
+	cbCutSew:=0
+	pOne:=1
+	pTwo:=0
+	  //QUERY SELECTION([Lists];[Lists]ListName="Fabric";*)
+	  //QUERY SELECTION([Lists]; & ;[Lists]KWCS="Woven")
+	  //
+	  //ORDER BY([Lists];[Lists]ListItem;>)
+	REDUCE SELECTION([Lists];0)
+	SET WINDOW TITLE(String(Records in selection([Lists]))+" list items")
+	atListContents:=1
+End if 

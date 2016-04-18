@@ -1,0 +1,144 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($html)
+C_BOOLEAN($stop)
+C_LONGINT($i;$n;$totaltot;$c;$packtot)
+C_POINTER($fieldPtr)
+C_LONGINT($width)
+C_POINTER($arrayptr)
+C_TEXT($style)
+ARRAY LONGINT($grandtots;0)
+vtBreakdown:=""
+ARRAY LONGINT(alSelfKey;0)
+COPY ARRAY(alFoundKeys;alSelfKey)
+
+$stop:=False
+$packtot:=0
+
+ARRAY LONGINT(alGrandTotals;0)
+vlBDGrandTot:=0
+Web_BuildBD ([Orders]BDHeaderKey)
+
+If (Find in array(asBDSelf;"Grand@")>0)
+	asBDSelf{Find in array(asBDSelf;"Grand@")}:="Grand total"
+	
+	$i:=1
+	For ($i;1;10)
+		If (Not($stop))
+			$fieldptr:=Field(62;3+$i)
+			If ($fieldptr->="")
+				$c:=$i
+				$stop:=True
+			End if 
+		End if 
+	End for 
+	
+	$width:=600/($c)
+	ARRAY LONGINT($grandtots;$c)
+	
+	If ([Orders]BDHeaderKey>0)
+		If (Size of array(asBDSelf)>0)
+			
+			$i:=1
+			$html:=Char(1)
+			$html:=$html+"<table width=800 border=0>"
+			$html:=$html+"<tr>"
+			$html:=$html+"<td width=48 class=style1> </td>"
+			$html:=$html+"<td width=200 class=style1>Size Breakdowns</td>"
+			For ($i;1;$c)
+				$fieldptr:=Field(62;$i+2)
+				$html:=$html+"<td width="+String($width)+" class=style1 align=right>"+$fieldptr->+"</td>"
+			End for 
+			$html:=$html+"<td width=144 class=style1 align=right>Ext.</td>"
+			
+			$i:=1
+			For ($i;1;$c)
+				$fieldptr:=Field(62;$i+2)
+				$html:=$html+"<td width="+String($width)+" class=style1 align=right>"+$fieldptr->+"</td>"
+			End for 
+			$html:=$html+"<td width="+String($width)+" class=style1 align=right>Totals</td>"
+			$html:=$html+"</tr>"
+			
+			$i:=1
+			For ($i;1;Size of array(asBDSelf))
+				$html:=$html+"<tr>"
+				If (Position("Total";asBDLetter{$i})>0)
+					$style:="style5"
+					$html:=$html+"<td class="+$style+">"+asBDLetter{$i}[[1]]+"</td>"
+					$html:=$html+"<td class="+$style+">"+asBDSelf{$i}+"</td>"
+					$html:=$html+"<td class="+$style+"> </td>"
+					$n:=1
+					For ($n;1;$c)
+						$html:=$html+"<td class=style2 align=right></td>"
+					End for 
+					$n:=1
+					
+					For ($n;1;$c)
+						$arrayPtr:=Get pointer("alBD"+String($n))
+						$html:=$html+"<td class=style5 align=right>"+String($arrayptr->{$i};"###,###")+"</td>"
+						  //$html:=$html+"<td class=style5 align=right></td>"
+						  //$html:=$html+"<td class=style5 align=right>"+String(alGrandTotals{$n})+"</td>"
+						  //$grandtots{$n}:=$grandtots{$n}+alGrandTotals{$n}
+						  //alGrandTotals{$n}:=0
+					End for 
+					$html:=$html+"<td class=style5 align=right>"+String(alBDPackTot{$i};"###,###")+"</td></tr>"
+					
+					$html:=$html+"<tr><td class=style6>_</td></tr>"
+				Else 
+					If ($i=Size of array(asBDSelf))
+						$html:=$html+"<td class=style2></td>"
+					Else 
+						$html:=$html+"<td class=style2>"+asBDLetter{$i}[[1]]+"</td>"
+					End if 
+					$html:=$html+"<td class=style2>"+asBDSelf{$i}+"</td></tr>"
+					$html:=$html+"<td class=style2></td>"
+					If (asBDSelf{$i}="Grand@")
+						$html:=$html+"<td class=style1>"+String($packtot)+" pack(s)</td>"
+					Else 
+						$html:=$html+"<td class=style1>"+String(alBDStores{$i})+" pack(s) of "+String(alBDPack{$i})+"</td>"
+						$packtot:=$packtot+alBDStores{$i}
+					End if 
+					
+					$n:=1
+					For ($n;1;$c)
+						$style:="style2"
+						$arrayPtr:=Get pointer("alBD"+String($n))
+						If (asBDSelf{$i}="Grand@")
+							$html:=$html+"<td class=style2 align=right> </td>"
+						Else 
+							$html:=$html+"<td class=style2 align=right>"+String($arrayptr->{$i};"###,###")+"</td>"
+						End if 
+					End for 
+					
+					$html:=$html+"<td class=style2 align=right></td>"
+					
+					$n:=1
+					For ($n;1;$c)
+						$arrayPtr:=Get pointer("alBD"+String($n))
+						If (asBDSelf{$i}="Grand@")
+							$html:=$html+"<td class=style2 align=right>"+String($arrayptr->{$i};"###,###")+"</td>"
+						Else 
+							$html:=$html+"<td class=style2 align=right>"+String($arrayptr->{$i}*alBDStores{$i};"###,###")+"</td>"
+						End if 
+						  //$totals{$n}:=alGrandTotals{$n}+($arrayptr->{$i}*alBDStores{$i})
+					End for 
+					
+					If (asBDSelf{$i}="Grand@")
+						$html:=$html+"<td class="+$style+" align=right>"+String($totaltot;"###,###")+"</td>"
+					Else 
+						$html:=$html+"<td class="+$style+" align=right>"+String(alBDPackTot{$i};"###,###")+"</td>"
+						$totaltot:=$totaltot+alBDPackTot{$i}
+					End if 
+				End if 
+				
+				$html:=$html+"</tr>"
+			End for 
+			
+			$html:=$html+"</table>"
+			  //
+		End if 
+		
+	End if 
+	
+	vtBreakdown:=$html
+	
+End if 

@@ -1,0 +1,55 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //po date
+vsChange1:=Web_Order_FlagField (2)
+  //order date
+vsChange2:=Web_Order_FlagField (29)
+  //season
+vsChange3:=Web_Order_FlagField (122)
+  //ny cancel date
+vsChange4:=Web_Order_FlagField (75)
+
+  //entered by
+vsChange5:=Web_Order_FlagField (56)
+  //price
+vsChange6:=Web_Order_FlagField (60)
+  //retail
+vsChange7:=Web_Order_FlagField (119)
+  //quantity
+vsChange8:=Web_Order_FlagField (129)
+
+  //customer
+vsChange9:=Web_Order_FlagField (21)
+  //customer po
+vsChange10:=Web_Order_FlagField (131)
+  //division
+vsChange11:=Web_Order_FlagField (107)
+  //label source
+vsChange12:=Web_Order_FlagField (59)
+
+  //pattern source
+  //vsChange13:=Web_Order_FlagField (56)
+  //label
+vsChange14:=Web_Order_FlagField (46)
+  //cutting ticket
+vsChange15:=Web_Order_FlagField (28)
+  //price ticket
+vsChange16:=Web_Order_FlagField (62)
+
+  //sample number
+vsChange17:=Web_Order_FlagField (130)
+  //sample supplier
+  //vsChange18:=Web_Order_FlagField (29)
+  //size range
+vsChange19:=Web_Order_FlagField (122)
+  //sample status
+  //vsChange20:=Web_Order_FlagField (75)
+
+  //approval date
+vsChange21:=Web_Order_FlagField (56)
+  //after approval
+vsChange22:=Web_Order_FlagField (60)
+  //ship method
+vsChange23:=Web_Order_FlagField (119)
+  //quantity
+  //vsChange24:=Web_Order_FlagField (129)
+

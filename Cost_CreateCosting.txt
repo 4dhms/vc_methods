@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE RECORD([Costing])
+[Costing]FactoryAPTerms:=60
+[Costing]SheetNumber:=Sequence number([Costing])
+vlNewSheetNumber:=[Costing]SheetNumber
+
+[Costing]CreationDate:=Current date(*)
+[Costing]Platform:=<>vlPlatform
+[Costing]OrderNumber:=<>vlOrderNumber
+If (<>vlOrderNumber>0)
+	[Costing]DesignNumber:=[Orders]DesignNumber
+	[Costing]StyleNumber:=[Orders]StyleNumber
+	[Costing]Customer:=[Orders]Customer
+	[Costing]Factory:=[Orders]Factory
+Else 
+	[Costing]DesignNumber:=[Samples]DesignNum
+	[Costing]StyleNumber:=[Samples]StyleNum
+	[Costing]Customer:=[Samples]Customer
+	[Costing]Factory:=[Samples]SamGarFactry
+End if 
+
+SAVE RECORD([Costing])
+
+<>vfAdd:=True
+

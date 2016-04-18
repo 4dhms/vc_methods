@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Orders];"TCsReport.i")
+FORM SET INPUT([Orders];"OrdEntSlsMed")
+
+Array_BuildDates 
+REDUCE SELECTION([Orders];0)
+SET WINDOW TITLE("New Order Report")
+
+If (Screen width<780)
+	Center Window (620;420;4;"";"WincBox")
+	MODIFY SELECTION([Orders])
+Else 
+	Center Window (780;550;4;"";"WincBox")
+	MODIFY SELECTION([Orders];*)
+End if 
+
+CLOSE WINDOW
+<>vlNewOrdRep:=0
+<>vlNewOrdSum:=0

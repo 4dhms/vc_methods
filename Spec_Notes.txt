@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$top;$right;$bottom)
+
+GET WINDOW RECT($left;$top;$right;$bottom)
+$right:=Screen width-50
+
+Open window($right-295;$top;$right;$bottom;4;"")
+DIALOG("Note")
+CLOSE WINDOW

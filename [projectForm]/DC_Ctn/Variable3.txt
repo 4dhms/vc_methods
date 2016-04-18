@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c;$line)
+
+
+If (Form event=On Data Change)
+	$line:=alBDPack
+	$c:=alBDPack{alBDPack}
+	If (vlDCcount>0)
+		vlRunningTotal:=alBDPack{alBDPack}*vlDCcount
+		vlTotQty:=vlRunningTotal*vlCtnCount
+	End if 
+End if 

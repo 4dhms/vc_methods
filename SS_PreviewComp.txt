@@ -1,0 +1,12 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+<>vlPreviewSS:=7
+QUERY([SpecFactory];[SpecFactory]OrderNumber=$1)
+QUERY([CS_Lines];[CS_Lines]OrderNumber=[SpecFactory]OrderNumber)
+ORDER BY([CS_Lines];[CS_Lines]CS_Sort;>)
+vfNewFactory:=False
+<>vlOrderNumber:=[SpecFactory]OrderNumber
+FIRST RECORD([SpecFactory])
+Center Window (940;680;4;"";"WincBox")
+DIALOG([SpecFactory];"Specsheet.i")
+CLOSE WINDOW
+

@@ -1,0 +1,268 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($readWrite)
+C_LONGINT($i;<>PrcQteID)
+C_POINTER($fieldptr)
+C_BOOLEAN(<>vfPreview;)
+
+If (Not(User in group(Current user;"Limited"))) & ([Costing]Factory="JY")
+	CANCEL
+	WinPrompt ("Costsheet unavailable at this time.")
+End if 
+
+Order_GetCategory (False)
+
+If (<>vlOrderNumber>0)
+	If ([Orders]KWCnS="Cutsew")
+		vtFabric10:="Cut & Sew"
+	Else 
+		vtFabric10:=[Orders]KWCnS
+	End if 
+Else 
+	If ([Samples]KWCnS="Cutsew")
+		vtFabric10:="Cut & Sew"
+	Else 
+		vtFabric10:=[Samples]KWCnS
+	End if 
+End if 
+
+pOne:=0
+pTwo:=0
+pThree:=0
+
+Case of 
+	: ([Costing]PayTo=0)
+		[Costing]PayTo:=1
+		pOne:=1
+	: ([Costing]PayTo=1)
+		pOne:=1
+	: ([Costing]PayTo=2)
+		pTwo:=1
+	: ([Costing]PayTo=3)
+		pThree:=1
+End case 
+SET MENU BAR(6)
+vrTestPrice:=0
+vfTestPrice:=False
+vfTestQuantity:=False
+vlTestQuantity:=0
+
+OBJECT SET VISIBLE(bSpread;User in group(Current user;"SuperCostsheets"))
+OBJECT SET VISIBLE(bBatch;[Costing]OrderNumber>0)
+
+OBJECT SET VISIBLE(vrTestPrice;False)
+OBJECT SET VISIBLE(vlTestQuantity;False)
+  //Cost_CurrencyCheck 
+
+  //If (Not(◊vfPreview))
+  //If (Find in array(asQuikFind;"Sample Order")<1)
+  //INSERT IN ARRAY(asQuikFind;5;1)
+  //asQuikFind{5}:="Sample Order"
+  //End if 
+  //End if 
+
+If ((Not([CostSheets]ShipAir)) & (Not([CostSheets]ShipSea)))
+	Case of 
+		: (Position("FOB";[Orders]ShipInfo)>0)
+		: (Position("LDP";[Orders]ShipInfo)>0)
+		: (Position("Air";[Orders]ShipInfo)>0)
+			[CostSheets]ShipAir:=True
+		: (Position("Sea";[Orders]ShipInfo)>0)
+			[CostSheets]ShipSea:=True
+	End case 
+End if 
+
+If ([CostSheets]SpecialNotes="0")
+	[CostSheets]SpecialNotes:=""
+End if 
+
+If ([CostSheets]OtherShip="")
+	[CostSheets]OtherShip:=[Orders]OtherShip
+End if 
+
+vfNewCostsheet:=True
+
+If (Application type#5)
+	OBJECT SET VISIBLE(bFrstHMS;(Not(<>PrcQteID>0) & (Not(User in group(Current user;"DressesOnly")))))
+	OBJECT SET VISIBLE(bPrvHMS;(Not(<>PrcQteID>0) & (Not(User in group(Current user;"DressesOnly")))))
+	OBJECT SET VISIBLE(bNxtHMS;(Not(<>PrcQteID>0) & (Not(User in group(Current user;"DressesOnly")))))
+	OBJECT SET VISIBLE(bLstHMS;(Not(<>PrcQteID>0) & (Not(User in group(Current user;"DressesOnly")))))
+End if 
+
+If (<>PrcQteID>0)
+	OBJECT SET ENTERABLE([Costing]DesignNumber;True)
+	OBJECT SET ENTERABLE([Costing]StyleNumber;True)
+	OBJECT SET COLOR([Costing]DesignNumber;-(15+(256*0)))
+	OBJECT SET COLOR([Costing]StyleNumber;-(15+(256*0)))
+Else 
+	QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+	Cost_CurrencyCheck 
+End if 
+
+If (Not(<>vfPreview))
+	Cost_NavBut 
+	Cost_EntryShow 
+End if 
+
+Cost_EntryCalculate 
+Cost_FreightToggle 
+Order_AirSeaToggle 
+Inv_UpdateSubtot 
+
+Case of 
+	: (<>vlOrderNumber>0)
+		vsHeader:="HMS Order"
+		vsType:="PO Date"
+		[Costing]Customer:=[Orders]Customer
+		If ([Orders]Price Terms="8/10") | ([Orders]NetDiscount=8)
+			[CostSheets]Figurer:=8
+		Else 
+			[CostSheets]Figurer:=[Orders]NetDiscount
+		End if 
+		vdDate:=[Orders]PODate
+	: (<>vlOrderNumber=0)
+		vsHeader:=""
+	Else 
+		vsType:="Order Date"
+		vsHeader:="Sample Order"
+		vdDate:=[Samples]SampleOrderDate
+		[Costing]Customer:=[Samples]Customer
+End case 
+
+If (<>vfPreview)
+	vlOrderNumber:=Abs([Costing]OrderNumber)
+Else 
+	vlOrderNumber:=Abs(<>vlOrderNumber)
+End if 
+
+Case of 
+	: (<>vlOrderNumber>0)
+		vRecNum:=String(Selected record number([Orders]))+" / "+String(Records in selection([Orders]))
+	Else 
+		vRecNum:=String(Selected record number([Samples]))+" / "+String(Records in selection([Samples]))
+End case 
+
+Case of 
+	: (User in group(Current user;"SuperCostsheets"))
+		$readwrite:=True
+	: (Not(User in group(Current user;"SpreadSheets")))
+		$readwrite:=False
+	: ([CostSheets]KeepOpen)
+		$readWrite:=True
+	: ([Costing]OpenSheetID=[CostSheets]SheetID)
+		$readWrite:=True
+	Else 
+		$readWrite:=False
+End case 
+
+If ([Costing]TypeSizePC=0)
+	[Costing]TypeSizePC:=9
+End if 
+If ([Costing]TypeSizeMac=0)
+	[Costing]TypeSizeMac:=11
+End if 
+
+If ([Costing]FactoryAPTerms<1)
+	[Costing]FactoryAPTerms:=60
+	SAVE RECORD([Costing])
+End if 
+
+
+If (Not(<>vfPreview))
+	asSheetNames:=Find in array(asSheetNames;[CostSheets]SheetName)
+	
+	If (Find in array(asSheetNames;"Actual A")<1)
+		  // depreciated ENABLE BUTTON(bImport)
+		OBJECT SET ENABLED(bImport;True)
+	Else 
+		  // depreciated DISABLE BUTTON(bImport)
+		OBJECT SET ENABLED(bImport;False)
+	End if 
+	
+	OBJECT SET VISIBLE(bAdd;$readWrite)
+	OBJECT SET VISIBLE(bChange;$readWrite)
+	
+	$i:=1
+	For ($i;1;Get last field number(53))
+		If (Is field number valid(53;$i))
+			$fieldptr:=Field(53;$i)
+			OBJECT SET ENTERABLE($fieldptr->;$readWrite)
+		End if 
+	End for 
+	OBJECT SET ENTERABLE([CostSheets]SheetDate;False)
+	OBJECT SET ENTERABLE([CostSheets]Writer;False)
+	OBJECT SET ENTERABLE([Costing]StyleNumber;False)
+	OBJECT SET ENTERABLE([Costing]DesignNumber;False)
+	
+	If (Current user="Lai Mun") | (Current user="Maggie") | (Current user="Jonanna Li") | (Current user="Karen") | (Current user="Ada") | (Current user="Designer")
+		OBJECT SET VISIBLE(cbLP;True)
+		If ([Costing]OnLine=[CostSheets]SheetID)
+			cbLP:=1
+		Else 
+			cbLP:=0
+		End if 
+	Else 
+		OBJECT SET VISIBLE(cbLP;False)
+	End if 
+	
+	Case of 
+		: (User in group(Current user;"SpreadSheets"))
+			Cost_EntryShowA 
+		: (User in group(Current user;"Warehouse"))
+			Cost_EntryShowW 
+	End case 
+	
+	If ($readWrite) | ([CostSheets]KeepOpen) | (Position("Actual";[CostSheets]SheetName)>0)
+		Cost_EntryShowB 
+	Else 
+		OBJECT SET VISIBLE(*;"xComplete";True)
+	End if 
+End if 
+
+OBJECT SET VISIBLE(bChoice1;($readWrite) | ([Costing]OpenSheetID=[CostSheets]SheetID) | ([CostSheets]KeepOpen) & (User in group(Current user;"SpreadSheets")))
+OBJECT SET VISIBLE(bChoice2;($readWrite) | ([Costing]OpenSheetID=[CostSheets]SheetID) | ([CostSheets]KeepOpen) & (User in group(Current user;"SpreadSheets")))
+If (User in group(Current user;"Warehouse"))
+	OBJECT SET VISIBLE(bChoice1;True)
+	OBJECT SET VISIBLE(bChoice2;True)
+End if 
+OBJECT SET VISIBLE(bAddComp;([Costing]OpenSheetID=[CostSheets]SheetID) | ([CostSheets]KeepOpen) & (User in group(Current user;"SpreadSheets")))
+OBJECT SET VISIBLE(bClear;Current user="Designer")
+OBJECT SET VISIBLE([Orders]CancelDate;<>vlOrderNumber>0)
+OBJECT SET VISIBLE(*;"xNYCancel";<>vlOrderNumber>0)
+vsRecInSelection:=String(Selected record number([Orders]))+" / "+String(Records in selection([Orders]))
+
+If ([Costing]QHTS1="0") | ([Costing]QHTS1="False")
+	[Costing]QHTS1:=""
+	SAVE RECORD([Costing])
+End if 
+If ([Costing]QHTS2="0") | ([Costing]QHTS2="False")
+	[Costing]QHTS2:=""
+	SAVE RECORD([Costing])
+End if 
+
+
+QUERY([Designs];[Designs]DesignNum=[Costing]DesignNumber)
+If ([Costing]DesignNumber="")
+	REDUCE SELECTION([Designs];0)
+End if 
+
+QUERY([Invoices];[Invoices]OrderNumber=[Costing]OrderNumber)
+
+Case of 
+	: (<>vfPreview)
+		If ([Costing]OrderNumber>0)
+			cbSG:=0
+		Else 
+			cbSG:=1
+		End if 
+		FORM GOTO PAGE(3)
+End case 
+OBJECT SET VISIBLE([Designs]Sketch;[CostSheets]SheetNumber#-1)
+OBJECT SET VISIBLE(*;"xTemplate";[CostSheets]SheetNumber=-1)
+
+OBJECT SET VISIBLE(vlOrderNumber;vlOrderNumber#0)
+OBJECT SET VISIBLE(*;"xCushion";(User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet))
+OBJECT SET VISIBLE(*;"xCushion1";(User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet))
+OBJECT SET VISIBLE([CostSheets]Cushion;(User in group(Current user;"SuperCostsheets")) & (<>vfSupersheet))
+OBJECT SET VISIBLE([CostSheets]DutyActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+OBJECT SET VISIBLE([CostSheets]DutyAmountActual;(User in group(Current user;"SuperCostsheets") & <>vfSupersheet))
+

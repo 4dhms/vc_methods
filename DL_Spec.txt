@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //$1 element
+  //$2 font
+  //$3 size
+Case of 
+	: ($1="line")
+		[DesignLines]LineFont:=asFonts{asFonts}
+	: ($1="season")
+		[DesignLines]SeasonFont:=asFonts{asFonts}
+	: ($1="title")
+		[DesignLines]TitleFont:=asFonts{asFonts}
+	: ($1="text")
+		[DesignLines]TextFont:=asFonts{asFonts}
+	: ($1="pubdate")
+		[DesignLines]PubdateFont:=asFonts{asFonts}
+End case 
+DL_CoverpageFonts 

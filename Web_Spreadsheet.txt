@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($html;$fontA;$fontB;$end)
+C_LONGINT($i;$c;$n)
+C_POINTER($colptr)
+C_TEXT($user)
+
+$user:=Replace string(vsWebUser;"_";" ")
+
+ARRAY TEXT(asSheetNames;0)
+$fontA:="<FONT SIZE=2 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$fontB:="<FONT SIZE=1 face="+Char(34)+"Verdana, Verdana, Arial, Helvetica, sans-serif"+Char(34)+">"
+$end:="</font>"
+
+<>vlOrderNumber:=$1
+vtTitle:="COST SPREADSHEET: "+String(<>vlOrderNumber)
+
+QUERY([Costing];[Costing]OrderNumber=<>vlOrderNumber)
+QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+ORDER BY([CostSheets];[CostSheets]SheetID;<)
+SELECTION TO ARRAY([CostSheets]SheetName;asSheetNames)
+$c:=Size of array(asSheetNames)+1
+CREATE SET([CostSheets];"sheets")
+
+<>vfPreview:=True
+CS_Spreadsheet 
+
+If (User in group($user;"SuperCostsheets"))
+Else 
+	Web_DeleteCostline (Find in array(atCost0;"cushion"))
+End if 
+
+$i:=1
+$html:=Char(1)
+$html:=$html+"<table width=1000 border=1 cellspacing=12>"
+
+For ($i;1;Size of array(atCost0))
+	$n:=1
+	For ($n;1;$c)
+		$colptr:=Get pointer("atCost"+String($n-1))
+		If ($i=1)
+			If ($n=1)
+				$html:=$html+"<tr><td width=200>"
+			Else 
+				$html:=$html+"<td width=50><b>"
+			End if 
+		Else 
+			$html:=$html+"<td>"
+		End if 
+		
+		If ($n>1)
+			USE SET("sheets")
+			QUERY SELECTION([CostSheets];[CostSheets]SheetName=asSheetNames{$n-1})
+		End if 
+		
+		Case of 
+			: ($i=1) & ($n>1)
+				$html:=$html+$fontB+"<b>"+$colptr->{$i}+"</b></font></td>"
+			: ($n=1) & ($i>1)
+				$html:=$html+$fontB+"<b>"+$colptr->{$i}+"</b></font></td>"
+			Else 
+				$html:=$html+$fontA+$colptr->{$i}+"</font></td>"
+		End case 
+	End for 
+	$html:=$html+"</tr>"
+End for 
+
+$html:=$html+"</Table>"
+
+vtSpreadsheet:=$html
+
+WEB SEND FILE("spreadsheet.html")

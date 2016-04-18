@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE EMPTY SET([CostSheets];"LastSheet")
+ADD TO SET([CostSheets];"LastSheet")
+
+QUERY([CostSheets];[CostSheets]SheetNumber=$1)
+QUERY SELECTION([CostSheets];[CostSheets]SheetNumber#0)
+CREATE SET([CostSheets];"Sheets")
+USE SET("Sheets")
+
+If (<>vfDCS)
+	DCS_RouterArray 
+Else 
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual@")
+	
+	If (Records in selection([CostSheets])>0)
+		ARRAY TEXT(asRouter;1)
+		ARRAY TEXT(atFiles;1)
+		asRouter{1}:="Actual "+Char(65+Records in selection([CostSheets]))
+	Else 
+		
+		If ($2>0)
+			ARRAY TEXT(asRouter;4)
+			ARRAY TEXT(atFiles;4)
+			asRouter{4}:="Actual A"
+		Else 
+			ARRAY TEXT(asRouter;3)
+			ARRAY TEXT(atFiles;3)
+		End if 
+		
+		USE SET("Sheets")
+		QUERY SELECTION([CostSheets];[CostSheets]SheetName="Estimate@")
+		asRouter{1}:="Estimate "+String(1+Records in selection([CostSheets]))
+		USE SET("Sheets")
+		QUERY SELECTION([CostSheets];[CostSheets]SheetName="Original@")
+		If (Records in selection([CostSheets])>0)
+			asRouter{2}:="Original Quote "+String(1+Records in selection([CostSheets]))
+		Else 
+			asRouter{2}:="Original Quote"
+		End if 
+		
+		USE SET("Sheets")
+		QUERY SELECTION([CostSheets];[CostSheets]SheetName="Confirmed@")
+		asRouter{3}:="Confirmed "+String(1+Records in selection([CostSheets]))
+	End if 
+End if 
+
+USE SET("LastSheet")
+CLEAR SET("LastSheet")
+CLEAR SET("Sheets")

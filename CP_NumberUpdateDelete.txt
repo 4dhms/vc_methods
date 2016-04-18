@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($drop)
+$drop:=False
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber)
+QUERY([CP_Customers];[CP_Customers]CPNumber=vsCPNumber)
+
+If ([ColorPrintNumber]Division=[PCatalog]Division) & ([ColorPrintNumber]SeasonName=[PCatalog]SeasonName) & ([ColorPrintNumber]SeasonYear=[PCatalog]SeasonYear)
+	[ColorPrintNumber]Droplet:=True
+Else 
+	QUERY([CP_Customers];[CP_Customers]CPNumber=vsCPNumber)
+	
+	If (Records in selection([CP_Customers])=0)
+		[ColorPrintNumber]Dropped:=True
+		[ColorPrintNumber]DroppedDate:=Current date(*)
+	Else 
+		QUERY SELECTION([CP_Customers];[CP_Customers]Division=[PCatalog]Division)
+		QUERY SELECTION([CP_Customers];[CP_Customers]SeasonName=[PCatalog]SeasonName)
+		QUERY SELECTION([CP_Customers];[CP_Customers]SeasonYear=[PCatalog]SeasonYear)
+		
+		If (Records in selection([CP_Customers])=1)
+			DELETE RECORD([CP_Customers])
+			[PCatalog]History:=[PCatalog]History+Char(13)+vsCPNumber+" deleted from the Color/Print Library "+String(Current date(*))+" "+String(Current time(*))
+		End if 
+	End if 
+End if 
+SAVE RECORD([ColorPrintNumber])
+
+vsCPNumber:=""
+UNLOAD RECORD([ColorPrintNumber])

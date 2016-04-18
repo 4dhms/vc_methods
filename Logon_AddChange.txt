@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($category)
+
+QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+
+Case of 
+	: ([Changes]FieldName="Size Range")
+		$category:="SR"
+	: ([Changes]FieldName="SeasonName")
+		$category:="SC"
+	: ([Changes]FieldName="StyleNumber")
+		$category:="CS"
+	: ([Changes]FieldName="Price")
+		$category:="PC"
+	: ([Changes]FieldName="OrderDivision")
+		$category:="DV"
+End case 
+
+If ($category#"") & ([Changes]OldData#"")
+	APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+	APPEND TO ARRAY(adActionDate;[Changes]RevDate)
+	If ([Changes]LOProcessDate#!00-00-00!)
+		APPEND TO ARRAY(afProcess;True)
+	Else 
+		APPEND TO ARRAY(afProcess;False)
+	End if 
+	APPEND TO ARRAY(asDivisions;[Orders]OrderDivision)
+	APPEND TO ARRAY(asSeasonName;[Orders]SeasonName+" "+[Orders]SeasonYear)
+	LogOn_Group 
+	APPEND TO ARRAY(asXSizeRange;[Orders]BrkdnCutRatio)
+	APPEND TO ARRAY(asColors;[Changes]NewChange)
+	APPEND TO ARRAY(asColorCodes;"C"+String([Changes]ChangeKey))
+	APPEND TO ARRAY(atChange;$category)
+	APPEND TO ARRAY(arSalePrice;[Orders]Price)
+	APPEND TO ARRAY(asUsers;[Changes]LOProcessor)
+	If ([Changes]LOProcessDate=!00-00-00!)
+		APPEND TO ARRAY(asProcessDate;"")
+	Else 
+		APPEND TO ARRAY(asProcessDate;String([Changes]LOProcessDate))
+	End if 
+End if 

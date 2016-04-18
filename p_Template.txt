@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asTemplates;0)
+ARRAY LONGINT(alTemplateKeys;0)
+
+QUERY([SpecTemplate];[SpecTemplate]TempKeyNumber>0)
+FORM SET OUTPUT([SpecTemplate];"Template.list")
+FORM SET INPUT([SpecTemplate];"Template.i")
+If (Records in selection([SpecTemplate])=0)
+	CREATE RECORD([SpecTemplate])
+	[SpecTemplate]TempKeyNumber:=Sequence number([SpecTemplate])
+	SAVE RECORD([SpecTemplate])
+Else 
+	ORDER BY([SpecTemplate];[SpecTemplate]Template;>)
+	SELECTION TO ARRAY([SpecTemplate]Template;asTemplates;[SpecTemplate]TempKeyNumber;alTemplateKeys)
+	INSERT IN ARRAY(asTemplates;1;1)
+	INSERT IN ARRAY(alTemplateKeys;1;1)
+	asTemplates{1}:="Select Template"
+	INSERT IN ARRAY(asTemplates;Size of array(asTemplates)+1;1)
+	INSERT IN ARRAY(alTemplateKeys;Size of array(asTemplates);1)
+	asTemplates{Size of array(alTemplateKeys)}:="Add new part name"
+End if 
+
+<>CloseBox:=True
+Center Window (750;680;4;"Specsheet Templates")
+If (<>vlCostRouter=1)
+	MODIFY SELECTION([SpecTemplate];*)
+Else 
+	FIRST RECORD([SpecTemplate])
+	MODIFY RECORD([SpecTemplate];*)
+End if 
+CLOSE WINDOW
+<>vlSpecTemplate:=0

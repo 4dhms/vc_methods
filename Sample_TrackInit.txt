@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asEnterer;0)
+ARRAY TEXT(atLDescript;0)
+ARRAY TEXT(asDiv;0)
+ARRAY TEXT(asStyleNumbers;0)
+ARRAY TEXT(asColor1;0)
+ARRAY TEXT(asCustomers;0)
+ARRAY DATE(adDateOut;0)
+ARRAY DATE(adDateIn;0)
+ARRAY TEXT(asBDNotes;0)
+ARRAY LONGINT(alTrackId;0)

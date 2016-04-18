@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_PICTURE($pic)
+
+ARRAY PICTURE(aSketch;0)
+ARRAY TEXT(atNote;0)
+
+QUERY([SpecPix];[SpecPix]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+CREATE SET([SpecPix];"pix")
+
+ARRAY LONGINT($imagenumber;0)
+SELECTION TO ARRAY([SpecPix]ImageNumber;$imagenumber)
+SORT ARRAY($imagenumber;>)
+
+$i:=1
+For ($i;1;Size of array($imagenumber))
+	USE SET("pix")
+	QUERY SELECTION([SpecPix];[SpecPix]ImageNumber=$imagenumber{$i})
+	
+	If (Records in selection([SpecPix])>0)
+		Picture_Get ($imagenumber{$i};"spec")
+		Pix_Delay 
+		  //If (Picture size(<>vxSketch)>2000)
+		APPEND TO ARRAY(aSketch;<>vxSketch)
+		APPEND TO ARRAY(atNote;[SpecPix]Description)
+		  // End if 
+	End if 
+End for 
+
+UNLOAD RECORD([SpecPix])
+
+vlPixPos:=0
+vlPixCount:=Size of array(aSketch)

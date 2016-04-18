@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+PreCarton_MissingII 
+QUERY([NeedByLib];[NeedByLib]Leadtime>0)
+QUERY SELECTION([NeedByLib];[NeedByLib]Router=FORM Get current page)
+ORDER BY([NeedByLib];[NeedByLib]Name;>)
+

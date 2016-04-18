@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //p_SpeedpEntry global procedure
+Closed:=False
+SET MENU BAR(8)
+ALL RECORDS([Speedpost Form])
+
+Array_Factories 
+
+FORM SET OUTPUT([Speedpost Form];"SpeedpostOutp")
+FORM SET INPUT([Speedpost Form];"SpeedpostInp")
+vlWinWd:=600
+If (Screen height<800)
+	vlWinHt:=550
+Else 
+	vlWinHt:=750
+End if 
+vlWinType:=8
+vsWinTitle:=""
+<>CloseBox:=True
+
+Center Window 
+
+p_SetWndwSpdpst 
+AccessMode (->[Speedpost Form];True)
+TheFile:=->[Speedpost Form]
+MODIFY SELECTION([Speedpost Form])
+CLOSE WINDOW
+<>SpdpstID:=0
+
+
+
+

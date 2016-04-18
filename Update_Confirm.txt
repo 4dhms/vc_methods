@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+
+$path:=Application file
+$path:=Substring($path;1;Position(":";$path))+"Applications:4Dv14R5.app"
+
+
+If (Test path name($path)=0)
+	$0:=True
+Else 
+	$0:=False
+End if 
+

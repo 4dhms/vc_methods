@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Display Detail)
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+	If ([FabricLibrary]SecondaryFabric#"")
+		OBJECT SET VISIBLE(*;"xCompound";True)
+	Else 
+		OBJECT SET VISIBLE(*;"xCompound";False)
+	End if 
+	UNLOAD RECORD([FabricLibrary])
+End if 

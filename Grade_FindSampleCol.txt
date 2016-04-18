@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If ([SpecFactory]SampleCol=0)
+	Case of 
+		: (vsSize1=[SpecFactory]Size)
+			vlColSlider:=1
+		: (vsSize2=[SpecFactory]Size)
+			vlColSlider:=2
+		: (vsSize3=[SpecFactory]Size)
+			vlColSlider:=3
+		: (vsSize4=[SpecFactory]Size)
+			vlColSlider:=4
+		: (vsSize5=[SpecFactory]Size)
+			vlColSlider:=5
+		: (vsSize6=[SpecFactory]Size)
+			vlColSlider:=6
+		: (vsSize7=[SpecFactory]Size)
+			vlColSlider:=7
+		: (vsSize8=[SpecFactory]Size)
+			vlColSlider:=8
+		: (vsSize9=[SpecFactory]Size)
+			vlColSlider:=9
+		: (vsSize10=[SpecFactory]Size)
+			vlColSlider:=10
+		Else 
+			Grade_ColArray 
+			WinFindList ("Selected sample size.";24)
+			If (ok=1)
+				vlColSlider:=asSizeName-1
+				
+				[SpecFactory]SampleCol:=vlColSlider
+			Else 
+				vlColSlider:=[SpecFactory]SampleCol
+			End if 
+			
+			$i:=1
+			FIRST RECORD([Sizes])
+			For ($i;1;Records in selection([Sizes]))
+				Case of 
+					: (vlColSlider=1)
+						[Sizes]Size1:=[SpecSheetLines]Spec1A
+					: (vlColSlider=2)
+						[Sizes]Size2:=[SpecSheetLines]Spec1A
+					: (vlColSlider=3)
+						[Sizes]Size3:=[SpecSheetLines]Spec1A
+					: (vlColSlider=4)
+						[Sizes]Size4:=[SpecSheetLines]Spec1A
+					: (vlColSlider=5)
+						[Sizes]Size5:=[SpecSheetLines]Spec1A
+					: (vlColSlider=6)
+						[Sizes]Size6:=[SpecSheetLines]Spec1A
+					: (vlColSlider=7)
+						[Sizes]Size7:=[SpecSheetLines]Spec1A
+					: (vlColSlider=8)
+						[Sizes]Size8:=[SpecSheetLines]Spec1A
+					: (vlColSlider=9)
+						[Sizes]Size9:=[SpecSheetLines]Spec1A
+					: (vlColSlider=10)
+						[Sizes]Size10:=[SpecSheetLines]Spec1A
+					: (vlColSlider=11)
+						[Sizes]Size11:=[SpecSheetLines]Spec1A
+					: (vlColSlider=12)
+						[Sizes]Size12:=[SpecSheetLines]Spec1A
+				End case 
+				SAVE RECORD([Sizes])
+				NEXT RECORD([Sizes])
+			End for 
+	End case 
+End if 
+

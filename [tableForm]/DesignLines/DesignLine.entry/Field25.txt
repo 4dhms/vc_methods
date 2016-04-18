@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([DesignLines]8Up)
+	WinPrompt ("If this is a pre-existing 12-up plan, designs 9-12 will be stripped off.")
+	OBJECT SET VISIBLE([DesignLines]8UpH;[DesignLines]8Up)
+End if 

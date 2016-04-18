@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global for Sample Garment List entry
+Case of 
+	: (<>SamListID=0)
+		<>SamListID:=New process("p_SamGarList";0;"Sample Garment List")
+	Else 
+		SHOW PROCESS(<>SamListID)
+		BRING TO FRONT(<>SamListID)
+End case 

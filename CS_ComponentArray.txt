@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asComponents;9)
+asComponents{1}:="Zipper (a)"
+asComponents{2}:="Zipper (b)"
+asComponents{3}:="Shoulder Pads"
+asComponents{4}:="Buttons (a)"
+asComponents{5}:="Buttons (b)"
+asComponents{6}:="Buckles"
+asComponents{7}:="Snaps"
+asComponents{8}:="Hooks & Eyes"
+asComponents{9}:="MTL Report"
+
+INSERT IN ARRAY(asComponents;1;1)
+asComponents{1}:="Component Library"
+asComponents:=1
+
+If (Count parameters>0)
+	ARRAY TEXT(asTemplates;0)
+	QUERY([SpecTemplate];[SpecTemplate]TempCategory=$1)
+	SELECTION TO ARRAY([SpecTemplate]Template;asTemplates)
+	SORT ARRAY(asTemplates;>)
+	INSERT IN ARRAY(asTemplates;1;1)
+	asTemplates{1}:="Use Template"
+	asTemplates:=1
+End if 

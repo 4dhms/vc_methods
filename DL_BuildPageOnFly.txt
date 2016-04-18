@@ -1,0 +1,75 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtStitch1;vtStitch2;vtStitch3;vtStitch4;vtStitch5;vtStitch6;vtStitch7;vtStitch8;vtStitch9;vtStitch10;vtStitch11;vtStitch12)
+C_LONGINT($i)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey;*)
+QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=[DLPages]PageNumber)
+
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]ItemNumber;>)
+
+ARRAY TEXT(asDesignNumbers;0)
+ARRAY TEXT(AStyle;0)
+ARRAY TEXT(AStitch;0)
+ARRAY PICTURE(ASketch;0)
+ARRAY TEXT(asFabric;0)
+ARRAY TEXT(atPrice;0)
+ARRAY REAL(arMSRP;0)
+ARRAY TEXT(asSize;0)
+ARRAY TEXT(atColor;0)
+ARRAY TEXT(atTitle;0)
+ARRAY LONGINT(alPOOrder;0)
+  //ARRAY BOOLEAN($duplices;0)
+  //ARRAY LONGINT($itms;0)
+
+C_PICTURE(vxSketch;vxSketch1;vxSketch2;vxSketch3;vxSketch4;vxSketch5;vxSketch6;vxSketch7;vxSketch8)
+C_PICTURE(vxSketch9;vxSketch10;vxSketch11;vxSketch12;vxSketch13;vxSketch14;vxSketch15;vxSketch16;vxSketch17;vxSketch18)
+ARRAY LONGINT(alItemNumber;0)
+ARRAY DATE(adCancelDate;0)
+
+SELECTION TO ARRAY([DesignLineIncluded]Name;atTitle;[DesignLineIncluded]DesignNumber;asDesignNumbers;[DesignLineIncluded]StyleNumber;aStyle)
+SELECTION TO ARRAY([DesignLineIncluded]Fiber;asFabric;[DesignLineIncluded]Price;atPrice;[DesignLineIncluded]MSRP;arMSRP;[DesignLineIncluded]Size;asSize;[DesignLineIncluded]Colors;atColor)
+SELECTION TO ARRAY([DesignLineIncluded]ItemNumber;alItemNumber;[DesignLineIncluded]CancelDate;adCancelDate;[DesignLineIncluded]OrderNumber;alPOOrder)
+  //SELECTION TO ARRAY([DesignLineIncluded]Duplex;$duplices;[DesignLineIncluded]ItemNumber;$itms)
+
+  //$i:=1
+  //For ($i;1;Size of array($itms))
+  //If ($duplices{$i}=True)
+  //afDuplices{$itms{$i}}:=True
+  //End if 
+  //End for 
+
+If ([DesignLines]Stock)
+	ARRAY LONGINT($pos;0)
+	ARRAY TEXT($special;0)
+	SELECTION TO ARRAY([DesignLineIncluded]OrderNumber;$pos;[DesignLineIncluded]Stitch;$special)
+	$i:=1
+	For ($i;1;Size of array($pos))
+		Case of 
+			: ($special{$i}="")
+				APPEND TO ARRAY(aStitch;"PO: "+String($pos{$i}))
+			: ($special{$i}="PO#@")
+				APPEND TO ARRAY(aStitch;$special{$i})
+			Else 
+				APPEND TO ARRAY(aStitch;$special{$i}+"   PO: "+String($pos{$i}))
+		End case 
+	End for 
+Else 
+	SELECTION TO ARRAY([DesignLineIncluded]Stitch;aStitch)
+End if 
+
+$i:=1
+For ($i;1;18)
+	Case of 
+		: ([DesignLines]OnePerPage) & ($i=1)
+			FIRST RECORD([DesignLineIncluded])
+			QUERY([DesignBreakDown];[DesignBreakDown]ItemKey=[DesignLineIncluded]ItemKey)
+			DL_BuildItem (1)
+		: (vf8Up)
+			If ($i<9)
+				DL_BuildItem ($i)
+			End if 
+		Else 
+			DL_BuildItem ($i)
+	End case 
+End for 
+

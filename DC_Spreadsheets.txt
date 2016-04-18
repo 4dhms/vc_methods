@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$n;$c;$carton;$qty)
+C_TEXT($strip)
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	
+	SEND PACKET($docref;"Factory"+Char(9)+"HMS PO"+Char(9)+"Style #"+Char(9)+"Customer PO"+Char(9)+"# of Cartons"+Char(9)+"Quantity"+Char(13))
+	FIRST RECORD([Orders])
+	
+	$i:=1
+	For ($i;1;Records in selection([Orders]))
+		QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+		CREATE SET([DC_Spreads];"spread")
+		
+		QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=[DC_Spreads]DCSheetKey)
+		CREATE SET([DC_SpreadLines];"line")
+		
+		QUERY([Cartons];[Cartons]OrderNumber=[Orders]OrderNum)
+		CREATE SET([Cartons];"carton")
+		
+		ARRAY TEXT($po;0)
+		DISTINCT VALUES([DC_SpreadLines]DCpo;$po)
+		
+		$n:=1
+		If (Shift down)
+			ALERT(String(Records in set("line"))+"  "+String(Size of array($po)))
+		End if 
+		
+		For ($n;1;Size of array($po))
+			
+			$carton:=0
+			$qty:=0
+			
+			USE SET("line")
+			QUERY SELECTION([DC_SpreadLines];[DC_SpreadLines]DCpo=$po{$n})
+			
+			$c:=1
+			For ($c;1;Records in selection([DC_SpreadLines]))
+				
+				$qty:=$qty+Num([DC_SpreadLines]Total)
+				NEXT RECORD([DC_SpreadLines])
+			End for 
+			
+			
+			USE SET("carton")
+			$strip:=Substring($po{$n};Position(" ";$po{$n})+1;99)
+			QUERY SELECTION([Cartons];[Cartons]CtnPO=$strip)
+			
+			$c:=1
+			For ($c;1;Records in selection([Cartons]))
+				$carton:=$carton+[Cartons]CtnIn
+				NEXT RECORD([Cartons])
+			End for 
+			
+			SEND PACKET($docref;[Orders]Factory+Char(9)+String([Orders]OrderNum)+Char(9)+[Orders]StyleNumber+Char(9))
+			SEND PACKET($docref;$po{$n}+Char(9)+String(Round($qty/$carton;2))+Char(9)+String($qty;"###,###")+Char(13))
+		End for 
+		
+		CLEAR SET("spread")
+		CLEAR SET("line")
+		CLEAR SET("carton")
+		NEXT RECORD([Orders])
+	End for 
+	
+	CLOSE DOCUMENT($docref)
+	ALERT("Done")
+End if 
+
+

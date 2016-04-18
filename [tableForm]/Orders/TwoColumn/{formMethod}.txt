@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtPart1;vtPart2)
+
+If (Form event=On Printing Detail)
+	If (vtPart1="Notes@") | (vtPart1="Care and Content@") | (Find in array(asList21;vtPart1)>0)
+		OBJECT SET FONT STYLE(vtPart1;1)
+	Else 
+		OBJECT SET FONT STYLE(vtPart1;0)
+	End if 
+	If (vtPart2="Care and Content@")
+		OBJECT SET FONT STYLE(vtPart2;1)
+	Else 
+		OBJECT SET FONT STYLE(vtPart2;0)
+	End if 
+	
+End if 

@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Getting Focus)
+		DC_ComboButton (14)
+	: (Form event=On Losing Focus)
+		Order_DC_Total 
+End case 

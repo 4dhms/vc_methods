@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+OBJECT SET ENTERABLE([CostSheets]Duty1;True)
+OBJECT SET ENTERABLE([CostSheets]Duty2;True)
+OBJECT SET ENTERABLE([CostSheets]BrokerageChg;True)
+OBJECT SET ENTERABLE([CostSheets]ShipSea;True)
+OBJECT SET ENTERABLE([CostSheets]ShipAir;True)
+OBJECT SET ENTERABLE([CostSheets]OtherShip;True)
+OBJECT SET ENTERABLE([CostSheets]FreightBOAT;True)
+OBJECT SET ENTERABLE([CostSheets]FreightAIR;True)

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+SET PRINT OPTION(Orientation option;1)
+PRINT SETTINGS
+
+Print form([Dialogs];"SR_PrintHeader")
+
+$i:=1
+For ($i;1;Size of array(asSRseasonA))
+	vsSeason1A:=asSRseasonA{$i}
+	vsMonth1:=asSRmonth{$i}
+	vlOrders13:=alSRorderA{$i}
+	vlUnits13:=alSRunitA{$i}
+	vlDollars13:=alSRdollarA{$i}
+	vsSeason2A:=asSRseasonB{$i}
+	vlOrders1:=alSRorderB{$i}
+	vlUnits1:=alSRunitB{$i}
+	vlDollars1:=alSRdollarB{$i}
+	  //If (vsMonth1#"") | (vsSeason1A#"")
+	Print form([Dialogs];"SR_PrintMonth")
+	  //End if 
+End for 
+
+PAGE BREAK

@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($combo)
+
+If (Form event=On Load)
+	ARRAY TEXT(asList17;0)
+	APPEND TO ARRAY(asList17;"Self")
+	APPEND TO ARRAY(asList17;"Combo 1")
+	APPEND TO ARRAY(asList17;"Combo 2")
+	APPEND TO ARRAY(asList17;"Combo 3")
+	APPEND TO ARRAY(asList17;"Combo 4")
+	APPEND TO ARRAY(asList17;"Combo 5")
+	asList17:=1
+	
+	Case of 
+		: (vsPart1="")
+			cbOrder:=1
+		: (vsPart1="PO@")
+			cbOrder:=1
+		: (vsPart1="SG@")
+			cbSG:=1
+	End case 
+	
+	QUERY([Costing];[Costing]OrderNumber=Num(vsPart1))
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	
+	If (vsPart3="Self")
+		$combo:=False
+	Else 
+		$combo:=True
+	End if 
+	
+	If (vfEdit)
+		
+		Case of 
+			: ($combo) & ([CostSheets]YdCombo1>0)
+				vsPart11:=String([CostSheets]YdCombo1;"#.00")
+			: ($combo) & ([OrdersFabricXRef]Usage>0)
+				vsPart11:=String([OrdersFabricXRef]Usage;"#.00")
+			: ($combo) & ([Orders]YardsCombo>0)
+				vsPart11:=String([Orders]YardsCombo;"#.00")
+			: ([CostSheets]YdFabric>0) & (Not($combo))
+				vsPart11:=String([CostSheets]YdFabric;"#.00")
+			: ([Orders]YardsReq>0) & (Not($combo))
+				vsPart11:=String([Orders]YardsReq;"#.00")
+		End case 
+		OBJECT SET ENABLED(bAccept;True)
+		OBJECT SET ENABLED(bRemove;True)
+		FORM GOTO PAGE(2)
+		OBJECT SET VISIBLE(cbSG;False)
+		OBJECT SET VISIBLE(cbOrder;False)
+	Else 
+		OBJECT SET ENABLED(bAccept;True)
+		OBJECT SET ENABLED(bRemove;False)
+		OBJECT SET VISIBLE(cbSG;True)
+		OBJECT SET VISIBLE(cbOrder;True)
+		cbOrder:=1
+		GOTO OBJECT(vsPart1)
+	End if 
+End if 

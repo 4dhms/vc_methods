@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //new record for HMS Sample Garments
+  //
+CREATE SET([Samples];"Garms")
+p_NewRcdSamGar 
+ADD TO SET([Samples];"Garms")
+USE SET("Garms")
+CLEAR SET("Garms")

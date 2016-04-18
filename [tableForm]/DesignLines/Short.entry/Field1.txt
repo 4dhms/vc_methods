@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+DL_Spec ("Line")
+If (Substring([DesignLines]Line;2;1)="-")
+	[DesignLines]Line:=Substring([DesignLines]Line;3;999)
+End if 

@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($customer)
+
+Case of 
+	: (Form event=On After Keystroke)
+		C_LONGINT($i)
+		REDUCE SELECTION([RMA];0)
+		
+		$customer:=Get edited text+"@"
+		
+		ARRAY TEXT(asCustomerBuild;0)
+		$i:=1
+		For ($i;1;Size of array(asCustomers))
+			If (asCustomers{$i}=$customer)
+				APPEND TO ARRAY(asCustomerBuild;asCustomers{$i})
+				OBJECT SET VISIBLE(asCustomerBuild;True)
+			End if 
+		End for 
+		Case of 
+			: (Size of array(asCustomerBuild)=0)
+				OBJECT SET VISIBLE(asCustomerBuild;False)
+			Else 
+				OBJECT SET VISIBLE(asCustomerBuild;True)
+		End case 
+End case 

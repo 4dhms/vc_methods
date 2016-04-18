@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (User in group(Current user;"SuperCostsheets"))
+	
+	GOTO RECORD([CostSheets];$1)
+	QUERY([Costing];[Costing]SheetNumber=[CostSheets]SheetNumber)
+	
+	vtNote:=""
+	If ([CostSheets]Details#"")
+		vtNote:="DETAIL: "+[CostSheets]Details+Char(13)+Char(13)
+	End if 
+	If ([CostSheets]NYMiscNotes#"")
+		vtNote:=vtNote+"NY MISC: "+[CostSheets]NYMiscNotes+Char(13)+Char(13)
+	End if 
+	If ([CostSheets]MiscNotes#"")
+		vtNote:=vtNote+"MISC: "+[CostSheets]MiscNotes+Char(13)+Char(13)
+	End if 
+	If ([CostSheets]FOBNotes#"")
+		vtNote:=vtNote+"FOB: "+[CostSheets]FOBNotes+Char(13)+Char(13)
+	End if 
+	If ([CostSheets]ShipNotes#"")
+		vtNote:=vtNote+"Special: "+[CostSheets]ShipNotes
+	End if 
+	
+	
+	vlOrderNumber:=[Costing]OrderNumber
+	FORM SET INPUT([CostSheets];"Preview")
+	Center Window (900;600;1;"")
+	DIALOG([CostSheets];"Preview")
+	CLOSE WINDOW
+	UNLOAD RECORD([CostSheets])
+	UNLOAD RECORD([Costing])
+	
+End if 

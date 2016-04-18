@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vtSubject="Details")
+		[CostSheets]Details:=<>vtNotes
+	: (vtSubject="Miscellany Notes")
+		[CostSheets]MiscNotes:=<>vtNotes
+	: (vtSubject="Shipping Notes")
+		[CostSheets]ShipNotes:=<>vtNotes
+	: (vtSubject="NY Misc Notes")
+		[CostSheets]NYMiscNotes:=<>vtNotes
+	: (vtSubject="FOB Notes")
+		[CostSheets]FOBNotes:=<>vtNotes
+	: (vtSubject="Quota Notes")
+		[CostSheets]SpecialNotes:=<>vtNotes
+End case 
+SAVE RECORD([CostSheets])
+
+ACCEPT

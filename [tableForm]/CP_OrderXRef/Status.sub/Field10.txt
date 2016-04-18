@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CP_StatusChange 
+Rev_LogFromStatus ([CP_OrderXRef]CPStatus)

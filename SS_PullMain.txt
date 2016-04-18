@@ -1,0 +1,21 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+
+Case of 
+	: (vlDupeOrderNumber#0) | ([SpecFactory]Size="")
+		If (<>vlOrderNumber>0)
+			[SpecFactory]KnitWoven1:=<>vsKnitWoven
+		End if 
+		[SpecFactory]CreationDate:=Current date(*)
+		[SpecFactory]CreatedBy:=Current user
+		[SpecFactory]Factory:=<>vsFactory
+		[SpecFactory]XFactory:=<>vdXFactory
+		[SpecFactory]Size:=vsSize
+		[SpecFactory]PatternSource:=<>vsSource
+		[SpecFactory]Colhead:=vsColHead1
+		[SpecFactory]Submit:=vdSubmit1
+		SAVE RECORD([SpecFactory])
+	Else 
+		QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+		QUERY SELECTION([SpecSheetLines];[SpecSheetLines]SF_KeyNumber#0)
+		
+End case 

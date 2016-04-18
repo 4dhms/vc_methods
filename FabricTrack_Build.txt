@@ -1,0 +1,251 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alTrackOrdered;0)
+ARRAY LONGINT(alTrackShipped;0)
+ARRAY LONGINT(alTrackUsed;0)
+C_LONGINT($i;$n;$subtot;$grandtot;$c;$ordernumber)
+C_TEXT($header)
+C_POINTER($nextCol)
+C_POINTER($thisCol)
+C_BOOLEAN($done)
+C_LONGINT($ordernumber)
+ARRAY LONGINT(alFabOrderKey;0)
+
+<>vtMessage:="Building spreadsheet"
+<>vlCounter:=0
+EMail_SendingProc 
+
+CREATE EMPTY SET([Orders];"Factories")
+
+$i:=1
+For ($i;1;Size of array(alSOrder))
+	QUERY([Orders];[Orders]OrderNum=alSOrder{$i})
+	ADD TO SET([Orders];"Factories")
+End for 
+
+USE SET("Factories")
+
+ORDER BY([Orders];[Orders]Factory;>;[Orders]OrderNum;>)
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	APPEND TO ARRAY(asMOrder;String([Orders]OrderNum))
+	NEXT RECORD([Orders])
+End for 
+
+FabricTrack_ArrayInit (0)
+FabricTrack_ArrayInit (Size of array(asMOrder))
+
+ARRAY TEXT(asColors;0)
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"Colors")
+
+For ($i;1;Size of array(asMOrder))
+	$ordernumber:=Num(asMOrder{$i})
+	
+	QUERY([Orders];[Orders]OrderNum=asMOrder{$i})
+	adMCancel{$i}:=[Orders]ShipDateFactory
+	asFactories{$i}:=[Orders]Factory
+	
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$ordernumber)
+	QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+	
+	$n:=1
+	FIRST RECORD([OrdersFabricXRef])
+	For ($n;1;Records in selection([OrdersFabricXRef]))
+		
+		If (Find in array(alFabOrderKey;[OrdersFabricXRef]FabricOrderKey)<1)
+			APPEND TO ARRAY(alFabOrderKey;[OrdersFabricXRef]FabricOrderKey)
+		End if 
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+	
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$ordernumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPOrdID>0;*)
+	QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Self")
+	
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		If (Find in array(asColors;[CP_OrderXRef]CPNumber)<1)
+			APPEND TO ARRAY(asColors;[CP_OrderXRef]CPNumber)
+		End if 
+		APPEND TO ARRAY(alXrefkeys;[CP_OrderXRef]XrefID)
+		ADD TO SET([CP_OrderXRef];"Colors")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+End for 
+
+If (Size of array(asColors)>19)
+	WinPrompt ("The system can not track more than 19 colors.")
+	ARRAY TEXT(asColors;19)
+End if 
+
+$i:=1
+For ($i;1;19)
+	$header:="Header"+String($i+8)
+	$nextCol:=Get pointer("arMcol"+String($i))
+	If (Size of array(asColors)>=$i)
+		OBJECT SET TITLE(*;$header;asColors{$i})
+	Else 
+		OBJECT SET TITLE(*;$header;"")
+	End if 
+End for 
+
+For ($i;1;Size of array(asMOrder))
+	USE SET("Colors")
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber=asMOrder{$i};*)
+	QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Self";*)
+	QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPOrdID>0)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber#"")
+	
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		
+		$c:=Find in array(asColors;[CP_OrderXRef]CPNumber)
+		If ($c>0)
+			$thiscol:=Get pointer("arMcol"+String($c))
+			$thiscol->{$i}:=Round(-1*([CP_OrderXRef]Quantity*arConsumption{Find in array(alSOrder;[CP_OrderXRef]OrderNumber)});0)
+			alFabricColor{$i}:=16777215
+		End if 
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+End for 
+CLEAR SET("Colors")
+
+
+  //  `checks for colors without a fabric order
+  //
+  //  $i:=1
+  //  For ($i;1;Size of array(asMOrder))
+  //  If (asMOrder{$i}#"")
+  //  $missing:=True
+  //  $n:=1
+  //  For ($n;1;Size of array(asColors))
+  //  QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=asColors{$n})
+  //  QUERY([OrdersFabricXRef];[OrdersFabricXRef]XrefID=[CP_OrderXRef]XrefID)
+  //  If ([OrdersFabricXRef]FabricOrderKey>0)
+  //  $missing:=False
+  //  End if 
+  //  End for 
+  //  If ($missing)
+  //  alFabricColor{$i}:=16711690
+  //  Else 
+  //  alFabricColor{$i}:=16777215
+  //  End if 
+  //  End if 
+  //End for 
+
+$i:=1
+$n:=1
+Repeat 
+	  //ALERT(String($n)+"  "+string(Size of array(asMOrder))+"  "+string(Size of array(asFactories)))
+	Case of 
+		: ($i=Size of array(asMOrder)) | ($n=Size of array(asMOrder))  // | ($n=Size of array(asMOrder))
+			$done:=True
+			$n:=$n+1
+			FabricTrack_ArrayInsert ($n;2)
+			asFactories{$n}:="Total"
+			asFactories{$n+1}:="Grand Total"
+			$done:=True
+		: (asFactories{$n}=asFactories{$n+1})
+			$n:=$n+1
+			$i:=$i+1
+		: (asMOrder{$n}#asMOrder{$n+1})
+			$i:=$i+1
+			$n:=$n+1
+			FabricTrack_ArrayInsert ($n;2)
+			asFactories{$n}:="Total"
+			$n:=$n+2
+		Else 
+			$i:=$i+1
+			$n:=1+$n
+	End case 
+Until ($done)
+
+
+$grandtot:=0
+$i:=1
+For ($i;1;Size of array(asColors))
+	$thisCol:=Get pointer("arMCol"+String($i))
+	$subtot:=0
+	$n:=1
+	$done:=False
+	$grandtot:=0
+	Repeat 
+		Case of 
+			: (asFactories{$n}="Grand Total")
+				$thisCol->{$n}:=$grandtot
+				APPEND TO ARRAY(alTrackUsed;Abs($grandtot))
+				$subtot:=0
+				$done:=True
+				FabricTrack_ArrayInsert ($n+1;2)
+				
+			: (asFactories{$n}="Total")
+				$thisCol->{$n}:=$subtot
+				$grandtot:=$grandtot+$subtot
+				$subtot:=0
+				$n:=$n+1
+			: (asMOrder{$n}="")
+				$n:=$n+1
+			Else 
+				$subtot:=$subtot+$thisCol->{$n}
+				$n:=$n+1
+		End case 
+	Until ($done)
+End for 
+
+  //notes
+QUERY([FabricDC];[FabricDC]TrackKey=[FabricTrack]TrackKey)
+  //
+$i:=1
+FIRST RECORD([FabricDC])
+For ($i;1;Records in selection([FabricDC]))
+	atMNote{Find in array(asMOrder;[FabricDC]OrderNumber)}:=[FabricDC]Note
+	$ordernumber:=Num([FabricDC]OrderNumber)
+	asMPO{Find in array(asMOrder;[FabricDC]OrderNumber)}:=asSPo{Find in array(alSOrder;$ordernumber)}
+	NEXT RECORD([FabricDC])
+End for 
+
+ARRAY TEXT(asMOrder;Find in array(asFactories;"Grand Total"))
+
+FabricTrack_Ordered 
+
+  //FabricTrack_ArrayInit (Size of array(asMOrder))
+
+FabricTrack_DC (Size of array(asMOrder))
+
+$n:=Find in array(asFactories;"Total Waiting")+2
+
+FabricTrack_ArrayInsert ($n;2)
+asFactories{$n}:="Over/Under"
+$i:=1
+For ($i;1;Size of array(asColors))
+	$thisCol:=Get pointer("arMCol"+String($i))
+	$thisCol->{$n}:=alTrackShipped{$i}-alTrackUsed{$i}
+End for 
+
+$n:=$n+2
+FabricTrack_ArrayInsert ($n;2)
+asFactories{$n}:="Off Order"
+$i:=1
+For ($i;1;Size of array(asColors))
+	$thisCol:=Get pointer("arMCol"+String($i))
+	$thisCol->{$n}:=alTrackOrdered{$i}-alTrackUsed{$i}
+End for 
+
+LISTBOX SELECT ROW(afshiplist;Size of array(asMOrder)+1)
+
+UNLOAD RECORD([Deliveries])
+UNLOAD RECORD([FabPOLines])
+UNLOAD RECORD([FabricOrders])
+
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+
+
+

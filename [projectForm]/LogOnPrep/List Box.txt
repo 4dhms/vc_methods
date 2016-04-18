@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Clicked)
+		If (adActionDate{adActionDate}=Current date(*))
+			WinPrompt ("Today's entries are not yet ready for processing.")
+			afLogOn{adActionDate}:=False
+		End if 
+	: (Form event=On Column Moved)
+		ALERT("Moving columns breaks this report.";"Don't do it")
+		CANCEL
+End case 

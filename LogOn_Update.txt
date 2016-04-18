@@ -1,0 +1,88 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$record;$Process;$locked;$key)
+C_TEXT($user;$lockinguser;$session;$processname;$message)
+
+  //ARRAY LONGINT($locked;0)
+  //$locked:=0
+
+If (Current user="Ricky")
+	$user:="Admin"
+Else 
+	$user:=Current user
+End if 
+
+$i:=1
+For ($i;1;Size of array(afLogOn))
+	If (afLogOn{$i}=True) & (afProcess{$i}=False) & (adActionDate{$i}<Current date(*))
+		Case of 
+			: (asColorCodes{$i}="A@")
+				$record:=Num(asColorCodes{$i})
+				GOTO RECORD([Orders];$record)
+				If (Locked([Orders]))
+					LOCKED BY([Orders];$Process;$lockinguser;$Session;$ProcessName)
+					$message:="Order #: "+String([Orders]OrderNum)+" S/N: "+[Orders]StyleNumber+" is locked by "
+					$message:=$message+$lockinguser+"."+Char(13)+Char(13)
+					$message:=$message+"It will not be processed at this time."
+					WinPrompt ($message)
+					CREATE RECORD([Changes])
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]FieldName:=asColorCodes{$i}
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RecordKey:=-11111
+					SAVE RECORD([Changes])
+					UNLOAD RECORD([Changes])
+				Else 
+					[Orders]LOProcessDate:=Current date(*)
+					[Orders]LOProcessor:=$user
+					SAVE RECORD([Orders])
+					UNLOAD RECORD([Orders])
+				End if 
+				
+			: (asColorCodes{$i}="B@")
+				$record:=Num(asColorCodes{$i})
+				
+				QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$record)
+				If (Locked([CP_OrderXRef]))
+					LOCKED BY([CP_OrderXRef];$Process;$lockinguser;$Session;$ProcessName)
+					QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+					$message:="Order #: "+String([CP_OrderXRef]OrderNumber)+" S/N: "+[Orders]StyleNumber+" is locked by "
+					$message:=$message+$lockinguser+"."+Char(13)+Char(13)
+					$message:=$message+"It will not be processed at this time."
+					WinPrompt ($message)
+					CREATE RECORD([Changes])
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]FieldName:=asColorCodes{$i}
+					[Changes]OrderNumber:=[CP_OrderXRef]CPOrdID
+					[Changes]RecordKey:=-22222
+					SAVE RECORD([Changes])
+					UNLOAD RECORD([Changes])
+					UNLOAD RECORD([Orders])
+				Else 
+					[CP_OrderXRef]LOProcessDate:=Current date(*)
+					[CP_OrderXRef]LOProcessor:=$user
+					SAVE RECORD([CP_OrderXRef])
+					UNLOAD RECORD([CP_OrderXRef])
+				End if 
+			: (asColorCodes{$i}="C@")
+				$record:=Num(asColorCodes{$i})
+				QUERY([Changes];[Changes]ChangeKey=$record)
+				[Changes]LOProcessor:=$user
+				[Changes]LOProcessDate:=Current date(*)
+				
+				SAVE RECORD([Changes])
+				UNLOAD RECORD([Changes])
+		End case 
+		afProcess{$i}:=True
+		asUsers{$i}:=$user
+	End if 
+End for 
+
+If (LISTBOX Get number of columns(afLogOn)=15)
+	LogOn_SaveColor 
+End if 

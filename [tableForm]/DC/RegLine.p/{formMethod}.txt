@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	If (vfIn)
+		OBJECT SET VISIBLE(*;"xIn";True)
+	Else 
+		OBJECT SET VISIBLE(*;"xIn";False)
+	End if 
+End if 

@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //PasteText (->◊vtCopyNotes;->◊vtNotes)
+WinPrompt ("Use the Edit menu to copy and paste.")

@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtTable;$HTML)
+C_LONGINT($i)
+C_DATE($start;$date)
+ARRAY TEXT($userNames;0)
+ARRAY TEXT($full;0)
+$start:=Current date(*)-(Day number(Current date(*))+5)
+$date:=$start
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsMonday size=1>"
+
+$i:=1
+For ($i;1;10)
+	If ($i=2)
+		$HTML:=$HTML+"<option selected>"+String($date;4)+"</option>"
+	Else 
+		$HTML:=$HTML+"<option>"+String($date;4)+"</option>"
+	End if 
+	$date:=$date+7
+End for 
+$HTML:=$HTML+"</select>"
+vtTable:=$HTML
+
+QUERY([Appts];[Appts]ApptDate>=$start;*)
+QUERY([Appts]; & ;[Appts]ApptDate<=$date)
+RELATE MANY SELECTION([Attendees]ApptKey)
+
+DISTINCT VALUES([Attendees]Attendee;$full)
+$i:=1
+For ($i;1;Size of array($full))
+	If (User in group($full{$i};"Sales"))
+		INSERT IN ARRAY($userNames;1;1)
+		$userNames{1}:=$full{$i}
+	End if 
+End for 
+
+SORT ARRAY($userNames;>)
+INSERT IN ARRAY($userNames;1;1)
+$userNames{1}:="All"
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<select name=vsCalUser size=1>"
+$i:=1
+For ($i;1;Size of array($userNames))
+	If ($i=1)
+		$HTML:=$HTML+"<option selected>"+$userNames{$i}+"</option>"
+	Else 
+		$HTML:=$HTML+"<option>"+$userNames{$i}+"</option>"
+	End if 
+End for 
+$HTML:=$HTML+"</select>"
+
+vtQueryText:=$HTML
+Web_UserField 
+WEB SEND FILE("daterange.html")
+

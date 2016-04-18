@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;$c)
+C_REAL($unit)
+
+$c:=Records in selection([SLRReporter])
+
+$unit:=250/$c
+
+$line:=$c-((250-vlSlider)*$unit)
+
+ALERT(String(vlSlider)+"  "+String($c)+"  "+String($unit)+"  "+String($line))
+
+Case of 
+	: ($1=1)
+		OBJECT SET SCROLL POSITION([SLRReporter];$line;*)
+End case 

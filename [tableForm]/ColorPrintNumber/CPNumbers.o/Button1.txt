@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Sort in which direction?";"Up";"Down")
+If (ok=1)
+	ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPNumber;>)
+Else 
+	ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPNumber;<)
+End if 

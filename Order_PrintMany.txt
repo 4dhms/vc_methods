@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+vlPage:=0
+$i:=1
+
+
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	<>vlOrderNumber:=[Orders]OrderNum
+	Order_Print 
+	If ($i<Records in selection([Orders]))
+		PAGE BREAK(>)
+	Else 
+		PAGE BREAK
+	End if 
+	NEXT RECORD([Orders])
+End for 

@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asRowheaders+1<Size of array(asRowheaders))
+	asRowheaders:=asRowheaders+2
+	SS_PullPrevious 
+	SS_Show 
+End if 
+
+If (asRowHeaders=Size of array(asRowHeaders))
+	OBJECT SET VISIBLE(*;"xKill";True)
+	OBJECT SET ENABLED(bDelete;True)
+End if 

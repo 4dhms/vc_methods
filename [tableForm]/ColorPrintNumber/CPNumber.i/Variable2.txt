@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($rawNumber)
+C_LONGINT($next;$dot)
+
+If ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor="")
+	WinPrompt ("Enter Thread Color")
+	GOTO OBJECT([ColorPrintNumber]ThreadColor)
+Else 
+	If (Semaphore("NewVariation"))
+		WinPrompt ("Someone is making a variation of this right now. Continue when they are done.")
+	Else 
+		If (ColorPrint_Mandatories )
+			[ColorPrintNumber]NewCP:=False
+			SAVE RECORD([ColorPrintNumber])
+			$dot:=Position("-";[ColorPrintNumber]CPNumber)+1
+			If ($dot=1)
+				$rawNumber:=[ColorPrintNumber]CPNumber
+			Else 
+				$rawNumber:=Substring([ColorPrintNumber]CPNumber;1;$dot-2)
+			End if 
+			If (Num($rawNumber)<2500) & ([ColorPrintNumber]CPType=2)
+				WinPrompt ("Preexisting numbers must be created at the order level.")
+			Else 
+				CREATE SET([ColorPrintNumber];"Prints")
+				
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPType=[ColorPrintNumber]CPType;*)
+				QUERY([ColorPrintNumber]; & ;[ColorPrintNumber]CPNumber=$rawNumber+"@")
+				ORDER BY([ColorPrintNumber];[ColorPrintNumber]Version;<)
+				
+				$dot:=Position("-";[ColorPrintNumber]CPNumber)+1
+				If ($dot=1)
+					$next:=1
+				Else 
+					$next:=Num(Substring([ColorPrintNumber]CPNumber;$dot;10))+1
+				End if 
+				
+				CP_Duplicate ($rawNumber;$next)
+				OBJECT SET ENTERABLE([ColorPrintNumber]CPName;True)
+				OBJECT SET VISIBLE(*;"xNo";False)
+				
+				If (Records in set("Prints")>0)
+					ADD TO SET([ColorPrintNumber];"Prints")
+				End if 
+				
+				RELATE MANY([ColorPrintNumber]CPNumberKey)
+			End if 
+			
+		End if 
+		CLEAR SEMAPHORE("NewVariation")
+	End if 
+End if 

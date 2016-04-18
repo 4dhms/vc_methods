@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //C_BOOLEAN($0)
+  //C_TEXT($1;$2;$3;$4;$5;$6)
+  //C_TEXT($URL;$Browser;$BrowserIP;$ServerIP;$name;$password)
+  //$URL:=$1
+  //$Browser:=$2
+  //$BrowserIP:=$3
+  //$ServerIP:=$4
+  //$name:=$5
+  //$password:=$6
+  //
+  //Case of 
+  //: ($5="") | ($6="")
+  //$0:=False
+  //: (Not(User in group($5;"Web"))
+  //$0:=False
+  //Else 
+  //If ($1="/")
+  //vsWebSession:=Replace string(String(Current time(*));":";"")
+  //vsWebUser:=$5
+  //Else 
+  //End if 
+  //End case 

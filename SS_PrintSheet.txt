@@ -1,0 +1,89 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT(cbPrintGrade;cbPrintTrim;cbPrintComments)
+C_BOOLEAN($keepPrinting)
+
+SAVE RECORD([SpecFactory])
+Case of 
+	: ([SpecFactory]OrderNumber=0)
+		vtHeader:="SPEC SHEET"
+		vlOrderNumber:=[SpecFactory]SF_KeyNumber
+	: ([SpecFactory]OrderNumber>0) | (vfPDF)
+		vtHeader:="HMS ORDER"
+		vlOrderNumber:=<>vlOrderNumber
+	Else 
+		vtHeader:="HMS SAMPLE"
+		vlOrderNumber:=Abs(<>vlOrderNumber)
+End case 
+
+Case of 
+	: (<>vlOrderNumber<0)
+		If ([Samples]NoOrder)
+			vtApproved:="THIS IS NOT AN ORDER"
+		End if 
+		
+	: ([SpecFactory]ApprovedForProd)
+		vtApproved:="Approved for production"+Char(13)+String([SpecFactory]ApproveDate)
+	Else 
+		vtApproved:=""
+End case 
+
+SS_PrintPrepFabric 
+$keepPrinting:=True
+
+  //If (ok=1)
+
+SET PRINT OPTION(Orientation option;2)
+vlPage:=0
+
+If (Not(vfPDF))
+	PRINT SETTINGS
+End if 
+
+If (Not(SS_PrintPOM ))
+	$keepPrinting:=False
+End if 
+
+If (vfPrintTrim) & ($keepPrinting)
+	If (Not(SS_PrintTrim ))
+		$keepPrinting:=False
+	End if 
+End if 
+
+If (vfPrintGrade) & ($keepPrinting)
+	If (Not(SS_PrintGrade ))
+		$keepPrinting:=False
+	End if 
+End if 
+
+If (vfPrintComments) & ($keepPrinting)
+	SS_PrintComments 
+End if 
+
+If (vfPrintImages)
+	SS_PrintImages 
+End if 
+PAGE BREAK
+
+If (Not(vfPDF))
+	SS_Build 
+	vlCloneRouter:=0
+	SS_GetPart 
+	Case of 
+		: (Size of array(asPart)=3)
+			pOne:=0
+			pTwo:=0
+			pThree:=1
+		: (Size of array(asPart)=2)
+			pOne:=0
+			pTwo:=1
+			pThree:=0
+		Else 
+			pOne:=1
+			pTwo:=0
+			pThree:=0
+	End case 
+	  // SS_BuildSize 
+	FORM GOTO PAGE(1)
+End if 
+
+

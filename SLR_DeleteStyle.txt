@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($style)
+C_LONGINT($i)
+ARRAY TEXT($acct;0)
+
+$style:=Request("What style number do you want to delete?")
+If (ok=1)
+	
+	QUERY([SLRAcct];[SLRAcct]SLRStyleNumber=$style)
+	
+	If (Records in selection([SLRAcct])=0)
+		WinPrompt ("No such style number")
+	Else 
+		SELECTION TO ARRAY([SLRAcct]SLRAcct;$acct)
+		
+		$i:=1
+		For ($i;1;Size of array($acct))
+			WinChoice ("Do you want to delete "+$style+" from "+$acct{$i})
+			If (ok=1)
+				QUERY([SLRAcct];[SLRAcct]SLRStyleNumber=$style)
+				QUERY SELECTION([SLRAcct];[SLRAcct]SLRAcct=$acct{$i})
+				DELETE RECORD([SLRAcct])
+			End if 
+		End for 
+	End if 
+End if 

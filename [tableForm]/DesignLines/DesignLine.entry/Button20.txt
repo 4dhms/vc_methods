@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+WinChoice ("Are you sure you want to"+Char(13)+"Force Initial Caps?")
+If (ok=1)
+	$i:=1
+	FIRST RECORD([DesignLineIncluded])
+	For ($i;1;Records in selection([DesignLineIncluded]))
+		[DesignLineIncluded]Colors:=Util_Ulc ([DesignLineIncluded]Colors)
+		SAVE RECORD([DesignLineIncluded])
+		NEXT RECORD([DesignLineIncluded])
+	End for 
+End if 

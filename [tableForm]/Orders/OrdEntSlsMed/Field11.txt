@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		If ([Orders]Price Terms="8/10") & ([Orders]NetDiscount#8)
+			WinPrompt ("Terms are 8/10."+Char(13)+"Change terms if you want other than 8%.")
+			[Orders]NetDiscount:=8
+		End if 
+End case 

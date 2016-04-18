@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(<>vfGuideFlag;<>vfDevelopment;<>vf13)
+
+Case of 
+	: (Form event=On Load)
+		  //If (<>vf13)
+		  //SET TIMER(3600)
+		  //vhPingTime:=Current time(*)
+		  //End if 
+		If (Current user="Designer")
+			vsStructure:=Substring(Structure file;Position(":";Structure file)+1;999)
+			vsStructure:=Substring(vsStructure;Position(":";vsStructure)+1;999)
+			vsStructure:=Substring(vsStructure;Position(":";vsStructure)+1;999)
+		Else 
+			vsStructure:=""
+		End if 
+		Report_Array 
+		<>asReports:=1
+		
+		SeasonArrays 
+		
+		If (Shift down)
+			SET MENU BAR(20)
+		End if 
+		  //: (Form event=On Timer)
+		  //If (<>vf13)
+		  //QUERY([Changes];[Changes]FieldName=Current user)
+		  //If (Records in selection([Changes])=0)
+		  //CREATE RECORD([Changes])
+		  //[Changes]FieldName:=Current user
+		  //[Changes]Tag:="Ping"
+		  //End if 
+		  //[Changes]NewChange:=String(Current time(*)-vhPingTime)
+		  //SAVE RECORD([Changes])
+		  //UNLOAD RECORD([Changes])
+		  //End if 
+		
+End case 

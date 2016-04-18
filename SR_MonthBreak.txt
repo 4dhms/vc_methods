@@ -1,0 +1,188 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($startA;$startB;$endA;$endB)
+C_TEXT($firstHalf;$secondHalf)
+C_TEXT($firstHalfLast;$secondHalfLast)
+
+vsDivision:=asDivisions{asDivisions}
+
+If (Records in set("Master")>0)
+	If (asSeasonA{asSeasonA}="Fall")
+		$firstHalf:=" "+String(alYearA{alYearA}+1)
+		$secondHalf:=" "+String(alYearA{alYearA})
+		$firstHalfLast:=" "+String(alYearA{alYearA})
+		$secondHalfLast:=" "+String(alYearA{alYearA}-1)
+		Case of 
+			: ($1>12)
+				vlMonth:=$1
+				vlYear:=alYearA{alYearA}
+			: ($1<7)
+				vlMonth:=$1+6
+				vlYear:=alYearA{alYearA}
+			Else 
+				vlMonth:=$1-6
+				vlYear:=alYearA{alYearA}+1
+		End case 
+	Else 
+		vlMonth:=$1
+		vlYear:=alYearA{alYearA}
+		$firstHalf:=" "+String(vlYear)
+		$secondHalf:=" "+String(vlYear)
+		$firstHalfLast:=" "+String(vlYear-1)
+		$secondHalfLast:=" "+String(vlYear-1)
+	End if 
+	
+	Case of 
+		: (vlMonth=1)
+			vsMonth:="January"+$firstHalf
+			vsMonthLast:="January"+$firstHalfLast
+		: (vlMonth=2)
+			vsMonth:="February"+$firstHalf
+			vsMonthLast:="February"+$firstHalfLast
+		: (vlMonth=3)
+			vsMonth:="March"+$firstHalf
+			vsMonthLast:="March"+$firstHalfLast
+		: (vlMonth=4)
+			vsMonth:="April"+$firstHalf
+			vsMonthLast:="April"+$firstHalfLast
+		: (vlMonth=5)
+			vsMonth:="May"+$firstHalf
+			vsMonthLast:="May"+$firstHalfLast
+		: (vlMonth=6)
+			vsMonth:="June"+$firstHalf
+			vsMonthLast:="June"+$firstHalfLast
+		: (vlMonth=7)
+			vsMonth:="July"+$secondHalf
+			vsMonthLast:="July"+$secondHalfLast
+		: (vlMonth=8)
+			vsMonth:="August"+$secondHalf
+			vsMonthLast:="August"+$secondHalfLast
+		: (vlMonth=9)
+			vsMonth:="September"+$secondHalf
+			vsMonthLast:="September"+$secondHalfLast
+		: (vlMonth=10)
+			vsMonth:="October"+$secondHalf
+			vsMonthLast:="October"+$secondHalfLast
+		: (vlMonth=11)
+			vsMonth:="November"+$secondHalf
+			vsMonthLast:="November"+$secondHalfLast
+		: (vlMonth=12)
+			vsMonth:="December"+$secondHalf
+			vsMonthLast:="December"+$secondHalfLast
+		: (vlMonth=13)
+			vsMonth:=asSeasonA{asSeasonA}+" "+$firstHalf
+			vsMonthLast:=asSeasonA{asSeasonA}+" "+$firstHalfLast
+		: (vlMonth=14) & (asSeasonA{asSeasonA}="Fall")
+			vsMonth:="Spring "+$secondHalf
+			vsMonthLast:="Spring "+$secondHalfLast
+		: (vlMonth=14) & (asSeasonA{asSeasonA}="Spring")
+			vsMonth:="Fall "+$secondHalf
+			vsMonthLast:="Fall "+$secondHalfLast
+		: (vlMonth=15) & (asSeasonA{asSeasonA}="Fall")
+			vsMonth:="Spring/Fall "+$secondHalf
+			vsMonthLast:="Spring/Fall "+$secondHalfLast
+		: (vlMonth=15) & (asSeasonA{asSeasonA}="Spring")
+			vsMonth:="Fall/Spring "+$secondHalf
+			vsMonthLast:="Fall/Spring "+$secondHalfLast
+	End case 
+	
+	Case of 
+		: (vlMonth=13) & (asSeasonA{asSeasonA}="Fall")
+			$startA:=Date("07/01/"+String(vlYear))
+			$startB:=Date("07/01/"+String(vlYear-1))
+		: (vlMonth=13) & (asSeasonA{asSeasonA}="Spring")
+			$startA:=Date("01/01/"+String(vlYear))
+			$startB:=Date("01/01/"+String(vlYear-1))
+		: (vlMonth=14) & (asSeasonA{asSeasonA}="Spring")
+			$startA:=Date("07/01/"+String(vlYear))
+			$startB:=Date("07/01/"+String(vlYear-1))
+		: (vlMonth=14) & (asSeasonA{asSeasonA}="Fall")
+			$startA:=Date("01/01/"+String(vlYear+1))
+			$startB:=Date("01/01/"+String(vlYear))
+		: (vlMonth=15) & (asSeasonA{asSeasonA}="Spring")
+			$startA:=Date("01/01/"+String(vlYear))
+			$startB:=Date("01/01/"+String(vlYear-1))
+		: (vlMonth=15) & (asSeasonA{asSeasonA}="Fall")
+			$startA:=Date("07/01/"+String(vlYear))
+			$startB:=Date("07/01/"+String(vlYear-1))
+		Else 
+			$startA:=Date(String(vlMonth)+"/1/"+String(vlYear))
+			$startB:=Date(String(vlMonth)+"/1/"+String(vlYear-1))
+	End case 
+	
+	Case of 
+		: (vlMonth=13) & (asSeasonA{asSeasonA}="Fall")
+			$endA:=Date("01/01/"+String(vlYear+1))
+			$endB:=Date("01/01/"+String(vlYear))
+		: (vlMonth=13) & (asSeasonA{asSeasonA}="Spring")
+			$endA:=Date("07/01/"+String(vlYear))
+			$endB:=Date("07/01/"+String(vlYear-1))
+		: (vlMonth=14) & (asSeasonA{asSeasonA}="Fall")
+			$endA:=Date("07/01/"+String(vlYear+1))
+			$endB:=Date("07/01/"+String(vlYear))
+		: (vlMonth=14) & (asSeasonA{asSeasonA}="Spring")
+			$endA:=Date("01/01/"+String(vlYear+1))
+			$endB:=Date("01/01/"+String(vlYear))
+		: (vlMonth=15) & (asSeasonA{asSeasonA}="Spring")
+			$endA:=Date("01/01/"+String(vlYear+1))
+			$endB:=Date("01/01/"+String(vlYear))
+		: (vlMonth=15) & (asSeasonA{asSeasonA}="Fall")
+			$endA:=Date("07/01/"+String(vlYear+1))
+			$endB:=Date("07/01/"+String(vlYear))
+		: (vlMonth<12)
+			$endA:=Date(String(vlMonth+1)+"/1/"+String(vlYear))
+			$endB:=Date(String(vlMonth+1)+"/1/"+String(vlYear-1))
+		Else 
+			$endA:=Date("01/01/"+String(vlYear+1))
+			$endB:=Date("01/01/"+String(vlYear))
+	End case 
+	
+	USE SET("Master")
+	
+	QUERY SELECTION([Orders];[Orders]CancelDate>=$startB;*)
+	QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$endA)
+	
+	QUERY SELECTION([Orders];[Orders]CancelDate<$endB;*)
+	QUERY SELECTION([Orders]; | ;[Orders]CancelDate>=$StartA)
+	
+	If (asDivisions{asDivisions}="All Divisions")
+		Case of 
+			: (Current user="Mark")
+				QUERY SELECTION([Orders];[Orders]OrderDivision="02-@";*)
+				QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="01-@";*)
+				QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="04-@")
+				  //QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="08-@")
+		End case 
+	Else 
+		QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+	End if 
+	
+	  //size cat specific
+	If (cbBreakout=1) & (FORM Get current page=1)
+		Case of 
+			: (asSRmonth{asSRmonth}="Petite") | (asSRmonth{asSRmonth}="Missy") | (asSRmonth{asSRmonth}="Large")
+				QUERY SELECTION([Orders];[Orders]SizeCategory=asSRmonth{asSRmonth})
+		End case 
+	End if 
+	
+	CREATE SET([Orders];"Month")
+	
+	ARRAY TEXT(asMeetingCust;0)
+	DISTINCT VALUES([Orders]Customer;asMeetingCust)
+	
+	USE SET("Month")
+	QUERY SELECTION([Orders];[Orders]CancelDate>=$startA;*)
+	QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$endA)
+	CREATE SET([Orders];"ThisYear")
+	
+	USE SET("Month")
+	QUERY SELECTION([Orders];[Orders]CancelDate>=$startB;*)
+	QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$endB)
+	
+	CREATE SET([Orders];"LastYear")
+	CLEAR SET("Month")
+	
+	SR_CustomerArray 
+	
+	FORM GOTO PAGE(3)
+End if 
+

@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($0;$good)
+$good:=False
+
+Case of 
+	: ([ColorPrintNumber]CPType=-1)
+		$good:=True
+	: ([ColorPrintNumber]Enterer="")
+		WinPrompt ("Enter ORDER WRITER.")
+	: ([ColorPrintNumber]Division="")
+		WinPrompt ("Enter DIVISION.")
+	: ([ColorPrintFamilies]CPFamilyName="") & ([ColorPrintNumber]CPType<3)
+		WinPrompt ("Select FAMILY.")
+	: ([ColorPrintNumber]CPName="")
+		WinPrompt ("Enter NAME.")
+	: ([ColorPrintNumber]SeasonName="")
+		WinPrompt ("Enter SEASON NAME.")
+	: ([ColorPrintNumber]BuySeason="") & ([ColorPrintNumber]SeasonYear="")
+		WinPrompt ("Enter SEASON YEAR.")
+	: ([ColorPrintNumber]CPType=2) & ([ColorPrintNumber]ThreadColor="")
+		WinPrompt ("Prints much have"+Char(13)+"a THREAD COLOR.")
+	Else 
+		$good:=True
+End case 
+
+$0:=$good

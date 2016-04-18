@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+$choice:=Pop up menu("Pass;Fail")
+Case of 
+	: ($choice=1)
+		[Orders]AuditPF:="Pass"
+	: ($choice=2)
+		[Orders]AuditPF:="Fail"
+End case 

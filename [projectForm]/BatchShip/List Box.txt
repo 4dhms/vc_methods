@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+
+Case of 
+	: (Form event=On Clicked)
+		WH_ShowSpec 
+	: (Form event=On Double Clicked)
+		If (Shift down)
+			WinChoice ("Delete line?")
+			If (ok=1)
+				$line:=alPOOrder
+				DELETE FROM ARRAY(afBatchList;$line;1)
+				DELETE FROM ARRAY(alPOOrder;$line;1)
+				DELETE FROM ARRAY(asXStyle;$line;1)
+				DELETE FROM ARRAY(asSheetNames;$line;1)
+				DELETE FROM ARRAY(asEnterer;$line;1)
+				DELETE FROM ARRAY(adXShip;$line;1)
+				DELETE FROM ARRAY(alxqty;$line;1)
+				DELETE FROM ARRAY(arMCol1;$line;1)
+				DELETE FROM ARRAY(arMCol2;$line;1)
+				DELETE FROM ARRAY(arMCol3;$line;1)
+				DELETE FROM ARRAY(arMCol4;$line;1)
+				DELETE FROM ARRAY(arFOB;$line;1)
+				DELETE FROM ARRAY(arPrice;$line;1)
+				  //DELETE FROM ARRAY(alTrackShipped;$line;1)
+				  //DELETE FROM ARRAY(afTrackShip;$line;1)
+			End if 
+		Else 
+			WH_UndoLine 
+		End if 
+End case 
+

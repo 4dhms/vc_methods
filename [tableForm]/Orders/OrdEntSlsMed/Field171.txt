@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Data Change)
+		<>vsCustomer:=[Orders]Customer
+		DELAY PROCESS(Current process;6)
+		If ([Orders]Price Tckt#"") & (Current user#"Alex")
+			WinChoice ("Changing customer will clear out old price ticket information.";"Clear Ticket";"Keep Ticket")
+			If (ok=1)
+				[Orders]Price Tckt:=""
+			End if 
+		End if 
+		
+		Customer_InfoProc 
+		Order_CreditReq 
+		If (Find in array(asCustomerBuild;[Orders]Customer)>0)
+			Order_TicketChange 
+		Else 
+			WinPrompt ([Orders]Customer+" is not on the official client list.")
+			[Orders]Customer:=""
+		End if 
+		Order_DefaultTicket 
+		GOTO OBJECT([Orders]RetailPrice)
+End case 

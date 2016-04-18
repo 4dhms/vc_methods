@@ -1,0 +1,172 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$n)
+C_BOOLEAN($add)
+C_POINTER($order;$unit;$dollar)
+
+
+$n:=1
+For ($n;1;4)
+	
+	If ($n<3)
+		$order:=->alSRorderA
+		$unit:=->alSRunitA
+		$dollar:=->alSRdollarA
+		
+		Case of 
+			: (cbBreakout=0) & ($n=1)
+				$add:=True
+				$c:=7
+			: (cbBreakout=0) & ($n=2)
+				$add:=True
+				$c:=14
+			: ($n=1)
+				$add:=True
+				$c:=24
+			Else 
+				$add:=True
+				$c:=52
+		End case 
+	Else 
+		$order:=->alSRorderB
+		$unit:=->alSRunitB
+		$dollar:=->alSRdollarB
+		
+		Case of 
+			: (cbBreakout=0) & ($n=3)
+				$add:=True
+				$c:=7
+			: (cbBreakout=0) & ($n=4)
+				$add:=True
+				$c:=14
+			: ($n=3)
+				$add:=True
+				$c:=24
+			Else 
+				$add:=True
+				$c:=52
+		End case 
+	End if 
+	
+	$i:=1
+	For ($i;1;Size of array(alSROrderA)-1)
+		Case of 
+			: (cbBreakout=0) & ($c=7) & ($i<7)
+				$order->{$c}:=$order->{$c}+$order->{$i}
+				$unit->{$c}:=$unit->{$c}+$unit->{$i}
+				$dollar->{$c}:=$dollar->{$c}+$dollar->{$i}
+				
+			: (cbBreakout=0) & ($c=14) & ($i>7) & ($i<14)
+				$order->{$c}:=$order->{$c}+$order->{$i}
+				$unit->{$c}:=$unit->{$c}+$unit->{$i}
+				$dollar->{$c}:=$dollar->{$c}+$dollar->{$i}
+				
+			: (cbBreakout=0)
+				  //complete
+				
+			: ($i>24) & ($n=1)
+				$add:=False
+				
+			: ($i<29) | ($i>52) & ($n=2)
+				$add:=False
+				
+			: ($i>24) & ($n=3)
+				$add:=False
+				
+			: ($i<29) | ($i>52) & ($n=4)
+				$add:=False
+				
+			: ($i%4=1)
+				$order->{$c+1}:=$order->{$c+1}+$order->{$i}
+				$unit->{$c+1}:=$unit->{$c+1}+$unit->{$i}
+				$dollar->{$c+1}:=$dollar->{$c+1}+$dollar->{$i}
+				
+			: ($i%4=2)
+				$order->{$c+2}:=$order->{$c+2}+$order->{$i}
+				$unit->{$c+2}:=$unit->{$c+2}+$unit->{$i}
+				$dollar->{$c+2}:=$dollar->{$c+2}+$dollar->{$i}
+			: ($i%4=3)
+				$order->{$c+3}:=$order->{$c+3}+$order->{$i}
+				$unit->{$c+3}:=$unit->{$c+3}+$unit->{$i}
+				$dollar->{$c+3}:=$dollar->{$c+3}+$dollar->{$i}
+			: ($i%4=0)
+				$order->{$c+4}:=$order->{$c+4}+$order->{$i}
+				$unit->{$c+4}:=$unit->{$c+4}+$unit->{$i}
+				$dollar->{$c+4}:=$dollar->{$c+4}+$dollar->{$i}
+		End case 
+	End for 
+	
+	
+	Case of 
+		: (cbBreakout=0)
+			$order->{15}:=$order->{14}+$order->{7}
+			$unit->{15}:=$unit->{14}+$unit->{7}
+			$dollar->{15}:=$dollar->{14}+$dollar->{7}
+			
+		: ($n=2) | ($n=4)
+			$order->{57}:=$order->{53}+$order->{25}
+			$unit->{57}:=$unit->{53}+$unit->{25}
+			$dollar->{57}:=$dollar->{53}+$dollar->{25}
+			
+			$order->{58}:=$order->{54}+$order->{26}
+			$unit->{58}:=$unit->{54}+$unit->{26}
+			$dollar->{58}:=$dollar->{54}+$dollar->{26}
+			
+			$order->{59}:=$order->{55}+$order->{27}
+			$unit->{59}:=$unit->{55}+$unit->{27}
+			$dollar->{59}:=$dollar->{55}+$dollar->{27}
+			
+			$order->{60}:=$order->{56}+$order->{28}
+			$unit->{60}:=$unit->{56}+$unit->{28}
+			$dollar->{60}:=$dollar->{56}+$dollar->{28}
+	End case 
+End for 
+
+If (cbBreakout=0)
+	asSRavgA{7}:=String(Round(alSRdollarA{7}/alSRunitA{7};2);"###.00")
+	asSRavgA{14}:=String(Round(alSRdollarA{14}/alSRunitA{14};2);"###.00")
+	asSRavgB{7}:=String(Round(alSRdollarB{7}/alSRunitB{7};2);"###.00")
+	asSRavgB{14}:=String(Round(alSRdollarB{14}/alSRunitB{14};2);"###.00")
+Else 
+	asSRavgA{25}:=String(Round(alSRdollarA{25}/alSRunitA{25};2);"###.00")
+	asSRavgA{26}:=String(Round(alSRdollarA{26}/alSRunitA{26};2);"###.00")
+	asSRavgA{27}:=String(Round(alSRdollarA{27}/alSRunitA{27};2);"###.00")
+	asSRavgA{28}:=String(Round(alSRdollarA{28}/alSRunitA{28};2);"###.00")
+	
+	asSRavgA{53}:=String(Round(alSRdollarA{53}/alSRunitA{54};2);"###.00")
+	asSRavgA{54}:=String(Round(alSRdollarA{54}/alSRunitA{54};2);"###.00")
+	asSRavgA{55}:=String(Round(alSRdollarA{55}/alSRunitA{55};2);"###.00")
+	asSRavgA{56}:=String(Round(alSRdollarA{56}/alSRunitA{56};2);"###.00")
+	
+	asSRavgB{25}:=String(Round(alSRdollarB{25}/alSRunitB{25};2);"###.00")
+	asSRavgB{26}:=String(Round(alSRdollarB{26}/alSRunitB{26};2);"###.00")
+	asSRavgB{27}:=String(Round(alSRdollarB{27}/alSRunitB{27};2);"###.00")
+	asSRavgB{28}:=String(Round(alSRdollarB{28}/alSRunitB{28};2);"###.00")
+	
+	asSRavgB{53}:=String(Round(alSRdollarB{53}/alSRunitB{54};2);"###.00")
+	asSRavgB{54}:=String(Round(alSRdollarB{54}/alSRunitB{54};2);"###.00")
+	asSRavgB{55}:=String(Round(alSRdollarB{55}/alSRunitB{55};2);"###.00")
+	asSRavgB{56}:=String(Round(alSRdollarB{56}/alSRunitB{56};2);"###.00")
+	
+End if 
+
+
+
+If (cbBreakout=0)
+	SR_InsertArray (15)
+	alSRbackground{15}:=16777215
+	SR_InsertArray (8)
+	alSRbackground{8}:=16777215
+Else 
+	SR_InsertArray (57)
+	alSRbackground{57}:=16777215
+	SR_InsertArray (53)
+	alSRbackground{53}:=16777215
+	SR_InsertArray (29)
+	alSRbackground{29}:=16777215
+	SR_InsertArray (25)
+	alSRbackground{25}:=16777215
+	
+End if 
+
+LISTBOX SELECT ROW(susanlist;Size of array(asSRseasonA)+1)
+

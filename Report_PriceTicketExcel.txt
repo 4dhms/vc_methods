@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TIME($docRef)
+C_TEXT($packet;$path)
+
+$docRef:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	
+	If (vdShipDateFact=!00-00-00!)  //report A
+		$packet:="PO"+Char(9)
+		$packet:=$packet+"Style Number"+Char(9)
+		$packet:=$packet+"Factory"+Char(9)
+		$packet:=$packet+"XFactory"+Char(9)
+		$packet:=$packet+"Cancel Date"+Char(9)
+		$packet:=$packet+"Customer"+Char(9)
+		$packet:=$packet+"Customer PO"+Char(9)
+		$packet:=$packet+"Division"+Char(9)
+		$packet:=$packet+"Salesperson"+Char(9)
+		$packet:=$packet+"Enterer"+Char(9)
+		$packet:=$packet+"Group"+Char(9)
+		$packet:=$packet+"Retail"+Char(9)
+		$packet:=$packet+"Need By"+Char(13)
+		
+		SEND PACKET($docRef;$packet)
+		
+		$i:=1
+		FIRST RECORD([Orders])
+		
+		For ($i;1;Records in selection([Orders]))
+			$packet:=String([Orders]OrderNum)+Char(9)
+			$packet:=$packet+[Orders]StyleNumber+Char(9)
+			$packet:=$packet+[Orders]Factory+Char(9)
+			$packet:=$packet+String([Orders]ShipDateFactory)+Char(9)
+			$packet:=$packet+String([Orders]CancelDate)+Char(9)
+			$packet:=$packet+[Orders]Customer+Char(9)
+			$packet:=$packet+[Orders]CustPONumber+Char(9)
+			$packet:=$packet+[Orders]OrderDivision+Char(9)
+			$packet:=$packet+[Orders]Salesperson+Char(9)
+			$packet:=$packet+[Orders]Order_Enterer+Char(9)
+			$packet:=$packet+[Orders]Group+Char(9)
+			$packet:=$packet+String([Orders]RetailPrice;"##0.00")+Char(9)
+			$packet:=$packet+String([Orders]NeedBy)+Char(13)
+			
+			SEND PACKET($docRef;$packet)
+			NEXT RECORD([Orders])
+		End for 
+	Else   //report B
+		$packet:="PO"+Char(9)
+		$packet:=$packet+"Style Number"+Char(9)
+		$packet:=$packet+"Factory"+Char(9)
+		$packet:=$packet+"XFactory"+Char(9)
+		$packet:=$packet+"Customer"+Char(9)
+		$packet:=$packet+"Enterer"+Char(9)
+		$packet:=$packet+"Cancel Date"+Char(9)
+		$packet:=$packet+"Group"+Char(9)
+		$packet:=$packet+"Retail"+Char(9)
+		$packet:=$packet+"Need By"+Char(13)
+		SEND PACKET($docRef;$packet)
+		
+		$i:=1
+		FIRST RECORD([Orders])
+		
+		For ($i;1;Records in selection([Orders]))
+			$packet:=String([Orders]OrderNum)+Char(9)
+			$packet:=$packet+[Orders]StyleNumber+Char(9)
+			$packet:=$packet+[Orders]Factory+Char(9)
+			$packet:=$packet+String([Orders]ShipDateFactory)+Char(9)
+			$packet:=$packet+[Orders]Customer+Char(9)
+			$packet:=$packet+[Orders]Order_Enterer+Char(9)
+			$packet:=$packet+String([Orders]CancelDate)+Char(9)
+			$packet:=$packet+[Orders]Group+Char(9)
+			$packet:=$packet+String([Orders]RetailPrice)+Char(9)
+			$packet:=$packet+String([Orders]NeedBy)+Char(13)
+			SEND PACKET($docRef;$packet)
+			NEXT RECORD([Orders])
+		End for 
+	End if 
+	CLOSE DOCUMENT($docRef)
+	SHOW ON DISK($path)
+End if 

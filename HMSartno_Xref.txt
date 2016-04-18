@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;Size of array(afListBox1))
+	If (afListBox1{$i}=True) & (atArtNumber{$i}#"HMS@")
+		QUERY([FabricLibrary];[FabricLibrary]FabricLibKey=alRecordKey{$i})
+		[FabricLibrary]HMSANkey:=[HMSArtNo]HANkey
+		SAVE RECORD([FabricLibrary])
+		
+		QUERY([HMSArtNoRelated];[HMSArtNoRelated]HANkey=[HMSArtNo]HANkey)
+		QUERY SELECTION([HMSArtNoRelated];[HMSArtNoRelated]ArticleNumber=atArtNumber{$i})
+		If (Records in selection([HMSArtNoRelated])=0)
+			CREATE RECORD([HMSArtNoRelated])
+			[HMSArtNoRelated]ArticleNumber:=atArtNumber{$i}
+			[HMSArtNoRelated]HANkey:=[HMSArtNo]HANkey
+			[FabricLibrary]HMSANumber:=[HMSArtNo]HANumber
+			SAVE RECORD([HMSArtNoRelated])
+		End if 
+	End if 
+End for 
+
+Fab_RelatedArtNos 
+UNLOAD RECORD([FabricLibrary])
+UNLOAD RECORD([HMSArtNoRelated])
+FORM GOTO PAGE(1)

@@ -1,0 +1,45 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($title)
+C_POINTER($note)
+C_POINTER($sketch)
+C_POINTER($LP)
+C_TEXT($key)
+C_POINTER($text)
+
+Pix_Init 
+
+If (<>vlOrderNumber>0)
+	$key:="B"
+Else 
+	$key:="S"
+End if 
+
+$i:=1
+For ($i;1;4)
+	QUERY([SpecPix];[SpecPix]OrderNumber=<>vlOrderNumber)
+	QUERY SELECTION([SpecPix];[SpecPix]SketchNumber=$i)
+	
+	If (Records in selection([SpecPix])>0)
+		$title:=Get pointer("vtField"+String($i))
+		$note:=Get pointer("vtField1"+String($i))
+		$sketch:=Get pointer("vxSketch"+String($i))
+		$text:=Get pointer("xAdd"+String($i))
+		$LP:=Get pointer("cbLP"+String($i))
+		
+		Picture_Get (Abs(<>vlOrderNumber)+($i*0.1);$key)
+		Pix_Delay 
+		
+		$title->:=[SpecPix]Title
+		$note->:=[SpecPix]Description
+		$sketch->:=<>vxSketch
+		If ([SpecPix]LinePlan=True)
+			$LP->:=1
+		Else 
+			$LP->:=0
+		End if 
+		
+	End if 
+	UNLOAD RECORD([SpecPix])
+End for 
+GET PICTURE FROM LIBRARY("empty.jpg";<>vxSketch)

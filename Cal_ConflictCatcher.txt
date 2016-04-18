@@ -1,0 +1,70 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_BOOLEAN($conflict)
+ARRAY TEXT($user;0)
+
+QUERY([Appts];[Appts]ApptDate=vdCalToday)
+RELATE MANY SELECTION([Attendees]ApptKey)
+
+DISTINCT VALUES([Attendees]Attendee;$user)
+CREATE SET([Attendees];"Users")
+
+$i:=1
+For ($i;1;Size of array($user))
+	USE SET("Users")
+	QUERY SELECTION([Attendees];[Attendees]Attendee=$user{$i})
+	
+	If (Records in selection([Attendees])=1)
+		[Attendees]Conflict:=False
+		SAVE RECORD([Attendees])
+	Else 
+		
+		CREATE SET([Attendees];"ThisGuy")
+		RELATE ONE SELECTION([Attendees];[Appts])
+		ORDER BY([Appts];[Appts]ApptStart;>;[Appts]ApptEnd;>)
+		
+		ARRAY TEXT($start;Records in selection([Appts]))
+		ARRAY TEXT($end;Records in selection([Appts]))
+		ARRAY LONGINT($recordNumber;Records in selection([Appts]))
+		
+		$n:=1
+		For ($n;1;Size of array($start))
+			$start{$n}:=String([Appts]ApptStart)
+			$end{$n}:=String([Appts]ApptEnd)
+			$recordNumber{$n}:=Record number([Appts])
+			NEXT RECORD([Appts])
+		End for 
+		
+		$n:=1
+		For ($n;1;Size of array($start))
+			$conflict:=False
+			Case of 
+				: (Size of array($start)=1)
+					  //DO NOTHING
+				: ($n=1)
+					If (Time($end{$n})>Time($start{$n+1}))
+						$conflict:=True
+					End if 
+				: ($n<Size of array($start))
+					Case of 
+						: (Time($end{$n})>Time($start{$n+1}))
+							$conflict:=True
+						: (Time($end{$n-1})>Time($start{$n}))
+							$conflict:=True
+					End case 
+				Else 
+					If (Time($end{$n-1})>Time($start{$n}))
+						$conflict:=True
+					End if 
+			End case 
+			
+			GOTO RECORD([Appts];$recordNumber{$n})
+			USE SET("ThisGuy")
+			QUERY SELECTION([Attendees];[Attendees]ApptKey=[Appts]ApptKey;*)
+			QUERY SELECTION([Attendees]; & ;[Attendees]Attendee=$user{$i})
+			[Attendees]Conflict:=$conflict
+			SAVE RECORD([Attendees])
+		End for 
+	End if 
+End for 
+

@@ -1,0 +1,84 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(*;"xRevised";[SampleFabrics]Revised)
+		OBJECT SET VISIBLE(*;"xVoid";[SampleFabrics]Void)
+		SampFabrics_Trigger 
+	: (Form event=On Printing Detail)
+		If ([SampleFabrics]Sam Fab Qty 1>0)
+			vsPart1:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart1:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 2>0)
+			vsPart2:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart2:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 3>0)
+			vsPart3:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart3:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 4>0)
+			vsPart4:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart4:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 5>0)
+			vsPart5:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart5:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 6>0)
+			vsPart6:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart6:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 7>0)
+			vsPart7:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart7:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 8>0)
+			vsPart8:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart8:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 9>0)
+			vsPart9:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart9:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 10>0)
+			vsPart10:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart10:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 11>0)
+			vsPart11:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart11:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 12>0)
+			vsPart12:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart12:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 13>0)
+			vsPart13:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart13:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 14>0)
+			vsPart14:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart14:=""
+		End if 
+		If ([SampleFabrics]Sam Fab Qty 15>0)
+			vsPart15:=[SampleFabrics]Unit of Measr
+		Else 
+			vsPart15:=""
+		End if 
+		
+End case 

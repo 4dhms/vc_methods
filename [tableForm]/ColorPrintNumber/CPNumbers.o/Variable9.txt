@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i)
+C_TEXT($path)
+
+$docref:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	ORDER BY([ColorPrintNumber];[ColorPrintNumber]CPNumber;>;[ColorPrintNumber]CPCreationDate;>)
+	
+	SEND PACKET($docref;"Color/Print Number"+Char(9)+"Name"+Char(9)+"Division"+Char(9)+"Season"+Char(9)+"Year"+Char(9)+"Created"+Char(13))
+	$i:=1
+	FIRST RECORD([ColorPrintNumber])
+	For ($i;1;Records in selection([ColorPrintNumber]))
+		SEND PACKET($docref;[ColorPrintNumber]CPNumber+Char(9)+[ColorPrintNumber]CPName+Char(9)+[ColorPrintNumber]Division+Char(9))
+		SEND PACKET($docref;[ColorPrintNumber]SeasonName+Char(9)+[ColorPrintNumber]SeasonYear+Char(9)+String([ColorPrintNumber]CPCreationDate)+Char(13))
+		NEXT RECORD([ColorPrintNumber])
+	End for 
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 

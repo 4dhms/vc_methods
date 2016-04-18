@@ -1,0 +1,89 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_TEXT($month)
+C_TEXT($sort)
+C_TEXT(vsDivision;vsCustomer;vsFactory;vsStyleNumber)
+
+
+
+vsCustomer:=""
+vlShipQty:=0
+vlShipQtySub:=0
+vlShipQtyTot:=0
+vlShipQtyGross:=0
+vlShipAmt:=0
+vlShipAmtSub:=0
+vlShipAmtTot:=0
+vlShipAmtGross:=0
+vlInvQty:=0
+vlInvQtySub:=0
+vlInvQtyTot:=0
+vlInvQtyGross:=0
+vlInvAmt:=0
+vlInvAmtSub:=0
+vlInvAmtTot:=0
+vlInvAmtGross:=0
+vsFactory:=""
+vlGrossAmt:=0
+vTotSales:=0
+vlSubTotal:=0
+
+WinChoice ("Do you want to print?";"Report";"Digest";"Pictures")
+If (ok=1) & (bChoice2=1)
+	Report_BookingDigest 
+Else 
+	If (ok=1)
+		FORM SET OUTPUT([Orders];"PrtMthBkReportMulti")
+	Else 
+		FORM SET OUTPUT([Orders];"PrtMnthlyBookwPix")
+	End if 
+	FIRST RECORD([Orders])
+	vsMonthSorter:=[Orders]MonthSorter
+	$i:=1
+	For ($i;1;Records in selection([Orders]))
+		If (Month of([Orders]CancelDate)>9)
+			$month:=String(Month of([Orders]CancelDate))
+		Else 
+			$month:="0"+String(Month of([Orders]CancelDate))
+		End if 
+		$sort:=String(Year of([Orders]CancelDate))+"/"+$month
+		[Orders]MonthSorter:=$sort
+		SAVE RECORD([Orders])
+		NEXT RECORD([Orders])
+	End for 
+	vfDivision:=False
+	WinChoice ("Do you want to report by Factory or Customer?";"Factory";"Division";"Customer")
+	Case of 
+		: (ok=1) & (bChoice2=1)
+			vfDivision:=True
+			ARRAY REAL(arPrice;0)
+			ARRAY TEXT(asCustomers;0)
+			ARRAY LONGINT(alUnits;0)
+			ORDER BY([Orders];[Orders]OrderDivision;>;[Orders]MonthSorter;>;[Orders]CancelDate;>)
+			BREAK LEVEL(2)
+			ACCUMULATE([Orders]OrderDivision;[Orders]TotalOrderQuantity;[Orders]TotalSales;[Orders]Price)
+		: (ok=1)
+			<>vfFactory:=True
+			ARRAY REAL(arPrice;0)
+			ARRAY TEXT(asCustomers;0)
+			ARRAY LONGINT(alUnits;0)
+			ORDER BY([Orders];[Orders]Factory;>;[Orders]MonthSorter;>;[Orders]CancelDate;>)
+			BREAK LEVEL(2)
+			ACCUMULATE([Orders]Factory;[Orders]TotalOrderQuantity;[Orders]TotalSales;[Orders]Price)
+		Else 
+			Report_BookingArray 
+			<>vfFactory:=False
+			ORDER BY([Orders];[Orders]Customer;>;[Orders]MonthSorter;>;[Orders]CancelDate;>)
+			BREAK LEVEL(2)
+			ACCUMULATE([Orders]Customer;[Orders]TotalOrderQuantity;[Orders]TotalSales;[Orders]Price)
+	End case 
+	
+	SET PRINT OPTION(Orientation option;1)
+	
+	FIRST RECORD([Orders])
+	vsMonthSorter:=[Orders]MonthSorter
+	Print_Selection (->[Orders])
+	vsFactory:=""
+	vsCustomer:=""
+	FORM SET OUTPUT([Orders];"MnthlyBkRep Out")
+End if 

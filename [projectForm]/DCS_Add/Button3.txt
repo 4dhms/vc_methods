@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($itemPos;$itemRef;$parent)
+C_TEXT($itemText;$newitem)
+C_BOOLEAN($exp)
+
+$itemPos:=Selected list items(hlDCS)
+GET LIST ITEM(hlDCS;$itemPos;$itemRef;$itemText;$sub;$exp)
+$parent:=List item parent(hlDCS;$itemRef)
+
+If ($parent=0) & ($itemText#"Duty")
+	WinChoice ("Do you want to add to "+$itemText+"?")
+	If (ok=1)
+		$newitem:=Request("Add to list:")
+		If ($newitem#"") & (ok=1)
+			APPEND TO LIST($sub;$newitem;Num(Substring(String(Tickcount);1;5)))
+			SAVE LIST(hlDCS;"DCS")
+		End if 
+	End if 
+End if 
+
+

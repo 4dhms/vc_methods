@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Designer")
+	QUERY([DCS];[DCS]SheetNumber=[CostSheets]SheetNumber)
+	
+	If (<>vlOrderNumber>0)
+		vtPart11:=String([Orders]OrderNum)
+		vtPart12:=[Orders]StyleNumber
+		vtPart13:=[Orders]DesignNumber
+		vtPart14:=[Orders]Factory
+		vtPart15:=[Orders]Customer
+	Else 
+		vtPart11:=String([Samples]SampleNumber)
+		vtPart12:=[Samples]StyleNum
+		vtPart13:=[Samples]DesignNum
+		vtPart14:=[Samples]SamGarFactry
+		vtPart15:=[Samples]Customer
+	End if 
+	vtPart16:=[CostSheets]SheetName
+	
+	FORM SET OUTPUT([DCS];"DCS.print")
+	ORDER BY([DCS];[DCS]SortOrder;>)
+	ACCUMULATE(vrTotal2)
+	BREAK LEVEL(0)
+	
+	vTotal3:=vrLDPBoat
+	PRINT SELECTION([DCS])
+	
+Else 
+	WinPrompt ("Under development")
+End if 

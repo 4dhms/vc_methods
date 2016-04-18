@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([Dialogs];"Calendar")
+
+<>CloseBox:=True
+
+If (Screen height>580)
+	Center Window (600;540;4;"")
+	ADD RECORD([Dialogs];*)
+Else 
+	Center Window (600;480;4;"")
+	ADD RECORD([Dialogs])
+End if 
+CLOSE WINDOW
+<>vlCalendarProc:=0
+

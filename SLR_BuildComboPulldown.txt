@@ -1,0 +1,77 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($Qstyle;$snc;$cpS;$cpC)
+
+ARRAY TEXT($colors;0)
+ARRAY LONGINT($orders;0)
+
+ARRAY LONGINT($selfkey;0)
+ARRAY TEXT($combod;0)
+
+$Qstyle:=Replace string(vsStyleNumber;" CL";"")
+
+QUERY([Orders];[Orders]StyleNumber=$Qstyle)
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+UNLOAD RECORD([Orders])
+
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"colors")
+For ($i;1;Size of array($orders))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i})
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	
+	CREATE SET([CP_OrderXRef];"temp")
+	UNION("temp";"colors";"colors")
+	CLEAR SET("temp")
+End for 
+USE SET("colors")
+
+SELECTION TO ARRAY([CP_OrderXRef]SelfKey;$selfkey)
+
+$n:=1
+For ($n;1;Size of array($selfkey))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$selfkey{$n})
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self";*)
+	QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 1")
+	
+	ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPType;<)
+	FIRST RECORD([CP_OrderXRef])
+	$snc:=[CP_OrderXRef]CPNumber
+	NEXT RECORD([CP_OrderXRef])
+	$snc:=$snc+"_"+[CP_OrderXRef]CPNumber
+	
+	If (Find in array($colors;[CP_OrderXRef]CPNumber)<1)
+		APPEND TO ARRAY($colors;$snc)
+	End if 
+End for 
+
+  //custom colors
+QUERY([SLRColor];[SLRColor]SLRAcctKey=[SLRAcct]SLRAcctKey)
+QUERY SELECTION([SLRColor];[SLRColor]CustomColor=True)
+
+$i:=1
+FIRST RECORD([SLRColor])
+For ($i;1;Records in selection([SLRColor]))
+	If (Position(";";[SLRColor]SLRColor)>0)
+		APPEND TO ARRAY($colors;[SLRColor]SLRColor)
+	End if 
+	NEXT RECORD([SLRColor])
+End for 
+
+SORT ARRAY($colors;>)
+ARRAY TEXT(asColors;0)
+$i:=1
+For ($i;1;Size of array($colors))
+	$cpS:=Substring($colors{$i};1;Position("_";$colors{$i})-1)
+	$cpC:=Substring($colors{$i};Position("_";$colors{$i})+1;10)
+	
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cpS)
+	$snc:=$cpS+"/"+Substring([ColorPrintNumber]CPName;1;8)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cpC)
+	$snc:=$snc+" "+$cpC+"/"+[ColorPrintNumber]CPName
+	
+	If (Find in array(asColors;$snc)<1)
+		APPEND TO ARRAY(asColors;$snc)
+	End if 
+End for 
+

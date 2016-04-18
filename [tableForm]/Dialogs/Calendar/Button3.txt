@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Changes];[Changes]FieldName="todo")
+ORDER BY([Changes];[Changes]OrderNumber;>)
+FORM GOTO PAGE(5)
+

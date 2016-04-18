@@ -1,0 +1,27 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+QUERY([SpecTempBuilder];[SpecTempBuilder]TempKey=[SpecTemplate]TempKeyNumber)
+CREATE SET([SpecTempBuilder];"Resort")
+
+$i:=1
+For ($i;1;Size of array(asList1))
+	USE SET("Resort")
+	QUERY SELECTION([SpecTempBuilder];[SpecTempBuilder]SpecTempBuildKey=alItemNumber{$i})
+	If (Records in selection([SpecTempBuilder])=0) | (alItemNumber{$i}=-1)
+		CREATE RECORD([SpecTempBuilder])
+		[SpecTempBuilder]TempKey:=[SpecTemplate]TempKeyNumber
+		[SpecTempBuilder]SpecTempBuildKey:=Sequence number([SpecTempBuilder])
+		QUERY([ChineseDictionary];[ChineseDictionary]EnglishName=asList1{$i})
+		[SpecTempBuilder]SpecLibKey:=[SpecLibrary]SpecLibKey
+		[SpecTempBuilder]TempSpec:=asList1{$i}
+	End if 
+	
+	[SpecTempBuilder]SortOrder:=$i
+	SAVE RECORD([SpecTempBuilder])
+End for 
+
+USE SET("Resort")
+ORDER BY([SpecTempBuilder];[SpecTempBuilder]SortOrder;>)
+UNLOAD RECORD([SpecTempBuilder])
+UNLOAD RECORD([ChineseDictionary])
+CLEAR SET("Resort")

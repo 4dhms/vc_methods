@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($atFormVariableNames;0)
+ARRAY TEXT($atFormVariableValues;0)
+WEB GET VARIABLES($atFormVariableNames;$atFormVariableValues)
+ARRAY TEXT($asSubCC;1)
+ARRAY LONGINT($records;1)
+C_LONGINT($order)
+
+vtEmailAddress:=$atFormVariableValues{Find in array($atFormVariableNames;"email")}
+$asSubCC{1}:=vtEmailAddress
+If (vlOrderNumber>0)
+	QUERY([Orders];[Orders]OrderNum=vlOrderNumber)
+	$records{1}:=Record number([Orders])
+	UNLOAD RECORD([Orders])
+Else 
+	$order:=Abs(vlOrderNumber)
+	QUERY([Samples];[Samples]SampleNumber=$order)
+	$records{1}:=Record number([Samples])
+	UNLOAD RECORD([Samples])
+End if 
+
+QUERY([Spooler];[Spooler]Waiting=False;*)
+QUERY([Spooler]; & ;[Spooler]SpoolLog=False)
+QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+
+If (Records in selection([Spooler])<1) | (Locked([Spooler]))
+	CREATE RECORD([Spooler])
+Else 
+	Spooler_ClearSprocket 
+End if 
+[Spooler]SpoolKey:=Sequence number([Spooler])
+[Spooler]Waiting:=True
+[Spooler]ReturnAddress:="4DServer@nubby.com"
+[Spooler]SpoolRouter:=1
+[Spooler]Status:=1
+VARIABLE TO BLOB($asSubCC;[Spooler]AddressListBlob)
+VARIABLE TO BLOB($records;[Spooler]OrderArrayBlob)
+If (vlOrderNumber>0)
+	[Spooler]Genre:="PO"
+Else 
+	[Spooler]Genre:="SG"
+End if 
+SAVE RECORD([Spooler])
+UNLOAD RECORD([Spooler])
+UNLOAD RECORD([Orders])
+
+vtEmailAddress:=""
+Web_Error ("Email sent.")

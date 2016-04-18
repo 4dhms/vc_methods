@@ -1,0 +1,34 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtTable;$HTML)
+vtOrderTop:=Char(1)
+vtOrderTop:=vtOrderTop+"<IMG SRC=<!--4DVAR vtGetLogo--> width=200 height=200 align=left>"
+vtOrderTop:=vtOrderTop+"<br><br>"
+vsWebUser:=Replace string(vsWebUser;" ";"_")
+
+$HTML:=Char(1)+"Select category:<BR><BR>"
+$HTML:=$HTML+"<font color=#000000 face=Verdana, Arial, Helvetica, sans-serif size=2><b>"
+$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?findorder"+vsWebsession+">HMS Orders<BR><BR>"
+  //$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?findsample"+vsWebsession+">Sample Garments<BR><BR>"
+If (1=2)
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_DesignLib["+vsWebUser+"]"+vsWebsession+">Design Library<BR><BR>"
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_SpecSheets["+vsWebUser+"]"+vsWebsession+">Spec Sheets<BR><BR>"
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_SpeedForms["+vsWebUser+"]"+vsWebsession+">Speed Forms<BR><BR>"
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_FabricOrders["+vsWebUser+"]"+vsWebsession+">Fabric Orders<BR><BR>"
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_FabricLib["+vsWebUser+"]"+vsWebsession+">Fabric Library<BR><BR>"
+	$HTML:=$HTML+"<A href=/4DCGI/Rec01_Approval["+vsWebUser+"]"+vsWebsession+">Approval<BR><BR>"
+End if 
+
+If (User in group(vsWebUser;"Reports"))
+	$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?susansreport"+vsWebsession+">Susan's Report<BR><BR>"
+End if 
+$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?findcalendar"+vsWebsession+">View Calendar<BR><BR>"
+$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?addcalendar"+vsWebsession+">Add to Calendar<BR><BR>"
+$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?returns"+vsWebsession+">Returns<BR><BR>"
+
+$HTML:=$HTML+"</font></b>"
+Web_UserField 
+
+vtTable:=$HTML
+vtGetLogo:="/4DCGI/LOGO"
+
+WEB SEND FILE("menu.html")

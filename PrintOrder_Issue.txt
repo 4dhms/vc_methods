@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([CS_Issues]Resolved)
+		vtLine:="Resolved: "+String([CS_Issues]ResolveDate)+Char(13)+[CS_Issues]CS_Issue
+	: ([CS_Issues]Resolved)
+		vtLine:=""
+	Else 
+		vtLine:=[CS_Issues]CS_Issue
+End case 
+
+If ([CS_Issues]OrderNumber=0)
+	OBJECT SET FONT STYLE(vtLine;0)
+Else 
+	OBJECT SET FONT STYLE(vtLine;6)
+End if 

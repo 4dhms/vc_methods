@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SampFab_LastRev 
+[SampleFabrics]Printed:=True
+SAVE RECORD([SampleFabrics])
+Email_Confirm ("SF";"Sample Fabric")

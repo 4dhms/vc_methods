@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($um)
+C_TEXT($message)
+
+$message:=Request("Broadcast this message:")
+If (ok=1)  // & ($message#"")
+	
+	  //QUERY([Changes];[Changes]OrderNumber=-123)
+	  //If (Records in selection([Changes])=0)
+	  //CREATE RECORD([Changes])
+	  //[Changes]OrderNumber:=-123
+	  //End if 
+	  //[Changes]NewChange:=$message
+	  //SAVE RECORD([Changes])
+	  //UNLOAD RECORD([Changes])
+	
+	$um:=Execute on server("UniversalMessageClient";32*1024;"UniversalMessage";$message)
+End if 

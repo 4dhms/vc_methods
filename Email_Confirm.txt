@@ -1,0 +1,179 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($searchString)
+ARRAY TEXT(atFiles;0)
+C_BOOLEAN($send;$continue;$close)
+C_TEXT($message)
+C_POINTER($tablePtr)
+C_LONGINT($orderNumber;$fieldType;$i)
+C_TIME($duration)
+  //vfReviseMany:=False
+
+$tablePtr:=Current form table
+vfProdStatus:=False
+vfStatus:=True
+vtFullName:=""
+If ([Orders]POOpen) & (Table name($tablePtr)="Orders") & ($1#"TC")
+	$message:="Once you send this PO"+Char(13)+"changes will be marked as revisions."
+	$message:=$message+Char(13)+Char(13)+"Do you want to continue?"
+	WinChoice ($message;"Send PO";"Wait")
+	If (ok=1)
+		$close:=True
+		$continue:=True
+	Else 
+		$continue:=False
+	End if 
+Else 
+	$continue:=True
+End if 
+
+If ($continue)
+	vsPrintingFooter:=""
+	EMail_Pointers ($1)
+	CREATE SET(vptablePtr->;"FullSet")
+	
+	If (Records in selection(vptablePtr->)=1) & ($1#"SP")
+		Case of 
+			: ($1="Spec") | ($1="CS")
+			: ($1="DL") | ($1="DPY") | ($1="DPN")
+				$send:=True
+			Else 
+				WinChoice ("Do you want to send this single "+$2+" order?";"Yes";"No")
+		End case 
+		If (ok=1) | ($1="Spec") | ($1="CS")
+			$send:=True
+		End if 
+	Else 
+		
+		Case of 
+			: ($1="TC@") & (Num($1)>0)
+				bChoice2:=0
+				bAccept:=1
+				ok:=1
+			: ($1="CS")
+				bChoice2:=0
+				bAccept:=1
+				ok:=1
+			: ($1="SP")
+				bChoice2:=0
+				WinChoice ("Do you want to send this Speed Form?";"Yes";"No")
+			Else 
+				WinChoice ("Send one or all "+String(Records in selection(vptablePtr->))+" of the selected "+$2+" orders?";"One";"Group";"Cancel")
+		End case 
+		
+		If (ok=1)
+			Case of 
+				: ($1="SP")
+					CREATE EMPTY SET([Speedpost Form];"SingleForm")
+					ADD TO SET([Speedpost Form];"SingleForm")
+					USE SET("SingleForm")
+					CLEAR SET("SingleForm")
+					$send:=True
+				: (bAccept=1)
+					GET FIELD PROPERTIES(vpnumberPtr;$fieldType)
+					
+					If ($fieldType=8) | ($fieldType=9)
+						vfNumber:=True
+					Else 
+						vfNumber:=False
+					End if 
+					If (vfNumber)
+						$orderNumber:=vpNumberPtr->
+						QUERY(vptablePtr->;vpnumberPtr->=$orderNumber)
+					Else 
+						$searchString:=vpNumberPtr->
+						QUERY(vptablePtr->;vpnumberPtr->=$searchString)
+					End if 
+					$send:=True
+				: (bChoice2=1) & (Records in selection(vptablePtr->)>50)
+					$send:=False
+					WinPrompt ("The PDF would be over 50 orders."+Char(13)+"That would choke the server."+Char(13)+"Please reduce the size of the selection.")
+				: (bChoice2=1) & (<>vlOrderNumber>0)
+					  //vfReviseMany:=True
+					ARRAY TEXT($factories;0)
+					ARRAY LONGINT($orders;0)
+					SELECTION TO ARRAY([Orders]Factory;$factories;[Orders]OrderNum;$orders)
+					If (Find in array($factories;"")>0)
+						WinPrompt ("Order Number: "+String($orders{Find in array($factories;"")})+" is missing a Factory. Add factory or remove from group.")
+						$send:=False
+					Else 
+						$send:=True
+					End if 
+					  //checks for mixed factories
+					ARRAY TEXT($testF;0)
+					$i:=1
+					For ($i;1;Size of array($factories))
+						If (Find in array($testF;$factories{$i})<1) & ($factories{$i}#"")
+							APPEND TO ARRAY($testF;$factories{$i})
+						End if 
+					End for 
+					If (Size of array($testF)=1)
+						$send:=True
+					Else 
+						$i:=1
+						$message:=""
+						For ($i;1;Size of array($testF))
+							$message:=$message+$testF{$i}
+							If ($i<Size of array($testF))
+								$message:=$message+", "
+							End if 
+						End for 
+						$message:="Are you sure you want to send to multiple factories?"+Char(13)+"("+$message+")"
+						WinChoice ($message)
+						If (ok=1)
+							$send:=True
+						Else 
+							$send:=False
+						End if 
+					End if 
+					
+				: (bChoice2=1) & (<>vlOrderNumber<0)
+					$send:=True
+				: (bChoice2=1) & (Table name(Current form table)="FabricOrders")
+					$send:=True
+					
+				Else 
+					$send:=False
+			End case 
+		End if 
+	End if 
+	
+	If ($send)
+		Case of 
+			: ($1="PO") | ($1="POs") & ($close)
+				APPLY TO SELECTION([Orders];[Orders]POOpen:=False)
+			: ($1="SG")
+				APPLY TO SELECTION([Samples];[Samples]EmailDate:=Current date(*))
+				SAVE RECORD([Samples])
+		End case 
+		SAVE RECORD(vptablePtr->)
+		If (<>vtMailFrom="")
+			WinPrompt ("No return address. Quit system and enter email address on prompt.")
+		Else 
+			Spooler_AddMail ($1)
+		End if 
+	End if 
+	UNLOAD RECORD(vptablePtr->)
+End if 
+
+If (Records in set("FullSet")>0)
+	USE SET("FullSet")
+	CLEAR SET("FullSet")
+End if 
+
+
+  //checks that spooler is active
+QUERY([Changes];[Changes]OrderNumber=500)
+If (Records in selection([Changes])=1) & ([Changes]RevTime#?00:00:00?)
+	$duration:=Current time(*)-[Changes]RevTime
+	If ($duration>?00:10:00?)
+		WinPrompt ("The email spooler needs to be restarted.")
+	End if 
+End if 
+UNLOAD RECORD([Changes])
+
+  //If (vfReviseMany)
+  //vfReviseMany:=False
+  //CANCEL
+  //End if 
+
+

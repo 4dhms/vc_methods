@@ -1,0 +1,4 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+If (Form event=On Mouse Enter)
+	GET MOUSE(vlX;vlY;vlZ)
+End if 

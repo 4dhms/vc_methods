@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+FIRST RECORD([Samples])
+
+$i:=1
+For ($i;1;Records in selection([Samples]))
+	Sample_SeasonSort 
+	SAVE RECORD([Samples])
+	NEXT RECORD([Samples])
+End for 

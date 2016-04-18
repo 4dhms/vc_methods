@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlMailer)
+
+Case of 
+	: (Not([RMA]ShipBack)) & (cb1=0)
+		WinPrompt ("Does customer need to return item(s).")
+	: (Not([RMA]Credit)) & (cb2=0)
+		WinPrompt ("Credit or replacement?")
+	Else 
+		RMA_Save 
+		WinChoice ("Do you want to send this RMA to "+[ReturnStores]StoreEmail+"?")
+		
+		
+		If (ok=1)
+			RMA_Email (True)
+			
+			WinChoice ("Do you want to print a copy also?")
+			If (ok=1)
+				FORM SET OUTPUT([Returns];"Returns.print")
+				PRINT SELECTION([Returns])
+			End if 
+		End if 
+End case 

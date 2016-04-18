@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (FORM Get current page=3)
+	Spec_SaveOrder 
+End if 
+FORM GOTO PAGE(2)

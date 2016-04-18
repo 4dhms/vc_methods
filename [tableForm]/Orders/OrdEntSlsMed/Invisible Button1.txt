@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($cancel)
+C_LONGINT($i)
+
+If (Shift down)
+	If (Records in selection([Orders])>50)
+		WinPrompt ("You can not batch process more than 50 orders at the same time.")
+	Else 
+		$cancel:=[Orders]CancelDate
+		WinChoice ("Are you sure you want to make "+String($cancel)+" the cancel date for these "+String(Records in selection([Orders]))+" orders?")
+		If (ok=1)
+			
+			If (Order_Update )
+				SAVE RECORD([Orders])
+				
+				FIRST RECORD([Orders])
+				
+				$i:=1
+				For ($i;1;Records in selection([Orders]))
+					CREATE RECORD([Changes])
+					[Changes]RevisionNumber:=[Orders]RevisionNumber
+					[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+					[Changes]OrderNumber:=[Orders]OrderNum
+					[Changes]RevDate:=Current date(*)
+					[Changes]RevTime:=Current time(*)
+					[Changes]Writer:=Current user
+					[Changes]ChangeKey:=Sequence number([Changes])
+					[Changes]TableNum:=2
+					  //[Changes]FieldNum:=$fieldnum
+					[Changes]FieldName:="Cancel date"
+					[Changes]Tag:="Batch Cancel change"
+					[Changes]OldData:=String([Orders]CancelDate)
+					[Changes]NewChange:=String($cancel)
+					SAVE RECORD([Changes])
+					[Orders]CancelDate:=$cancel
+					SAVE RECORD([Orders])
+					NEXT RECORD([Orders])
+				End for 
+			End if 
+			ACCEPT
+		End if 
+	End if 
+End if 
+

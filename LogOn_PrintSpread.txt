@@ -1,0 +1,80 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$p;$length)
+C_TIME(vhDocref)
+C_DATE($range)
+C_TEXT($t;$colorprint;$rem;$key;$cat)
+C_TEXT($path;$descript;$price)
+
+
+$range:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+
+If (Count in array(afLogOn;True)<1)
+	vfAll:=True
+Else 
+	WinChoice ("Do want to make a spread sheet of everything or just the selection?";"Everything";"Selection")
+	If (ok=1)
+		vfAll:=True
+	Else 
+		vfAll:=False
+	End if 
+End if 
+
+$t:=Char(9)
+vhDocref:=Create document("";"xls")
+If (ok=1)
+	$path:=Document
+	
+	If (cbDivision=1)
+		SEND PACKET(vhDocref;"04-Eldeen"+Char(13)+"ONLY"+Char(13)+Char(13))
+	End if 
+	
+	SEND PACKET(vhDocref;"NS"+$t+"New Style"+Char(9)+Char(9)+"DV Change Divison"+Char(13))
+	SEND PACKET(vhDocref;"CS"+$t+"Change Style"+Char(9)+Char(9)+"NC New Color"+Char(13))
+	SEND PACKET(vhDocref;"SR"+$t+"Size Range"+Char(9)+Char(9)+"CC Change Color"+Char(13))
+	SEND PACKET(vhDocref;"SC"+$t+"Season Change"+Char(9)+Char(9)+"PC Price Change"+Char(13))
+	SEND PACKET(vhDocref;Char(13)+Char(13))
+	
+	SEND PACKET(vhDocref;$t+"Style"+$t+"Date"+$t+"Description"+$t+"Division"+$t+"Gender"+$t+"Season"+$t+"Group"+Char(9))
+	SEND PACKET(vhDocref;"Category"+$t+"Size Range"+$t+"Price"+$t+"Color/Print"+Char(13))
+	
+	$i:=1
+	For ($i;1;Size of array(asStyleNumbers))
+		QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+		QUERY SELECTION([Orders];[Orders]Cancelled=False)
+		ORDER BY([Orders];[Orders]OrderNum;<)
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		$descript:=Replace string([Designs]Description;Char(13);"")
+		
+		If ([Orders]SizeCategory="Large")
+			$cat:="LG"
+		Else 
+			$cat:=[Orders]SizeCategory
+		End if 
+		$price:=String(arSalePrice{$i})
+		$length:=Length($price)-1
+		Case of 
+			: (Position(".";$price)<1)
+				$price:=$price+".00"
+			: (Position(".";$price)=$length)
+				$price:=$price+"0"
+		End case 
+		$price:=$price+"   USD"
+		
+		If (afLogOn{$i}=True) | (vfAll)
+			SEND PACKET(vhDocref;atChange{$i}+$t+asStyleNumbers{$i}+$t+String(adActionDate{$i})+$t+$descript+$t+asDivisions{$i}+$t+"W"+$t+asSeasonName{$i}+$t+asGroups{$i}+$t)
+			SEND PACKET(vhDocref;$cat+$t+asXSizeRange{$i}+$t+$price+$t+Replace string(asColors{$i};" [c] ";" // ")+Char(13))
+		End if 
+	End for 
+	
+	CLOSE DOCUMENT(vhDocref)
+	UNLOAD RECORD([Orders])
+	UNLOAD RECORD([OrdersFabricXRef])
+	UNLOAD RECORD([ColorPrintNumber])
+	UNLOAD RECORD([CP_OrderXRef])
+End if 
+
+ARRAY TEXT(asSubCC;1)
+asSubCC{1}:="ricky@nubby.com"
+Mail_SimpleSend ("List";$path;"LogOn Report";"Attached"+Char(13))
+
+SHOW ON DISK($path)

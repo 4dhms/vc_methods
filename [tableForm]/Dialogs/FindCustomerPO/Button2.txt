@@ -1,0 +1,67 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($q1)
+C_DATE($okdate)
+
+
+Case of 
+	: (Size of array(asNames)=1) & (vsCustomer#"")
+		$q1:="@"+asNames{1}+"@"
+		$q1:=Replace string($q1;"@@";"@")
+		QUERY([Orders];[Orders]CustPONumber=$q1;*)
+		QUERY([Orders]; & ;[Orders]Customer=vsCustomer)
+		CANCEL
+	: (Size of array(asNames)>1) & (vsCustomer#"")
+		$i:=1
+		For ($i;1;Size of array(asNames))
+			$q1:="@"+asNames{$i}+"@"
+			$q1:=Replace string($q1;"@@";"@")
+			If ($i=1)
+				QUERY([Orders];[Orders]CustPONumber=$q1;*)
+			Else 
+				QUERY([Orders]; | ;[Orders]CustPONumber=$q1;*)
+			End if 
+		End for 
+		QUERY([Orders]; & ;[Orders]Customer=vsCustomer)
+		CANCEL
+	Else 
+		$i:=1
+		For ($i;1;Size of array(asNames))
+			$q1:="@"+asNames{$i}+"@"
+			$q1:=Replace string($q1;"@@";"@")
+			
+			Case of 
+				: (Size of array(asNames)=1)
+					QUERY([Orders];[Orders]CustPONumber=$q1)
+				: ($i=1)
+					QUERY([Orders];[Orders]CustPONumber=$q1;*)
+				: ($i=Size of array(asNames))
+					QUERY([Orders]; | ;[Orders]CustPONumber=$q1)
+				Else 
+					QUERY([Orders]; | ;[Orders]CustPONumber=$q1;*)
+			End case 
+		End for 
+End case 
+
+If (Current user="Peter G") | (Current user="Designer") & (Records in selection([Orders])>0)
+	WinChoice ("Do you want to approve credit for these "+String(Records in selection([Orders]))+" orders?")
+	If (ok=1)
+		$okdate:=Date(Request("Approval date:";String(Current date(*))))
+		If (ok=1)
+			APPLY TO SELECTION([Orders];[Orders]CreditOK:=True)
+			APPLY TO SELECTION([Orders];[Orders]CreditOKDate:=$okdate)
+			
+			$n:=1
+			FIRST RECORD([Orders])
+			For ($n;1;Records in selection([Orders]))
+				If (Locked([Orders]))
+					ALERT("PO "+String([Orders]OrderNum)+" is locked."+Char(13)+"It will not be updated at this time.")
+				End if 
+				NEXT RECORD([Orders])
+			End for 
+		End if 
+	End if 
+End if 
+
+
+

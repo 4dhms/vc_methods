@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$page;$n;$item;$m)
+C_DATE($previousdate)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;<)
+$page:=[DesignLineIncluded]PageNumber
+
+$previousdate:=!00-00-00!
+
+$i:=1
+For ($i;1;Size of array(alOrders))
+	QUERY([Orders];[Orders]OrderNum=alOrders{$i})
+	If ([Orders]CancelMonth=!00-00-00!)
+		$m:=Month of([Orders]CancelDate)
+		If ($m=12)
+			[Orders]CancelMonth:=Date("12/31/"+String(Year of([Orders]CancelDate)))
+		Else 
+			[Orders]CancelMonth:=Date(String(Month of([Orders]CancelDate)+1)+"/1/"+String(Year of([Orders]CancelDate)))-1
+		End if 
+		SAVE RECORD([Orders])
+	End if 
+	If ($previousdate#[Orders]CancelMonth) | ($item>12)
+		$previousdate:=[Orders]CancelMonth
+		$page:=$page+1
+		$item:=1
+		CREATE RECORD([DLPages])
+		[DLPages]DLItemKey:=[DesignLines]DesignLineKey
+		[DLPages]PageNumber:=$page
+		[DLPages]NewPageNumber:=$page
+		[DLPages]PageTitle:="New "+String([Orders]CancelMonth)
+		SAVE RECORD([DLPages])
+	End if 
+	
+	CREATE RECORD([DesignLineIncluded])
+	[DesignLineIncluded]PageNumber:=$page
+	[DesignLineIncluded]ItemNumber:=$item
+	[DesignLineIncluded]CancelDate:=[Orders]CancelMonth
+	[DesignLineIncluded]DesignNumber:=[Orders]DesignNumber
+	[DesignLineIncluded]DesignLineKey:=[DesignLines]DesignLineKey
+	[DesignLineIncluded]OrderNumber:=[Orders]OrderNum
+	[DesignLineIncluded]StyleNumber:=[Orders]StyleNumber
+	[DesignLineIncluded]Stock:=True
+	[DesignLineIncluded]MSRP:=[Orders]RetailPrice
+	[DesignLineIncluded]Price:=String(Round([Orders]RetailPrice/2;2);"###.00")
+	QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	[DesignLineIncluded]Name:=[Designs]Description
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+	[DesignLineIncluded]Fiber:=[OrdersFabricXRef]FabricName
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	DL_PullColors (False)
+	SAVE RECORD([DesignLineIncluded])
+	$item:=$item+1
+	UNLOAD RECORD([Orders])
+End for 

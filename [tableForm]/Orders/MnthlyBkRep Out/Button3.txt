@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Report_BuildBooking 
+Case of 
+	: (vsDivision#"") & (vsCustomer#"")
+		vtTitle:=vsDivision+"/"+vsCustomer+"  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asStartYear{<>asStartYear}+"-"+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+	: (vsCustomer#"")
+		vtTitle:=vsCustomer+"  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asStartYear{<>asStartYear}+"-"+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+	: (vsDivision#"")
+		vtTitle:=vsDivision+"  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asStartYear{<>asStartYear}+"-"+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+	: (vsStyleNumber#"")
+		vtTitle:="Style Number: "+vsStyleNumber+"  ("+String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asStartYear{<>asStartYear}+"-"+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}+")"
+	Else 
+		vtTitle:=String(<>asStartMonth)+"/"+<>asStartDay{<>asStartDay}+"/"+<>asStartYear{<>asStartYear}+"-"+String(<>asEndMonth)+"/"+<>asEndDay{<>asEndDay}+"/"+<>asEndYear{<>asEndYear}
+End case 

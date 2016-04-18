@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vTotal1:=[Speedpost Form]Quantity 1*[Speedpost Form]Unit Value 1
+vTotal2:=[Speedpost Form]Quantity 2*[Speedpost Form]Unit Value 2
+vTotal3:=[Speedpost Form]Quantity 3*[Speedpost Form]Unit Value 3
+vTotal4:=[Speedpost Form]Quantity 4*[Speedpost Form]Unit Value 4
+vTotal5:=[Speedpost Form]Quantity 5*[Speedpost Form]Unit Value 5
+vTotal6:=[Speedpost Form]Quantity 6*[Speedpost Form]Unit Value 6
+vTotal7:=[Speedpost Form]Quantity 7*[Speedpost Form]Unit Value 7
+vTotal8:=[Speedpost Form]Quantity 8*[Speedpost Form]Unit Value 8
+vTotal9:=[Speedpost Form]Quantity 9*[Speedpost Form]Unit Value 9
+vTotal10:=[Speedpost Form]Quantity 10*[Speedpost Form]Unit Value 10
+vGrandTotal:=vTotal1+vTotal2+vTotal3+vTotal4+vTotal5+vTotal6+vTotal7+vTotal8+vTotal9+vTotal10

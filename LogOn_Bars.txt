@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($prev)
+C_BOOLEAN($gray)
+
+$gray:=False
+
+ARRAY LONGINT(alXBG;Size of array(asStyleNumbers))
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	If ($prev#asStyleNumbers{$i})
+		$prev:=asStyleNumbers{$i}
+		If ($gray)
+			$gray:=False
+		Else 
+			$gray:=True
+		End if 
+	End if 
+	If (afProcess{$i}=False)
+		QUERY([Changes];[Changes]FieldName=asColorCodes{$i})
+	End if 
+	Case of 
+			  //: (afProcess{$i}=False) & (Records in selection([Changes])>0)
+			  //alXBG{$i}:=16711690
+		: (cbDivision=1) & (LogOn_Div04 (asStyleNumbers{$i}))
+			alXBG{$i}:=16711690
+		: ($gray)
+			alXBG{$i}:=16777215
+		Else 
+			alXBG{$i}:=15790320
+	End case 
+End for 
+
+

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		If (Current user="Dominique") | (Current user="Designer")
+			cbUpdate:=1
+		End if 
+		alSortList:=1
+		PrintCat_PageLoad 
+End case 

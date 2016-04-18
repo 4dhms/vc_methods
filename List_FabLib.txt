@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldPtr)
+C_LONGINT($fieldNumber)
+ARRAY TEXT(atListContents;0)
+ARRAY TEXT(atAllListContents;0)
+vlListRouter:=1
+
+If (cbKnit=0) & (cbWoven=0) & (cbCutSew=0)
+	WinChoice ("What sort of fabric is this?";"Knit";"Woven";"Cut & Sew")
+	If (ok=1)
+		If (bChoice2=1)
+			cbWoven:=1
+		Else 
+			cbKnit:=1
+		End if 
+	Else 
+		cbCutSew:=1
+	End if 
+End if 
+
+$fieldPtr:=$2
+$fieldNumber:=Field($fieldPtr)
+vsList1Name:=$1
+vsList3Name:=Current user+"'s "+vsList1Name+" List"
+vsList4Name:="Complete "+vsList1Name+" List"
+vtAddToList:=""
+QUERY([Lists];[Lists]ListName=vsList1Name)
+If (Records in selection([Lists])=0)
+	WinPrompt ("There is no list for "+$1)
+Else 
+	CREATE SET([Lists];"Lists")
+	QUERY SELECTION([Lists];[Lists]UserName="")
+	SELECTION TO ARRAY([Lists]ListItem;atAllListContents)
+	SORT ARRAY(atAllListContents;>)
+	
+	USE SET("Lists")
+	CLEAR SET("Lists")
+	QUERY SELECTION([Lists];[Lists]UserName=Current user)
+	SELECTION TO ARRAY([Lists]ListItem;atListContents)
+	SORT ARRAY(atListContents;>)
+	
+	Center Window (580;550;1;vsList1Name;"cb_generic")
+	DIALOG([Dialogs];"List.win")
+	CLOSE WINDOW
+	
+	If (ok=1)
+		$fieldPtr->:=vtReturn
+	End if 
+End if 

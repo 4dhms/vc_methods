@@ -1,0 +1,88 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Printing Footer)
+		If (vOrd="")
+			vsPrintingFooter:="END of SAMPLE GARMENT ORDER"
+		Else 
+			vsPrintingFooter:="MORE"
+		End if 
+		
+	: (Form event=On Load)
+		SG_PopDivision 
+		
+	: (Form event=On Header)
+		If (vsPrintingFooter#"More")
+			Order_PrintLoadHeader (False)
+		End if 
+		
+		  //SET VISIBLE(*;"xAddress";vOrd="")
+		OBJECT SET VISIBLE(*;"xHeader1";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeader2";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeader3";vOrd#"")
+		OBJECT SET VISIBLE(*;"xPO1";vOrd#"")
+		OBJECT SET VISIBLE(*;"xHeadLine";vOrd#"")
+		
+		If (Printing page>vlLastPage)
+			vlLastPage:=Printing page
+			vlPage:=vlPage+1
+		End if 
+		
+		If (vlPage=1) | (vlPage=0)
+			vsPrintingHeader:=""
+		Else 
+			vsPrintingHeader:="PAGE "+String(vlPage)
+		End if 
+		vDesc:=""
+		
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE(*;"xStyle";[Samples]MultipleStyles)
+		OBJECT SET VISIBLE([Samples]Retired;[Samples]SeasonName="")
+		OBJECT SET VISIBLE([Samples]SeasonName;[Samples]SeasonName#"")
+		OBJECT SET VISIBLE([Samples]SeasonYear;[Samples]SeasonName#"")
+		
+		Case of 
+			: ([Samples]KWCnS="Woven")
+				vsKWCS:="Woven"
+			: ([Samples]KWCnS="Knit")
+				vsKWCS:="Knit"
+			: ([Samples]KWCnS="CutSew")
+				vsKWCS:="Cut and Sew"
+			Else 
+				vsKWCS:=""
+		End case 
+		
+		<>vlOrderNumber:=-1*[Samples]SampleNumber
+		Order_PrintLoadHeader (True)
+		
+		If ([Samples]NoOrder)
+			vsPOFlag:="This is NOT an order"
+		Else 
+			vsPOFlag:=""
+		End if 
+		<>vlSGPO:=<>vlOrderNumber
+		
+		Order_PrintCSBottom 
+		OBJECT SET VISIBLE(*;"xLine2";Records in selection([CS_Issues])>0)
+		OBJECT SET VISIBLE(*;"xIssue";Records in selection([CS_Issues])>0)
+		
+		If (Records in selection([CS_Lines])<1) & (Records in selection([CS_Issues])<1) & (Records in selection([CS_Status])<1)
+			Order_PrintLoadHeader (False)
+			vlPage:=0
+			vlRecCount:=vlReccount+1
+		End if 
+		
+		
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		QUERY SELECTION([Designs];[Designs]DesignNum#"")
+		QUERY([Specs];[Specs]Design Num=[Samples]DesignNum)
+		
+		  //Sets color approval
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		RELATE MANY([CP_OrderXRef]XrefID)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+		
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		Order_PullCP (<>vlOrderNumber)
+		Order_Fab_Sort 
+		
+End case 

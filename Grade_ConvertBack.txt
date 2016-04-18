@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($int;$adjuster)
+C_REAL($frac;$number)
+C_TEXT($fracText;$result)
+
+If ($1=0)
+	$0:="0"
+Else 
+	
+	If ($1<0)
+		$adjuster:=-1
+	Else 
+		$adjuster:=1
+	End if 
+	
+	$number:=Abs($1)
+	$int:=Int($number)
+	$frac:=$number-$int
+	
+	Case of 
+		: ($frac=0.0625)
+			$fracText:="1/16"
+		: ($frac=0.125)
+			$fracText:="1/8"
+		: ($frac=0.1875)
+			$fracText:="3/16"
+		: ($frac=0.25)
+			$fracText:="1/4"
+		: ($frac=0.3125)
+			$fracText:="5/16"
+		: ($frac=0.375)
+			$fracText:="3/8"
+		: ($frac=0.4375)
+			$fracText:="7/16"
+		: ($frac=0.5)
+			$fracText:="1/2"
+		: ($frac=0.5625)
+			$fracText:="9/16"
+		: ($frac=0.625)
+			$fracText:="5/8"
+		: ($frac=0.6875)
+			$fracText:="11/16"
+		: ($frac=0.75)
+			$fracText:="3/4"
+		: ($frac=0.8125)
+			$fracText:="13/16"
+		: ($frac=0.875)
+			$fracText:="7/8"
+		: ($frac=0.9375)
+			$fracText:="15/16"
+		Else 
+			$fracText:=""
+	End case 
+	
+	
+	Case of 
+		: ($int>0) & ($fracText="")
+			$result:=String($int)
+		: ($int>0)
+			$result:=String($int)+" "+$fracText
+		Else 
+			$result:=$fracText
+	End case 
+	
+	If ($adjuster<0)
+		$result:="-"+$result
+	End if 
+	
+	$0:=Replace string($result;"--";"-")
+End if 
+
+
+
+

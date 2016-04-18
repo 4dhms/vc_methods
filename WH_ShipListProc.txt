@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlShipping)
+
+Case of 
+	: (<>vlShipping=0)
+		<>vlShipping:=New process("WH_ShipList";0;"Shipping")
+	Else 
+		SHOW PROCESS(<>vlShipping)
+		BRING TO FRONT(<>vlShipping)
+End case 
+
+  //

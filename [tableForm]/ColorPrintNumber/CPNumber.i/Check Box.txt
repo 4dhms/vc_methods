@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($newnumber)
+
+$newnumber:=Replace string([ColorPrintNumber]CPNumber;"YD";"WD")
+
+WinChoice ("Are you sure you want to change "+[ColorPrintNumber]CPNumber+" to "+$newnumber+"?")
+If (ok=1)
+	[ColorPrintNumber]CPNumber:=$newnumber
+End if 

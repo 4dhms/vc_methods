@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($image)
+C_LONGINT($fetch)
+C_BOOLEAN($doit)
+<>vxSketch:=$image
+
+Case of 
+	: (<>vlOrderNumber>0) & (Not([Orders]DontPrintLabel)) & ([Orders]OrderDivision="05-@") & ([Designs]LabelPict)
+		$doit:=True
+	: (<>vlOrderNumber<0) & (Not([Samples]DontPrintLabel)) & ([Samples]SampleDivision="05-@") & ([Designs]LabelPict)
+		$doit:=True
+	Else 
+		$doit:=False
+End case 
+
+If ($doit)
+	GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+	<>vfCatchFile:=True
+	
+	$fetch:=Execute on server("Picture_ReturnLabel";1064*64;"LabelGet";[Designs]DesignNum;Current machine owner)
+	Repeat 
+	Until (Picture size(<>vxSketch)>1400)
+	vxSketch:=<>vxSketch
+	
+	vxSketch11:=$image
+	vxSketch12:=vxSketch
+	vtField22:="LABEL PLACEMENT"
+	vtField24:=[Designs]LabelSpec
+	Print form("PixPrint")
+	vlPrintedPixels:=vlPrintedPixels+278
+End if 

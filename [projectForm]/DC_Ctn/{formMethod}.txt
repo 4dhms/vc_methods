@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	If (vtDCpo="") & ([Orders]CustPONumber#"")
+		vtDCpo:=[Orders]CustPONumber
+		GOTO OBJECT(vtDCpo)
+	End if 
+	If (vtDCpo="")
+		GOTO OBJECT(vtDCpo)
+	End if 
+	vlDCcount:=0
+	vlDCcount:=0
+	vsPart1:=""
+	vlRunningTotal:=0
+	vlTotQty:=0
+End if 

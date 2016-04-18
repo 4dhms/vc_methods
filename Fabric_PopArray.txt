@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+CREATE SET([OrdersFabricXRef];"fabrics")
+
+$n:=Records in selection([OrdersFabricXRef])
+$i:=1
+
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;$n)
+	asOrderType{$i}:=[OrdersFabricXRef]OrdType
+	asSolidPrint{$i}:=[OrdersFabricXRef]SolidPrint
+	asFabric{$i}:=[OrdersFabricXRef]FabricName
+	asFiber{$i}:=[OrdersFabricXRef]FiberContent
+	asTreatment{$i}:=[OrdersFabricXRef]Treatment
+	atArtNumber{$i}:=[OrdersFabricXRef]FabArtNo
+	
+	QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+	If ([FabricLibrary]SecondaryFabric="")
+		GET PICTURE FROM LIBRARY("empty.jpg";axCompound{$i})
+	Else 
+		GET PICTURE FROM LIBRARY("Scissors";axCompound{$i})
+	End if 
+	asFabSpler{$i}:=[OrdersFabricXRef]FabSupplier
+	asGarPart{$i}:=[OrdersFabricXRef]Part
+	Case of 
+		: ([OrdersFabricXRef]Usage>0)
+			arUsage{$i}:=[OrdersFabricXRef]Usage
+			
+			  //correcting past siins
+		: ([OrdersFabricXRef]Consumed>0) & ([OrdersFabricXRef]Usage=0) & ([OrdersFabricXRef]OrderNumber<0)
+			arUsage{$i}:=[OrdersFabricXRef]Consumed
+			
+		: ([Orders]YardsReq>0) & ([OrdersFabricXRef]OrdType="Self")
+			arUsage{$i}:=[Orders]YardsReq
+		: ([Orders]YardsCombo>0) & ([OrdersFabricXRef]OrdType="Combo 1")
+			arUsage{$i}:=[Orders]YardsCombo
+	End case 
+	
+	arActual{$i}:=[OrdersFabricXRef]Consumed
+	asGauge{$i}:=[OrdersFabricXRef]Gauge
+	asYarnSize{$i}:=[OrdersFabricXRef]YarnSize
+	
+	If (vfFabImport)
+		alXrefKeys{$i}:=0
+	Else 
+		alXrefKeys{$i}:=[OrdersFabricXRef]XrefID
+	End if 
+	alFabricColor{$i}:=16777215
+	
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+
+ArtNo_Update 

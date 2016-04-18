@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	Case of 
+		: ([DesignLines]Season="@13")
+			<>asSeasonYear:=Find in array(<>asSeasonYear;"2013")
+		: ([DesignLines]Season="@14")
+			<>asSeasonYear:=Find in array(<>asSeasonYear;"2014")
+		: ([DesignLines]Season="@15")
+			<>asSeasonYear:=Find in array(<>asSeasonYear;"2015")
+		Else 
+			<>asSeasonYear:=1
+	End case 
+	
+	Case of 
+		: ([DesignLines]Season="Fall@")
+			<>asSeasonName:=2
+		: ([DesignLines]Season="Holiday@")
+			<>asSeasonName:=3
+		: ([DesignLines]Season="Resort@")
+			<>asSeasonName:=4
+		: ([DesignLines]Season="Spring II@")
+			<>asSeasonName:=6
+		: ([DesignLines]Season="Spring@")
+			<>asSeasonName:=5
+		: ([DesignLines]Season="Summer@")
+			<>asSeasonName:=7
+		: ([DesignLines]Season="Transition@")
+			<>asSeasonName:=8
+		: ([DesignLines]Season="Downtime@")
+			<>asSeasonName:=9
+		Else 
+			<>asSeasonName:=1
+	End case 
+End if 

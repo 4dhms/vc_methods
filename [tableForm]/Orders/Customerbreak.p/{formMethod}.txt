@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Detail)
+		vsCustomer:=asMeetingCust{Selected record number([Orders])}
+		vlOrdersA:=alOrders{Selected record number([Orders])}
+		vlUnitsA:=alQuantity{Selected record number([Orders])}
+		vlDollarsA:=alTotalSales{Selected record number([Orders])}
+		vlOrdersB:=alOrdersB{Selected record number([Orders])}
+		vlUnitsB:=alQuantityB{Selected record number([Orders])}
+		vlDollarsB:=alTotalSalesB{Selected record number([Orders])}
+		
+End case 

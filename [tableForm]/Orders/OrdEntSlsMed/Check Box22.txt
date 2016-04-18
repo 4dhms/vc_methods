@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cb7:=0
+cb9:=0
+
+WH_ShipDocChecks 

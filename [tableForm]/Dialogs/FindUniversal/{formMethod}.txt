@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsField)
+
+Case of 
+	: (Form event=On Load)
+		vYesNo:=0
+		vAddTo:=0
+		
+		Case of 
+			: (vlRouter>0)
+				vsRequestString:=""
+			: (vlRouter=-1)
+				vsRequestString:=""
+				vAddTo:=1
+		End case 
+		
+		Case of 
+			: (vlRouter=9)
+				Case of 
+					: (vfSample)
+						cbSG:=1
+					: (vfDesign)
+						cbDesign:=1
+					: (vfStyle)
+						cbStyle:=1
+					Else 
+						cbOrder:=1
+				End case 
+				FORM GOTO PAGE(9)
+				
+			: (vlRouter=10)
+				OBJECT SET LIST BY NAME(vsRequestString;"<None>")
+				vlRouter:=4
+			: (vlRouter=4)
+				If (vsField="Treatment")
+					OBJECT SET LIST BY NAME(vsRequestString;"Treatment")
+				Else 
+					OBJECT SET LIST BY NAME(vsRequestString;"<None>")
+					
+				End if 
+				OBJECT SET TITLE(bValidate;"Save")
+			: (vlRouter=8)
+				OBJECT SET TITLE(bValidate;"Enter")
+			: (vlRouter=5)
+				OBJECT SET TITLE(bValidate;"Enter")
+				If (<>vlOrderNumber=0)
+					HIGHLIGHT TEXT(vsRequestString;1;1)
+				End if 
+			: (vlRouter=6)
+				  //add line to list
+				OBJECT SET TITLE(bValidate;"Add")
+			: (vlRouter=-4)
+				OBJECT SET TITLE(bValidate;"Change")
+			: (vlRouter=-5)
+				vsRequestString:=String(Current date(*))
+				OBJECT SET TITLE(bValidate;"Save")
+			: (vlRouter=-6)
+				vsRequestString:=""
+				OBJECT SET TITLE(bValidate;"Save")
+		End case 
+		
+		FORM GOTO PAGE(Abs(vlRouter))
+		GOTO OBJECT(vsRequestString)
+End case 

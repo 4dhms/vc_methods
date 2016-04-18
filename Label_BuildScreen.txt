@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList11;0)
+ARRAY TEXT(asList12;0)
+ARRAY TEXT(asList13;0)
+
+LabAN_Pop ("cupio";"CUBLGL")
+LabAN_Pop ("cupio blush";"CUSHNG")
+LabAN_Pop ("SPENSE";"SPIVGR")
+LabAN_Pop ("Spense";"SPBLWH")
+LabAN_Pop ("spenser jeremy";"SJBLWH")
+LabAN_Pop ("CG cable & gauge";"CGCGBW")
+LabAN_Pop ("cable & gauge";"CGBLWH")
+LabAN_Pop ("CG sport";"CGSPBW")
+LabAN_Pop ("Cable & gauge heatseal";"CGHS")
+LabAN_Pop ("Melissa Paige";"MPBLGL")
+LabAN_Pop ("Pointelle";"PTGRIV")
+

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Do you want a paper copy or PDF?";"Paper";"PDF")
+If (ok=1)
+	vfPDF:=False
+Else 
+	vfPDF:=True
+End if 
+Spec_PrintTemplate 
+PAGE BREAK
+vfPDF:=False

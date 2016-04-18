@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_REAL($percent)
+
+<>vtMessage:="Building report"
+EMail_SendingProc 
+Open window(Screen width-360;50;Screen width-20;Screen height-50;5;"Processing")
+MESSAGE("Searching Print Library ("+asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+")"+Char(13))
+UsagePrint_SearchEngine 
+
+
+$i:=1
+UsageInitArrays (0)
+UsageInitArrays (11)
+
+CREATE SET([ColorPrintNumber];"Prints")
+UsagePrintsII 
+
+$n:=1
+For ($n;1;Size of array(asDivisions))
+	
+	If (asDivisions{$n}#"All Divisions")
+		If (alChartPrintsUsed{$n}=0)
+			alChartPrintsRatio{$n}:=0
+		Else 
+			$percent:=alChartPrintsUsed{$n}/alChartPrints{$n}
+			alChartPrintsRatio{$n}:=Round($percent*100;0)
+		End if 
+		If (alVarPrintsUsed{$n}=0)
+			alVarPrintsRatio{$n}:=0
+		Else 
+			$percent:=alVarPrintsUsed{$n}/alVarPrints{$n}
+			alVarPrintsRatio{$n}:=Round($percent*100;0)
+		End if 
+	End if 
+	
+	alChartOrderTot{$n}:=alPrintOrders{$n}+alVarOrders{$n}
+	alChartUnitTot{$n}:=alPrintUnits{$n}+alVarUnits{$n}
+End for 
+
+$i:=Size of array(alChartPrintsUsed)
+
+
+alChartPrintsRatio{$i}:=(alChartPrintsUsed{$i}/alChartPrints{$i})*100
+alVarPrintsRatio{$i}:=(alVarPrintsUsed{$i}/alVarPrints{$i})*100
+
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+
+

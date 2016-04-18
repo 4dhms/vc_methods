@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($style)
+
+If (Form event=On Display Detail)
+	If ([DC_SpreadLines]LineNumber=0)
+		$style:=1
+	Else 
+		$style:=0
+	End if 
+	OBJECT SET FONT STYLE([DC_SpreadLines]ColorNumber;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Note;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]ColorCode;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz1;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz2;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz3;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz4;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz5;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz6;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz7;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz8;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz9;$style)
+	OBJECT SET FONT STYLE([DC_SpreadLines]Sz10;$style)
+End if 

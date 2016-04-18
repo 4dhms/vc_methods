@@ -1,0 +1,43 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($customer)
+vfSameAdd:=False
+Web_StockVar 
+
+$customer:=Replace string(vtCustomer;"_";" ")
+QUERY([Customers];[Customers]CustomerName=$customer)
+
+If (Records in selection([Customers])=0)
+	CREATE RECORD([Customers])
+	[Customers]CustomerKey:=Sequence number([Customers])
+	[Customers]CustomerName:=Replace string(vtCustomer;"_";" ")
+	[Customers]DefaultAddress:=vtCustomerAddress
+	If (vfSameAdd)
+		[Customers]ShipTo:=vtCustomerAddress
+	Else 
+		[Customers]ShipTo:=vtShipTo
+	End if 
+	[Customers]ShipVia:=vtShipVia
+	[Customers]Terms:=vtTerms
+	SAVE RECORD([Customers])
+End if 
+
+CREATE RECORD([Contacts])
+[Contacts]ContactID:=Sequence number([Contacts])
+[Contacts]CustomerKey:=[Customers]CustomerKey
+[Contacts]Contact:=Replace string(vsUser;"_";" ")
+[Contacts]EmailAddress:=vtEmail
+[Contacts]PhoneBusiness:=vtTelephone
+[Contacts]PhoneHome:=vtTelephone2
+[Contacts]PhoneCell:=vtCell
+[Contacts]Fax:=vtFax
+SAVE RECORD([Contacts])
+vtContactKey:=String([Contacts]ContactID)
+
+UNLOAD RECORD([Contacts])
+UNLOAD RECORD([Contacts])
+
+Web_StockOrderOpen 
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+ORDER BY([StockOrdersLines];[StockOrdersLines]SOKey;<)
+WEB SEND FILE("stockorder.html")

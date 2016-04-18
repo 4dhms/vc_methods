@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i;$n)
+
+$docref:=Create document("";"xls")
+
+SEND PACKET($docref;Char(9)+Char(9)+Char(9)+Char(9)+Char(9)+Char(9))
+SEND PACKET($docref;"self minimums per"+Char(9)+"combo minimums per"+Char(9)+Char(13))
+If (ok=1)
+	SEND PACKET($docref;"Sketch"+Char(9)+"Style#/Design#"+Char(9)+"Self Fabric/Article#"+Char(9))
+	SEND PACKET($docref;"Self Content%"+Char(9)+"Combo Article#"+Char(9)+"Combo Content%"+Char(9))
+	SEND PACKET($docref;"order/per color"+Char(9)+"order/per color"+Char(9)+"Fabric lead time"+Char(13))
+	
+	$i:=1
+	For ($i;1;Size of array(asPages))
+		QUERY([DesignLineIncluded];[DesignLineIncluded]PageNumber=$i;*)
+		QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+		ORDER BY([DesignLineIncluded];[DesignLineIncluded]ItemNumber;>)
+		
+		$n:=1
+		FIRST RECORD([DesignLineIncluded])
+		For ($n;1;Records in selection([DesignLineIncluded]))
+			SEND PACKET($docref;Char(9)+[DesignLineIncluded]StyleNumber+" / "+[DesignLineIncluded]DesignNumber+Char(9))
+			SEND PACKET($docref;Char(9)+[DesignLineIncluded]Fiber+Char(13))
+			NEXT RECORD([DesignLineIncluded])
+		End for 
+	End for 
+	CLOSE DOCUMENT($docref)
+End if 

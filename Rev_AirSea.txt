@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+If (Records in selection([Costing])>0)
+	QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+	QUERY SELECTION([CostSheets];[CostSheets]SheetName="Actual@")
+	
+	Case of 
+		: (Records in selection([CostSheets])=1)
+			If ([CostSheets]ShipAir#[Orders]ShipAir) | ([CostSheets]ShipSea#[Orders]ShipSea) | ([CostSheets]Quantity#[Orders]TotalOrderQuantity)
+				[CostSheets]ShipAir:=[Orders]ShipAir
+				[CostSheets]ShipSea:=[Orders]ShipSea
+				[CostSheets]FreightBOAT:=0
+				[CostSheets]FreightAIR:=0
+				[CostSheets]ShipNotes:="Ship method changed on PO. ("+String(Current date(*))+")"+Char(13)+[CostSheets]ShipNotes
+				SAVE RECORD([CostSheets])
+			End if 
+		: (Records in selection([CostSheets])>1)
+			$i:=1
+			FIRST RECORD([CostSheets])
+			For ($i;1;Records in selection([CostSheets]))
+				[CostSheets]ShipNotes:="Ship method changed on PO. ("+String(Current date(*))+")"+Char(13)+[CostSheets]ShipNotes
+				SAVE RECORD([CostSheets])
+				NEXT RECORD([CostSheets])
+			End for 
+	End case 
+End if 
+

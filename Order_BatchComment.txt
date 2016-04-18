@@ -1,0 +1,90 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;$fieldnum)
+C_POINTER($fieldptr)
+C_TEXT($fieldname)
+
+$c:=Records in selection([Orders])
+WinChoice ("Are you sure you want to add a note to each of these "+String($c)+" orders?")
+If (ok=1)
+	If ($c>100)
+		WinPrompt ("You have selected "+String($c)+" orders."+Char(13)+"System will not process more than 100 orders at one time.")
+	Else 
+		<>vtNotes:=""
+		vtSubject:="Add to notes"
+		WinCentOnCenter (450;400;1)
+		DIALOG([Dialogs];"Note.i")
+		CLOSE WINDOW
+		If (ok=1) & (<>vtNotes#"")
+			Case of 
+				: (c1=1)
+					$fieldptr:=->[Orders]ProdComments
+					$fieldnum:=150
+					$fieldname:="Status Report Notes"
+				: (c2=1)
+					$fieldptr:=->[Orders]Special_Instructions
+					$fieldnum:=30
+					$fieldname:="Special_Instructions"
+				: (c3=1)
+					$fieldptr:=->[Orders]Comments_Sales
+					$fieldnum:=20
+					$fieldname:="Revisions"
+				: (c4=1)
+					$fieldptr:=->[Orders]Care Label
+					$fieldnum:=11
+					$fieldname:="Care Label"
+				: (c5=1)
+					$fieldptr:=->[Orders]FitNotes
+					$fieldnum:=11
+					$fieldname:="Fit Notes"
+				: (c6=1)
+					$fieldptr:=->[Orders]FabricNotes
+					$fieldnum:=11
+					$fieldname:="Fabric Notes"
+				: (c7=1)
+					$fieldptr:=->[Orders]TrimNotes
+					$fieldnum:=11
+					$fieldname:="Trim Notes"
+				: (c8=1)
+					$fieldptr:=->[Orders]InspectionReport
+					$fieldnum:=11
+					$fieldname:="Inspection Report"
+				: (c9=1)
+					$fieldptr:=->[Orders]TimeActionNotes
+					$fieldnum:=11
+					$fieldname:="Time and Action Notes"
+			End case 
+			FIRST RECORD([Orders])
+			$i:=1
+			For ($i;1;Records in selection([Orders]))
+				Case of 
+						  //: (c4=1)
+						  //$fieldptr->:=<>vtNotes
+					: (vfAdd)
+						$fieldptr->:=$fieldptr->+Char(13)+<>vtNotes
+					Else 
+						$fieldptr->:=<>vtNotes+Char(13)+$fieldptr->
+				End case 
+				
+				SAVE RECORD([Orders])
+				  //add to history log
+				CREATE RECORD([Changes])
+				[Changes]RevisionNumber:=[Orders]RevisionNumber
+				[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+				[Changes]OrderNumber:=[Orders]OrderNum
+				[Changes]RevDate:=Current date(*)
+				[Changes]RevTime:=Current time(*)
+				[Changes]Writer:=Current user
+				[Changes]ChangeKey:=Sequence number([Changes])
+				[Changes]TableNum:=2
+				[Changes]FieldNum:=$fieldnum
+				[Changes]FieldName:=$fieldname
+				[Changes]Tag:="Batch added"
+				[Changes]OldData:=""
+				[Changes]NewChange:=<>vtNotes
+				SAVE RECORD([Changes])
+				UNLOAD RECORD([Changes])
+				NEXT RECORD([Orders])
+			End for 
+		End if 
+	End if 
+End if 

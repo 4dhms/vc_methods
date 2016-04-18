@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asStHour>19)
+	WinPrompt ("Have an extra cup of coffee you are scheduling this meeting for "+asStHour{asStHour}+" AM.")
+End if 
+asEndHour:=asStHour+1
+Cal_SetPM 

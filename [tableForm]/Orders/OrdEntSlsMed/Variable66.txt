@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vsList1Name;$new;$cue)
+
+ARRAY TEXT($list;0)
+
+WinChoice ("Which list?";"Customers";"Factories";"Cancel")
+
+If (ok=1)
+	If (bChoice2=1)
+		vsList1Name:="Factories"
+		$cue:="Factory"
+	Else 
+		vsList1Name:="Customers"
+		$cue:="Customer"
+	End if 
+	
+	WinChoice ("Add or Delete?";"Add";"Delete";"Cancel")
+	
+	If (ok=1)
+		LIST TO ARRAY(vsList1Name;$list)
+		If (bChoice2=1)
+			ARRAY TEXT(asCustomerBuild;0)
+			COPY ARRAY($list;asCustomerBuild)
+			INSERT IN ARRAY(asCustomerBuild;1;1)
+			asCustomerBuild{1}:=vsList1Name
+			asCustomerBuild:=1
+			OBJECT SET VISIBLE(asCustomerBuild;True)
+		Else 
+			$new:=Request("New "+$cue)
+			If (ok=0)
+				If (Find in array($list;$new)>0)
+					WinPrompt ($new+" is already on the list.")
+				End if 
+			Else 
+				APPEND TO ARRAY($list;$new)
+				SORT ARRAY($list;>)
+				ARRAY TO LIST($list;vsList1Name)
+			End if 
+		End if 
+	End if 
+End if 
+

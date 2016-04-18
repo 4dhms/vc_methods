@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($order)
+
+If (Form event=On Clicked)
+	$order:=Num(asList1{asList1})
+	vfPO:=False
+	vfEmail:=False
+	QUERY([Orders];[Orders]OrderNum=$order)
+	Order_POEngine 
+	UNLOAD RECORD([Orders])
+End if 

@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsQOrderNumber:=""
+vsQStyle:=""
+vsQDesign:=""
+vtQFactory:=""
+vdQCancel:=!00-00-00!
+vAddto:=0
+COMPILER_WS_Arrays 

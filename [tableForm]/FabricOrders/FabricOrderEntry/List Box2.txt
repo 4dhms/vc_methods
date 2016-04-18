@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	If (Find in array(afListBox4;True)>0)
+		OBJECT SET VISIBLE(bAddToPO;True)
+	End if 
+End if 

@@ -1,0 +1,78 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($HTML)
+C_LONGINT($i;$n)
+C_TEXT($color)
+
+CREATE EMPTY SET([CP_OrderXRef];"CPs")
+ARRAY LONGINT(alFoundKeys;0)
+
+$i:=1
+For ($i;1;Size of array(alXrefKeys))
+	QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=alXrefKeys{$i})
+	$n:=1
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		If ([CP_OrderXRef]CPType="Self")
+			APPEND TO ARRAY(alFoundKeys;[CP_OrderXRef]SelfKey)
+		End if 
+		ADD TO SET([CP_OrderXRef];"CPs")
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+End for 
+USE SET("CPs")
+CLEAR SET("CPs")
+
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]CPOrdID;>)
+
+
+If (vlOrderNumber<0)
+	$color:="#336600"
+Else 
+	$color:="#663300"
+End if 
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<br><table width=750 border=0>"
+$HTML:=$HTML+"<tr>"
+$HTML:=$HTML+"<td width=24 class=style1> </td>"
+$HTML:=$HTML+"<td width=132 class=style1>Fabric Type</td>"
+$HTML:=$HTML+"<td width=132 class=style1>Color Number</td>"
+$HTML:=$HTML+"<td width=180 class=style1>Name</td>"
+$HTML:=$HTML+"<td width=180 class=style1>Color Code</td>"
+$HTML:=$HTML+"<td width=120 class=style1>Status</td>"
+$HTML:=$HTML+"<td width=120 class=style1>Date</td>"
+$HTML:=$HTML+"<td width=48 align=right class=style1>Quantity</td>"
+$HTML:=$HTML+"<td></font></td>"
+$HTML:=$HTML+"</tr>"
+
+For ($i;1;Records in selection([CP_OrderXRef]))
+	$HTML:=$HTML+"<tr>"
+	$HTML:=$HTML+"<td class=style2>"+[CP_OrderXRef]LineKey+"</td>"
+	$HTML:=$HTML+"<td class=style2>"+[CP_OrderXRef]CPType+"</td>"
+	$HTML:=$HTML+"<td class=style2>"+[CP_OrderXRef]CPNumber+"</td>"
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+	$HTML:=$HTML+"<td class=style2>"+[ColorPrintNumber]CPName+"</td>"
+	UNLOAD RECORD([ColorPrintNumber])
+	  //Color Code
+	If ([CP_OrderXRef]ColorCodeOverride)
+		$HTML:=$HTML+"<td class=style2>"+[CP_OrderXRef]ColorCodeNew+"</td>"
+	Else 
+		$HTML:=$HTML+"<td class=style2><b>"+[CP_OrderXRef]ColorCode+"</b></td>"
+	End if 
+	$HTML:=$HTML+"<td class=style2>"+[CP_OrderXRef]CPStatus+"</td>"
+	$HTML:=$HTML+"<td class=style2>"+String([CP_OrderXRef]CPStatusDate)+"</td>"
+	If ([CP_OrderXRef]CPType="Self")
+		$HTML:=$HTML+"<td class=style2 align=right>"+String([CP_OrderXRef]Quantity;"###,##0")+"</td>"
+	Else 
+		$HTML:=$HTML+"<td width=162><FONT SIZE=2 face="+Char(34)+"Verdana, Arial, Helvetica, sans-serif"+Char(34)+"></td>"
+	End if 
+	$HTML:=$HTML+"<td></td>"
+	$HTML:=$HTML+"</tr>"
+	NEXT RECORD([CP_OrderXRef])
+End for 
+$HTML:=$HTML+"</Table><BR>"
+
+$0:=$HTML
+

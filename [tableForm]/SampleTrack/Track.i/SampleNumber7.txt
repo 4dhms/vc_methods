@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([SampleTrack]DateIn=!00-00-00!) & (Form event=On Getting Focus)
+	[SampleTrack]DateIn:=Current date(*)
+End if 
+

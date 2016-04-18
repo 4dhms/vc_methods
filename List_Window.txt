@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($fieldPtr)
+C_LONGINT($fieldNumber)
+C_BOOLEAN(<>Enter;$continue)
+ARRAY TEXT(atListContents;0)
+ARRAY TEXT(atAllListContents;0)
+vlListRouter:=1
+
+Case of 
+	: (<>Enter)
+		$continue:=True
+	: (Table name(Current form table)#"Orders") & (Table name(Current form table)#"Samples")
+		$continue:=True
+End case 
+
+If ($continue)
+	$fieldPtr:=$2
+	$fieldNumber:=Field($fieldPtr)
+	vsList1Name:=$1
+	vsList3Name:=Current user+"'s "+vsList1Name+" List"
+	vsList4Name:="Complete "+vsList1Name+" List"
+	vtAddToList:=""
+	QUERY([Lists];[Lists]ListName=vsList1Name)
+	If (Records in selection([Lists])=0)
+		WinPrompt ("There is no list for "+$1)
+	Else 
+		CREATE SET([Lists];"Lists")
+		QUERY SELECTION([Lists];[Lists]UserName="")
+		SELECTION TO ARRAY([Lists]ListItem;atAllListContents)
+		SORT ARRAY(atAllListContents;>)
+		
+		USE SET("Lists")
+		CLEAR SET("Lists")
+		QUERY SELECTION([Lists];[Lists]UserName=Current user)
+		SELECTION TO ARRAY([Lists]ListItem;atListContents)
+		SORT ARRAY(atListContents;>)
+		
+		Center Window (550;580;1;vsList1Name;"cb_generic")
+		DIALOG([Dialogs];"List.win")
+		CLOSE WINDOW
+		
+		If (ok=1)
+			$fieldPtr->:=vtReturn
+		End if 
+	End if 
+Else 
+	WinPrompt ("This field is non-enterable at the moment."+Char(13)+"Revise or Edit.")
+End if 
+
+If (<>vlOrderNumber>0)
+	Order_RequiredFlag 
+Else 
+	Sample_RequiredFlag 
+End if 

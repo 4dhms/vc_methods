@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+
+If (Find in array(afLogOn;True)>0)
+	$i:=1
+	CREATE EMPTY SET([Orders];"print")
+	For ($i;1;Size of array(afLogOn))
+		If (afLogOn{$i}=True)
+			QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+			$n:=1
+			FIRST RECORD([Orders])
+			For ($n;1;Records in selection([Orders]))
+				ADD TO SET([Orders];"print")
+				NEXT RECORD([Orders])
+			End for 
+		End if 
+	End for 
+	
+	USE SET("print")
+	CLEAR SET("print")
+	ORDER BY([Orders];[Orders]StyleNumber;>)
+	vfPO:=False
+	Order_PrintMany 
+Else 
+	WinPrompt ("Select styles to print.")
+End if 

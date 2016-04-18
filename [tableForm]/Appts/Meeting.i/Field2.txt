@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	QUERY([Customers];[Customers]CustomerName=[Appts]ApptWith;*)
+	QUERY([Customers];[Customers]CustomerName#"")
+	
+	If (Records in selection([Customers])=0) & ([Appts]ApptWith#"")
+		OBJECT SET VISIBLE(*;"xNoEntry";True)
+	Else 
+		OBJECT SET VISIBLE(*;"xNoEntry";False)
+	End if 
+	  //WinChoice (Char(34)+[Appts]ApptWith+Char(34)+Char(13)+" does not appear in the Customer List."+Char(13)+"Do you want to add it?")
+	  //If (ok=1)
+	  //CREATE RECORD([Customers])
+	  //[Customers]CustomerKey:=Sequence number([Customers])
+	  //[Customers]CustomerName:=[Appts]ApptWith
+	  //SAVE RECORD([Customers])
+	  //End if 
+	  //End if 
+End if 
+Cal_ContactList 

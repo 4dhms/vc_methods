@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+<>vtNotes:=$1->
+vtSubject:=$2
+WinCentOnCenter (350;350;1)
+DIALOG([Dialogs];"Note.i")
+CLOSE WINDOW
+
+$1->:=<>vtNotes

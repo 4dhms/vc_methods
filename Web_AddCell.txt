@@ -1,0 +1,39 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($catalog;$rem)
+C_LONGINT($page;$item;$dlkey;$buyerKey)
+
+$rem:=Substring($1;Position("=";$1)+1;999)
+$page:=Num(Substring($rem;1;Position("!";$rem)-1))
+$rem:=Substring($rem;Position("!";$rem)+1;999)
+$item:=Num(Substring($rem;1;Position("!";$rem)-1))
+$rem:=Substring($rem;Position("!";$rem)+1;999)
+$buyerkey:=Num(Substring($rem;Position("+";$rem)+1;10))
+$dlkey:=Num(Substring($rem;1;Position("_";$rem)-1))
+
+$catalog:="M="+$rem
+
+QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+If (Records in selection([StockOrders])=0)
+	CREATE RECORD([StockOrders])
+	[StockOrders]TempID:=vsWebSession
+	[StockOrders]SODate:=Current date(*)
+	[StockOrders]BuyerKey:=$buyerkey
+	[StockOrders]MyLine:=True
+	SAVE RECORD([StockOrders])
+End if 
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+QUERY SELECTION([StockOrdersLines];[StockOrdersLines]CP_OrdID=$page;*)
+QUERY SELECTION([StockOrdersLines]; & ;[StockOrdersLines]SONumber=$item)
+If (Records in selection([StockOrdersLines])=0)
+	CREATE RECORD([StockOrdersLines])
+	[StockOrdersLines]TempID:=vsWebSession
+	[StockOrdersLines]CP_OrdID:=$page
+	[StockOrdersLines]SONumber:=$item
+	[StockOrdersLines]DLKey:=$dlkey
+	SAVE RECORD([StockOrdersLines])
+End if 
+UNLOAD RECORD([StockOrders])
+UNLOAD RECORD([StockOrdersLines])
+
+Web_StockCatalog ($catalog)

@@ -1,0 +1,211 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($srchDate)
+C_TIME($docRef)
+C_TEXT($path)
+C_LONGINT($i)
+C_TEXT($datestamp)
+C_TEXT($message)
+C_LONGINT($range)
+C_BOOLEAN($continue)
+C_TEXT($whnote)
+$continue:=False
+
+$range:=2
+
+$srchDate:=Current date(*)-($range*30)
+QUERY([Orders];[Orders]CancelDate>=$srchDate)
+QUERY SELECTION([Orders];[Orders]CancelDate<=Current date(*))
+CREATE SET([Orders];"Back")
+
+$srchDate:=Current date(*)+30
+QUERY([Orders];[Orders]CancelDate<=$srchDate)
+QUERY SELECTION([Orders];[Orders]CancelDate>=Current date(*);*)
+QUERY SELECTION([Orders]; & ;[Orders]ActualDeliveryDate#!00-00-00!)
+CREATE SET([Orders];"Fore")
+
+UNION("Back";"Fore";"Both")
+USE SET("Both")
+CLEAR SET("Back")
+CLEAR SET("Fore")
+CLEAR SET("Both")
+
+QUERY SELECTION([Orders];[Orders]Customer="TK Max@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Mark's Warehouse@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Wado@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="CM";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Winner@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Aafe@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Manteaux@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="TJX UK@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Strong";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Illig";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Simons";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Ricki's";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Suzy";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="TJXE@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Wados@Chile";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="EME";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="EM@Sweater";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="TABI";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="JC Retail@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="TSC@The Shopping@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="@Shopping@Channel@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="J.C. Retail@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Trade Secret";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Chico's@";*)
+QUERY SELECTION([Orders]; | ;[Orders]Customer="Costco@";*)
+QUERY SELECTION([Orders]; & ;[Orders]Customer#"Costco US")
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+ORDER BY([Orders];[Orders]CancelDate;>;[Orders]WHInvoice;>;[Orders]OrderNum;>)
+
+If (Application type=5) | (Current user="Spooler")
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":DirectShip_"+$datestamp+".xls"
+	$path:=Replace string($path;"DirectShip";"DirectShip")
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+	$continue:=True
+Else 
+	$docRef:=Create document("";"xls")
+	If (ok=1)
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	SEND PACKET($docRef;"PO"+Char(9))
+	SEND PACKET($docRef;"Style"+Char(9))
+	SEND PACKET($docRef;"Design"+Char(9))
+	SEND PACKET($docRef;"Factory"+Char(9))
+	SEND PACKET($docRef;"Customer"+Char(9))
+	SEND PACKET($docRef;"X Factory"+Char(9))
+	SEND PACKET($docRef;"Actual"+Char(9))
+	SEND PACKET($docRef;"Cancel Date"+Char(9))
+	SEND PACKET($docRef;"Quantity"+Char(9))
+	SEND PACKET($docRef;"Invoice Notes"+Char(9))
+	SEND PACKET($docRef;"Packing List"+Char(9))
+	SEND PACKET($docRef;"Proof of Delivery"+Char(9))
+	SEND PACKET($docRef;"FCR"+Char(9))
+	SEND PACKET($docRef;"Shipping"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		  //If ([Orders]OrderNum=60775)
+		  //TRACE
+		  //End if 
+		
+		SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+		SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+		SEND PACKET($docRef;[Orders]DesignNumber+Char(9))
+		SEND PACKET($docRef;[Orders]Factory+Char(9))
+		SEND PACKET($docRef;[Orders]Customer+Char(9))
+		SEND PACKET($docRef;String([Orders]ShipDateFactory)+Char(9))
+		SEND PACKET($docRef;String([Orders]ActualDeliveryDate)+Char(9))
+		SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+		SEND PACKET($docRef;String([Orders]TotalOrderQuantity)+Char(9))
+		If ([Orders]WHInvoiceNos="0")
+			SEND PACKET($docRef;Char(9))
+		Else 
+			$whnote:=Replace string([Orders]WHInvoiceNos;Char(9);" ";*)
+			$whnote:=Replace string($whnote;Char(13);" ";*)
+			SEND PACKET($docRef;$whnote+Char(9))
+		End if 
+		QUERY([ShippingDocs];[ShippingDocs]Customer=[Orders]Customer)
+		If (Records in selection([ShippingDocs])=0)
+			SEND PACKET($docRef;Char(13))
+		Else 
+			Case of 
+				: ([ShippingDocs]ProofDelivery=0)
+					SEND PACKET($docRef;Char(9))
+				: ([ShippingDocs]ProofDelivery=3)
+					SEND PACKET($docRef;"N/A"+Char(9))
+				: ([ShippingDocs]ProofDelivery=1)
+					SEND PACKET($docRef;Char(9))
+				: ([Orders]WH_Packing)
+					SEND PACKET($docRef;String([Orders]WH_PackingDate)+Char(9))
+				Else 
+					SEND PACKET($docRef;Char(9))
+			End case 
+			Case of 
+				: ([ShippingDocs]ProofDelivery=0)
+					SEND PACKET($docRef;Char(9))
+				: ([ShippingDocs]ProofDelivery=3)
+					SEND PACKET($docRef;"N/A"+Char(9))
+				: ([ShippingDocs]ProofDelivery=1)
+					SEND PACKET($docRef;Char(9))
+				: ([Orders]WH_ProofDelivery)
+					SEND PACKET($docRef;String([Orders]WH_ProofoDeliveryDate)+Char(9))
+				Else 
+					SEND PACKET($docRef;"No"+Char(9))
+			End case 
+			
+			Case of 
+				: ([ShippingDocs]BillLading=0)
+					SEND PACKET($docRef;Char(9))
+				: ([ShippingDocs]BillLading=3)
+					SEND PACKET($docRef;"N/A"+Char(9))
+				: ([ShippingDocs]BillLading=1)
+					SEND PACKET($docRef;Char(9))
+				: ([Orders]WH_BilloLading)
+					SEND PACKET($docRef;"Yes"+Char(9))
+				Else 
+					SEND PACKET($docRef;"No"+Char(9))
+			End case 
+			
+			Case of 
+				: ([ShippingDocs]ShippingDoc=0)
+					SEND PACKET($docRef;Char(13))
+				: ([ShippingDocs]ShippingDoc=3)
+					SEND PACKET($docRef;"N/A"+Char(13))
+				: ([ShippingDocs]ShippingDoc=1)
+					SEND PACKET($docRef;Char(13))
+				: ([Orders]WH_ShippingDoc)
+					SEND PACKET($docRef;"Yes"+Char(13))
+				Else 
+					SEND PACKET($docRef;"No"+Char(13))
+			End case 
+		End if 
+		
+		NEXT RECORD([Orders])
+		UNLOAD RECORD([Designs])
+	End for 
+	
+	CLOSE DOCUMENT($docRef)
+	
+	$message:="Attached is the new Direct Shipment Status Report."
+	
+	If (Application type=5) | (Current user="Spooler")
+		ARRAY TEXT(asSubCC;0)
+		APPEND TO ARRAY(asSubCC;"tcli@nubby.com")
+		APPEND TO ARRAY(asSubCC;"dusha@nubby.com")
+		APPEND TO ARRAY(asSubCC;"ruby@nubby.com")
+		APPEND TO ARRAY(asSubCC;"spenser@nubby.com")
+		APPEND TO ARRAY(asSubCC;"claudia@nubby.com")
+		  //APPEND TO ARRAY(asSubCC;"ginger@nubby.com")
+		APPEND TO ARRAY(asSubCC;"sandie.fung@nubby.com")
+		APPEND TO ARRAY(asSubCC;"august@nubby.com")
+		APPEND TO ARRAY(asSubCC;"johnmow@nubby.com")
+		APPEND TO ARRAY(asSubCC;"sheldon@nubby.com")
+		APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+		APPEND TO ARRAY(asSubCC;"natalies@nubby.com")
+		APPEND TO ARRAY(asSubCC;"davids@nubby.com")
+		APPEND TO ARRAY(asSubCC;"jin@nubby.com")
+		APPEND TO ARRAY(asSubCC;"silia@nubby.com")
+		APPEND TO ARRAY(asSubCC;"christine@nubby.com")
+		APPEND TO ARRAY(asSubCC;"elaine@nubby.com")
+		APPEND TO ARRAY(asSubCC;"linli@nubby.com")
+		APPEND TO ARRAY(asSubCC;"melvina@nubby.com")
+		APPEND TO ARRAY(asSubCC;"ken.tsui@nubby.com")
+		APPEND TO ARRAY(asSubCC;"ELAINE.YANG@NUBBY.COM")
+		APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+		
+		
+		Mail_SimpleSend ("List";$path;"Direct Shipment Status Report ("+String(Current date(*))+")";$message)
+	End if 
+End if 
+
+
+

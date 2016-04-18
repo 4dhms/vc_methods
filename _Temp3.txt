@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+FIRST RECORD([CP_OrderXRef])
+For ($i;1;Records in selection([CP_OrderXRef]))
+	If ([CP_OrderXRef]ThreadColor="0")
+		[CP_OrderXRef]ThreadColor:=""
+		SAVE RECORD([CP_OrderXRef])
+	End if 
+	
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+ALERT("Done")
+
+

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (FORM Get current page=1)
+	WinChoice ("Are you sure you want to reset this spreadsheet?";"Yes";"No")
+	If (ok=1)
+		WinChoice ("This will permanently clear all current breakdowns.";"Stop";"Continue")
+		If (ok=0)
+			[Orders]BDHeaderKey:=0
+			
+			$i:=1
+			For ($i;1;Size of array(alBDSelfKeys))
+				QUERY([OrdersBreakdowns];[OrdersBreakdowns]SelfKey=alBDSelfKeys{$i})
+				[OrdersBreakdowns]SelfKey:=-1*[OrdersBreakdowns]SelfKey
+				SAVE RECORD([OrdersBreakdowns])
+			End for 
+		End if 
+		Order_BDInit (0)
+		vlBDGrandTot:=0
+		CANCEL
+	End if 
+End if 

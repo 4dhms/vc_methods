@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY REAL(arSizeCalc;0)
+C_POINTER($colPtr;$adjustPtr)
+C_LONGINT($i)
+
+$i:=1
+For ($i;1;10)
+	$colPtr:=Get pointer("vsSize"+String($i))
+	If ($colPtr->#"")
+		INSERT IN ARRAY(arSizeCalc;Size of array(arSizeCalc)+1;1)
+		$adjustPtr:=Field(88;$i+15)
+		arSizeCalc{Size of array(arSizeCalc)}:=$adjustPtr->
+	End if 
+End for 

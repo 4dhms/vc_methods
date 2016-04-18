@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ARRAY TEXT(asList1;0)
+ARRAY TEXT(asList2;0)
+ARRAY TEXT(asList3;0)
+ARRAY TEXT(asList4;0)
+ARRAY TEXT(asUsers;0)
+$i:=1
+For ($i;1;26)
+	QUERY([Staff];[Staff]PBName=Char(96+$i)+"@")
+	QUERY SELECTION([Staff];[Staff]PhoneBook=True)
+	If (Records in selection([Staff])>0) & (Char(96+$i)#"W") & (Char(96+$i)#"Y") & (Char(96+$i)#"Z")
+		
+		APPEND TO ARRAY(asUsers;Uppercase(Char(96+$i)))
+	End if 
+End for 
+APPEND TO ARRAY(asUsers;"WYZ")
+APPEND TO ARRAY(asUsers;"Misc")
+asUsers:=1
+<>CloseBox:=True
+
+Center Window (660;350;1984;"")
+DIALOG("Phonebook")
+CLOSE WINDOW

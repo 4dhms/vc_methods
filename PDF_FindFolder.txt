@@ -1,0 +1,14 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($pathName)
+
+If (<>vlPlatform<3)
+	$pathName:=Substring(System folder;1;Position(":";System folder))+"4D_PDFs"
+Else 
+	$pathName:="C:\\4D_PDFs"
+End if 
+
+If (Test path name($pathName)#0)
+	CREATE FOLDER($pathName)
+End if 
+
+$0:=$pathName

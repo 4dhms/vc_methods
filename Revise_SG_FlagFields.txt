@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($fieldptr)
+C_TEXT($testField)
+ARRAY LONGINT(alFieldNumber;0)
+C_REAL($revKey)
+vlTableNum:=Table(Current form table)
+
+$revKey:=-1*([Samples]SampleNumber+([Samples]RevisionNumber/100))
+
+QUERY([Changes];[Changes]RevisionKey=$revKey)
+QUERY SELECTION([Changes];[Changes]TableNum=3)
+QUERY SELECTION([Changes];[Changes]RevisionNumber>0)
+SELECTION TO ARRAY([Changes]FieldNum;alFieldNumber)
+
+$i:=1
+For ($i;1;Get last field number(vlTableNum))
+	If (Is field number valid(vlTableNum;$i)) & ($i#20)
+		$fieldptr:=Field(vlTableNum;$i)
+		$testField:=Field name($fieldptr)
+		If (Find in array(alFieldNumber;$i)>0) & ([Samples]RevisionNumber>0)
+			OBJECT SET FONT STYLE($fieldptr->;3)
+			OBJECT SET COLOR($fieldptr->;-(3+(256*0)))
+		Else 
+			OBJECT SET FONT STYLE($fieldptr->;0)
+			OBJECT SET COLOR($fieldptr->;-(15+(256*0)))
+		End if 
+		
+		If (Count parameters>0)
+			OBJECT SET ENTERABLE($fieldptr->;$1)
+		End if 
+	End if 
+End for 
+
+OBJECT SET ENTERABLE([Samples]SampleNumber;False)
+OBJECT SET ENTERABLE([Samples]SGQuantity;False)
+
+If (Count parameters>0)
+	If ($1)
+		OBJECT SET ENABLED(cbWoven;True)
+		OBJECT SET ENABLED(cbKnit;True)
+		OBJECT SET ENABLED(cbCutSew;True)
+	Else 
+		OBJECT SET ENABLED(cbWoven;False)
+		OBJECT SET ENABLED(cbKnit;False)
+		OBJECT SET ENABLED(cbCutSew;False)
+	End if 
+End if 

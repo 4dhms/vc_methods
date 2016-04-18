@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($catagory;$range;$position)
+C_LONGINT($subkey;$i)
+C_POINTER($col)
+
+If (Form event=On Load)
+	[SpecSheetLines]ChineseOverride:=True
+	$subkey:=-1*[SpecFactory]SF_KeyNumber
+	
+	Case of 
+		: (pOne=1)
+			$catagory:=[SpecFactory]KnitWoven1
+		: (pTwo=1)
+			$catagory:=[SpecFactory]KnitWoven2
+		: (pThree=1)
+			$catagory:=[SpecFactory]KnitWoven3
+	End case 
+	
+	QUERY([Sizes];[Sizes]SF_KeyNumber=$subkey)
+	vsSize1:=[Sizes]Size1
+	vsSize2:=[Sizes]Size2
+	vsSize3:=[Sizes]Size3
+	vsSize4:=[Sizes]Size4
+	vsSize5:=[Sizes]Size5
+	vsSize6:=[Sizes]Size6
+	vsSize7:=[Sizes]Size7
+	vsSize8:=[Sizes]Size8
+	vsSize9:=[Sizes]Size9
+	vsSize10:=[Sizes]Size10
+	vsSize11:=[Sizes]Size11
+	vsSize12:=[Sizes]Size12
+	vtGradeRange:=""
+	
+	$i:=1
+	For ($i;1;10)
+		$col:=Get pointer("vsSize"+String($i))
+		Case of 
+			: ($col->#"") & (vtGradeRange="")
+				vtGradeRange:=$col->
+			: ($col->#"")
+				vtGradeRange:=vtGradeRange+"-"+$col->
+		End case 
+	End for 
+	QUERY([Steps];[Steps]Range=vtGradeRange;*)
+	QUERY([Steps]; & ;[Steps]Category=$catagory)
+	ORDER BY([Steps];[Steps]POM;>)
+	ARRAY TEXT(asList17;0)
+	ARRAY LONGINT(alFieldChange;0)
+	ARRAY TEXT($pom;0)
+	ARRAY LONGINT($id;0)
+	SELECTION TO ARRAY([Steps]POM;$pom;[Steps]Key;$id)
+	
+	$i:=1
+	For ($i;1;Size of array($pom))
+		If (Find in array(asList17;$pom{$i})<1)
+			APPEND TO ARRAY(asList17;$pom{$i})
+			APPEND TO ARRAY(alFieldChange;$id{$i})
+		End if 
+	End for 
+	
+	$position:=Substring([SpecSheetLines]OtherDescription;1;10)+"@"
+	LISTBOX SELECT ROW(afListBox1;Find in array(asList17;$position))
+	
+End if 

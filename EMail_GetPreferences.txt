@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ALL RECORDS([Preferences])
+vtEncoding:=[Preferences]Encoding
+vtEMHost:=[Preferences]EmailHost
+vtEMPOText:=[Preferences]EMailPOText
+vsUser:=[Preferences]User
+vsPassword:=[Preferences]Password
+If ([Preferences]EmailServer)
+	$0:=True
+Else 
+	$0:=False
+End if 
+UNLOAD RECORD([Preferences])

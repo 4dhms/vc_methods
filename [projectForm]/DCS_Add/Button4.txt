@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cbDuty:=1
+OBJECT SET VISIBLE(vrCCostDuty;cbDuty=1)
+OBJECT SET VISIBLE(*;"xPC1";cbDuty=1)
+
+GOTO OBJECT(vrCCostDuty)

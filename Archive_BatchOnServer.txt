@@ -1,0 +1,58 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_DATE($range;$cancel)
+
+$range:=Current date(*)-365
+$cancel:=Current date(*)-180
+
+QUERY([Designs];[Designs]DesEntryDate<$range)
+QUERY SELECTION([Designs];[Designs]ArchivedPict=False)
+  //ALERT(String(Records in selection([Designs]))+"/"+String(Records in table([Designs])))
+
+  // Why did you call it sleep? lol
+CREATE SET([Designs];"sleep")
+
+$i:=1
+FIRST RECORD([Designs])
+
+  // Find all orders whose order designer number matches the design, design number, I guess this way you archive only the images that are attached to orders, the range is set to 365 days from
+  // The last day the archive runs? 
+  // The most effecient way to handle this I think though is to save all images to the file server and run the Pictuer_RestoreOnTheFly, then we don't have to archive, or we can archive more data, 
+  // And not just for images... 
+For ($i;1;Records in selection([Designs]))
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum;*)
+	  //QUERY([Orders]; & ;[Orders]CancelDate>$cancel)
+	QUERY([Orders]; & ;[Orders]CancelDate>$range)
+	
+	
+	  // Check selection of orders if the set sleep exists, if so remove it
+	If (Records in selection([Orders])>0)
+		REMOVE FROM SET([Designs];"sleep")
+	Else 
+		  // Same as order archive
+		QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum;*)
+		QUERY([Samples]; & ;[Samples]SampleOrderDate>$range)
+		
+		  // Check selection of samples of the set sleep exists, if so remove it
+		If (Records in selection([Samples])>0)
+			REMOVE FROM SET([Designs];"sleep")
+		End if 
+	End if 
+	NEXT RECORD([Designs])
+End for 
+
+USE SET("sleep")
+
+  //CONFIRM("Process "+String(Records in selection([Designs]))+"?")
+
+
+  // if all is good run the archive function that moves the image to a file folder, clear the set and unload the records 
+If (ok=1)
+	Picture_Archive 
+End if 
+CLEAR SET("sleep")
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([Designs])
+ALERT("Done")
+

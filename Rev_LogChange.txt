@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //This is a simplified version meant over time to replace Rev_LogEvent
+C_REAL($revKey)
+C_TEXT(vtOldData;$1;$2)
+
+$revkey:=[Orders]OrderNum+([Orders]RevisionNumber/100)
+
+If ([Orders]RevisionNumber>0) | (vtOldData#"") | ($2="Component added") | ($2="Component changed")
+	CREATE RECORD([Changes])
+	[Changes]RevisionNumber:=<>vlRevisionNumber
+	[Changes]RevisionKey:=$revKey
+	[Changes]OrderNumber:=$3
+	[Changes]RevDate:=Current date(*)
+	[Changes]RevTime:=Current time(*)
+	[Changes]Writer:=Current user
+	[Changes]ChangeKey:=Sequence number([Changes])
+	[Changes]Tag:=$1
+	[Changes]FieldName:=$2
+	[Changes]OldData:=vtOldData
+	[Changes]NewChange:=vtNewData
+	SAVE RECORD([Changes])
+	UNLOAD RECORD([Changes])
+End if 

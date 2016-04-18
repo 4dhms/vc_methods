@@ -1,0 +1,86 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($inpack;$packs;$line;$i)
+C_TEXT(vtDCdept)
+C_POINTER($button)
+
+$line:=alBDPack
+
+vtDCNote:="Pack A"
+$i:=1
+For ($i;1;Size of array(asDCNote))
+	If (alDCNumber{$i}=$1)
+		Case of 
+			: (asDCNote{$i}="Pack G")
+				vtDCNote:="Pack H"
+			: (asDCNote{$i}="Pack F")
+				vtDCNote:="Pack G"
+			: (asDCNote{$i}="Pack E")
+				vtDCNote:="Pack F"
+			: (asDCNote{$i}="Pack D")
+				vtDCNote:="Pack E"
+			: (asDCNote{$i}="Pack C")
+				vtDCNote:="Pack D"
+			: (asDCNote{$i}="Pack B")
+				vtDCNote:="Pack C"
+			: (asDCNote{$i}="Pack A")
+				vtDCNote:="Pack B"
+		End case 
+	End if 
+End for 
+
+$inpack:=alBDPack{$line}
+
+QUERY([DC_Locations];[DC_Locations]DCKey=alDCkeys{$1})
+
+Case of 
+	: (asDCpo{$1}="")
+		vlDCShow:=1
+		vtDCpo:=[DC_Locations]DCPOprefix+" "
+	: (asDCpo{$1}#"")
+		vtDCpo:=asDCpo{$1}
+End case 
+
+If (asDCdept{$1}="")
+	vlDCShow:=vlDCShow+10
+End if 
+
+vlDCcount:=0
+
+
+Center Window (200;220;1;"")
+DIALOG("DC_Count")
+asDCpo{$1}:=vtDCpo
+
+If (ok=1) & (vlDCcount>0)
+	If (vlDCShow=10) | (vlDCShow=11) & (vtDCdept#"")
+		asDCdept{$1}:=vtDCdept
+	End if 
+	
+	Case of 
+		: (vlDCcount%$inpack=0)
+			$packs:=vlDCcount/$inpack
+			
+			APPEND TO ARRAY(asDCcc;asBDColorCode{$line})
+			APPEND TO ARRAY(alDCLine;$line)
+			APPEND TO ARRAY(alDCQty;vlDCcount)
+			APPEND TO ARRAY(alDCNumber;$1)
+			APPEND TO ARRAY(asDClineColor;asBDSelf{$line})
+			APPEND TO ARRAY(asDClinePO;vtDCpo)
+			APPEND TO ARRAY(alDCListKey;0)
+			If (cbOther=1)
+				APPEND TO ARRAY(asDCNote;vtDCNote)
+			Else 
+				APPEND TO ARRAY(asDCNote;"")
+			End if 
+			$button:=Get pointer("b"+String(10+$1))
+			OBJECT SET VISIBLE($button->;True)
+			$button:=Get pointer("b"+String(20+$1))
+			OBJECT SET VISIBLE($button->;True)
+			OBJECT SET VISIBLE(*;"m"+String($1);True)
+			OBJECT SET VISIBLE(*;"xm"+String($1);True)
+			OBJECT SET VISIBLE(*;"bl"+String($1);True)
+		Else 
+			WinPrompt ("Bad quantity."+Char(13)+"There will be a remainder of "+String(vlDCcount%$inpack)+" garments.")
+	End case 
+End if 
+

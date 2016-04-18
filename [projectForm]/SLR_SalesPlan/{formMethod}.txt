@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	ARRAY TEXT(asCustomerBuild;0)
+	COPY ARRAY(asCustomers;asCustomerBuild)
+End if 

@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($width;$height)
+C_REAL($testW;$testH;$shrinkW;$shrinkH)
+C_POINTER($picture)
+
+$picture:=Get pointer("vxSketch"+String($1))
+PICTURE PROPERTIES($picture->;$width;$height)
+$testW:=Round(350/$width;2)
+$testH:=Round(190/$height;2)
+$shrinkW:=1-$testW
+$shrinkH:=1-$testH
+
+Case of 
+	: ($testW>=1) & ($testH>=1)
+		  //do nothing it's fine
+	: ($testW<$testH)
+		TRANSFORM PICTURE($picture->;1;$testW;$testW)
+		TRANSFORM PICTURE($picture->;101)
+	: ($testH<$testW)
+		TRANSFORM PICTURE($picture->;1;$testH;$testH)
+		TRANSFORM PICTURE($picture->;101)
+End case 

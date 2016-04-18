@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	vtPart7:=String(adDates{7})
+	vtPart8:=String(adDates{8})
+	vtPart9:=String(adDates{9})
+	vtPart10:=String(adDates{10})
+	vtPart11:=String(adDates{11})
+	vtPart12:=String(adDates{12})
+End if 

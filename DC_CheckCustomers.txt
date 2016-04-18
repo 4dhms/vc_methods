@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($short)
+
+QUERY([DC];[DC]Customer#"";*)
+QUERY([DC]; & ;[DC]Customer#"+/-")
+
+ARRAY TEXT($customer;0)
+DISTINCT VALUES([DC]Customer;$customer)
+CONFIRM("Short?  "+String(Size of array($customer)))
+If (ok=1)
+	$short:=True
+End if 
+
+$i:=1
+CREATE EMPTY SET([DC];"missing")
+For ($i;1;Size of array($customer))
+	QUERY([Customers];[Customers]CustomerName=$customer{$i})
+	
+	If ($short)
+		If (Records in selection([Customers])=0)
+			QUERY([DC];[DC]Customer=$customer{$i})
+			ADD TO SET([DC];"missing")
+		End if 
+	Else 
+		QUERY([DC];[DC]Customer=$customer{$i})
+		ADD TO SET([DC];"missing")
+	End if 
+End for 
+
+USE SET("missing")
+CLEAR SET("missing")
+
+ALERT("Done")

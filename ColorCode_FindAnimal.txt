@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+Case of 
+	: (Position("ANMAL";$1)>4)
+		$0:=2
+	: (Position("Black";$1)>4)
+		$0:=2
+	: (Position("BOUCL";$1)>4)
+		$0:=2
+	: (Position("CAMO";$1)>4)
+		$0:=2
+	: (Position("CHECK";$1)>4)
+		$0:=2
+	: (Position("CONVR";$1)>4)
+		$0:=2
+	: (Position("DPDYE";$1)>4)
+		$0:=2
+	: (Position("DOT";$1)>4)
+		$0:=2
+	: (Position("ETHST";$1)>4)
+		$0:=2
+	: (Position("FLORL";$1)>4)
+		$0:=2
+	: (Position("GRPHC";$1)>4)
+		$0:=2
+	: (Position("JCQRD";$1)>4)
+		$0:=2
+	: (Position("LACE";$1)>4)
+		$0:=2
+	: (Position("ORNTL";$1)>4)
+		$0:=2
+	: (Position("PASLY";$1)>4)
+		$0:=2
+	: (Position("PLAID";$1)>4)
+		$0:=2
+	: (Position("PUCCI";$1)>4)
+		$0:=2
+	: (Position("PURPL";$1)>4)
+		$0:=2
+	: (Position("Red";$1)>4)
+		$0:=2
+	: (Position("SLDVR";$1)>4)
+		$0:=2
+	: (Position("STRIP";$1)>4)
+		$0:=2
+	: (Position("TIDYE";$1)>4)
+		$0:=2
+	: (Position("TRPCL";$1)>4)
+		$0:=2
+	: (Position("MULTI";$1)>4)
+		$0:=2
+	Else 
+		$0:=0
+End case 

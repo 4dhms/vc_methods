@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_TEXT($group)
+Case of 
+	: (asGroups{asGroups}="Sales")
+		$group:="Sales"
+	: (asGroups{asGroups}="Design")
+		$group:="Design"
+	: (asGroups{asGroups}="Other")
+		$group:="Other"
+	Else 
+		$group:="All"
+End case 
+SET WINDOW TITLE(asUsers{asUsers}+"    "+String(vdCalToday;3)+"  "+$group)

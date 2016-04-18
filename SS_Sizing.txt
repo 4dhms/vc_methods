@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (FORM Get current page=2) & (vlCloneRouter#3)
+	vlCloneRouter:=0
+	SS_GetPart 
+	FORM GOTO PAGE(vlPageRouter)
+Else 
+	vrSampleSize:=[SpecFactory]SampleCol
+	<>asGradeCat:=1
+	USE SET("ActiveLines")
+	Case of 
+		: (pOne=1)
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=1)
+		: (pTwo=1)
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=2)
+		: (pThree=1)
+			QUERY SELECTION([SpecSheetLines];[SpecSheetLines]PartNumber=2)
+	End case 
+	
+	SS_BuildSize 
+	$i:=1
+	FIRST RECORD([Sizes])
+	For ($i;1;Records in selection([Sizes]))
+		SS_MovePointer (vlColSlider)
+		If (Find in array(alSpecLineKey;[Sizes]SpecLineKey)>0)
+			[Sizes]Tolerance:=asSpecLineTol{Find in array(alSpecLineKey;[Sizes]SpecLineKey)}
+			SAVE RECORD([Sizes])
+		End if 
+		NEXT RECORD([Sizes])
+	End for 
+End if 

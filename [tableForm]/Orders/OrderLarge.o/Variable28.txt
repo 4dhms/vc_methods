@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]SeasonName="Fall";*)
+QUERY([Orders]; | ;[Orders]SeasonName="Holiday";*)
+QUERY([Orders]; & ;[Orders]SeasonYear="2015")
+CREATE SET([Orders];"bex1")
+
+QUERY([Orders];[Orders]SeasonName="Resort";*)
+QUERY([Orders]; & ;[Orders]SeasonYear="2016")
+CREATE SET([Orders];"bex2")
+
+UNION("bex1";"bex2";"bex")
+USE SET("bex")
+CLEAR SET("bex")
+CLEAR SET("bex1")
+CLEAR SET("bex2")
+
+QUERY SELECTION([Orders];[Orders]OrderDivision="12@")
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))

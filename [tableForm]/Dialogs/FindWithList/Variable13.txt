@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbAdd=1)
+	Case of 
+		: (vlRouter=1)
+			vsSubHead:="Enter new Color:"
+			FORM GOTO PAGE(2)
+		: (vlRouter=2)
+			vsSubhead:="Enter new Print:"
+			FORM GOTO PAGE(2)
+		: (vlRouter=13)  //CP Find Editor
+			CANCEL
+			QUERY([ColorPrintNumber])
+			
+	End case 
+End if 

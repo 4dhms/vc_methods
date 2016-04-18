@@ -1,0 +1,128 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($type;$cpnumber;$category;$colorbuild)
+C_LONGINT($recordkey;$p;$run;$n)
+C_BOOLEAN($add)
+
+$recordkey:=[Changes]ChangeKey
+
+If ([Changes]FieldName="Self Color@")  //| ([Changes]FieldName="Combo Color@")
+	Case of 
+		: ([Changes]Tag="Changed")
+			$category:="CC"
+			$add:=True
+		: ([Changes]Tag="Added")
+			
+			$category:="NC"
+			$add:=True
+	End case 
+	$type:=Substring([Changes]FieldName;1;Position(" (";[Changes]FieldName)-1)
+	Case of 
+		: ([Changes]FieldName="Self Color/Print Number") | ([Changes]FieldName="Self Color/Print Number ")
+			$cpnumber:=[Changes]NewChange
+		Else 
+			$cpnumber:=Replace string([Changes]FieldName;$type;"")
+			$cpnumber:=Replace string($cpnumber;"(";"")
+			$cpnumber:=Substring($cpnumber;1;Position(")";$cpnumber)-1)
+			$cpnumber:=Replace string($cpnumber;" ";"")
+	End case 
+	
+	
+	QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Changes]OrderNumber)
+	
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=$cpnumber)
+	
+	  //removes similar self different combos
+	$n:=1
+	For ($n;1;Size of array(alCtnIn))
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey#alCtnIn{$n})
+	End for 
+	
+	If (Records in selection([CP_OrderXRef])>0)
+		
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=[CP_OrderXRef]SelfKey)
+		
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self";*)
+		QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 1";*)
+		QUERY SELECTION([CP_OrderXRef]; | ;[CP_OrderXRef]CPType="Combo 2")
+		
+		ARRAY TEXT($build;0)
+		
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPType;<)
+		FIRST RECORD([CP_OrderXRef])
+		
+		  //DAMAGE CONTROL
+		If ([CP_OrderXRef]CPType="Self")
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			APPEND TO ARRAY($build;[CP_OrderXRef]CPNumber)
+			
+			If (Records in selection([CP_OrderXRef])>1)
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo@")
+				ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPType;>)
+				APPEND TO ARRAY($build;[CP_OrderXRef]CPNumber)
+				If (Records in selection([CP_OrderXRef])>1)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 2")
+					APPEND TO ARRAY($build;[CP_OrderXRef]CPNumber)
+				End if 
+			End if 
+			
+			
+			$p:=1
+			$colorbuild:=""
+			
+			For ($p;1;Size of array($build))
+				If ($p>1)
+					$colorbuild:=$colorbuild+" [c] "
+				End if 
+				If ($build{$p}="DTM")
+					$colorbuild:=$colorbuild+$build{$p}
+				Else 
+					If ([Orders]Customer="K & G@")
+						$colorbuild:=$colorbuild+$build{$p}
+					Else 
+						$colorbuild:=$colorbuild+$build{$p}+" "+[ColorPrintNumber]CPName
+					End if 
+				End if 
+			End for 
+			
+			
+			<>vlPriors:=0
+			
+			$run:=New process("LogOn_PreDated";0;"Predate";[Orders]OrderNum;[Orders]StyleNumber;$colorbuild)
+			
+			Repeat 
+			Until (<>vlPriors#0) | (Shift down)
+			
+			Case of 
+				: (<>vlPriors=1)
+					  //pre-existing
+					
+				: ($add)
+					  //this deals with same self different combos
+					APPEND TO ARRAY(alCtnIn;[CP_OrderXRef]SelfKey)
+					
+					APPEND TO ARRAY(asStyleNumbers;[Orders]StyleNumber)
+					APPEND TO ARRAY(adActionDate;[Changes]RevDate)
+					If ([Changes]LOProcessDate#!00-00-00!)
+						APPEND TO ARRAY(afProcess;True)
+						APPEND TO ARRAY(asUsers;[Changes]LOProcessor)
+						APPEND TO ARRAY(asProcessDate;String([Changes]LOProcessDate))
+					Else 
+						APPEND TO ARRAY(afProcess;False)
+						APPEND TO ARRAY(asUsers;"")
+						APPEND TO ARRAY(asProcessDate;"")
+					End if 
+					APPEND TO ARRAY(asDivisions;[Orders]OrderDivision)
+					APPEND TO ARRAY(asSeasonName;[Orders]SeasonName+" "+[Orders]SeasonYear)
+					LogOn_Group 
+					APPEND TO ARRAY(asXSizeRange;[Orders]BrkdnCutRatio)
+					APPEND TO ARRAY(asColorCodes;"C"+String($recordkey))
+					APPEND TO ARRAY(asColors;Replace string($colorbuild;"  ";" "))
+					
+					APPEND TO ARRAY(arSalePrice;[Orders]Price)
+					APPEND TO ARRAY(atChange;$category)
+					  //APPEND TO ARRAY(alXBG;14155775)
+			End case 
+		End if 
+	End if 
+End if 

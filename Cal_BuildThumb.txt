@@ -1,0 +1,53 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+
+vdCalDay1:=Date("!"+String(Month of(vdCalToday))+"/1/"+String(Year of(vdCalToday))+"!")
+vlCalAdj:=Day number(vdCalDay1)
+
+vlMonth:=Month of(vdCalDay1)
+vlYear:=Year of(vdCalDay1)-2000
+
+Case of 
+	: (vlMonth=1)
+		vsFlag:="January"
+		vlDayCount:=31
+	: (vlMonth=2)
+		vsFlag:="February"
+		If (Year of(Current date(*))%4=0)
+			vlDayCount:=29
+		Else 
+			vlDayCount:=28
+		End if 
+	: (vlMonth=3)
+		vsFlag:="March"
+		vlDayCount:=31
+	: (vlMonth=4)
+		vsFlag:="April"
+		vlDayCount:=30
+	: (vlMonth=5)
+		vsFlag:="May"
+		vlDayCount:=31
+	: (vlMonth=6)
+		vsFlag:="June"
+		vlDayCount:=30
+	: (vlMonth=7)
+		vsFlag:="July"
+		vlDayCount:=31
+	: (vlMonth=8)
+		vsFlag:="August"
+		vlDayCount:=31
+	: (vlMonth=9)
+		vsFlag:="September"
+		vlDayCount:=30
+	: (vlMonth=10)
+		vsFlag:="October"
+		vlDayCount:=31
+	: (vlMonth=11)
+		vsFlag:="November"
+		vlDayCount:=30
+	: (vlMonth=12)
+		vsFlag:="December"
+		vlDayCount:=31
+End case 
+vsFlag:=vsFlag+"  "+String(2000+vlYear)
+
+Cal_DisplayThumb 

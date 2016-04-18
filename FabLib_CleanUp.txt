@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+QUERY([FabricLibrary];[FabricLibrary]ArticleNumber="@ ")
+$i:=1
+FIRST RECORD([FabricLibrary])
+For ($i;1;Records in selection([FabricLibrary]))
+	$c:=Length([FabricLibrary]ArticleNumber)
+	If ([FabricLibrary]ArticleNumber[[$c]]=" ")
+		[FabricLibrary]ArticleNumber:=Substring([FabricLibrary]ArticleNumber;1;$c-1)
+		SAVE RECORD([FabricLibrary])
+	End if 
+	NEXT RECORD([FabricLibrary])
+End for 

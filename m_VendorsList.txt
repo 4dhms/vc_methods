@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //VendorList procedure
+  //
+Case of 
+	: (<>VendorsPrcID>0)
+		SHOW PROCESS(<>VendorsPrcID)
+		BRING TO FRONT(<>VendorsPrcID)
+	Else 
+		<>VendorsPrcID:=New process("p_VendorsList";0;"VendorList")
+End case 

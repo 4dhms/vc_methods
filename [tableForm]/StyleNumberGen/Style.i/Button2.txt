@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($second)
+C_TEXT(vsCustomer)
+
+If (vtStyleNo#"")
+	QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=vtStyleNo+"@";*)
+	$second:=True
+Else 
+	ALL RECORDS([StyleNumberGen])
+End if 
+
+If (vDesignNum#"")
+	If ($second)
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]DesignNumber=vDesignNum+"@";*)
+	Else 
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]DesignNumber=vDesignNum+"@";*)
+		$second:=True
+	End if 
+End if 
+
+If (vsWriter#"")
+	If ($second)
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]StyleNumberCreator=vsWriter;*)
+	Else 
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]StyleNumberCreator=vsWriter;*)
+		$second:=True
+	End if 
+End if 
+
+If (vdDate#!00-00-00!)
+	If ($second)
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]StyleNumberDate=vdDate;*)
+	Else 
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]StyleNumberDate=vdDate;*)
+		$second:=True
+	End if 
+End if 
+
+
+If (vsCustomer#"")
+	If ($second)
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]Primary Customer=vsCustomer;*)
+	Else 
+		QUERY([StyleNumberGen]; & ;[StyleNumberGen]Primary Customer=vsCustomer;*)
+		$second:=True
+	End if 
+End if 
+
+QUERY([StyleNumberGen]; & ;[StyleNumberGen]StyleNumberDate>!2001-01-01!)
+
+Case of 
+	: (Records in selection([StyleNumberGen])<1)
+		vtStyleNo:=""
+		vDesignNum:=""
+		vsWriter:=""
+		vdDate:=!00-00-00!
+		vsCustomer:=""
+		WinPrompt ("There are no styles with that criteria.")
+	: (Records in selection([StyleNumberGen])>1)
+		CANCEL
+		vfContinue:=False
+	Else 
+		QUERY([Orders];[Orders]StyleNumber=[StyleNumberGen]StyleNumber)
+		vfContinue:=False
+		FORM GOTO PAGE(1)
+End case 

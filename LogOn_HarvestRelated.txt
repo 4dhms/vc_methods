@@ -1,0 +1,56 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s)
+
+ARRAY TEXT($styles;0)
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	If (Find in array($styles;asStyleNumbers{$i})<1)
+		APPEND TO ARRAY($styles;asStyleNumbers{$i})
+	End if 
+End for 
+
+QUERY([Changes];[Changes]RevDate>vdEnd)
+CREATE SET([Changes];"set")
+
+$i:=1
+CREATE EMPTY SET([Changes];"relate")
+For ($i;1;Size of array($styles))
+	QUERY([Orders];[Orders]StyleNumber=$styles{$i})
+	
+	FIRST RECORD([Orders])
+	$n:=1
+	For ($n;1;Records in selection([Orders]))
+		USE SET("set")
+		QUERY SELECTION([Changes];[Changes]OrderNumber=[Orders]OrderNum)
+		$s:=1
+		FIRST RECORD([Changes])
+		For ($s;1;Records in selection([Changes]))
+			ADD TO SET([Changes];"relate")
+			NEXT RECORD([Changes])
+		End for 
+		NEXT RECORD([Orders])
+	End for 
+	
+	USE SET("relate")
+	QUERY SELECTION([Changes];[Changes]OrderNumber>0)
+	QUERY SELECTION([Changes];[Changes]FieldName="Size Range";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="SeasonName";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="StyleNumber";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="Price";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="OrderDivision";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="Self Color@";*)
+	QUERY SELECTION([Changes]; | ;[Changes]FieldName="Combo@Color@")
+	
+	If (Records in selection([Changes])>0)
+		ORDER BY([Changes];[Changes]RevDate;>;[Changes]Tag;>;[Changes]NewChange;>;[Changes]OrderNumber;>)
+		
+		$s:=1
+		For ($s;1;Records in selection([Changes]))
+			Logon_AddColor 
+			Logon_AddChange 
+			NEXT RECORD([Changes])
+		End for 
+	End if 
+End for 
+

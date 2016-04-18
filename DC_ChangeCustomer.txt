@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($report)
+
+If ($2="")
+	$report:=$1
+Else 
+	$report:=$2
+End if 
+
+USE SET("work")
+QUERY SELECTION([DC];[DC]Customer=$1)
+
+$i:=1
+FIRST RECORD([DC])
+For ($i;1;Records in selection([DC]))
+	[DC]ReportCustomer:=$report
+	SAVE RECORD([DC])
+	
+	QUERY([Lists];[Lists]ListName="DC";*)
+	QUERY([Lists]; & ;[Lists]ListCode=$report)
+	If (Records in selection([Lists])=0)
+		CREATE RECORD([Lists])
+		[Lists]ListName:="DC"
+		[Lists]ListItem:=$report
+		[Lists]ListCode:=$report
+		SAVE RECORD([Lists])
+	End if 
+	
+	
+	REMOVE FROM SET([DC];"work")
+	NEXT RECORD([DC])
+End for 
+

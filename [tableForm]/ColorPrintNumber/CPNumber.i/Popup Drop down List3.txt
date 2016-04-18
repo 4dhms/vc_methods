@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asSeasonName>1)
+	[ColorPrintNumber]SeasonName:=<>asSeasonName{<>asSeasonName}
+End if 

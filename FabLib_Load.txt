@@ -1,0 +1,138 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asPrintNumber;0)
+ARRAY TEXT(asPrintName;0)
+ARRAY TEXT(atCost1;0)
+ARRAY TEXT(atCost2;0)
+ARRAY TEXT(atCost3;0)
+ARRAY TEXT(atCost4;0)
+ARRAY TEXT(atCost5;0)
+ARRAY TEXT(atCols;0)
+ARRAY DATE(adPODate;0)
+ARRAY BOOLEAN(afReceived;0)
+C_LONGINT($i;$n)
+
+vsSubhead:="Base Fabric Builder"
+
+If ([FabricLibrary]SecondaryFabric="")
+	OBJECT SET VISIBLE(*;"xSecond";False)
+	OBJECT SET VISIBLE(*;"xSecond1";False)
+	OBJECT SET VISIBLE([FabricLibrary]SecondaryFabric;False)
+	OBJECT SET VISIBLE([FabricLibrary]SecondaryContent;False)
+Else 
+	OBJECT SET VISIBLE(*;"xSecond";True)
+	OBJECT SET VISIBLE(*;"xSecond1";True)
+	OBJECT SET VISIBLE([FabricLibrary]SecondaryFabric;True)
+	OBJECT SET VISIBLE([FabricLibrary]SecondaryContent;True)
+End if 
+
+LIST TO ARRAY("ArticleBuild";atCost1)
+INSERT IN ARRAY(atCost1;1;1)
+atCost1{1}:="Fiber List"
+
+COPY ARRAY(atCost1;atCost2)
+COPY ARRAY(atCost1;atCost3)
+COPY ARRAY(atCost1;atCost4)
+COPY ARRAY(atCost1;atCost5)
+atCost1:=1
+atCost2:=1
+atCost3:=1
+atCost4:=1
+atCost5:=1
+vlItem1:=0
+vlItem2:=0
+vlItem3:=0
+vlItem4:=0
+vlItem5:=0
+vsFiber1:=""
+vsFlag:=""
+vtHistory:=""
+OBJECT SET VISIBLE(*;"xPerc1";False)
+OBJECT SET VISIBLE(*;"xPerc2";False)
+OBJECT SET VISIBLE(*;"xPerc3";False)
+OBJECT SET VISIBLE(*;"xPerc4";False)
+OBJECT SET VISIBLE(atCost2;False)
+OBJECT SET VISIBLE(atCost3;False)
+OBJECT SET VISIBLE(atCost4;False)
+OBJECT SET VISIBLE(atCost5;False)
+OBJECT SET VISIBLE(vlItem2;False)
+OBJECT SET VISIBLE(vlItem3;False)
+OBJECT SET VISIBLE(vlItem4;False)
+OBJECT SET VISIBLE(vlItem5;False)
+
+Case of 
+	: (Is new record([FabricLibrary]))
+		[FabricLibrary]FabricLibKey:=Sequence number([FabricLibrary])
+		[FabricLibrary]CreatedBy:=Current user
+		[FabricLibrary]CreationDate:=Current date(*)
+		
+		REDUCE SELECTION([OrdersFabricXRef];0)
+	: ([FabricLibrary]ArticleNumber="HMS@") | ([FabricLibrary]HMSANmaster)
+		  //
+	Else 
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=[FabricLibrary]ArticleNumber)
+		ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber;>)
+		  //QUERY([FabricOrders];[FabricOrders]FabLibKey=[FabricLibrary]FabricLibKey)
+		
+		$i:=1
+		For ($i;1;Records in selection([OrdersFabricXRef]))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+			$n:=1
+			For ($n;1;Records in selection([CP_OrderXRef]))
+				If (Find in array(asPrintNumber;[CP_OrderXRef]CPNumber)<1) & ([CP_OrderXRef]CPNumber#"000@")
+					APPEND TO ARRAY(asPrintNumber;[CP_OrderXRef]CPNumber)
+					QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+					APPEND TO ARRAY(asPrintName;[ColorPrintNumber]CPName)
+				End if 
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+		
+		QUERY([FabricOrders];[FabricOrders]ArticleNo=[FabricLibrary]ArticleNumber)
+		ORDER BY([FabricOrders];[FabricOrders]FabPODate;>)
+		SELECTION TO ARRAY([FabricOrders]PONumber;atCols;[FabricOrders]FabPODate;adPODate;[FabricOrders]Closed;afReceived)
+End case 
+QUERY([FabricLibRates];[FabricLibRates]FabricLibKey=[FabricLibrary]FabricLibKey)
+ORDER BY([FabricLibRates];[FabricLibRates]SortOrder;>)
+
+QUERY([HMSArtNo];[HMSArtNo]HANkey=[FabricLibrary]HMSANkey)
+QUERY SELECTION([HMSArtNo];[HMSArtNo]HANkey>0)
+If (Records in selection([HMSArtNo])=0)
+	QUERY([HMSArtNoRelated];[HMSArtNoRelated]ArticleNumber=[FabricLibrary]ArticleNumber)
+	QUERY([HMSArtNo];[HMSArtNo]HANkey=[HMSArtNoRelated]HANkey)
+	QUERY SELECTION([HMSArtNo];[HMSArtNo]HANkey>0)
+End if 
+
+OBJECT SET VISIBLE(*;"xRestricted1";[FabricLibrary]Restricted#"")
+OBJECT SET VISIBLE(*;"xRestricted";[FabricLibrary]ArticleNumber="HMS@")
+OBJECT SET VISIBLE([FabricLibrary]Restricted;[FabricLibrary]ArticleNumber="HMS@")
+
+Case of 
+	: (Records in selection([HMSArtNo])=0)
+		OBJECT SET VISIBLE(*;"xHMSart";False)
+		OBJECT SET VISIBLE(*;"xHMSart1";False)
+		OBJECT SET VISIBLE(vsArticle;False)
+	: ([HMSArtNo]HANumber=[FabricLibrary]ArticleNumber)
+		OBJECT SET VISIBLE(*;"xHMSart";False)
+		OBJECT SET VISIBLE(*;"xHMSart1";False)
+		OBJECT SET VISIBLE(vsArticle;False)
+	Else 
+		OBJECT SET VISIBLE(*;"xHMSart";True)
+		OBJECT SET VISIBLE(*;"xHMSart1";True)
+		vsArticle:=[HMSArtNo]HANumber
+		OBJECT SET VISIBLE(vsArticle;True)
+		UNLOAD RECORD([HMSArtNoRelated])
+		UNLOAD RECORD([HMSArtNo])
+End case 
+OBJECT SET VISIBLE(bGet;Is new record([FabricLibrary]))
+
+Case of 
+	: (Is new record([FabricLibrary]))
+		OBJECT SET VISIBLE(bBack;False)
+		FORM GOTO PAGE(2)
+	: ([FabricLibrary]ArticleNumber="HMS@") | ([FabricLibrary]HMSANmaster)
+		FORM GOTO PAGE(4)
+	Else 
+		FORM GOTO PAGE(1)
+End case 
+

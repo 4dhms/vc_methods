@@ -1,0 +1,72 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($note)
+C_LONGINT($i;$n;$c)
+  //C_REAL(vrDutyRate)
+
+  //If (vrDutyRate>0)
+  //QUERY([SpecialDuty];[SpecialDuty]SDName=vsName)
+  //QUERY SELECTION([SpecialDuty];[SpecialDuty]SDuty=vrDutyRate)
+  //QUERY SELECTION([SpecialDuty];[SpecialDuty]SDNote=vtNote)
+  //
+  //If (Records in selection([SpecialDuty])=0)
+  //CREATE RECORD([SpecialDuty])
+  //[SpecialDuty]SDID:=Sequence number([SpecialDuty])
+  //[SpecialDuty]SDName:=vsName
+  //[SpecialDuty]SDuty:=vrDutyRate
+  //[SpecialDuty]SDNote:=vtNote
+  //SAVE RECORD([SpecialDuty])
+  //End if 
+  //End if 
+
+$note:=vsName+Char(13)+"Duty: "+String(vrDutyRate;"###.00")+Char(13)+vtNote
+
+$i:=1
+For ($i;1;Size of array(afProcess))
+	If (afProcess{$i}=True)
+		QUERY([Orders];[Orders]OrderNum=Num(asOrderNumbers{$i}))
+		
+		Case of 
+			: (Locked([Orders]))
+				WinPrompt ("Order #"+String(alOrders{$i})+" is in use."+Char(13)+"Update duty later.")
+			: (Locked([CostSheets]))
+				WinPrompt ("Costsheet #"+String(alOrders{$i})+" is in use."+Char(13)+"Update duty later.")
+			Else 
+				[Orders]SDID:=alSDID{$i}
+				[Orders]SDProcessed:=True
+				[Orders]ActlDutyRate:=Num(atCost7{$i})
+				SAVE RECORD([Orders])
+				afApproved{$i}:=True
+				
+				FIRST RECORD([CostSheets])
+				[CostSheets]ShipNotes:=$note+Char(13)+[CostSheets]ShipNotes
+				SAVE RECORD([CostSheets])
+				
+		End case 
+		SAVE RECORD([CostSheets])
+	End if 
+End for 
+cbGroup:=0
+UNLOAD RECORD([CostSheets])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Costing])
+
+$i:=1
+$n:=0
+$c:=0
+For ($i;1;Size of array(afProcess))
+	If (afProcess{$i}=True)
+		If ($n=0)
+			$n:=$i+1
+			vlLine:=$i
+		Else 
+			$c:=$c+1
+		End if 
+	End if 
+End for 
+
+SD_ResetLine 
+If ($c>0) & ($n<Size of array(afProcess))
+	SD_DeleteArray ($n;$c)
+End if 
+
+SD_ColorCoded 

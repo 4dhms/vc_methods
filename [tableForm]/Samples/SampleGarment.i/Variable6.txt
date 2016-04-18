@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$sampleNumber)
+
+If (Is new record([Samples]))
+	$sampleNumber:=-1*[Samples]SampleNumber
+	QUERY([Changes];[Changes]OrderNumber=$sampleNumber)
+	DELETE SELECTION([Changes])
+	
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$sampleNumber)
+	
+	If (Records in selection([OrdersFabricXRef])>0)
+		$i:=1
+		FIRST RECORD([OrdersFabricXRef])
+		For ($i;1;Records in selection([OrdersFabricXRef]))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+			  //DELETE SELECTION([CP_OrderXRef])
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+		DELETE SELECTION([OrdersFabricXRef])
+	End if 
+End if 
+CANCEL

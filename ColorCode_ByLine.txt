@@ -1,0 +1,69 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($continue)
+C_TEXT($self;$combo1;$combo2;$print)
+C_LONGINT($seek)
+
+$i:=1
+For ($i;1;Size of array(asCPNumbers))
+	If (asCC{$i}="") & (asTypeList{$i}="Self")
+		vlSelfKey:=alColorKey{$i}
+		
+		Case of 
+			: (asCC{$i}="") & (asTypeList{$i}="Self")
+				
+				$self:=asCPNumbers{$i}
+				If (Size of array(asTypeList)-1>=$i)
+					If (asTypeList{$i+1}="Combo 1")
+						$combo1:=asCPNumbers{$i+1}
+					End if 
+				End if 
+				If (Size of array(asTypeList)-2>=$i)
+					If (asTypeList{$i+2}="Combo 2")
+						$combo2:=asCPNumbers{$i+2}
+					End if 
+				End if 
+				
+				If (Size of array(asCPNumbers)>0)
+					$continue:=True
+				Else 
+					$continue:=False
+				End if 
+			Else 
+				$continue:=False
+		End case 
+	Else 
+		$continue:=False
+	End if 
+	
+	If ($continue)
+		If (Position("-";asCPNumbers{1})>4)
+			$print:="Print"
+		Else 
+			$print:="Solid"
+		End if 
+		
+		If (<>vlCodeCheck=0)
+			<>vfContinue:=False
+			
+			$seek:=New process("ColorCode_Harvest";0;"Harvest";[Orders]StyleNumber;$self;$combo1;$combo2;[Orders]Customer)
+			Repeat 
+			Until (<>vfContinue) | (Shift down)
+			<>vfContinue:=False
+		Else 
+			<>vtColorCode:=""
+		End if 
+		
+		If (<>vlCodeCheck=0) & ($print="Print")
+			<>vlCodeCheck:=2
+		End if 
+		
+		  //1=color code is print number
+		  //2=print
+		  //3=alpha
+		  //4=color code is solid number
+		  //9=code returned
+		
+		ColorCode_EZ 
+	End if 
+End for 

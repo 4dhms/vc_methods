@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($folderPath)
+C_TEXT($diskName)
+
+ALL RECORDS([Preferences])
+
+$diskName:=Get 4D folder
+$diskName:=Substring($diskName;1;Position(":";$diskName))
+$folderPath:=$diskName+"4D Images:"
+If (Test path name($folderPath)#0)
+	CREATE FOLDER($folderPath)
+End if 
+$folderPath:=$folderPath+String(Int($1/100))+":"
+$0:=$folderPath

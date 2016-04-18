@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (pOne=1)
+		FORM SET INPUT([DesignLines];"DesignLine.entry")
+		QUERY([DesignLines];[DesignLines]Linked=False;*)
+		QUERY([DesignLines]; & ;[DesignLines]Stock=False)
+	: (pTwo=1)
+		FORM SET INPUT([DesignLines];"DesignLine.linked")
+		QUERY([DesignLines];[DesignLines]Linked=True;*)
+		QUERY([DesignLines]; & ;[DesignLines]Stock=False)
+	: (pThree=1)
+		FORM SET INPUT([DesignLines];"DesignLine.stock")
+		QUERY([DesignLines];[DesignLines]Linked=False;*)
+		QUERY([DesignLines]; & ;[DesignLines]Stock=True)
+End case 
+ORDER BY([DesignLines];[DesignLines]DesignLineKey;<)

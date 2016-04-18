@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (zYes=1)
+	zNo:=0
+	[Orders]VSReorder:=2
+Else 
+	[Orders]VSReorder:=0
+End if 

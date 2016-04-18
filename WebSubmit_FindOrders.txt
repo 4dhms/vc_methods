@@ -1,0 +1,179 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_POINTER($fieldPtr)
+C_BOOLEAN($query1;$dateQuery;$intQuery)
+C_LONGINT($i)
+C_TEXT($compare)
+C_TEXT($value;$lineStat)
+C_TEXT($user)
+$user:=Replace string(vsWebUser;"_";" ")
+
+$query1:=True
+  //gets Factory and Web Session
+vsFactory:=vtFactoryField
+  //Web_UserField 
+
+  //Pointers on these fields
+ARRAY POINTER($ar_Ptr1;5)
+ARRAY POINTER($ar_Ptr2;5)
+ARRAY POINTER($ar_Ptr3;5)
+ARRAY POINTER($ar_Ptr4;5)
+ARRAY POINTER($ar_Ptr5;5)
+
+READ ONLY([Orders])
+
+$i:=0
+For ($i;1;Size of array($ar_Ptr1))
+	$ar_Ptr1{$i}:=Get pointer("w_ProdField"+String($i))
+	$ar_Ptr2{$i}:=Get pointer("w_ProdTest"+String($i))
+	  //$ar_Ptr3{$i}:=Get pointer("w_ProdValue"+String($i))
+	$ar_Ptr3{$i}:=Get pointer("w_ProdVal"+String($i))
+	If ($i>1)
+		$ar_Ptr4{$i}:=Get pointer("w_ProdLogic"+String($i))
+	End if 
+	$ar_Ptr5{$i}:=Get pointer("vtTextField"+String($i))
+End for 
+
+vtError:=""
+$continue:=False
+$i:=1
+
+For ($i;1;Size of array($ar_Ptr3))
+	If ($ar_Ptr3{$i}->#"") & ($ar_Ptr3{$i}->#"Factory List")
+		$continue:=True
+	End if 
+End for 
+
+If (Not($continue))
+	vtError:="You need to enter something to search for."
+Else 
+	$i:=1
+	For ($i;1;Size of array($ar_Ptr1))
+		  //gets value
+		$value:=$ar_Ptr3{$i}->
+		If ($i>1)
+			$lineStat:=$ar_Ptr4{$i}->
+		End if 
+		
+		
+		If (Position("contains";$ar_Ptr2{$i}->)>0)
+			$value:="@"+$value+"@"
+		End if 
+		
+		  //gets field   
+		$dateQuery:=False
+		$intQuery:=False
+		Case of 
+			: ($ar_Ptr1{$i}->="Order Number")
+				$fieldPtr:=->[Orders]OrderNum
+				$intQuery:=True
+				
+			: ($ar_Ptr1{$i}->="Style Number")
+				$fieldPtr:=->[Orders]StyleNumber
+				
+			: ($ar_Ptr1{$i}->="Design Number")
+				$fieldPtr:=->[Orders]DesignNumber
+				
+			: ($ar_Ptr1{$i}->="Factory")
+				$fieldPtr:=->[Orders]Factory
+				
+			: ($ar_Ptr1{$i}->="Customer")
+				$fieldPtr:=->[Orders]Customer
+				
+			: ($ar_Ptr1{$i}->="Cancel")
+				$fieldPtr:=->[Orders]Cancelled
+				
+			: ($ar_Ptr1{$i}->="Start Cancel Date")
+				$fieldPtr:=->[Orders]CancelDate
+				$dateQuery:=True
+				
+			: ($ar_Ptr1{$i}->="Ship Date Factory")
+				$fieldPtr:=->[Orders]ShipDateFactory
+				$dateQuery:=True
+				If ($value="00/00/00")
+					vtError:="Please enter date value in Ship Date Factory field."
+					$continue:=False
+				End if 
+				$intQuery:=False
+				
+			: ($ar_Ptr1{$i}->="Actual Delivery Date")
+				$fieldPtr:=->[Orders]ActualDeliveryDate
+				$dateQuery:=True
+		End case 
+		
+		  //gets comparison operator
+		$compare:=Web_PDGetCompare ($ar_Ptr2{$i}->)
+		
+		  //builds the query
+		If ($value#"") & ($value#"Factory List")
+			
+			If ($query1)
+				$query1:=False
+				Case of 
+					: ($intQuery)
+						QUERY([Orders];$fieldPtr->;$compare;Num($value);*)
+					: ($dateQuery)
+						QUERY([Orders];$fieldPtr->;$compare;Date($value);*)
+					Else 
+						QUERY([Orders];$fieldPtr->;$compare;$value;*)
+				End case 
+			Else 
+				Case of 
+					: ($intQuery) & ($lineStat="And")
+						QUERY([Orders]; & ;$fieldPtr->;$compare;Num($value);*)
+					: ($intQuery) & ($lineStat="or")
+						QUERY([Orders]; | ;$fieldPtr->;$compare;Num($value);*)
+					: ($dateQuery) & ($lineStat="And")
+						QUERY([Orders]; & ;$fieldPtr->;$compare;"!"+$value+"!";*)
+					: ($dateQuery) & ($lineStat="or")
+						QUERY([Orders]; | ;$fieldPtr->;$compare;"!"+$value+"!";*)
+					: ($lineStat="And")
+						QUERY([Orders]; & ;$fieldPtr->;$compare;$value;*)
+					Else 
+						QUERY([Orders]; | ;$fieldPtr->;$compare;$value;*)
+				End case 
+			End if 
+		End if 
+	End for 
+	QUERY([Orders])
+	
+	Case of 
+		: (w_ProdField8="With costsheets")
+			Web_Cost_Strip (1)
+		: (w_ProdField8="Without costsheets")
+			Web_Cost_Strip (2)
+	End case 
+	ORDER BY([Orders];[Orders]OrderNum;<)
+	
+	If (Records in selection([Orders])<1)
+		vtError:="There are no orders that match this request."
+		$continue:=False
+	Else 
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	  //Web_UserField 
+	ARRAY LONGINT(alOrders;0)
+	
+	SELECTION TO ARRAY([Orders]OrderNum;alOrders)
+	Web_SaveArray 
+	
+	  //temporarily turned off until numbers are verified
+	If (User in group($user;"Costsheets"))
+		vsInGroup:="Costsheets"
+	Else 
+		vsInGroup:="No"
+	End if 
+	
+	If (Records in selection([Orders])=1)
+		vsFoundCount:="1 Order"
+	Else 
+		vsFoundCount:=String(Records in selection([Orders]))+" Orders"
+	End if 
+	vsUniqueWebID:=String(Tickcount)
+	WEB SEND FILE("prodStatList.html")
+Else 
+	Web_Error (vtError)
+End if 

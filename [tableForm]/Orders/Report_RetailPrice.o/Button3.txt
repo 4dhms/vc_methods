@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Orders];"Rep_RetailPrice.p")
+PAGE SETUP([Orders];"Rep_RetailPrice.p")
+Print_Selection (->[Orders])
+FORM SET OUTPUT([Orders];"Report_RetailPrice.o")

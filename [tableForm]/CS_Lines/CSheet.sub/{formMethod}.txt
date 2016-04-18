@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Getting Focus)
+		vlKey:=[CS_Lines]CS_LineKey
+		SS_CompRelated 
+	: (Form event=On Display Detail)
+		If ([CS_Lines]LogCode="")
+			[CS_Lines]LogCode:="000000000"
+			SAVE RECORD([CS_Lines])
+		End if 
+		Trim_ShowChange 
+End case 

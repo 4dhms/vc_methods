@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>CloseBox:=True
+
+FORM SET OUTPUT([FabricTrack];"FabricTrack.o")
+FORM SET INPUT([FabricTrack];"FabricTrack.i")
+
+ALL RECORDS([FabricTrack])
+If (Screen width<1200)
+	Center Window (1000;700;4;"")
+	MODIFY SELECTION([FabricTrack])
+Else 
+	Center Window (1200;700;4;"")
+	MODIFY SELECTION([FabricTrack];*)
+End if 
+CLOSE WINDOW
+<>vlFabricTrack:=0

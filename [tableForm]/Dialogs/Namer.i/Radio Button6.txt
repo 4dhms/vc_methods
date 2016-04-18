@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vsFlag:="From Sample Order"
+QUERY([Costing];[Costing]SheetNumber=-1)
+If (Records in selection([Costing])>1)
+	REDUCE SELECTION([Costing];1)
+End if 
+Cost_HList 

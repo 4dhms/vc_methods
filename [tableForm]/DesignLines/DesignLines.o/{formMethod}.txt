@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		SET TIMER(120)
+		vfPrinting:=False
+		Print_Box 
+		pOne:=1
+		QUERY([DesignLines];[DesignLines]Linked=False;*)
+		QUERY([DesignLines]; & ;[DesignLines]Stock=False)
+		ORDER BY([DesignLines];[DesignLines]DesignLineKey;<)
+	: (Form event=On Display Detail)
+		OBJECT SET VISIBLE(*;"xInStore";[DesignLines]InStore)
+	: (Form event=On Timer)
+		If (cbStockPrint=1)
+			QUERY([StockOrders];[StockOrders]Print=True)
+			If (Records in selection([StockOrders])>0)
+				FIRST RECORD([StockOrders])
+				If ([StockOrders]MyLine)
+					Stock_MyLinePrint 
+				End if 
+			End if 
+		End if 
+		QUERY([StockOrders];[StockOrders]MyLine=False)
+		ORDER BY([StockOrders];[StockOrders]SONumber;<)
+End case 
+

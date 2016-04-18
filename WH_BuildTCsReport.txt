@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY REAL(arPrice;0)
+C_DATE(vdStart;vdEnd)
+C_TEXT($query)
+C_BOOLEAN(<>vfPreview)
+
+READ ONLY([Orders])
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+Case of 
+	: (vdStart=!00-00-00!)
+		WinPrompt ("Bad start date.")
+	: (vdEnd=!00-00-00!)
+		WinPrompt ("Bad end date.")
+	Else 
+		WinChoice ("How do you want to report?";"Cancel Date";"Creation Date";"PO Date")
+		Case of 
+			: (ok=1) & (bChoice2=1)
+				$query:="po"
+			: (ok=1)
+				$query:="cancel"
+			Else 
+				$query:="order"
+		End case 
+		Case of 
+			: ($query="cancel")
+				QUERY([Orders];[Orders]CancelDate>=vdStart;*)
+				QUERY([Orders]; & ;[Orders]CancelDate<=vdEnd)
+			: ($query="po")
+				QUERY([Orders];[Orders]PODate>=vdStart;*)
+				QUERY([Orders]; & ;[Orders]PODate<=vdEnd)
+			Else 
+				QUERY([Orders];[Orders]OrderEntryDate>=vdStart;*)
+				QUERY([Orders]; & ;[Orders]OrderEntryDate<=vdEnd)
+		End case 
+		ORDER BY([Orders];[Orders]CancelDate;>;[Orders]Customer;>;[Orders]Factory;>;[Orders]OrderNum;>)
+		SET WINDOW TITLE(String(Records in selection([Orders]))+" Orders")
+		OBJECT SET ENABLED(bPrint;True)
+End case 
+
+

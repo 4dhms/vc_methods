@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+UNLOAD RECORD([Orders])
+FORM SET INPUT([Dialogs];"CompStatus.i")
+Array_BuildDates 
+REDUCE SELECTION([Orders];0)
+
+vfIncomplete:=False
+Center Window (600;420;0;"";"cbGeneric")
+ADD RECORD([Dialogs];*)
+CLOSE WINDOW
+<>CompStat:=0

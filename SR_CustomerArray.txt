@@ -1,0 +1,57 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c;vlOrders;vlOrdersx;vlUnits;vlUnitsx;vlDollars;vlDollars;$n;$netTotal)
+ARRAY LONGINT(alOrders;0)
+ARRAY LONGINT(alQuantity;0)
+ARRAY LONGINT(alTotalSales;0)
+ARRAY LONGINT(alOrdersB;0)
+ARRAY LONGINT(alQuantityB;0)
+ARRAY LONGINT(alTotalSalesB;0)
+
+$c:=Size of array(asMeetingCust)
+
+ARRAY LONGINT(alOrders;$c)
+ARRAY LONGINT(alQuantity;$c)
+ARRAY LONGINT(alTotalSales;$c)
+ARRAY LONGINT(alOrdersB;$c)
+ARRAY LONGINT(alQuantityB;$c)
+ARRAY LONGINT(alTotalSalesB;$c)
+vlOrders:=0
+vlOrdersx:=0
+vlUnits:=0
+vlUnitsx:=0
+vlDollars:=0
+vlDollarsx:=0
+
+$i:=1
+For ($i;1;Size of array(asMeetingCust))
+	USE SET("ThisYear")
+	QUERY SELECTION([Orders];[Orders]Customer=asMeetingCust{$i})
+	alOrders{$i}:=Records in selection([Orders])
+	vlOrders:=vlOrders+alOrders{$i}
+	FIRST RECORD([Orders])
+	$n:=1
+	For ($n;1;Records in selection([Orders]))
+		alQuantity{$i}:=alQuantity{$i}+[Orders]TotalOrderQuantity
+		$netTotal:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+		alTotalSales{$i}:=alTotalSales{$i}+$netTotal
+		vlUnits:=vlUnits+[Orders]TotalOrderQuantity
+		vlDollars:=vlDollars+$netTotal
+		NEXT RECORD([Orders])
+	End for 
+	
+	USE SET("LastYear")
+	QUERY SELECTION([Orders];[Orders]Customer=asMeetingCust{$i})
+	alOrdersB{$i}:=Records in selection([Orders])
+	vlOrdersX:=vlOrders+alOrdersB{$i}
+	FIRST RECORD([Orders])
+	$n:=1
+	For ($n;1;Records in selection([Orders]))
+		alQuantityB{$i}:=alQuantityB{$i}+[Orders]TotalOrderQuantity
+		$netTotal:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+		alTotalSalesB{$i}:=alTotalSalesB{$i}+$netTotal
+		vlUnitsX:=vlUnitsX+[Orders]TotalOrderQuantity
+		vlDollarsX:=vlDollarsX+$netTotal
+		NEXT RECORD([Orders])
+	End for 
+	
+End for 

@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+vfPDF:=False
+
+FabPO_ChangedFieldList (2)
+SAVE RECORD([FabricOrders])
+CREATE SET([FabricOrders];"Fabs")
+
+  //FabPO_Print 
+WinChoice ("Print single order or selection?";"Single";"Selection";"Cancel")
+If (ok=1)
+	PRINT SETTINGS
+	vfPDF:=False
+	
+	If (ok=1)
+		If (bChoice2=1)
+			$i:=1
+			FIRST RECORD([FabricOrders])
+			For ($i;1;Records in selection([FabricOrders]))
+				If (FORM Get current page=3)
+					Fabric_PrintUsage 
+				Else 
+					FabricOrder_Print 
+				End if 
+				If ($i<Records in selection([FabricOrders]))
+					PAGE BREAK(>)
+				Else 
+					PAGE BREAK
+				End if 
+				NEXT RECORD([FabricOrders])
+			End for 
+			
+		Else 
+			If (FORM Get current page=3)
+				Fabric_PrintUsage 
+			Else 
+				FabricOrder_Print 
+			End if 
+			PAGE BREAK
+		End if 
+	End if 
+	
+	USE SET("Fabs")
+	CLEAR SET("Fabs")
+	UNLOAD RECORD([OrdersFabricXRef])
+	UNLOAD RECORD([CP_OrderXRef])
+	UNLOAD RECORD([Samples])
+	UNLOAD RECORD([Orders])
+	ACCEPT
+	UNLOAD RECORD([FabricOrders])
+	ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)
+End if 

@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlCustomerInfo)
+C_LONGINT($left;<>vlRight;<>vlTop;$bottom)
+GET WINDOW RECT($left;<>vlTop;<>vlRight;$bottom)
+GET WINDOW RECT($left;<>vlTop;<>vlRight;$bottom)
+
+  //If (<>vlCustomerInfo>0)
+  //CALL PROCESS(<>vlCustomerInfo)
+  //DELAY PROCESS(Current process;10)
+  //End if 
+  //If (<>vlCustomerInfo>0)
+  //CALL PROCESS(<>vlCustomerInfo)
+  //DELAY PROCESS(Current process;10)
+  //End if 
+<>vlCustomerInfo:=New process("Customer_Info";0;"CustomerInfo")
+
+

@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c;$subtot;$samplenumber;$rec)
+$samplenumber:=-1*[Samples]SampleNumber
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$sampleNumber)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+
+FIRST RECORD([OrdersFabricXRef])
+QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+$c:=1
+$subtot:=0
+$rec:=0
+
+FIRST RECORD([CP_OrderXRef])
+For ($c;1;Records in selection([CP_OrderXRef]))
+	If ([CP_OrderXRef]CPType="Self")
+		$subtot:=$subtot+[CP_OrderXRef]Quantity
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+vlSubtotal:=$subtot
+[Samples]SGQuantity:=vlSubtotal

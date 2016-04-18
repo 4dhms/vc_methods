@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($new)
+
+<>vsStyleNumber:="new"
+$new:=True
+p_GetStyleNumber 

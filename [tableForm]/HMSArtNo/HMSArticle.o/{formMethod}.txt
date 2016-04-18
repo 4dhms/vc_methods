@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asSort;0)
+		APPEND TO ARRAY(asSort;"Sort By:")
+		APPEND TO ARRAY(asSort;"Article Number-Up")
+		APPEND TO ARRAY(asSort;"Article Number-Down")
+		APPEND TO ARRAY(asSort;vtTitle2+"-Up")
+		APPEND TO ARRAY(asSort;vtTitle2+"-Down")
+		APPEND TO ARRAY(asSort;vtTitle3+"-Up")
+		APPEND TO ARRAY(asSort;vtTitle3+"-Down")
+		APPEND TO ARRAY(asSort;"Supplier-Up")
+		APPEND TO ARRAY(asSort;"Supplier-Down")
+		asSort:=1
+		ORDER BY([HMSArtNo];[HMSArtNo]HANumber;<)
+	: (Form event=On Display Detail)
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[HMSArtNo]HANumber)
+		
+End case 

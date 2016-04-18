@@ -1,0 +1,154 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+C_TEXT(vsUnits1)
+C_TEXT(vsUnits2)
+C_TEXT(vsUnits3)
+C_TEXT(vsUnits4)
+C_TEXT(vsUnits5)
+C_TEXT(vsUnits6)
+C_TEXT(vsUnits7)
+C_TEXT(vsUnits8)
+C_TEXT(vsUnits9)
+C_TEXT(vsUnits10)
+C_TEXT(vsUnits11)
+C_TEXT(vsUnits12)
+C_TEXT(vsChange1)
+C_TEXT(vsChange2)
+C_TEXT(vsChange3)
+C_TEXT(vsChange4)
+C_TEXT(vsChange5)
+C_TEXT(vsChange6)
+
+
+If ([SLRReporter]Units1+[SLRReporter]Total1+[SLRReporter]OHU1=0)
+	$show:=False
+Else 
+	$show:=True
+End if 
+OBJECT SET VISIBLE([SLRReporter]Units1;$show)
+OBJECT SET VISIBLE([SLRReporter]Total1;$show)
+OBJECT SET VISIBLE([SLRReporter]AUR1;$show)
+OBJECT SET VISIBLE([SLRReporter]SOP1;$show)
+OBJECT SET VISIBLE([SLRReporter]OHU1;$show)
+OBJECT SET VISIBLE([SLRReporter]WOS1;$show)
+
+If ([SLRReporter]Units2+[SLRReporter]Total2+[SLRReporter]OHU2=0)
+	$show:=False
+Else 
+	$show:=True
+End if 
+OBJECT SET VISIBLE([SLRReporter]Units2;$show)
+OBJECT SET VISIBLE([SLRReporter]Total2;$show)
+OBJECT SET VISIBLE([SLRReporter]AUR2;$show)
+OBJECT SET VISIBLE([SLRReporter]SOP2;$show)
+OBJECT SET VISIBLE([SLRReporter]OHU2;$show)
+OBJECT SET VISIBLE([SLRReporter]WOS2;$show)
+
+If ([SLRReporter]Units3+[SLRReporter]Total3+[SLRReporter]OHU3=0)
+	$show:=False
+Else 
+	$show:=True
+End if 
+OBJECT SET VISIBLE([SLRReporter]Units3;$show)
+OBJECT SET VISIBLE([SLRReporter]Total3;$show)
+OBJECT SET VISIBLE([SLRReporter]AUR3;$show)
+OBJECT SET VISIBLE([SLRReporter]SOP3;$show)
+OBJECT SET VISIBLE([SLRReporter]OHU3;$show)
+OBJECT SET VISIBLE([SLRReporter]WOS3;$show)
+
+If ([SLRReporter]Units4+[SLRReporter]Total4+[SLRReporter]OHU4=0)
+	$show:=False
+Else 
+	$show:=True
+End if 
+OBJECT SET VISIBLE([SLRReporter]Units4;$show)
+OBJECT SET VISIBLE([SLRReporter]Total4;$show)
+OBJECT SET VISIBLE([SLRReporter]AUR4;$show)
+OBJECT SET VISIBLE([SLRReporter]SOP4;$show)
+OBJECT SET VISIBLE([SLRReporter]OHU4;$show)
+OBJECT SET VISIBLE([SLRReporter]WOS4;$show)
+
+If ([SLRReporter]Units5+[SLRReporter]Total5+[SLRReporter]OHU5=0)
+	$show:=False
+Else 
+	$show:=True
+End if 
+OBJECT SET VISIBLE([SLRReporter]Units5;$show)
+OBJECT SET VISIBLE([SLRReporter]Total5;$show)
+OBJECT SET VISIBLE([SLRReporter]AUR5;$show)
+OBJECT SET VISIBLE([SLRReporter]SOP5;$show)
+OBJECT SET VISIBLE([SLRReporter]OHU5;$show)
+OBJECT SET VISIBLE([SLRReporter]WOS5;$show)
+
+If ([SLRReporter]Units6+[SLRReporter]Total6+[SLRReporter]OHU6=0)
+	$show:=False
+Else 
+	$show:=True
+End if 
+OBJECT SET VISIBLE([SLRReporter]Units6;$show)
+OBJECT SET VISIBLE([SLRReporter]Total6;$show)
+OBJECT SET VISIBLE([SLRReporter]AUR6;$show)
+OBJECT SET VISIBLE([SLRReporter]SOP6;$show)
+OBJECT SET VISIBLE([SLRReporter]OHU6;$show)
+OBJECT SET VISIBLE([SLRReporter]WOS6;$show)
+
+If ($1)
+	If (vsUnits1="0") & (vsUnits7="0") & (vsChange1="0")
+		$show:=False
+	Else 
+		$show:=True
+	End if 
+	OBJECT SET VISIBLE(vsUnits1;$show)
+	OBJECT SET VISIBLE(vsUnits7;$show)
+	OBJECT SET VISIBLE(vsChange1;$show)
+	
+	If (vsUnits2="0") & (vsUnits8="0") & (vsChange2="0")
+		$show:=False
+	Else 
+		$show:=True
+	End if 
+	OBJECT SET VISIBLE(vsUnits2;$show)
+	OBJECT SET VISIBLE(vsUnits8;$show)
+	OBJECT SET VISIBLE(vsChange2;$show)
+	
+	If (vsUnits3="0") & (vsUnits9="0") & (vsChange3="0")
+		$show:=False
+	Else 
+		$show:=True
+	End if 
+	OBJECT SET VISIBLE(vsUnits3;$show)
+	OBJECT SET VISIBLE(vsUnits9;$show)
+	OBJECT SET VISIBLE(vsChange3;$show)
+	
+	If (vsUnits4="0") & (vsUnits10="0") & (vsChange4="0")
+		$show:=False
+	Else 
+		$show:=True
+	End if 
+	OBJECT SET VISIBLE(vsUnits4;$show)
+	OBJECT SET VISIBLE(vsUnits10;$show)
+	OBJECT SET VISIBLE(vsChange4;$show)
+	
+	If (vsUnits5="0") & (vsUnits10="0") & (vsChange5="0")
+		$show:=False
+	Else 
+		$show:=True
+	End if 
+	OBJECT SET VISIBLE(vsUnits5;$show)
+	OBJECT SET VISIBLE(vsUnits11;$show)
+	OBJECT SET VISIBLE(vsChange5;$show)
+	
+	If (vsUnits6="0") & (vsUnits12="0") & (vsChange6="0")
+		$show:=False
+	Else 
+		$show:=True
+	End if 
+	OBJECT SET VISIBLE(vsUnits6;$show)
+	OBJECT SET VISIBLE(vsUnits12;$show)
+	OBJECT SET VISIBLE(vsChange6;$show)
+End if 
+
+
+
+
+

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([FabricOrders]FinalDelivery=!00-00-00!)
+	[FabricOrders]FinalDelivery:=Current date(*)
+	OBJECT SET VISIBLE([FabricOrders]FinalDelivery;True)
+	WinChoice ("Is this order closed?")
+	If (ok=1)
+		[FabricOrders]Closed:=True
+	End if 
+End if 

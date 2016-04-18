@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Cost_NewDataArray 
+
+If (Size of array(atOldData)=Size of array(atNewData))
+	$i:=1
+	For ($i;1;Size of array(atDataName))
+		
+		If (atOldData{$i}#"") & (atOldData{$i}#atNewData{$i})
+			CREATE RECORD([Changes])
+			[Changes]RevisionNumber:=[Orders]RevisionNumber
+			[Changes]RevisionKey:=[Orders]OrderNum+([Orders]RevisionNumber*0.01)
+			[Changes]OrderNumber:=[Orders]OrderNum
+			[Changes]TableNum:=2
+			[Changes]RevDate:=Current date(*)
+			[Changes]RevTime:=Current time(*)
+			[Changes]Writer:=Current user
+			[Changes]ChangeKey:=Sequence number([Changes])
+			[Changes]Tag:="Changed"
+			
+			[Changes]FieldName:=atDataName{$i}
+			
+			[Changes]OldData:=atOldData{$i}
+			[Changes]NewChange:=atNewData{$i}
+			SAVE RECORD([Changes])
+			UNLOAD RECORD([Changes])
+		End if 
+	End for 
+End if 

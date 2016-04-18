@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asXCustomer;0)
+ARRAY TEXT(asCustomerBuild;0)
+ARRAY TEXT(atCustomerSpec;0)
+QUERY([Lists];[Lists]ListName="DC")
+DISTINCT VALUES([Lists]ListCode;asXCustomer)
+SORT ARRAY(asXCustomer;>)
+COPY ARRAY(asXCustomer;atCustomerSpec)
+
+<>CloseBox:=True
+Center Window (600;700;1;"")
+DIALOG("DCCustomer.directory")
+CLOSE WINDOW

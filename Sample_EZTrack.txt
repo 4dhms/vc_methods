@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET INPUT([SampleTrack];"EZ.i")
+FORM SET OUTPUT([SampleTrack];"EZ.o")
+QUERY([SampleTrack];[SampleTrack]EZ=True)
+QUERY SELECTION([SampleTrack];[SampleTrack]DateIn=!00-00-00!)
+ORDER BY([Samples];[SampleTrack]DateOut;>)
+
+<>CloseBox:=True
+Center Window (470;300;4;"")
+MODIFY SELECTION([SampleTrack];*)
+CLOSE WINDOW
+<>vlEZTrack:=0

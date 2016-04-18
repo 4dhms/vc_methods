@@ -1,0 +1,175 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_TEXT($1;$0)
+C_TEXT($url)
+C_TEXT($command;$returnedText)
+C_LONGINT($nextpage)
+C_TEXT($user)
+$user:=Replace string(vsWebUser;"_";" ")
+
+  //assign the passed parameter to a local var so it's easier to read
+$command:=$1
+  //return the appropirate information based on the $command
+
+Case of 
+	: ($command="/printer")
+		  //$url:=Char(1)+"<a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?printline="+String(vlKey)+"_"+String(vlPage+1)+"_"+String(vlCount)+">"
+		$url:=Char(1)+"<a href=/4DACTION/Web_StockPrintLine/"+vsWebSession+">"
+		$returnedText:=$url+"<br><img src=/images/printer.jpg></a>"
+		
+	: ($command="/nextline")
+		QUERY([DLPages];[DLPages]DLItemKey=vlKey)
+		QUERY SELECTION([DLPages];[DLPages]PageNumber>vlPage)
+		ORDER BY([DLPages];[DLPages]PageNumber;>)
+		vlPage:=[DLPages]PageNumber
+		UNLOAD RECORD([DLPages])
+		If (vlPage<vlCount)
+			$url:=Char(1)+"<a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?stocklistM="+String(vlKey)+"_"+String(vlPage+1)+"_"+String(vlCount)+"+"+String(vlBuyerKey)+">"
+			$returnedText:=$url+"<br><img src=/images/right.jpg></a>"
+		Else 
+			$returnedText:=Char(1)+"<img src=/images/whitearrow.jpg>"
+		End if 
+		
+	: ($command="/previousline")
+		QUERY([DLPages];[DLPages]DLItemKey=vlKey)
+		QUERY SELECTION([DLPages];[DLPages]PageNumber<vlPage)
+		ORDER BY([DLPages];[DLPages]PageNumber;<)
+		vlPage:=[DLPages]PageNumber
+		UNLOAD RECORD([DLPages])
+		If (vlPage>0)
+			$url:=Char(1)+"<a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?stocklistM="+String(vlKey)+"_"+String(vlPage)+"_"+String(vlCount)+"+"+String(vlBuyerKey)+">"
+			$returnedText:=$url+"<br><img src=/images/left.jpg></a>"
+		Else 
+			$returnedText:=Char(1)+"<img src=/images/whitearrow.jpg>"
+		End if 
+		
+	: ($command="/bag")
+		$url:=Char(1)+"<a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?checkout="+String(vlKey)+"_"+String(vlPage+1)+"_"+String(vlCount)+">"
+		$returnedText:=$url+"<img src=/images/bag.gif></a>"
+		
+	: ($command="/linebutton")
+		If (vlPage<vlCount)
+			$returnedText:=Char(1)+"<label><input type=submit name=submit id=submit value=Next></label>"
+		Else 
+			$returnedText:=Char(1)+"<label><input type=submit name=submit id=submit value=Print></label>"
+		End if 
+		
+	: ($command="/nextstock")
+		QUERY([DLPages];[DLPages]DLItemKey=vlKey)
+		QUERY SELECTION([DLPages];[DLPages]PageNumber>vlPage)
+		ORDER BY([DLPages];[DLPages]PageNumber;>)
+		vlPage:=[DLPages]PageNumber
+		UNLOAD RECORD([DLPages])
+		If (vlPage<vlCount)
+			$url:=Char(1)+"<a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?stocklistM="+String(vlKey)+"_"+String(vlPage)+"_"+String(vlCount)+">"
+			$returnedText:=$url+"<img src=/images/right.gif></a>"
+		Else 
+			$returnedText:=Char(1)+"<img src=/images/blank.gif>"
+		End if 
+		
+	: ($command="/previousstock")
+		QUERY([DLPages];[DLPages]DLItemKey=vlKey)
+		QUERY SELECTION([DLPages];[DLPages]PageNumber<vlPage)
+		ORDER BY([DLPages];[DLPages]PageNumber;<)
+		$nextPage:=[DLPages]PageNumber
+		UNLOAD RECORD([DLPages])
+		If (vlPage=1)
+			$returnedText:=Char(1)+"<img src=/images/blank.gif>"
+		Else 
+			$url:=Char(1)+"<a href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?stocklistB="+String(vlKey)+"_"+String($nextPage)+"_"+String(vlCount)+">"
+			$returnedText:=$url+"<img src="+Char(34)+"/images/left.gif"+Char(34)+"></a>"
+		End if 
+		
+	: ($command="/previousorder")
+		Web_GetArray 
+		Case of 
+			: (Size of array(alOrders)=1)
+				$returnedText:=""
+			: (Find in array(alOrders;[Orders]OrderNum)<2) & (vsFlag="Order")
+				$returnedText:=""
+			: (Find in array(alOrders;[Samples]SampleNumber)<2) & (vsFlag="Sample")
+				$returnedText:=""
+			Else 
+				$returnedText:="Previous"
+		End case 
+		
+	: ($command="/nextorder")
+		Web_GetArray 
+		Case of 
+			: (Size of array(alOrders)=1)
+				$returnedText:=""
+			: (Find in array(alOrders;[Orders]OrderNum)>=Size of array(alOrders)) & (vsFlag="Order")
+				$returnedText:=""
+			: (Find in array(alOrders;[Samples]SampleNumber)>=Size of array(alOrders)) & (vsFlag="Sample")
+				$returnedText:=""
+			Else 
+				$returnedText:="Next"
+		End case 
+		
+	: ($command="/previouscost")
+		Case of 
+			: (Size of array(alOrders)=1)
+				$returnedText:=""
+			: (Find in array(alOrders;Abs([Costing]OrderNumber))<2)
+				$returnedText:=""
+			Else 
+				$returnedText:="Previous"
+		End case 
+		
+	: ($command="/nextcost")
+		Web_GetArray 
+		Case of 
+			: (Size of array(alOrders)=1)
+				$returnedText:=""
+			: (Find in array(alOrders;Abs([Costing]OrderNumber))>=Size of array(alOrders))
+				$returnedText:=""
+			Else 
+				$returnedText:="Next"
+		End case 
+		
+	: ($command="/footer")
+		If (vsWebSession="")
+			$returnedText:="Page served:"+String(Current time;HH MM AM PM)+" User:"+vsWebUser
+		Else 
+			$returnedText:="Page served:"+String(Current time;HH MM AM PM)+" User:"+vsWebUser+" Session: "+vsWebSession
+		End if 
+	: ($command="/getgcoc")
+		$returnedText:=Char(1)+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?pullgcoc"+vsOrderNumber+" class=style5>Create</A><BR><BR>"
+		$returnedText:=$returnedText+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?fmenu"+vsWebsession+" class=style5>Done</A>"
+	: ($command="/ordercost")
+		Case of 
+			: (Not(User in group($user;"Limited"))) & ([Orders]Factory="JY")
+				$returnedText:=""
+			: (User in group($user;"Costsheets"))
+				$returnedText:=[Orders]LastCostSheet
+			Else 
+				$returnedText:=""
+		End case 
+		  //: ($command="/spreadsheet")
+		  //$returnedText:="Spreadsheet"
+		
+	: ($command="/samplecost")
+		Case of 
+			: (Not(User in group(Current user;"Limited"))) & ([Samples]SamGarFactry="JY")
+				$returnedText:=""
+			: (User in group(vsWebUser;"Costsheets"))
+				$returnedText:=[Samples]LastCostSheet
+			Else 
+				$returnedText:=""
+		End case 
+	: ($command="/ShipAir")
+		If ([CostSheets]ShipAir) | ([CostSheets]ShipAir=[CostSheets]ShipSea)
+			$returnedText:="Air"
+		Else 
+			$returnedText:=""
+		End if 
+	: ($command="/ShipSea")
+		If ([CostSheets]ShipSea) | ([CostSheets]ShipAir=[CostSheets]ShipSea)
+			$returnedText:="Sea"
+		Else 
+			$returnedText:=""
+		End if 
+	: ($command="/ldpsea")
+		$returnedText:=String(vlLDP;"###.00")
+End case 
+
+$0:=$returnedText

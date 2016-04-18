@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vdStart:=Current date(*)+75
+vdEnd:=Current date(*)+89
+OBJECT SET VISIBLE(vdStart;True)
+OBJECT SET VISIBLE(vdEnd;True)
+OBJECT SET VISIBLE(bGet;True)
+OBJECT SET VISIBLE(*;"xFind1";True)
+OBJECT SET VISIBLE(*;"xFind2";True)
+OBJECT SET VISIBLE(bGet;True)

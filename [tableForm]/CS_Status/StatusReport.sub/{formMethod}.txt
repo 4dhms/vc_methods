@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Printing Detail)
+		Case of 
+			: ([CS_Lines]Source#"")
+				vtFrom:=[CS_Lines]Source
+			: ([CS_Lines]Source="") & ([ComponentSheets]FactorySupplied)
+				vtFrom:="Factory Supplied"
+			Else 
+				vtFrom:=""
+		End case 
+		
+End case 

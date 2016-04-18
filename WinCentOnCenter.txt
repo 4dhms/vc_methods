@@ -1,0 +1,37 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$right;$top;$bottom;$horC;$vertC)
+C_TEXT($center)
+
+$center:=WinFindCenter 
+
+$horC:=Num(Substring($center;1;Position("/";$center)-1))
+$vertC:=Num(Substring($center;Position("/";$center);100))
+
+$left:=$horC-($1/2)
+$right:=$left+$1
+$top:=$vertC-($2/2)
+$bottom:=$top+$2
+
+If (($left+$1)+20>Screen width) | ($left<10)
+	$left:=(Screen width/2)-($1/2)
+	$right:=(Screen width/2)+($1/2)
+End if 
+
+If ($top+$1+50>Screen height) | ($top<50) | ($bottom>Screen height)
+	$top:=(Screen height/2)-($2/2)
+	$bottom:=(Screen height/2)+($2/2)
+End if 
+
+Case of 
+	: (Count parameters>4)
+		Open window($left;$top;$right;$bottom;$3;$4;$5)
+	: (Count parameters>3)
+		Open window($left;$top;$right;$bottom;$3;$4)
+	: (Count parameters>2)
+		Open window($left;$top;$right;$bottom;$3)
+	: (Count parameters>2)
+		Open window($left;$top;$right;$bottom;4)
+End case 
+
+
+

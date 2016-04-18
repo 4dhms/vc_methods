@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($locked;$invisible)
+C_DATE($created;$modified;$range)
+C_TIME($createdat;$modifiedat)
+C_TEXT($folderpath;$filename)
+C_LONGINT($i)
+
+ARRAY TEXT($files;0)
+
+$folderpath:=Substring(Application file;1;Position(":";Application file))+"4D_PDFs"
+$range:=Current date(*)-1
+
+DOCUMENT LIST($folderpath;$files)
+
+$i:=1
+For ($i;1;Size of array($files))
+	$filename:=$folderpath+":"+$files{$i}
+	GET DOCUMENT PROPERTIES($filename;$locked;$invisible;$created;$createdat;$modified;$modifiedat)
+	If ($files{$i}="@.xls") | ($files{$i}="@.pdf") & ($created<$range)
+		DELETE DOCUMENT($filename)
+	End if 
+End for 
+

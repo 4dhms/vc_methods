@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($run)
+
+CONFIRM("Are you sure you want to archive sketches?")
+If (ok=1)
+	CONFIRM("Really sure?";"No";"Yes")
+	If (ok=0)
+		$run:=Execute on server("Archive_BatchOnServer";128*1064;"ArchivePix")
+	End if 
+End if 

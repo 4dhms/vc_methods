@@ -1,0 +1,23 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+<>vtMailFrom:=[Spooler]ReturnAddress
+vtProdStatGuide:=[Spooler]StatusGuide
+If (Substring(vtProdStatGuide;1;1)="1")
+	vfPrintTrim:=True
+Else 
+	vfPrintTrim:=False
+End if 
+If (Substring(vtProdStatGuide;2;1)="1")
+	vfPrintGrade:=True
+Else 
+	vfPrintGrade:=False
+End if 
+If (Substring(vtProdStatGuide;3;1)="1")
+	vfPrintComments:=True
+Else 
+	vfPrintComments:=False
+End if 
+If (Substring(vtProdStatGuide;4;1)="1")
+	vfPrintImages:=True
+Else 
+	vfPrintImages:=False
+End if 

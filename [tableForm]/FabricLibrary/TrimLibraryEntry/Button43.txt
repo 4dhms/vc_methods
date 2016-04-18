@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($path)
+
+$choice:=Pop up menu("Get Picture;Move to Desktop;Close Menu")
+
+Case of 
+		  //: ($choice=1)
+		  //FORM GOTO PAGE(2)
+	: ($choice=1)
+		CP_GetScan ("R")
+	: ($choice=2)
+		$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+		
+		$path:=$path+[FabricLibrary]ArticleNumber+".jpg"
+		WRITE PICTURE FILE($path;vxSketch;"JPEG")
+End case 
+

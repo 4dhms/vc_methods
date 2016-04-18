@@ -1,0 +1,104 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atNote;0)
+C_LONGINT($i;$char;$s;$c)
+C_TEXT($line)
+C_TEXT($rem)
+C_BOOLEAN($done;$add;vfOutside)
+
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+ORDER BY([SpecLineSample];[SpecLineSample]ColumnNumber;<)
+
+$char:=40
+$c:=1
+$i:=1
+For ($i;1;Records in selection([SpecLineSample])+1)
+	Case of 
+		: ([SpecFactory]Note="") & ($i=1)
+			$add:=False
+			$c:=$c+1
+		: ($i=1)
+			$add:=True
+			$rem:=Replace string([SpecFactory]Note;"  ";" ")
+			$rem:=Replace string($rem;Char(10);Char(13))+Char(13)
+			
+			$line:="NEWNOTE"+[SpecFactory]Colhead
+			$c:=$c+1
+		: (vfOutside)
+			$rem:=""
+			$line:=""
+			$add:=False
+		Else 
+			$add:=True
+			$rem:=Replace string([SpecLineSample]Comments;"  ";" ")
+			$rem:=Replace string($rem;Char(10);Char(13))
+			
+			
+			$line:="NEWNOTE"+[SpecLineSample]ColumnHeader+Char(13)
+			$c:=$c+1
+	End case 
+	If ($add)
+		APPEND TO ARRAY(atNote;$line)
+		Case of 
+			: (Size of array(atNote)%3=1)
+				APPEND TO ARRAY(atNote;"")
+				APPEND TO ARRAY(atNote;"")
+			: (Size of array(atNote)%3=2)
+				APPEND TO ARRAY(atNote;"")
+		End case 
+		
+		While (Length($rem)>0)
+			
+			Case of 
+				: ($rem#"")
+					$s:=$char
+					$done:=False
+					Repeat 
+						$s:=$s-1
+						Case of 
+							: (Position(Char(13);$rem;*)<$s) & (Position(Char(13);$rem;*)>0)
+								$s:=Position(Char(13);$rem;*)
+								$done:=True
+								
+							: ($s>Length($rem))
+								$done:=True
+							: ($s<1)
+								$s:=12
+								$done:=True
+							: ($rem[[$s]]=" ")
+								$done:=True
+							: ($rem[[$s]]=Char(13))
+								$done:=True
+							: (Shift down)
+								$done:=True
+						End case 
+					Until ($done)
+					$line:=Substring($rem;1;$s-1)
+					$rem:=Substring($rem;$s+1;99999)
+					
+					APPEND TO ARRAY(atNote;$line)
+					If (Position(Char(13);$rem;*)<1) & (Length($rem)<$char)
+						APPEND TO ARRAY(atNote;$rem)
+						$rem:=""
+					End if 
+			End case 
+		End while 
+		If (Size of array(atNote)%3=0)
+			APPEND TO ARRAY(atNote;"")
+		End if 
+		APPEND TO ARRAY(atNote;"FOOTER")
+		Case of 
+			: (Size of array(atNote)%3=1)
+				APPEND TO ARRAY(atNote;"")
+				APPEND TO ARRAY(atNote;"")
+			: (Size of array(atNote)%3=2)
+				APPEND TO ARRAY(atNote;"")
+		End case 
+	End if 
+	
+	If ($i=1)
+		FIRST RECORD([SpecLineSample])
+	Else 
+		NEXT RECORD([SpecLineSample])
+	End if 
+End for 
+

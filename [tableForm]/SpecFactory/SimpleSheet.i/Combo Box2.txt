@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_POINTER($szptr)
+
+ARRAY TEXT($sizehd;0)
+$i:=1
+For ($i;1;12)
+	$szptr:=Get pointer("vsSize"+String($i))
+	APPEND TO ARRAY($sizehd;$szptr->)
+End for 
+
+If (asClearSize>1)
+	WinChoice ("Are you sure you want to clear sizing for "+asClearSize{asClearSize}+"?")
+	If (ok=1)
+		WinChoice ("This is an irreverislbe process.";"Stop";"Continue")
+		If (ok=0)
+			$c:=Find in array($sizehd;asClearSize{asClearSize})
+			$szptr:=Get pointer("vsSize"+String($c))
+			$szptr->:=""
+			
+			Case of 
+				: ($c=1)
+					$szptr:=->[Sizes]Size1
+				: ($c=2)
+					$szptr:=->[Sizes]Size2
+				: ($c=3)
+					$szptr:=->[Sizes]Size3
+				: ($c=4)
+					$szptr:=->[Sizes]Size4
+				: ($c=5)
+					$szptr:=->[Sizes]Size5
+				: ($c=6)
+					$szptr:=->[Sizes]Size6
+				: ($c=7)
+					$szptr:=->[Sizes]Size7
+				: ($c=8)
+					$szptr:=->[Sizes]Size8
+				: ($c=9)
+					$szptr:=->[Sizes]Size9
+				: ($c=10)
+					$szptr:=->[Sizes]Size10
+				: ($c=11)
+					$szptr:=->[Sizes]Size11
+				: ($c=12)
+					$szptr:=->[Sizes]Size12
+			End case 
+			
+			$i:=1
+			FIRST RECORD([Sizes])
+			For ($i;1;Records in selection([Sizes]))
+				$szptr->:=""
+				SAVE RECORD([Sizes])
+				NEXT RECORD([Sizes])
+			End for 
+			
+			DELETE FROM ARRAY(asClearsize;asClearSize;1)
+			asClearSize:=1
+		End if 
+	End if 
+End if 

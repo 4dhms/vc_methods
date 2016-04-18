@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$totalUnits;$units)
+C_REAL(vrAvgPrice;vrAvgPriceTot;$totalPrice;$price)
+
+$i:=1
+For ($i;1;Size of array(asCustomers))
+	If (vsCustomer=asCustomers{$i})
+		$Units:=$Units+alUnits{$i}
+		$Price:=$Price+(arPrice{$i}*alUnits{$i})
+		If (vrAvgPriceTot=0)
+			$totalUnits:=$totalUnits+alUnits{$i}
+			$totalPrice:=$totalPrice+(arPrice{$i}*alUnits{$i})
+		End if 
+	End if 
+End for 
+
+vrAvgPrice:=Round($Price/$Units;2)
+If (vrAvgPriceTot=0)
+	vrAvgPriceTot:=Round($totalPrice/$totalUnits;2)
+End if 

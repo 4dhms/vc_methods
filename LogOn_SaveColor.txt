@@ -1,0 +1,85 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$s;$n)
+
+ARRAY TEXT(atColorBuild;0)
+ARRAY LONGINT($self;0)
+
+$i:=1
+For ($i;1;Size of array(asStyleNumbers))
+	
+	If (atLOcolor{$i}#"") & (afLogOn{$i}=True)
+		LogOn_ColorBuild (asColors{$i})
+		
+		QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+		CREATE EMPTY SET([CP_OrderXRef];"xref")
+		
+		$n:=1
+		For ($n;1;Records in selection([Orders]))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum;*)
+			QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{1})
+			
+			$s:=1
+			For ($s;1;Records in selection([CP_OrderXRef]))
+				ADD TO SET([CP_OrderXRef];"xref")
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			NEXT RECORD([Orders])
+		End for 
+		
+		USE SET("xref")
+		CLEAR SET("xref")
+		
+		SELECTION TO ARRAY([CP_OrderXRef]SelfKey;$self)
+		
+		$s:=1
+		CREATE EMPTY SET([CP_OrderXRef];"update")
+		
+		For ($s;1;Size of array($self))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self{$s})
+			
+			Case of 
+				: (Size of array(atColorBuild)=1)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+					ADD TO SET([CP_OrderXRef];"update")
+					
+				: (Size of array(atColorBuild)=2)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 1";*)
+					QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{2})
+					If (Records in selection([CP_OrderXRef])=1)
+						QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self{$s})
+						QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+						ADD TO SET([CP_OrderXRef];"update")
+					End if 
+					
+				: (Size of array(atColorBuild)>2)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 1";*)
+					QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{2})
+					
+					If (Records in selection([CP_OrderXRef])=1)
+						QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self{$s})
+						QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 2";*)
+						QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{3})
+						
+						If (Records in selection([CP_OrderXRef])=1)
+							QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self{$s})
+							QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+							ADD TO SET([CP_OrderXRef];"update")
+						End if 
+					End if 
+			End case 
+		End for 
+		
+		$n:=1
+		USE SET("update")
+		
+		CLEAR SET("update")
+		FIRST RECORD([CP_OrderXRef])
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			If ([CP_OrderXRef]LOColor#atLOcolor{$i})
+				[CP_OrderXRef]LOColor:=atLOcolor{$i}
+				SAVE RECORD([CP_OrderXRef])
+			End if 
+		End for 
+	End if 
+End for 
+UNLOAD RECORD([CP_OrderXRef])

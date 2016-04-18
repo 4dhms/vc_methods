@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Spec_TrackChange ([SpecFactory]Colhead;->[SpecFactory]Submit;"")
+SS_SaveOldComment 

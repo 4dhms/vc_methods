@@ -1,0 +1,72 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($divNumber)
+
+$divNumber:=Substring(asDivisions{asDivisions};1;2)
+
+Case of 
+	: ($divNumber="01")
+		ARRAY TEXT(<>asCategory;8)
+		<>asCategory{1}:="Select CATEGORY"
+		<>asCategory{2}:="1-Blouses"
+		<>asCategory{3}:="2-Pants"
+		<>asCategory{4}:="3-Jackets"
+		<>asCategory{5}:="4-Dresses"
+		<>asCategory{6}:="5-Skirts"
+		<>asCategory{7}:="6-Vests"
+		<>asCategory{8}:="7-Cut n Sew Knits"
+		If ($divNumber="01")
+			APPEND TO ARRAY(<>asCategory;"8-Full Fashion Knits")
+			APPEND TO ARRAY(<>asCategory;"9-Kinley")
+		End if 
+		<>asCategory:=1
+		
+	: ($divNumber="03")
+		ARRAY TEXT(<>asCategory;5)
+		<>asCategory{1}:="Select CATEGORY"
+		<>asCategory{2}:="1-Sweaters"
+		<>asCategory{3}:="2-Cut n Sew"
+		<>asCategory{4}:="3-Blouses"
+		<>asCategory{5}:="4-Dresses"
+		<>asCategory:=1
+		
+	: ($divNumber="02")
+		ARRAY TEXT(<>asCategory;1)
+		<>asCategory{1}:="2"
+		<>asCategory:=1
+		
+		
+	: ($divNumber="04") | ($divNumber="07")
+		ARRAY TEXT(<>asCategory;1)
+		<>asCategory{1}:="1"
+		<>asCategory:=1
+		
+	: ($divNumber="06")
+		ARRAY TEXT(<>asCategory;8)
+		<>asCategory{1}:="Select CATEGORY"
+		<>asCategory{2}:="1-Blouses"
+		<>asCategory{3}:="2-Pants"
+		<>asCategory{4}:="3-Jackets"
+		<>asCategory{5}:="4-Dresses"
+		<>asCategory{6}:="6-Vests"
+		<>asCategory{7}:="7-Cut n Sew Knits"
+		<>asCategory{8}:="8-Skirts"
+		<>asCategory:=1
+		
+	: ($divNumber="02")
+		ARRAY TEXT(<>asCategory;1)
+		<>asCategory{1}:="2"
+		<>asCategory:=1
+		
+	: ($divNumber="09")
+		ARRAY TEXT(<>asCategory;1)
+		<>asCategory{1}:="1"
+		<>asCategory:=1
+		
+	: ($divNumber="12")
+		ARRAY TEXT(<>asCategory;0)
+		
+	Else 
+		ARRAY TEXT(<>asCategory;1)
+		<>asCategory{1}:="1"
+		<>asCategory:=1
+End case 

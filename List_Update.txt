@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY TEXT($masterlist;0)
+
+QUERY([Lists];[Lists]UserName="")
+CREATE SET([Lists];"system")
+
+DISTINCT VALUES([Lists]ListName;$masterlist)
+SORT ARRAY($masterlist;>)
+
+$i:=1
+For ($i;1;Size of array($masterlist))
+	ARRAY TEXT($items;0)
+	USE SET("system")
+	QUERY SELECTION([Lists];[Lists]ListName=$masterlist{$i})
+	SELECTION TO ARRAY([Lists]ListItem;$items)
+	SORT ARRAY($items;>)
+	ARRAY TO LIST($items;$masterlist{$i})
+End for 
+CLEAR SET("system")

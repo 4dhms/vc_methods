@@ -1,0 +1,108 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlAddPartStatus;$headKey;$sampCol;$choice)
+C_TEXT(vsColHead1)
+
+vtSpecNotes:=""
+
+If (asCol4{asCol4}="X")
+	WinChoice ("Do you want to clone approval?")
+	If (ok=1)
+		vfCloneApp:=True
+	Else 
+		vfCloneApp:=False
+	End if 
+End if 
+
+If (vlCloneRouter=0)
+	SS_CloneRouter 
+End if 
+
+cbPort:=0
+vsCopyFrom:=asSGOrder{asSGOrder}
+Case of 
+	: (asSGOrder{asSGOrder}="Old Style") | (vsColHead1="") & (vlAddPartStatus#1) & (vlCloneRouter#3)
+		If (vsColHead1="")
+			vlDupeOrderNumber:=Num(asSGOrder{asSGOrder})
+			
+			QUERY([SpecFactory];[SpecFactory]OrderNumber=vlDupeOrderNumber)
+			vdApprovalDate:=[SpecFactory]ApproveDate
+			vtSpecNotes:=[SpecFactory]Note
+			
+			  //If (Current user="Designer")
+			  //SS_PullSample 
+			  //End if 
+			vsColHead1:=[SpecFactory]Colhead
+			vsSize:=[SpecFactory]Size
+			$headKey:=-1*[SpecFactory]SF_KeyNumber
+			$sampCol:=[SpecFactory]SampleCol
+			UNLOAD RECORD([SpecFactory])
+			QUERY([Sizes];[Sizes]SF_KeyNumber=$headKey)
+			If (Records in selection([Sizes])>0)
+				Case of 
+					: ($sampCol=1)
+						vsSize:=[Sizes]Size1
+					: ($sampCol=2)
+						vsSize:=[Sizes]Size2
+					: ($sampCol=3)
+						vsSize:=[Sizes]Size3
+					: ($sampCol=4)
+						vsSize:=[Sizes]Size4
+					: ($sampCol=5)
+						vsSize:=[Sizes]Size5
+					: ($sampCol=6)
+						vsSize:=[Sizes]Size6
+					: ($sampCol=7)
+						vsSize:=[Sizes]Size7
+					: ($sampCol=8)
+						vsSize:=[Sizes]Size8
+					: ($sampCol=9)
+						vsSize:=[Sizes]Size9
+					: ($sampCol=10)
+						vsSize:=[Sizes]Size10
+					: ($sampCol=11)
+						vsSize:=[Sizes]Size11
+					: ($sampCol=12)
+						vsSize:=[Sizes]Size12
+				End case 
+				
+				If (vsSize#"") & (vlCloneRouter#3)
+					WinChoice ("The sample size for "+asSGOrder{asSGOrder}+" was "+vsSize+".";"Use that";"Don't use that")
+					If (ok=0)
+						vsSize:=""
+					End if 
+				End if 
+				UNLOAD RECORD([Sizes])
+			End if 
+		Else 
+			cbPort:=1
+			If ([SpecFactory]Factory=[Orders]Factory)
+				<>vsFactory:=[SpecFactory]Factory
+			End if 
+		End if 
+		  //QUERY([Specs];[Specs]Design Num=asDesignNumbers{asDesignNumbers})
+		<>vfPreview:=False
+		
+		  //SS_BuildPreview 
+		vDesign1:=""
+		FORM GOTO PAGE(1)
+		GOTO OBJECT(vdSubmit1)
+		
+	: (vlAddPartStatus=1)
+		vlDupeOrderNumber:=Num(asSGOrder{asSGOrder})
+		ACCEPT
+		
+	: (vlCloneRouter=3) & (asDesignNumbers>0)
+		If (Grade_VetClone (Num(asSGOrder{asSGOrder});<>vlOrderNumber))
+			ACCEPT
+		Else 
+			FORM GOTO PAGE(5)
+		End if 
+		
+	: (asDesignNumbers>0)
+		vdSubmit1:=!00-00-00!
+		vlDupeOrderNumber:=Num(asSGOrder{asSGOrder})
+		vlPreviousSheet:=alRecordKey{asSGOrder}
+		FORM GOTO PAGE(1)
+		GOTO OBJECT(vdSubmit1)
+		
+End case 

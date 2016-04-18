@@ -1,0 +1,45 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ($1<0)
+		PREVIOUS RECORD([Changes])
+	: ($1>0)
+		NEXT RECORD([Changes])
+End case 
+
+Case of 
+	: (Records in selection([Changes])=1)
+		OBJECT SET ENABLED(bPrev;False)
+		OBJECT SET ENABLED(bNext;False)
+	: (Selected record number([Changes])=1)
+		OBJECT SET ENABLED(bPrev;False)
+		OBJECT SET ENABLED(bNext;True)
+	: (Selected record number([Changes])=Records in selection([Changes]))
+		OBJECT SET ENABLED(bNext;False)
+		OBJECT SET ENABLED(bPrev;True)
+End case 
+
+If ([Changes]FieldName="@color@") | ([Changes]FieldName="@fabric@")
+	OBJECT SET VISIBLE(bPreexist;False)
+Else 
+	OBJECT SET VISIBLE(bPreexist;True)
+End if 
+
+OBJECT SET VISIBLE(bPreexist;[Changes]TableNum>0)
+
+Case of 
+	: ([Changes]FieldName="@Changed@")
+		OBJECT SET VISIBLE(*;"xTo";True)
+		OBJECT SET VISIBLE([Changes]NewChange;True)
+	: ([Changes]Tag="Removed")
+		OBJECT SET VISIBLE(*;"xTo";False)
+		OBJECT SET VISIBLE([Changes]NewChange;False)
+	: ([Changes]Tag="Changed") | ([Changes]Tag="Revert")
+		OBJECT SET VISIBLE(*;"xTo";True)
+		OBJECT SET VISIBLE([Changes]NewChange;True)
+	: ([Changes]Tag="Fabric Change")
+		OBJECT SET VISIBLE(*;"xTo";True)
+		OBJECT SET VISIBLE([Changes]NewChange;True)
+	: ([Changes]Tag="Fabric Added")
+		OBJECT SET VISIBLE(*;"xTo";False)
+		OBJECT SET VISIBLE([Changes]NewChange;False)
+End case 

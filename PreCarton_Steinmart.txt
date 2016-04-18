@@ -1,0 +1,103 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($srchDate)
+C_TIME($docRef)
+C_TEXT($path)
+C_LONGINT($i)
+C_TEXT($datestamp)
+C_TEXT($message)
+
+C_LONGINT($longlead;$shortlead)
+ALL RECORDS([Preferences])
+FIRST RECORD([Preferences])
+$longlead:=[Preferences]SteinmartLong
+$shortlead:=[Preferences]SteinmartShort
+UNLOAD RECORD([Preferences])
+
+READ ONLY([Orders])
+
+$srchDate:=Current date(*)
+QUERY([Orders];[Orders]Customer="@steinmart@")
+QUERY SELECTION([Orders];[Orders]CancelDate>=$srchDate)
+
+QUERY SELECTION([Orders];[Orders]PriceTicket=False)
+
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+QUERY SELECTION([Orders];[Orders]Factory#"")
+
+PreCarton_DueCalc 
+
+ORDER BY([Orders];[Orders]CancelDate;>;[Orders]OrderNum;>)
+
+If (Application type=5) | (Current user="Spooler")
+	$datestamp:=Replace string(String($srchDate);"/";"_")
+	$path:=PDF_FindFolder +":Steinmart_"+$datestamp+".xls"
+	$path:=Replace string($path;"Steinmart";"Steinmart_")
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+Else 
+	  //If (<>vlPlatform<3)
+	  //WinPrompt ("Hint: include the extenion .xls to the file name.")
+	  //End if 
+	$docRef:=Create document("";"xls")
+End if 
+
+SEND PACKET($docRef;"PO"+Char(9))
+SEND PACKET($docRef;"Style"+Char(9))
+SEND PACKET($docRef;"Division"+Char(9))
+SEND PACKET($docRef;"Customer PO"+Char(9))
+SEND PACKET($docRef;"Factory"+Char(9))
+SEND PACKET($docRef;"Customer"+Char(9))
+SEND PACKET($docRef;"X Factory"+Char(9))
+SEND PACKET($docRef;"Cancel Date"+Char(9))
+SEND PACKET($docRef;"Quantity"+Char(9))
+SEND PACKET($docRef;"Price Ticket"+Char(9))
+SEND PACKET($docRef;"Need By"+Char(13))
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+	SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+	If ([Orders]DivisionOverride)
+		SEND PACKET($docRef;[Orders]OrderDivision+Char(9))
+	Else 
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		SEND PACKET($docRef;[Designs]DivisionCodeN+Char(9))
+	End if 
+	SEND PACKET($docRef;[Orders]CustPONumber+Char(9))
+	SEND PACKET($docRef;[Orders]Factory+Char(9))
+	SEND PACKET($docRef;[Orders]Customer+Char(9))
+	SEND PACKET($docRef;String([Orders]ShipDateFactory)+Char(9))
+	SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+	SEND PACKET($docRef;String([Orders]TotalOrderQuantity;"###,###,##0")+Char(9))
+	
+	If (Not([Orders]PriceTicket))
+		SEND PACKET($docRef;"Missing Price Ticket"+Char(9))
+		SEND PACKET($docRef;String([Orders]NeedBy)+Char(13))
+	Else 
+		SEND PACKET($docRef;Char(9)+" "+Char(13))
+	End if 
+	NEXT RECORD([Orders])
+	UNLOAD RECORD([Designs])
+End for 
+
+CLOSE DOCUMENT($docRef)
+$message:="Attached in the missing Steinmart price ticket report."
+
+If (Application type=5) | (Current user="Spooler")
+	ARRAY TEXT(asSubCC;0)
+	APPEND TO ARRAY(asSubCC;"tcli@nubby.com")
+	APPEND TO ARRAY(asSubCC;"peterli@nubby.com")
+	APPEND TO ARRAY(asSubCC;"susan@nubby.com")
+	APPEND TO ARRAY(asSubCC;"marisol@nubby.com")
+	APPEND TO ARRAY(asSubCC;"spenser@nubby.com")
+	APPEND TO ARRAY(asSubCC;"claudia@nubby.com")
+	APPEND TO ARRAY(asSubCC;"mark@nubby.com")
+	APPEND TO ARRAY(asSubCC;"bing@nubby.com")
+	APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+	APPEND TO ARRAY(asSubCC;"melaniem@nubby.com")
+	APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+	
+	Mail_SimpleSend ("List";$path;"Steinmart Report ("+String($srchdate)+")";$message)
+End if 
+

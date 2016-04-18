@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On After Keystroke)
+		<>vtClaim:=Get edited text
+		
+	: (Form event=On Outside Call)
+		CANCEL
+End case 

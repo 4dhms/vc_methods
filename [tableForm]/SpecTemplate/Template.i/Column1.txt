@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($checker;0)
+C_BOOLEAN($continue)
+
+
+Case of 
+	: (Form event=On Double Clicked)
+		If (asSpareParts>0)
+			CREATE SET([SpecTempBuilder];"Specs")
+			SELECTION TO ARRAY([SpecTempBuilder]TempSpec;$checker)
+			If (Find in array($checker;asSpareParts{asSpareParts})>1)
+				WinChoice (asSpareParts{asSpareParts}+" already exists in the template.";"Add";"Don't Add")
+				If (ok=1)
+					$continue:=True
+				Else 
+					$continue:=False
+				End if 
+			Else 
+				$continue:=True
+			End if 
+			If ($continue)
+				QUERY([SpecLibrary];[SpecLibrary]SpecEnglish=asSpareParts{asSpareParts})
+				CREATE RECORD([SpecTempBuilder])
+				[SpecTempBuilder]TempKey:=[SpecTemplate]TempKeyNumber
+				[SpecTempBuilder]SpecLibKey:=alSpareKeys{asSpareParts}
+				[SpecTempBuilder]TempSpec:=asSpareParts{asSpareParts}
+				[SpecTempBuilder]SpecTempBuildKey:=Sequence number([SpecTempBuilder])
+				If (cbKnit=1)
+					[SpecTempBuilder]Unused2:=[SpecLibrary]ToleranceKnit
+				Else 
+					[SpecTempBuilder]Unused2:=[SpecLibrary]ToleranceWoven
+				End if 
+				SAVE RECORD([SpecTempBuilder])
+				ADD TO SET([SpecTempBuilder];"Specs")
+				USE SET("Specs")
+				CLEAR SET("Specs")
+				ORDER BY([SpecLibrary];[SpecLibrary]SortOrder;>)
+				asSpareParts:=0
+			End if 
+		End if 
+End case 

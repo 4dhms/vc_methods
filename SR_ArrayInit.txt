@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSRmonth;$1)
+
+ARRAY TEXT(asSRseasonA;$1)
+ARRAY TEXT(asSRavgA;$1)
+ARRAY LONGINT(alSRorderA;$1)
+ARRAY LONGINT(alSRunitA;$1)
+ARRAY LONGINT(alSRdollarA;$1)
+
+ARRAY TEXT(asSRseasonB;$1)
+ARRAY TEXT(asSRavgB;$1)
+ARRAY LONGINT(alSRorderB;$1)
+ARRAY LONGINT(alSRunitB;$1)
+ARRAY LONGINT(alSRdollarB;$1)
+
+ARRAY LONGINT(alSRstyle;$1)
+ARRAY LONGINT(alSRbackground;$1)
+ARRAY LONGINT(alSRcolor;$1)
+

@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($sw;$sh;$ww;$wh)
+C_BOOLEAN($specialBox;$skew)
+
+If (Count parameters>3)
+	vlWinWd:=$1
+	vlWinHt:=$2
+	  //If ($3=1)
+	vlWinType:=5
+	  //Else 
+	vlWinType:=$3
+	  //End if 
+	vsWinTitle:=$4
+	If ($4="skew")  //moves big window to left on laptops
+		$skew:=True
+	End if 
+	If (Count parameters>4)
+		If ($5="WincBox")
+			$specialBox:=True
+		End if 
+	End if 
+End if 
+
+$sw:=Screen width/2
+
+$sh:=(Screen height/2)+10
+$ww:=vlWinWd/2
+$wh:=vlWinHt/2
+
+If ($skew)
+	$sw:=$sw-100
+End if 
+
+If (<>vlPlatform=3)
+	$sh:=$sh+30
+End if 
+
+Case of 
+	: ($specialBox)
+		Open window($sw-$ww;$sh-($wh+15);$sw+$ww;$sh+($wh-15);vlWinType;vsWinTitle;"WincBox")
+	: (<>CloseBox)
+		
+		<>CloseBox:=False
+		Open window($sw-$ww;$sh-($wh+15);$sw+$ww;$sh+($wh-15);vlWinType;vsWinTitle;"cb_generic")
+	Else 
+		Open window($sw-$ww;$sh-($wh+15);$sw+$ww;$sh+($wh-15);vlWinType;vsWinTitle)  //;"";cb_generic )
+End case 
+

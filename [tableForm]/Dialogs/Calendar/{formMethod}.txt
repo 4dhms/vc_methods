@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtCustomerNotes;vtCustomerAddress)
+
+Case of 
+	: (Form event=On Load)
+		If (Current user="Designer") | (Current user="Spenser")
+			OBJECT SET VISIBLE(bChoice5;True)
+		Else 
+			OBJECT SET VISIBLE(bChoice5;False)
+		End if 
+		
+		If (User in group(Current user;"CustomerInfo"))
+			OBJECT SET ENABLED(bNewCustomer;True)
+		Else 
+			OBJECT SET ENABLED(bNewCustomer;False)
+		End if 
+		If (<>vfStore)
+			Customer_Setup 
+			FORM GOTO PAGE(3)
+		Else 
+			Cal_Setup 
+		End if 
+	: (Form event=On Timer)
+		vtDateFlag:=String(Current date(*))+"  "+String(Current time(*);5)
+	: (Form event=On Unload)
+		DC_List 
+End case 

@@ -1,0 +1,101 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($nextHour;$i;$c)
+ARRAY TEXT(asMeeting;0)
+ARRAY TEXT(asAllUsers;0)
+ARRAY TEXT(asContacts;0)
+ARRAY TEXT(asMeetingCust;0)
+
+COPY ARRAY(asUsers;asAllUsers)
+If (Find in array(asAllUsers;"All")>0)
+	DELETE FROM ARRAY(asAllUsers;Find in array(asAllUsers;"All");1)
+End if 
+asAllUsers:=0
+
+$nextHour:=Int(Current time(*)/3600)+1
+ARRAY TEXT(asTeam;4)
+asTeam{1}:="Sales"
+asTeam{2}:="Design"
+asTeam{3}:="Other"
+asTeam{4}:="All"
+If (Find in array(asTeam;[Appts]Team)<1)
+	Case of 
+		: (asGroups{asGroups}="Design")
+			asTeam:=Find in array(asTeam;"Design")
+		: (asGroups{asGroups}="Sales")
+			asTeam:=Find in array(asTeam;"Sales")
+		: (asGroups{asGroups}="Other")
+			asTeam:=Find in array(asTeam;"Other")
+		Else 
+			asTeam:=Find in array(asTeam;"All")
+	End case 
+Else 
+	asTeam:=Find in array(asTeam;[Appts]Team)
+End if 
+
+If ([Appts]ApptKey<1)
+	[Appts]ApptKey:=Sequence number([Appts])
+	[Appts]ApptDate:=vdCalToday
+	Case of 
+		: ($nextHour>12) & ($nextHour<24)
+			asStHour:=Find in array(asStHour;String($nextHour-12))
+		: ($nextHour=12)
+			asStHour:=Find in array(asStHour;"Noon")
+		: ($nextHour=24)
+			asStHour:=Find in array(asStHour;"Mid")
+		Else 
+			asStHour:=Find in array(asStHour;String($nextHour))
+	End case 
+	asStMin:=1
+	asEndHour:=asStHour+1
+	asEndMin:=1
+	Cal_SetPM 
+	
+	CREATE RECORD([Attendees])
+	[Attendees]ApptKey:=[Appts]ApptKey
+	[Attendees]Attendee:=asUsers{asUsers}
+	SAVE RECORD([Attendees])
+	
+	INSERT IN ARRAY(asMeeting;1;1)
+	asMeeting{1}:=asUsers{asUsers}
+	DELETE FROM ARRAY(asAllUsers;Find in array(asAllUsers;asUsers{asUsers});1)
+	asAllUsers:=0
+Else 
+	
+	asStHour:=[Appts]StHr
+	asStMin:=[Appts]StMin
+	asEndHour:=[Appts]EndHr
+	asEndMin:=[Appts]EndMin
+	Cal_SetPM 
+	QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey;*)
+	QUERY([Attendees]; & ;[Attendees]Attendee#"")
+	QUERY SELECTION([Attendees];[Attendees]Customer=False)
+	DISTINCT VALUES([Attendees]Attendee;asMeeting)
+	SORT ARRAY(asMeeting;>)
+End if 
+
+QUERY([Attendees];[Attendees]ApptKey=[Appts]ApptKey)
+QUERY SELECTION([Attendees];[Attendees]Customer=True)
+SELECTION TO ARRAY([Attendees]Attendee;asMeetingCust)
+$i:=1
+$c:=Size of array(asAllUsers)
+For ($i;1;Size of array(asAllUsers))
+	If (Find in array(asMeeting;asAllUsers{$c})>0)
+		DELETE FROM ARRAY(asAllUsers;$c;1)
+	End if 
+	$c:=$c-1
+End for 
+SORT ARRAY(asAllUsers;>)
+vsContact:=""
+If ([Appts]ApptWith#"")
+	
+	Cal_ContactList 
+	$i:=1
+	$c:=Size of array(asContacts)
+	For ($i;1;Size of array(asContacts))
+		If (Find in array(asMeetingCust;asContacts{$c})>0)
+			DELETE FROM ARRAY(asContacts;$c;1)
+		End if 
+		$c:=$c-1
+	End for 
+	SORT ARRAY(asContacts;>)
+End if 

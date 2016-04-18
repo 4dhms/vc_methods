@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Designer") & (Shift down)
+	CONFIRM("Downsize?")
+	If (ok=1)
+		Sketch_Downsize 
+	End if 
+	
+Else 
+	Sketch_Get 
+End if 

@@ -1,0 +1,43 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (qShort=1)
+	vfDigest:=True
+Else 
+	vfDigest:=False
+End if 
+If (zNo=1)
+	vfStyle:=True
+Else 
+	vfStyle:=False
+End if 
+If (qLegal=1)
+	vfLegal:=True
+Else 
+	vfLegal:=False
+End if 
+
+If (nav1+nav2>0) & (c1+c2+c3>0)
+	vlRouter:=-1*FORM Get current page
+Else 
+	vlRouter:=FORM Get current page
+End if 
+
+  //SLR_PrintPrep 
+  //$i:=1
+  //FIRST RECORD([SLRReporter])
+  //For ($i;1;Records in selection([SLRReporter]))
+  //[SLRReporter]PrintKey:=vsMasterPrintKey+"."+String(1000+$i)
+  //SAVE RECORD([SLRReporter])
+  //NEXT RECORD([SLRReporter])
+  //End for 
+WinChoice ("Do you want to print prices?";"Yes";"No")
+If (ok=1)
+	vfPrint:=True
+Else 
+	vfPrint:=False
+End if 
+Case of 
+	: (qShort=1) | (qLetter=1)
+		SLR_PrintDirect 
+	Else 
+		SLR_Print 
+End case 

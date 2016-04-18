@@ -1,0 +1,16 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Revise_Array 
+
+  //If (User in group(Current user;"EMail"))
+OBJECT SET ENABLED(bEmail;True)
+  //Else 
+  //  DISABLE BUTTON(bEmail)
+  //End if 
+
+If ([Orders]PODate=!00-00-00!) | ([Orders]POOpen)
+	<>Enter:=True
+Else 
+	<>Enter:=False
+End if 
+Revise_FlagFields (<>Enter)
+Order_AirSeaToggle 

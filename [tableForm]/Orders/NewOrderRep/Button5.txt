@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+
+$choice:=Pop up menu("Filter;Excel;Style List")
+
+Case of 
+	: ($choice=1)
+		Report_CustomerList 
+	: ($choice=2)
+		If (Current user="TC Li") | (Current user="Designer")
+			WinChoice ("Do you want the Lead Time Report")
+			If (ok=1)
+				Report_LeadTime 
+			Else 
+				Report_NewOrderExcel 
+			End if 
+		Else 
+			Report_NewOrderExcel 
+		End if 
+	: ($choice=3)
+		Report_ExportStyles 
+End case 

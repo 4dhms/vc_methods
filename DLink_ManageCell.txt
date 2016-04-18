@@ -1,0 +1,154 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($dn)
+C_POINTER($tn)
+C_POINTER($tp)
+C_POINTER($dp)
+C_POINTER($mn)
+C_POINTER($mp)
+C_LONGINT($i;$choice;$newcell;$c;$type;$n;vlPage)
+C_BOOLEAN($stop)
+C_TEXT($message;$order)
+ARRAY LONGINT($move;0)
+
+If ([DesignLines]8Up)
+	If ($1>8) & ($1<13)
+		$stop:=True
+	End if 
+	$n:=8
+Else 
+	$n:=12
+End if 
+
+If (Not($stop))
+	$i:=1
+	For ($i;1;$n)
+		$dn:=Field(116;$i+15)
+		
+		If ($dn->="") & ($i#$1)
+			APPEND TO ARRAY($move;$i)
+		End if 
+	End for 
+	vlRouter:=$1
+	
+	If ($1>12)  //from pasteboard
+		$message:=""
+		$i:=1
+		For ($i;1;Size of array($move))
+			$message:=$message+"To Cell "+String($move{$i})+";"
+		End for 
+		$message:=$message+"Delete;Cancel"
+		$choice:=Pop up menu($message)
+		$c:=Size of array($move)
+		
+		Case of 
+			: ($choice=0)
+				  //nothing
+			: ($c+2=$choice)
+				  //cancel
+			: ($choice<=$c)
+				$newcell:=Num($move{$choice})
+				$tn:=Field(116;$newcell+3)
+				$dn:=Field(116;$newcell+15)
+				$mn:=Field(116;$newcell+28)
+				$tp:=Field(49;$1-12+1)
+				$dp:=Field(49;$1-12+7)
+				$mp:=Field(49;$1-12+13)
+				
+				$tn->:=$tp->
+				$dn->:=$dp->
+				$mn->:=$mp->
+				$mp->:=""
+				$tp->:=0
+				$dp->:=""
+				SAVE RECORD([DL_Other])
+				DLink_GrabDesign ($tn->;$dn->;$newcell)
+				DLink_GrabDesign ($tp->;$dp->;vlRouter)
+				
+				SAVE RECORD([DesignLinkedPages])
+				DLink_GrabDesign ($tn->;$dn->;$move{$choice})
+			: ($c+1=$choice)  //Delete
+				$tp:=Field(49;$1-12+1)
+				$dp:=Field(49;$1-12+7)
+				WinChoice ("Are you sure you want to remove this garment?")
+				If (ok=1)
+					$tp->:=0
+					$dp->:=""
+					SAVE RECORD([DL_Other])
+					DLink_GrabDesign ($tp->;$dp->;$1)
+				End if 
+		End case 
+	Else   //
+		$tn:=Field(116;vlRouter+3)
+		
+		If ($tn->=0)
+			vsEntryNumber:=""
+			DLink_Edit 
+		Else 
+			$dn:=Field(116;vlRouter+15)
+			
+			$type:=$tn->
+			$order:=$dn->
+			
+			$message:=""
+			$i:=1
+			For ($i;1;Size of array($move))
+				$message:=$message+"To Cell "+String($move{$i})+";"
+			End for 
+			$message:=$message+"To Pasteboard;Delete;Edit;Note;Cancel"
+			
+			$choice:=Pop up menu($message)
+			
+			$c:=Size of array($move)
+			Case of 
+				: ($choice=0)
+					  //nothing
+				: ($c+5=$choice)
+					  //Cancel
+				: ($choice<=$c)
+					$newcell:=Num($move{$choice})
+					$tn:=Field(116;$1+3)
+					$dn:=Field(116;$1+15)
+					$mn:=Field(116;$1+28)
+					$mp:=Field(116;$move{$choice}+28)
+					$type:=$tn->
+					$order:=$dn->
+					
+					  //MSRP
+					$mp->:=$mn->
+					$mn->:=""
+					
+					$tn->:=0
+					$dn->:=""
+					DLink_GrabDesign ($tn->;$dn->;vlRouter)
+					
+					$tn:=Field(116;$move{$choice}+3)
+					$dn:=Field(116;$move{$choice}+15)
+					
+					$tn->:=$type
+					$dn->:=$order
+					
+					SAVE RECORD([DesignLinkedPages])
+					DLink_GrabDesign ($tn->;$dn->;$move{$choice})
+					
+				: ($c+1=$choice)  //Pasteboard
+					DLink_ToPasteboard ($1)
+				: ($c+2=$choice)  //Delete
+					WinChoice ("Are you sure you want to remove this garment?")
+					If (ok=1)
+						$tn->:=0
+						$dn->:=""
+						SAVE RECORD([DesignLinkedPages])
+						DLink_GrabDesign ($tn->;$dn->;$1)
+					End if 
+				: ($c+4=$choice)  //Note
+					vlPage:=3
+					DLink_Edit 
+				: ($c+3=$choice)  //Edit
+					vlPage:=1
+					DLink_Edit 
+			End case 
+		End if 
+	End if 
+End if 
+DL_ShowCustom 
+DL_ShowCancel 

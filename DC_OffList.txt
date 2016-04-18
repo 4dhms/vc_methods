@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($range)
+
+$range:=Current date(*)-730
+QUERY([DC];[DC]CreateDate>$range)
+QUERY SELECTION([DC];[DC]ReportCustomer="")
+QUERY SELECTION([DC];[DC]Customer#"+@")
+QUERY SELECTION([DC];[DC]Customer#"-@")
+QUERY SELECTION([DC];[DC]Customer#"[@")
+QUERY SELECTION([DC];[DC]Customer#"")
+QUERY SELECTION([DC];[DC]Customer#"0")
+ORDER BY([DC];[DC]Customer;>)
+
+

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (nav1=1)
+	nav2:=0
+End if 
+vfSort:=True
+If (c1+c2+c3+c4+c5>0)
+	SLR_Sort (1)
+	SLR_BuildTitle 
+End if 

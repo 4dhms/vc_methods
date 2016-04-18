@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($note)
+C_POINTER($tn)
+C_POINTER($dn)
+
+$note:=Field(116;vlRouter+41)
+$tn:=Field(116;vlRouter+3)
+$dn:=Field(116;vlRouter+15)
+$note->:=vtNote
+SAVE RECORD([DesignLinkedPages])
+DLink_GrabDesign ($tn->;$dn->;vlRouter)
+ACCEPT

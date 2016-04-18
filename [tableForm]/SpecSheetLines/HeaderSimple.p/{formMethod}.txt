@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	vsSize:=[SpecFactory]Size
+	vsSource:=[SpecFactory]PatternSource
+	<>vsFactory:=[SpecFactory]Factory
+	vsRec1:=""
+	vsRec2:=""
+	
+	vsPrint1H:=[SpecFactory]Colhead
+	vsPrint1D:=String([SpecFactory]Submit)
+	If ([SpecFactory]Received#!00-00-00!)
+		vsRec1:="Rec: "+Char(13)+String([SpecFactory]Received)
+	End if 
+	vsPrint2H:=[SpecLineSample]ColumnHeader
+	vsPrint2D:=String([SpecLineSample]SubmitDue)
+	If ([SpecLineSample]Received#!00-00-00!)
+		vsRec2:="Rec: "+Char(13)+String([SpecLineSample]Received)
+	End if 
+	vsPrintingHeader:="Page "+String(vlPage)
+End if 

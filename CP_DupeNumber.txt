@@ -1,0 +1,32 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($type)
+
+Case of 
+	: ([ColorPrintNumber]CPType=1)
+		$type:="Solid"
+	: ([ColorPrintNumber]CPType=2)
+		$type:="Print"
+	: ([ColorPrintNumber]CPType=3)
+		$type:="Embroidery"
+	: ([ColorPrintNumber]CPType=4)
+		$type:="Layout"
+End case 
+
+WinChoice ("Are you sure you want to duplicate this "+$type+"?")
+  //DISABLE BUTTON(bFrstHMS)
+  //DISABLE BUTTON(bPrvHMS)
+  //DISABLE BUTTON(bNxtHMS)
+  //DISABLE BUTTON(bLstHMS)
+OBJECT SET ENABLED(bFrstHMS;False)
+OBJECT SET ENABLED(bPrvHMS;False)
+OBJECT SET ENABLED(bNxtHMS;False)
+OBJECT SET ENABLED(bLstHMS;False)
+
+If (ok=1)
+	SAVE RECORD([ColorPrintNumber])
+	OBJECT SET VISIBLE(*;"xNo";False)
+	OBJECT SET ENTERABLE([ColorPrintNumber]CPName;True)
+	CP_Duplicate ("new";1)
+	ColorPrint_ShowSeason 
+	GOTO OBJECT([ColorPrintNumber]CPName)
+End if 

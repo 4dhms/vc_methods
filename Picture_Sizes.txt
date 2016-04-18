@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$tot)
+
+ALL RECORDS([Designs])
+FIRST RECORD([Designs])
+$i:=1
+$tot:=0
+
+For ($i;1;Records in selection([Designs]))
+	[Designs]PictureSIze:=Picture size([Designs]Sketch)
+	$tot:=$tot+Picture size([Designs]Sketch)
+	  //SAVE RECORD([Designs])
+	NEXT RECORD([Designs])
+End for 
+ALERT(String($tot;"###,###,###,###"))

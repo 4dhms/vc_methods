@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asFamilies=0)
+	WinPrompt ("Chose family type.")
+Else 
+	CREATE SET([ColorPrintFamilies];"Families")
+	ADD RECORD([ColorPrintFamilies];*)
+	ADD TO SET([ColorPrintFamilies];"Families")
+	USE SET("Families")
+	CLEAR SET("Families")
+End if 

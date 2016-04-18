@@ -1,0 +1,63 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+C_LONGINT($i;<>vlStockProc)
+
+Case of 
+		  //: (Form event=On Losing Focus )
+		  //QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+		  //QUERY SELECTION([DC_Spreads];[DC_Spreads]DCSheet=vlDCSheet)
+	: (Form event=On Load)
+		OBJECT SET VISIBLE(bDistribute;User in group(Current user;"Distribution"))
+		If (vlOrderRouter=1)
+			OBJECT SET ENABLED(bOk;True)
+			OBJECT SET ENABLED(bPrint;True)
+			CREATE EMPTY SET([OrdersBreakdowns];"BD")
+			ARRAY TEXT(asBreakdowns;0)
+			ALL RECORDS([BreakDownLibrary])
+			SELECTION TO ARRAY([BreakDownLibrary]BDName;asBreakdowns)
+			SORT ARRAY(asBreakdowns;>)
+			INSERT IN ARRAY(asBreakdowns;1;1)
+			asBreakdowns{1}:="Breakdowns"
+			asBreakdowns:=1
+			APPEND TO ARRAY(asBreakdowns;"Add Breakdown")
+			ARRAY LONGINT(alFoundKeys;0)
+			COPY ARRAY(alSelfKey;alFoundKeys)
+			Order_BuildBD ([Orders]BDHeaderKey)
+			$i:=1
+			For ($i;1;Size of array(asBDCustomers))
+				If (asBDCustomers{$i}#"")
+					$show:=True
+				End if 
+			End for 
+			OBJECT SET VISIBLE(bAddDC;$show)
+		Else 
+			
+			If (vlOrderRouter=2)
+				pOne:=1
+				Order_DC 
+			Else 
+				Order_DC_Preview 
+				OBJECT SET ENABLED(bOk;False)
+				OBJECT SET ENABLED(bPrint;False)
+				OBJECT SET ENABLED(bAdd;False)
+			End if 
+			vtType1:=""
+			vtType2:=""
+			vtType3:=""
+			vtType4:=""
+			vtType5:=""
+			vtType6:=""
+			LISTBOX SELECT ROW(DCBreakdown;Size of array(asCustomers)+1)
+		End if 
+		
+		If (Current user#"Designer")
+			LISTBOX DELETE COLUMN(Breakdown;18;2)
+		End if 
+		FORM GOTO PAGE(Abs(vlOrderRouter))
+	: (Form event=On Unload)
+		FORM SET INPUT([Orders];"OrdEntSlsMed")
+		If (FORM Get current page=1)
+			UNLOAD RECORD([DC_SpreadLines])
+			UNLOAD RECORD([DC_Spreads])
+		End if 
+End case 

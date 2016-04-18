@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	If (alChartPrints{asDivisions}<1)
+		WinPrompt ("There are no prints for "+asDivisions{asDivisions}+".")
+	Else 
+		vlRouter:=1
+		Usage_PrintDetail 
+	End if 
+End if 

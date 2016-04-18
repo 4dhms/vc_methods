@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($fail)
+C_BOOLEAN($stop)
+
+ARRAY TEXT($customer;0)
+
+WinChoice ("Are you sure you want to make new revisions for these "+String(Records in selection([Orders]))+" orders?")
+If (ok=1)
+	SELECTION TO ARRAY([Orders]Customer;$customer)
+	$i:=1
+	For ($i;1;Size of array($customer))
+		If ($customer{$i}="Shop HQ@") | ($customer{$i}="Shop@NBC@")
+		Else 
+			$stop:=True
+			$fail:=$customer{$i}
+		End if 
+	End for 
+	If ($stop)
+		WinPrompt ("You can not include "+$fail+" in this batch.")
+	Else 
+		WinChoice ("Are you really really sure?";"No";"Yes")
+		If (ok=0)
+			FIRST RECORD([Orders])
+			$i:=1
+			For ($i;1;Records in selection([Orders]))
+				CREATE RECORD([Changes])
+				[Changes]RevisionNumber:=[Orders]RevisionNumber+1
+				[Changes]RevisionKey:=[Orders]OrderNum+(([Orders]RevisionNumber+1)/100)
+				[Changes]OrderNumber:=[Orders]OrderNum
+				[Changes]RevDate:=Current date(*)
+				[Changes]RevTime:=Current time(*)
+				[Changes]Writer:=Current user
+				[Changes]ChangeKey:=Sequence number([Changes])
+				[Changes]TableNum:=2
+				  //[Changes]FieldNum:=$fieldnum
+				[Changes]FieldName:="Customer"
+				[Changes]Tag:="Batch Customer change"
+				[Changes]OldData:=String([Orders]RevisionNumber)
+				[Changes]NewChange:=String([Orders]RevisionNumber+1)
+				SAVE RECORD([Changes])
+				[Orders]RevisionKey:=[Orders]RevisionKey+0.01
+				[Orders]RevisionNumber:=[Orders]RevisionNumber+1
+				SAVE RECORD([Orders])
+				NEXT RECORD([Orders])
+			End for 
+		End if 
+	End if 
+End if 
+
+

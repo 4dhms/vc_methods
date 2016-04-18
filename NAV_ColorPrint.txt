@@ -1,0 +1,77 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($message)
+C_BOOLEAN($go)
+SAVE RECORD([ColorPrintNumber])
+ARRAY TEXT(asDivisions;0)
+ARRAY TEXT(atFabrication;0)
+
+Case of 
+	: (FORM Get current page=1)
+		$go:=True
+		
+	: ([ColorPrintNumber]Enterer="")
+		WinPrompt ("Enter ORDER WRITER.")
+	: ([ColorPrintNumber]Division="")
+		WinPrompt ("Enter DIVISION.")
+	: ([ColorPrintFamilies]CPFamilyName="") & ([ColorPrintNumber]CPType<3)
+		WinPrompt ("Select FAMILY.")
+	: ([ColorPrintNumber]CPName="")
+		WinPrompt ("Enter NAME.")
+	Else 
+		CP_UseArray 
+		Case of 
+			: ([ColorPrintNumber]CPType=1)
+				$message:=" solid "
+			: ([ColorPrintNumber]CPType=2)
+				$message:=" print "
+		End case 
+		
+		If ([ColorPrintNumber]NewCP=True)
+			WinChoice ("Do you want to save this new"+$message+"?")
+			If (ok=1)
+				vsCPNumber:=[ColorPrintNumber]CPNumber
+				[ColorPrintNumber]NewCP:=False
+				SAVE RECORD([ColorPrintNumber])
+				$go:=True
+			End if 
+		Else 
+			SAVE RECORD([ColorPrintNumber])
+			$go:=True
+		End if 
+End case 
+
+If ($go)
+	RELATE MANY([ColorPrintNumber]CPNumberKey)
+	Case of 
+		: ($1=1)
+			FIRST RECORD([ColorPrintNumber])
+		: ($1=2)
+			PREVIOUS RECORD([ColorPrintNumber])
+		: ($1=3)
+			NEXT RECORD([ColorPrintNumber])
+		: ($1=4)
+			LAST RECORD([ColorPrintNumber])
+	End case 
+	CP_FM_Load 
+	OBJECT SET ENTERABLE([ColorPrintNumber]BorderPrint;False)
+	OBJECT SET ENTERABLE([ColorPrintNumber]Placement;False)
+	OBJECT SET VISIBLE(cbStrip;False)
+	RELATE MANY([ColorPrintNumber]CPNumberKey)
+	RELATE ONE([ColorPrintNumber])
+	
+	If (Selected record number([ColorPrintNumber])=1) | (Records in selection([ColorPrintNumber])=1)
+		OBJECT SET ENABLED(bFrstHMS;False)
+		OBJECT SET ENABLED(bPrvHMS;False)
+	Else 
+		OBJECT SET ENABLED(bFrstHMS;True)
+		OBJECT SET ENABLED(bPrvHMS;True)
+	End if 
+	
+	If (Selected record number([ColorPrintNumber])=Records in selection([ColorPrintNumber])) | (Records in selection([ColorPrintNumber])=1)
+		OBJECT SET ENABLED(bNxtHMS;False)
+		OBJECT SET ENABLED(bLstHMS;False)
+	Else 
+		OBJECT SET ENABLED(bNxtHMS;True)
+		OBJECT SET ENABLED(bLstHMS;True)
+	End if 
+End if 

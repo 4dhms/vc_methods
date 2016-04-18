@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+
+If (Records in set("Designs")>0)
+	CLEAR SET("Designs")
+End if 
+
+If (Records in set("Orders")>0)
+	CLEAR SET("Orders")
+End if 
+
+<>UsageProc:=0
+
+  //HIDE PROCESS(Current process)
+  //PAUSE PROCESS(Current process)
+  //HIDE WINDOW
+$path:=Get 4D folder+"Temp"
+If (Test path name($path)=1)
+	DELETE DOCUMENT($path)
+End if 
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Designs])
+CANCEL
+  //

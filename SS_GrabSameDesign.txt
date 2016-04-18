@@ -1,0 +1,35 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_TEXT($searchString)
+
+$searchString:=String(Num(<>vsDesignNumber))+"@"
+Case of 
+	: (Substring(<>vsDesignNumber;1;3)="12-")
+		$searchstring:=StripToNumber (<>vsDesignNumber)+"@"
+		
+	: (Substring(<>vsDesignNumber;1;1)="0")
+		$searchString:="0"+$searchString
+End case 
+  //
+QUERY([SpecLineSample];[SpecLineSample]SF_KeyNumber=[SpecFactory]SF_KeyNumber)
+QUERY([SpecFactory];[SpecFactory]DesignNumber=$searchString)
+
+QUERY SELECTION([SpecFactory];[SpecFactory]SF_KeyNumber>0;*)
+QUERY SELECTION([SpecFactory]; & ;[SpecFactory]OrderNumber<999999)
+ORDER BY([SpecFactory];[SpecFactory]SF_KeyNumber;>)
+
+vDesign1:=<>vsDesignNumber
+If (<>vlOrderNumber=0)
+	REDUCE SELECTION([Designs];0)
+Else 
+	SS_DesignSetup 
+End if 
+vfNewFactory:=True
+vlAddPartStatus:=2
+Center Window (400;450;1984;"")
+DIALOG([Dialogs];"SketchWindow.d")
+CLOSE WINDOW
+If (ok=1)
+	$0:=True
+Else 
+	$0:=False
+End if 

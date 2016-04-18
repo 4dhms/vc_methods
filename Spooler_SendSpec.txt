@@ -1,0 +1,75 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($rootNumber)
+C_LONGINT($vendorkey)
+C_TEXT($vsPoNumber)
+ARRAY LONGINT($recordSet;0)
+ARRAY TEXT(asSubCC;0)
+ARRAY TEXT(asSortOrder;0)
+C_LONGINT($vendorkey)
+
+SS_PrepSpec 
+
+BLOB TO VARIABLE([Spooler]AddressListBlob;asSubCC)
+BLOB TO VARIABLE([Spooler]OrderArrayBlob;$recordSet)
+
+CREATE SET FROM ARRAY([SpecFactory];$recordSet;"MailSet")
+USE SET("MailSet")
+CLEAR SET("MailSet")
+
+$vsPoNumber:=String([SpecFactory]OrderNumber)
+QUERY([Vendors];[Vendors]VendorName=[SpecFactory]Factory)
+$vendorkey:=[Vendors]VendorKey
+
+If ([SpecFactory]OrderNumber>0)
+	vtPDFName:="Spec_Order"+$vsPoNumber
+Else 
+	vtPDFName:="Spec_Sample_"+String(Abs(<>vlOrderNumber))
+End if 
+
+
+SET WINDOW TITLE("Spec Sheet")
+  //ALERT(◊pathbreak)
+  //ALERT(vtPDFName)
+
+
+vtPathName:=PDF_FindFolder +<>pathBreak+vtPDFName+".pdf"
+
+If ([SpecFactory]OrderNumber>0)
+	QUERY([Orders];[Orders]OrderNum=[SpecFactory]OrderNumber)
+	<>vsDesignNumber:=[Orders]DesignNumber
+	<>vlOrderNumber:=[Orders]OrderNum
+	<>vsStyleNumber:=[Orders]StyleNumber
+	<>vtCustomerStyle:=[Orders]CustomerStyle
+	<>vlSGPO:=Num([Orders]SGPO)
+Else 
+	$rootNumber:=-1*[SpecFactory]OrderNumber
+	QUERY([Samples];[Samples]SampleNumber=$rootNumber)
+	QUERY SELECTION([Samples];[Samples]Void=False)
+	<>vsDesignNumber:=[Samples]DesignNum
+	<>vlOrderNumber:=[SpecFactory]OrderNumber
+	<>vtCustomerStyle:=""
+	<>vsStyleNumber:=[Samples]StyleNum
+	<>vlSGPO:=0
+End if 
+
+SS_Build 
+vfPDF:=True
+<>ComponentSheet:=False
+ARRAY LONGINT(<>alPictKeys;0)
+PDF_SetPrinter (99)
+
+vfPDF:=False
+
+  //$errorcode:=PD_CleanUp 
+SET WINDOW TITLE("")
+vtSubjectLine:=vtPDFName
+
+If (<>vlOrderNumber>0)
+	vtBodyText:="Attached is the specsheet for HMS Order "+$vsPoNumber+"."
+Else 
+	vtBodyText:="Attached is the specsheet for Sample Order "+String(Abs(<>vlOrderNumber))+"."
+End if 
+
+SP_MailShipout 
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Samples])

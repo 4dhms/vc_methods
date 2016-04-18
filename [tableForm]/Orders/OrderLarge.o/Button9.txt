@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (vsPart2="6")
+	vsPart2:="5"
+	ORDER BY([Orders];[Orders]StyleNumber;>)
+Else 
+	vsPart2:="6"
+	ORDER BY([Orders];[Orders]StyleNumber;<)
+End if 
+vsPart1:=""
+  //vsPart2:=""
+vsPart3:=""
+vsPart4:=""
+vsPart5:=""
+vsPart6:=""
+vsPart7:=""
+vsPart8:=""
+vsPart9:=""
+vsPart10:=""
+Sample_ArrowInit 
+
+OBJECT SET VISIBLE(*;"xu2";vsPart2="5")
+OBJECT SET VISIBLE(*;"xd2";vsPart2="6")

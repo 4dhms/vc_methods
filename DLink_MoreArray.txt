@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+ARRAY TEXT(asMove;0)
+SORT ARRAY(arMcol1;>)
+
+$i:=1
+If (Size of array(arMcol1)>0)
+	For ($i;1;Size of array(arMcol1))
+		If (arMcol1{$i}#[DesignLinkedPages]PageNumber)
+			APPEND TO ARRAY(asMove;"Before "+String(Round(arMcol1{$i};0)))
+		End if 
+	End for 
+	If ([DesignLinkedPages]PageNumber<Size of array(arMcol1))
+		APPEND TO ARRAY(asMove;"After "+String(Round(arMcol1{Size of array(arMcol1)};0)))
+	End if 
+End if 
+INSERT IN ARRAY(asMove;1;1)
+asMove{1}:="Move"
+asMove:=1
+

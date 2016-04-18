@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+<>vtMessage:="MAIL FAIL"+Char(13)+"Your last email failed to transmit."+Char(13)+"Error Code: "+$1
+
+<>CloseBox:=True
+Center Window (250;75;1984;"")
+DIALOG("MailFail")
+CLOSE WINDOW

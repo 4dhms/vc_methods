@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+If (Records in selection([DLPages])>0) & (asSortOrder{asSortOrder}#[DesignLines]SortOrder)
+	
+	If ([DesignLines]BuildStatus>0)
+		WinChoice ("This design line plan has been previously edited, do you want to rebuild?")
+	Else 
+		WinChoice ("These pages have been previously sorted by  "+[DesignLines]SortOrder+", do you want to rebuild?")
+	End if 
+	If (ok=1)
+		WinChoice ("Are you sure you want to rebuild this line, it will complete repaginate?";"Stop";"Do it")
+		If (ok=0)
+			[DesignLines]SortOrder:=asSortOrder{asSortOrder}
+			[DesignLines]BuildStatus:=0
+			SAVE RECORD([DesignLines])
+			APPLY TO SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber:=0)
+			DL_SortOrder 
+		End if 
+	Else 
+		asSortOrder:=Find in array(asSortOrder;[DesignLines]SortOrder)
+	End if 
+Else 
+	[DesignLines]SortOrder:=asSortOrder{asSortOrder}
+	SAVE RECORD([DesignLines])
+	DL_SortOrder 
+End if 

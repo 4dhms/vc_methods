@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbOther=1)
+	cbLA:=0
+	cbNY:=0
+End if 
+OBJECT SET VISIBLE([Orders]OtherShip;cbOther=1)
+Order_AirSeaBuild 
+vfUpdateShipping:=True

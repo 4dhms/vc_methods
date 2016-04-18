@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY DATE(adQStart;24)
+ARRAY DATE(adQEnd;24)
+
+C_LONGINT($i)
+C_LONGINT($year)
+
+$year:=alYearA{alYearA}
+$i:=1
+
+For ($i;1;24)
+	
+	If (asSeasonA=1)
+		If ($i<13)
+			adQStart{$i}:=Date(String($i)+"/01/"+String($year-1))
+			If ($i<12)
+				adQEnd{$i}:=Date(String($i+1)+"/01/"+String($year-1))
+			Else 
+				adQEnd{$i}:=Date("01/1/"+String($year))
+			End if 
+		Else 
+			adQStart{$i}:=Date(String($i-12)+"/01/"+String($year))
+			If ($i<24)
+				adQEnd{$i}:=Date(String($i-11)+"/01/"+String($year))
+			Else 
+				adQEnd{$i}:=Date("01/1/"+String($year+1))
+			End if 
+		End if 
+	Else 
+		Case of 
+			: ($i<7)
+				adQStart{$i}:=Date(String($i+6)+"/01/"+String($year-1))
+				If ($i<6)
+					adQEnd{$i}:=Date(String($i+7)+"/01/"+String($year-1))
+				Else 
+					adQEnd{$i}:=Date("01/1/"+String($year))
+				End if 
+			: ($i<13)
+				adQStart{$i}:=Date(String($i-6)+"/01/"+String($year))
+				adQEnd{$i}:=Date(String($i-5)+"/01/"+String($year))
+			: ($i<19)
+				adQStart{$i}:=Date(String($i-6)+"/01/"+String($year))
+				If ($i<18)
+					adQEnd{$i}:=Date(String($i-5)+"/01/"+String($year))
+				Else 
+					adQEnd{$i}:=Date("01/1/"+String($year+1))
+				End if 
+			Else 
+				adQStart{$i}:=Date(String($i-18)+"/01/"+String($year+1))
+				adQEnd{$i}:=Date(String($i-17)+"/01/"+String($year+1))
+		End case 
+	End if 
+End for 

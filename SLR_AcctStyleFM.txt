@@ -1,0 +1,265 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfPrinting)
+C_LONGINT($color;$background;$fontstyle;$substyle;$i)
+C_POINTER($wk)
+
+If ([Designs]ArchivedPict)
+	Picture_RestoreProc 
+End if 
+Case of 
+	: ([SLRReporter]Header=-1)
+		$substyle:=5
+	: ([SLRReporter]Header=-2)
+		$substyle:=5
+	Else 
+		$substyle:=0
+End case 
+
+OBJECT SET VISIBLE(*;"at1";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"at2";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"at3";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"at4";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+  //SET VISIBLE(*;"at5";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+  //SET VISIBLE(*;"at6";([SLRReporter]StyleNumber#"") & ([SLRReporter]Header>=-1))
+OBJECT SET VISIBLE(*;"at7";([SLRReporter]StyleNumber#"") & ([SLRReporter]Header>-1))
+  //SET VISIBLE(*;"at8";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+  //SET VISIBLE(*;"at9";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+  //SET VISIBLE(*;"at10";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"at11";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"at12";([SLRReporter]StyleNumber#"") & ([SLRReporter]Header>-10))
+OBJECT SET VISIBLE(*;"at13";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+
+OBJECT SET VISIBLE(*;"td1";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"td2";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"td3";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"td4";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0))
+OBJECT SET VISIBLE(*;"td5";([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0) & ([SLRReporter]Header>-4))
+OBJECT SET VISIBLE([SLRReporter]LastOnHand;([SLRReporter]StyleNumber#"") | ([SLRReporter]Header<0) & ([SLRReporter]Header>-4))
+
+OBJECT SET VISIBLE(*;"td6";[SLRReporter]Header>=-2)
+OBJECT SET VISIBLE(*;"td7";[SLRReporter]Header>=-2)
+OBJECT SET VISIBLE(*;"td8";[SLRReporter]Header>=-2)
+
+Case of 
+	: ([SLRReporter]Header=-2) & ([SLRReporter]Reorder=999)
+		OBJECT SET COLOR(vsSubhead;-(Red+(256*0)))
+	: ([SLRReporter]Header=-2) & ([SLRReporter]Reorder>=10)
+		OBJECT SET COLOR(vsSubhead;-(Orange+(256*0)))
+	: ([SLRReporter]Header=-1)
+		OBJECT SET COLOR(vsSubhead;-(Orange+(256*0)))
+	: ([SLRReporter]Header>=0)
+		OBJECT SET COLOR(vsSubhead;-(Brown+(256*0)))
+		
+	Else 
+		OBJECT SET COLOR(vsSubhead;-(15+(256*0)))
+End case 
+
+Case of 
+	: (vfSort)
+	: ([SLRReporter]Reorder=10)
+		OBJECT SET COLOR(*;"xDivider";-(15+(256*1)))
+		OBJECT SET VISIBLE(*;"xDivider";True)
+		OBJECT SET VISIBLE(*;"xDivider1";False)
+	: ([SLRReporter]Header=-2) | ([SLRReporter]Header=-1)
+		OBJECT SET COLOR(*;"xDivider";-(12+(256*1)))
+		OBJECT SET VISIBLE(*;"xDivider";True)
+		OBJECT SET VISIBLE(*;"xDivider1";False)
+	: ([SLRReporter]Reorder>0) | ([SLRReporter]Header=0) & (Records in selection([SLRReporter])>0)
+		
+		OBJECT SET COLOR(*;"xDivider1";-(12+(256*1)))
+		OBJECT SET VISIBLE(*;"xDivider1";True)
+		OBJECT SET VISIBLE(*;"xDivider";False)
+	Else 
+		OBJECT SET VISIBLE(*;"xDivider";True)
+		OBJECT SET COLOR(*;"xDivider";-(12+(256*1)))
+End case 
+
+
+OBJECT SET VISIBLE([SLRReporter]MU_WTD;[SLRReporter]Header>=-2)
+OBJECT SET VISIBLE([SLRReporter]MU_MTD;[SLRReporter]Header>=-2)
+OBJECT SET VISIBLE([SLRReporter]MU_STD;[SLRReporter]Header>=-2)
+OBJECT SET VISIBLE([SLRReporter]MU_YTD;[SLRReporter]Header>=-2)
+OBJECT SET VISIBLE([SLRReporter]MU_LTD;[SLRReporter]Header>=-2)
+
+OBJECT SET VISIBLE(*;"xBG";([SLRReporter]Header>0) | ([SLRReporter]Header=-3))  // | ([SLRReporter]Reorder>0))
+OBJECT SET VISIBLE(*;"xBG1";[SLRReporter]Header=-1)
+
+OBJECT SET VISIBLE([SLRReporter]WkNumber1;([SLRReporter]WkNumber1>0) & ([SLRReporter]Header>-2))
+OBJECT SET VISIBLE([SLRReporter]WkNumber2;([SLRReporter]WkNumber2>0) & ([SLRReporter]Header>-2))
+OBJECT SET VISIBLE([SLRReporter]WkNumber3;([SLRReporter]WkNumber3>0) & ([SLRReporter]Header>-2))
+OBJECT SET VISIBLE([SLRReporter]WkNumber4;([SLRReporter]WkNumber4>0) & ([SLRReporter]Header>-2))
+OBJECT SET VISIBLE([SLRReporter]WkNumber5;([SLRReporter]WkNumber5>0) & ([SLRReporter]Header>-2))
+OBJECT SET VISIBLE([SLRReporter]WkNumber6;([SLRReporter]WkNumber6>0) & ([SLRReporter]Header>-2))
+
+OBJECT SET FONT STYLE([SLRReporter]Units1;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]Total1;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]AUR1;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]SOP1;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]OHU1;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]WOS1;$substyle)
+
+OBJECT SET FONT STYLE([SLRReporter]Units2;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]Total2;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]AUR2;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]SOP2;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]OHU2;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]WOS2;$substyle)
+
+OBJECT SET FONT STYLE([SLRReporter]Units3;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]Total3;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]AUR3;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]SOP3;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]OHU3;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]WOS3;$substyle)
+
+OBJECT SET FONT STYLE([SLRReporter]Units4;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]Total4;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]AUR4;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]SOP4;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]OHU4;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]WOS4;$substyle)
+
+OBJECT SET FONT STYLE([SLRReporter]Units5;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]Total5;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]AUR5;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]SOP5;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]OHU5;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]WOS5;$substyle)
+
+OBJECT SET FONT STYLE([SLRReporter]Units6;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]Total6;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]AUR6;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]SOP6;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]OHU6;$substyle)
+OBJECT SET FONT STYLE([SLRReporter]WOS6;$substyle)
+
+OBJECT SET VISIBLE(*;"xTotal";[SLRReporter]Header=-3)
+OBJECT SET VISIBLE([SLRReporter]LineItem;[SLRReporter]Header>=0)
+  //SET VISIBLE([SLRReporter]Price;[SLRReporter]Header>=-2)
+SLR_HideZeros (False)
+Case of 
+	: (vfByStyle) & ([SLRReporter]Header=-2.5)
+		OBJECT SET VISIBLE(*;"xTotal";True)
+		OBJECT SET VISIBLE(*;"xSubtotal";False)
+	: (vfByStyle) & ([SLRReporter]Header=-2)
+		OBJECT SET VISIBLE(*;"xTotal";False)
+		OBJECT SET VISIBLE(*;"xSubtotal";True)
+	: (Not(vfByStyle)) & ([SLRReporter]Subtotal)
+		OBJECT SET VISIBLE(*;"xSubtotal";True)
+	: (vfByStyle) & ([SLRReporter]Header=-2)
+		OBJECT SET VISIBLE(*;"xSubtotal";True)
+	: ([SLRReporter]Header=-3)
+		OBJECT SET VISIBLE(*;"xTotal";True)
+		OBJECT SET VISIBLE(*;"xSubtotal";False)
+	Else 
+		OBJECT SET VISIBLE(*;"xSubtotal";False)
+End case 
+OBJECT SET VISIBLE(*;"xGrandTotal";[SLRReporter]Header=-4)
+
+Case of 
+	: ([SLRReporter]Reorder=10) & ([SLRReporter]Header=-2)
+		vsSubhead:="Original Subtotal"
+		
+	: ([SLRReporter]Reorder<999) & ([SLRReporter]Header=-2) & ([SLRReporter]Reorder>10)
+		vsSubhead:="Reorder Subtotal"
+		
+	: ([SLRReporter]Header=2.5) & (zNo=1)
+		vsSubhead:=[Designs]Description
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;True)
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+		
+	: ([SLRReporter]Header=-2)
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;True)
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+		vsSubhead:=[Designs]Description
+		
+	: ([SLRReporter]Reorder>0) & ([SLRReporter]Header>=0)
+		vsSubhead:=Replace string([SLRReporter]LineItem;"/";Char(13);*)+Char(13)+"Reorder"
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;True)
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+		
+	: ([SLRReporter]Header>=0)
+		vsSubhead:=Replace string([SLRReporter]LineItem;"/";Char(13);*)
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;True)
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+		
+	: ([SLRReporter]Header=-2) & (vfByStyle)
+		vsSubhead:=[SLRReporter]Customer
+		
+	: ([SLRReporter]Header=-1)
+		vsSubhead:="Color Subtotal"+Char(13)+Substring([SLRReporter]LineItem;1;Position("/";[SLRReporter]LineItem)-1)
+		
+		
+	: ([SLRReporter]Header=-3)
+		vsSubHead:=""
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;[SLRReporter]Header>-3)
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;[SLRReporter]Header>-3)
+		
+	: (atPages=1) & ([SLRReporter]Header=-4)
+		vsSubHead:=""
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;False)
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;False)
+	Else 
+		OBJECT SET VISIBLE([SLRReporter]StyleNumber;True)
+		OBJECT SET VISIBLE([SLRReporter]DesignNumber;True)
+		vsSubHead:=""
+End case 
+
+If (vfPrinting)
+	$i:=1
+	For ($i;1;11)
+		$wk:=Get pointer("vlItem"+String($i))
+		If ([SLRReporter]WkNumber1-($i)>0)
+			$wk->:=[SLRReporter]WkNumber1-($i)
+			OBJECT SET COLOR($wk->;-($color+(256*$background)))
+			OBJECT SET FONT STYLE($wk->;$fontstyle)
+		Else 
+			$wk->:=0
+		End if 
+	End for 
+End if 
+SLR_TDcalc 
+
+Case of 
+	: ([SLRReporter]Header>-4) & (vfByStyle)
+		OBJECT SET VISIBLE([Designs]Sketch;True)
+	: ([SLRReporter]Header>-3)
+		OBJECT SET VISIBLE([Designs]Sketch;True)
+	Else 
+		OBJECT SET VISIBLE([Designs]Sketch;False)
+End case 
+Case of 
+	: (vfByStyle) & ([SLRReporter]Header=-2)
+		OBJECT SET VISIBLE([SLRReporter]Customer;True)
+	: ([SLRReporter]Reorder>=0)
+		OBJECT SET VISIBLE([SLRReporter]Customer;True)
+	Else 
+		OBJECT SET VISIBLE([SLRReporter]Customer;False)
+End case 
+
+OBJECT SET VISIBLE([SLRReporter]LineItem;[SLRReporter]Reorder=0)
+If ([SLRReporter]Reorder>0)
+	  //vsSubHead:="Reorder"
+End if 
+
+Case of 
+	: (vfSort) & (cbGroup=0)
+		OBJECT SET VISIBLE(*;"xDivider2";False)
+		OBJECT SET VISIBLE(*;"xSubtotal";False)
+	: ([SLRReporter]Reorder=999) | ([SLRReporter]Header=2.5)
+		OBJECT SET VISIBLE(*;"xDivider2";True)
+	: ([SLRReporter]Header<-1) & ([SLRReporter]Reorder=0)
+		OBJECT SET VISIBLE(*;"xDivider2";True)
+	Else 
+		OBJECT SET VISIBLE(*;"xDivider2";False)
+End case 
+  //
+
+If (Records in selection([SLRReporter])>0) & (Not(vfPrinting))
+	SLR_ShowRange 
+End if 
+
+OBJECT SET VISIBLE([SLRReporter]ColorSort;Current user="designer")
+OBJECT SET VISIBLE([SLRReporter]Header;Current user="designer")
+OBJECT SET VISIBLE([SLRReporter]PrimeSort;Current user="designer")
+

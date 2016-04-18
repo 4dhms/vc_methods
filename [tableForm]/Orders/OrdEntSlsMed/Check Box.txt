@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbChange=0)
+	vfTestPrice:=False
+	vrTestPrice:=0
+	OBJECT SET VISIBLE(vrTestPrice;False)
+	Cost_EntryCalculate 
+Else 
+	vfTestPrice:=True
+	OBJECT SET VISIBLE(vrTestPrice;True)
+	GOTO OBJECT(vrTestPrice)
+End if 

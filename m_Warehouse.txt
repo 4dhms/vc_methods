@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Fabric Order entry
+
+Case of 
+	: (<>vlWarehouse=0)
+		<>vlWarehouse:=New process("p_Warehouse";0;"PDF")
+	Else 
+		SHOW PROCESS(<>vlWarehouse)
+		BRING TO FRONT(<>vlWarehouse)
+End case 
+
+  //

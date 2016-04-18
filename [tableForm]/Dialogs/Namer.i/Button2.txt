@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($previewProc)
+OBJECT SET ENABLED(bNameOk;False)
+<>vfPreview:=True
+  //
+If (hlSheets>0)
+	$previewProc:=New process("Cost_Preview";0;"preview";vlRecordNumber)
+	OBJECT SET ENABLED(bNameOk;True)
+End if 

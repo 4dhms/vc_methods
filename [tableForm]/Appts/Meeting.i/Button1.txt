@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete this appointment?")
+If (ok=1)
+	CREATE SET([Appts];"Appts")
+	DELETE RECORD([Appts])
+	REMOVE FROM SET([Appts];"Appts")
+	USE SET("Appts")
+	CLEAR SET("Appts")
+	QUERY([Appts];[Appts]ApptDate=vdCalToday)
+	ORDER BY([Appts];[Appts]ApptStart;>;[Appts]ApptEnd;>)
+End if 

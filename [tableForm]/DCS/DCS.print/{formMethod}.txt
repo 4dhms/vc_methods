@@ -1,0 +1,28 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+C_REAL($dutyrate;$dutypaid)
+
+Case of 
+	: (Form event=On Printing Detail)
+		vrDutyRate:=0
+		Case of 
+			: ([DCS]Item="Boat") | ([DCS]Item="Air")
+				$show:=False
+				vrTotal2:=[DCS]Ext
+			: ([DCS]Item="Duty@")
+				$show:=False
+				vrTotal2:=[DCS]Ext
+			: ([DCS]Duty)
+				$dutyrate:=[DCS]DutyRate/100
+				$dutypaid:=Round([DCS]Ext*$dutyrate;2)
+				$show:=True
+				vrDutyRate:=[DCS]DutyRate
+				vrTotal2:=[DCS]Ext+$dutypaid
+			Else 
+				$show:=False
+				vrTotal2:=[DCS]Ext
+		End case 
+	: (Form event=On Printing Break)
+		OBJECT SET VISIBLE(*;"xCover";<>vlOrderNumber<0)
+		OBJECT SET VISIBLE(vTotal2;<>vlOrderNumber<0)
+End case 

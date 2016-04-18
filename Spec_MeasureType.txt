@@ -1,0 +1,68 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($specText)
+C_TEXT($msmt)
+C_TEXT($CA;$CB;$CR)
+
+$CA:=Char(91)
+$CB:=Char(93)
+$CR:=Char(13)
+
+Case of 
+	: (asMmtType{asMmtType}="Sweaters/Knits")
+		$specText:="FRONT LENGTH-HPS"+Char(13)+"CHEST WIDTH-1 IN."+Char(13)+"BOTTOM OPENING WIDTH"+Char(13)+"BOTTOM TRIM/HEM DEPTH"+Char(13)+"ACROSS SHOULDER"+Char(13)+"SLEEVE LENGTH"+Char(13)+"ARMHOLE"+Char(13)+"MUSCLE WIDTH-1in.ARMHOLE"+Char(13)+"ELBOW WIDTH-8in.ARMHOLE"+Char(13)+"SLEEVE OPENING WIDTH"+Char(13)+"CUFF TRIM/HEM DEPTH"+Char(13)+"NECK WIDTH"+Char(13)+"FRONT NECK DEPTH"+Char(13)+"BACK NECK DEPTH"+Char(13)+"COLLAR HEIGHT"+Char(13)+"NECK BASE WIDTH"+Char(13)+"NECK EDGE WIDTH"+Char(13)+"NECK CIRCUMFERENCE-STRETCH"+Char(13)+Char(13)+Char(13)+Char(13)+"NET WEIGHT:LBS./DOZEN"+Char(13)
+	: (asMmtType{asMmtType}="Dresses/coats")
+		$specText:="TOTAL LENGTH"+$CR+"BODICE LENGTH"+$CR+"SKIRT LENGTH"+$CR+"CHEST CIRC - 1 in."+$CR+"WAIST POSITION"+$CR+"WAIST CIRC"+$CR+"HIGH HIP CIRC "+$CA+"            "+$CB+$CR+"LOW HIP CIRC "+$CA+"            "+$CB+$CR+"SWEEP CIRC"+$CR+"ACROSS SHOULDER"+$CR+"ACROSS CHEST "+$CA+"            "+$CB+$CR+"ACROSS BACK "+$CA+"            "+$CB+$CR+"SLEEVE LENGTH "+$CA+" C.B. "+$CB+$CR+"SLEEVE LENGTH "+$CA+" SHO. "+$CB+$CR+"ARMHOLE CIRC"+$CR+"MUSCLE CIRC"+$CR+"SLEEVE OPENING CIRC"+$CR+"CUFF LENGTH"+$CR+"CUFF HEIGHT"+$CR+"NECK WIDTH"+$CR+"FRONT NECK DEPTH"+$CR+"BACK NECK DEPTH"+$CR+"NECK BASE CIRC"+$CR+"SLIT/VENT LENGTH"+$CR+"POCKET PLACEMENT"+$CR+"POCKET L & W"+$CR+"PLEAT DEPTH"+$CR+"BELT LENGTH"+$CR+"SHOULDER PAD NO."+$CR+"SHOULDER PAD POSITION"+$CR+"OPENING"+$CR
+	: (asMmtType{asMmtType}="Bottoms")
+		$specText:="C.B. LENGTH"+$CR+"WAIST CIRC (RELAXED)"+$CR+"WAIST CIRC (STRETCHED)"+$CR+"WAISTBAND WIDTH"+$CR+"HIGH HIP CIRC"+$CR+"LOW HIP CIRC"+$CR+"SWEEP CIRC"+$CR+"FRONT/SIDE/BACK OPENING"+$CR+"PLEAT DEPTH"+$CR+"SLIT LENGTH"+$CR+"POCKET LENGTH X WIDTH"+$CR+"FRONT RISE"+$CR+"BACK RISE"+$CR+"THIGH CIRC"+$CR+"KNEE CIRC"+$CR+"LEG OPENING"+$CR+"INSEAM"+$CR+"OUTSEAM"+$CR
+	: (asMmtType{asMmtType}="Blouses")
+		$specText:="C.B. LENGTH"+$CR+"CHEST CIRC"+$CR+"WAIST CIRC"+$CR+"HIGH HIP CIRC"+$CR+"SWEEP CIRC"+$CR+"ACROSS SHOULDER"+$CR+"ACROSS CHEST"+$CR+"ACROSS BACK"+$CR+"SLEEVE LENGTH"+$CR+"ARMHOLE CIRCLE"+$CR+"MSCLE.CRCLE-1"+$CR+"SLEEVE OPENING CIRCUM."+$CR+"CUFF HEIGHT"+$CR+"NECK WIDTH"+$CR+"FRONT NECK DEPTH"+$CR+"BACK NECK DEPTH"+$CR+"NECK CIRCUMFERENCE"+$CR+"NECKBAND HEIGHT"+$CR+"COLLAR HEIGHT"+$CR+"COLLAR POINT"+$CR+"LAPEL POINT"+$CR+"POCKET PLACEMENT"+$CR+"POCLET L*W"+$CR+"WAIST  POSITION"+$CR+"SHOULDER PAD POSITION"+$CR+"SHOULDER PAD NO."+$CR
+	: (asMmtType{asMmtType}="Jackets")
+		$specText:="TOTAL LENGTH"+$CR+"CHEST CIRC"+$CR+"WAIST CIRC"+$CR+"HIGH HIP CIRC"+$CR+"SWEEP CIRC"+$CR+"ACROSS SHOULDER"+$CR+"ACROSS CHEST"+$CR+"ACROSS BACK"+$CR+"SLEEVE LENGTH"+$CR+"ARMHOLE CIRC"+$CR+"MUSCLE CIRC"+$CR+"SLEEVE OPENING"+$CR+"NECK WIDTH"+$CR+"FRONT NECK DEPTH"+$CR+"BACK NECK DEPTH"+$CR+"COLLAR HEIGHT"+$CR+"COLLAR POINT"+$CR+"LAPEL WIDTH"+$CR+"VENT WIDTH"+$CR+"POCKET PLACEMENT"+$CR+"POCKET LENGTH & WIDTH"+$CR
+	: (asMmtType{asMmtType}="Outfits")
+		$specText:="LENGTH"+$CR+"CHEST CIRCUMERENCE 1 in."+$CR+"SWEEP CIRCLE"+$CR+"ACROSS SHOULDER"+$CR+"ACROSS CHEST"+$CR+"ACROSS BACK"+$CR+"SLEEVE LENGTH"+$CR+"ARMHOLE CIRCLE"+$CR+"MSCLE.CRCLE-1in.ARMHOLE"+$CR+"ELBOW CIRCUMFERENCE"+$CR+"SLEEVE OPENING CIRCUM."+$CR+"CUFF LENGTH"+$CR+"CUFF HEIGHT"+$CR+"NECK WIDTH"+$CR+"FRONT NECK DEPTH"+$CR+"BACK NECK DEPTH"+$CR+"NECK CIRCUMFERENCE"+$CR+"NECKBAND HEIGHT"+$CR+"COLLAR HEIGHT"+$CR+"COLLAR HEIGHT"+$CR+"COLLAR POINT"+$CR+"POCKET PLACEMENT"+$CR+"POCKET LENGTH & WIDTH"+$CR
+	: (asMmtType{asMmtType}="Panties")
+		$specText:="WAIST RELAXED AT EDGE"+$CR
+		$specText:=$specText+"WAIST WIDTH"+$CR+"(MINIMUM EXTENDED)"+$CR
+		$specText:=$specText+"WAIST ELASTIC WIDTH"+$CR
+		$specText:=$specText+"LEG OPENING"+$CR+"ELASTIC WIDTH"+$CR
+		$specText:=$specText+"LEG OPENING WIDTH (FOLD)"+$CR
+		$specText:=$specText+"FRONT RISE INCLUDING WB"+$CR
+		$specText:=$specText+"BK RISE INCLUDING WB"+$CR
+		$specText:=$specText+"CROTCH GUSSET LENGHT"+$CR
+		$specText:=$specText+"GUSSET WIDTH"+$CR+"@ FRONT SEAM"+$CR
+		$specText:=$specText+"GUSSET WIDTH"+$CR+"@ BACK SEAM"+$CR
+		$specText:=$specText+"FR COVERAGE"+$CR+"4"+Char(34)+" BELOW WAIST"+$CR
+		$specText:=$specText+"SEAT WIDTH"+$CR+"4"+Char(34)+" BELOW WAIST"+$CR
+		$specText:=$specText+"SIDE STRING WIDTH"+$CR
+		
+		$msmt:="1/4"+$CR+$CR
+		$msmt:=$msmt+"1/4"+$CR
+		$msmt:=$msmt+"0"+$CR+$CR
+		$msmt:=$msmt+"0"+$CR
+		$msmt:=$msmt+"1/4"+$CR
+		$msmt:=$msmt+"1/4"+$CR
+		$msmt:=$msmt+"1/4"+$CR
+		$msmt:=$msmt+"1/4"+$CR+$CR
+		$msmt:=$msmt+"1/4"+$CR+$CR
+		$msmt:=$msmt+"1/4"+$CR+$CR
+		$msmt:=$msmt+"1/4"+$CR+$CR
+		$msmt:=$msmt+"1/4"+$CR
+		$msmt:=$msmt+"1/4"+$CR
+		
+		Case of 
+			: (FORM Get current page=1)
+				[Specs]ShouldMeas1:=$msmt
+			: (FORM Get current page=2)
+				[Specs]ShouldMeas2:=$msmt
+			: (FORM Get current page=3)
+				[Specs]ShouldMeas3:=$msmt
+			: (FORM Get current page=4)
+				[Specs]ShouldMeas4:=$msmt
+			: (FORM Get current page=5)
+				[Specs]ShouldMeas5:=$msmt
+			: (FORM Get current page=6)
+				[Specs]ShouldMeas6:=$msmt
+		End case 
+End case 
+
+[Specs]MsmtTermText:=$specText

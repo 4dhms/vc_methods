@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($sampleNumber)
+
+$sampleNumber:=-1*[Samples]SampleNumber
+<>vsFactory:=[Samples]SamGarFactry
+vdDate:=[Samples]SampleOrderDate
+QUERY([Costing];[Costing]OrderNumber=$sampleNumber)
+
+
+  //◊vfAir:=[Orders]Air
+  //◊vfSea:=[Orders]Sea
+  //◊vlPrice:=[Orders]Price
+  //◊vsTerms:=[Orders]Price Terms
+  //◊vsDesignNumber:=[Orders]DesignNumber
+  //◊vsStyleNumber:=[Orders]StyleNumber
+  //◊vlQuantity:=[Orders]ClrPrtQtyTotal
+  //◊vsCustomer:=[Orders]Customer
+
+
+Cost_EntryScreen 
+

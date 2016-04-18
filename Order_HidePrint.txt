@@ -1,0 +1,31 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($show)
+If (vfPO)
+	$show:=True
+Else 
+	$show:=False
+End if 
+
+OBJECT SET VISIBLE(*;"xPO1";$show)
+OBJECT SET VISIBLE(*;"xPO2";$show)
+OBJECT SET VISIBLE(*;"xPO3";$show)
+  //SET VISIBLE([Orders]Factory;$show)
+OBJECT SET VISIBLE([Orders]ShipDateFactory;$show)
+OBJECT SET VISIBLE([Orders]ShipInfo;$show)
+
+OBJECT SET VISIBLE([Orders]Price;Not(vfPO))
+OBJECT SET VISIBLE([Orders]Price Terms;Not(vfPO))
+OBJECT SET VISIBLE([Orders]RetailPrice;Not(vfPO))
+OBJECT SET VISIBLE(*;"xPrice";Not(vfPO))
+OBJECT SET VISIBLE(*;"xRetail";Not(vfPO))
+OBJECT SET VISIBLE([Orders]CancelDate;Not(vfPO))
+OBJECT SET VISIBLE([Orders]StartDate;Not(vfPO))
+OBJECT SET VISIBLE(*;"xPO5";Not(vfPO))
+OBJECT SET VISIBLE(*;"xRetail1";Not(vfPO))
+OBJECT SET VISIBLE([Orders]NetDiscount;Not(vfPO))
+
+OBJECT SET VISIBLE(*;"xStart";Not(vfPO))
+OBJECT SET VISIBLE([Orders]StartDate;Not(vfPO))
+
+OBJECT SET VISIBLE(*;"xDC";Not(vfPO))
+OBJECT SET VISIBLE([Orders]InDC;Not(vfPO))

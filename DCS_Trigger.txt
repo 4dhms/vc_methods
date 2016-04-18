@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($itemPos;$itemRef;$parent)
+C_TEXT($itemText)
+C_BOOLEAN($exp)
+
+$itemPos:=Selected list items(hlDCS)
+GET LIST ITEM(hlDCS;$itemPos;$itemRef;$itemText;$sub;$exp)
+$parent:=List item parent(hlDCS;$itemRef)
+
+If (Current user="Lai Mun") | (Current user="Robert") | (Current user="Designer") & ($parent=0) & ($itemText#"Duty")
+	OBJECT SET VISIBLE(bAdd;True)
+Else 
+	OBJECT SET VISIBLE(bAdd;False)
+	If (Current user="Lai Mun") | (Current user="Robert") | (Current user="Designer") & (Macintosh command down) | (Windows Ctrl down)
+		WinChoice ("Are you sure you want to delete "+$itemText+" from the list?")
+		If (ok=1)
+			WinChoice ("Really sure?";"No";"Realy")
+			If (ok=0)
+				DELETE FROM LIST(hlDCS;$itemRef)
+			End if 
+		End if 
+		  //OBJECT SET VISIBLE(vrDutyRate;True)
+	Else 
+		OBJECT SET VISIBLE(bAdd;False)
+		Case of 
+			: ($itemText="Duty")
+				Cost_Quota (-1)
+				GOTO OBJECT(vrCCostPrice)
+				
+			: ($itemText="Combo")
+				Case of 
+					: (Find in array(asList11;"Combo 5")>0)
+						vtItemName:="Combo 6"
+					: (Find in array(asList11;"Combo 4")>0)
+						vtItemName:="Combo 5"
+					: (Find in array(asList11;"Combo 3")>0)
+						vtItemName:="Combo 4"
+					: (Find in array(asList11;"Combo 2")>0)
+						vtItemName:="Combo 3"
+					: (Find in array(asList11;"Combo 1")>0)
+						vtItemName:="Combo 2"
+					Else 
+						vtItemName:="Combo 1"
+				End case 
+			Else 
+				vtItemName:=$itemText
+		End case 
+		
+		DCS_Show 
+	End if 
+End if 
+
+
+

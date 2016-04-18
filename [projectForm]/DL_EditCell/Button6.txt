@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+REDUCE SELECTION([Designs];0)
+asSampleTypes:=0
+DL_CustomEnter 
+vsEntryNumber:=[DL_Custom]CustomKey
+vlPage:=2
+FORM GOTO PAGE(2)

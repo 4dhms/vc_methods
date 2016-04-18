@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	LISTBOX SELECT ROW(afListBox1;1000)
+	LISTBOX SELECT ROW(afListBox3;1000)
+End if 

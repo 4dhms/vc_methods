@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$order)
+C_BOOLEAN($stop)
+
+QUERY([Samples];[Samples]SeasonName="Summer";*)
+QUERY([Samples]; | ;[Samples]SeasonName="Transition";*)
+QUERY([Samples]; | ;[Samples]SeasonName="Fall";*)
+QUERY([Samples]; | ;[Samples]SeasonName="Holiday";*)
+QUERY([Samples]; | ;[Samples]SeasonName="Resort";*)
+QUERY([Samples]; & ;[Samples]SeasonYear="2013")
+
+CONFIRM(String(Records in selection([Samples])))
+If (ok=1)
+	
+	FIRST RECORD([Samples])
+	$i:=1
+	For ($i;1;Records in selection([Samples]))
+		$order:=-1*[Samples]SampleNumber
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+		
+		$n:=1
+		$stop:=False
+		For ($n;1;Records in selection([CP_OrderXRef]))
+			Case of 
+				: ($stop)
+					  //done
+				: ([CP_OrderXRef]CPStatus="Rcvd proto") & (Not([Samples]ProtoReceived)) & ([Samples]ProtoRecvDate#!00-00-00!)
+					[Samples]ProtoReceived:=True
+					[Samples]ProtoRecvDate:=[FabricStatus]StatusDate
+					SAVE RECORD([Samples])
+					$stop:=True
+				Else 
+					QUERY([FabricStatus];[FabricStatus]LibraryKey=[CP_OrderXRef]CPOrdID)
+					QUERY SELECTION([FabricStatus];[FabricStatus]Status="Rcvd proto")
+					If (Records in selection([FabricStatus])>0)
+						[Samples]ProtoReceived:=True
+						[Samples]ProtoRecvDate:=[FabricStatus]StatusDate
+						SAVE RECORD([Samples])
+						$stop:=True
+					End if 
+			End case 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		NEXT RECORD([Samples])
+	End for 
+End if 
+ALERT("Done")

@@ -1,0 +1,30 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfRemoteNew)
+
+If (asRouter<1)
+	OBJECT SET ENABLED(bNameOk;False)
+End if 
+
+If (<>vfPreview=True)
+	<>vfPreview:=False
+End if 
+
+Case of 
+	: (cbNew=1)
+		vlOldOrderNumber:=0
+		vfImport:=False
+		Cost_Router 
+		
+	: (Records in selection([CostSheets])=1) & (vlRecordNumber>0)
+		GOTO RECORD([CostSheets];vlRecordNumber)
+		vlOldOrderNumber:=[Costing]OrderNumber
+		Sheet_Import 
+		ACCEPT
+	Else 
+		ACCEPT
+End case 
+
+
+
+
+

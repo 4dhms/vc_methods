@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([ReturnStores];"Stores.o")
+FORM SET INPUT([ReturnStores];"Stores.i")
+ALL RECORDS([ReturnStores])
+ORDER BY([ReturnStores];[ReturnStores]StoreName;>)
+
+<>CloseBox:=True
+
+Center Window (600;600;4;"")
+MODIFY SELECTION([ReturnStores];*)
+CLOSE WINDOW
+<>vlReturns:=0

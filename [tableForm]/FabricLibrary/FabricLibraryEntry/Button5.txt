@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+cbKnit:=0
+cbWoven:=0
+cbCutSew:=0
+FORM GOTO PAGE(2)

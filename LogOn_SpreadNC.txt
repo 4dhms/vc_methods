@@ -1,0 +1,65 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s)
+C_TEXT($type;$color;$t)
+C_BOOLEAN(vfFirst)
+
+ARRAY TEXT($selectiontest;0)
+$t:=Char(9)
+vfFirst:=True
+
+$i:=1
+For ($i;1;Size of array(atChange))
+	If (afLogOn{$i}=True) | (vfAll)
+		
+		vfFirst:=True
+		If (atChange{$i}="@NC@")
+			QUERY([Orders];[Orders]StyleNumber=asStyleNumbers{$i})
+			$n:=1
+			FIRST RECORD([Orders])
+			For ($n;1;Records in selection([Orders]))
+				QUERY([Changes];[Changes]OrderNumber=[Orders]OrderNum)
+				QUERY SELECTION([Changes];[Changes]FieldName="Self Color@";*)
+				QUERY SELECTION([Changes]; | ;[Changes]FieldName="Combo@Color@";*)
+				QUERY SELECTION([Changes]; & ;[Changes]Tag="Added";*)
+				QUERY SELECTION([Changes]; & ;[Changes]RevDate>[Orders]OrderEntryDate)
+				ORDER BY([Changes];[Changes]ChangeKey;>)
+				FIRST RECORD([Changes])
+				$s:=1
+				For ($s;1;Records in selection([Changes]))
+					
+					If ([Changes]RevDate>[Orders]OrderEntryDate) & ([Changes]Tag#"Changed") & ([Orders]StyleNumber=asStyleNumbers{$i})
+						
+						$type:=Substring([Changes]FieldName;1;Position("(";[Changes]FieldName)-2)
+						$color:=Replace string([Changes]FieldName;$type;"")
+						$color:=Replace string($color;" (";"")
+						$color:=Replace string($color;")";"")
+						$type:=Replace string($type;" color";"")
+						
+						If (vfFirst)
+							QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+							SEND PACKET(vhDocref;"NC"+$t+asStyleNumbers{$i}+$t+String(adActionDate{$i})+$t+[Designs]Description+$t+[Orders]OrderDivision+$t+$t+$t+$t+$t+$t+$t)
+							vfFirst:=False
+						Else 
+							SEND PACKET(vhDocref;"NC"+$t+$t+$t+$t+$t+$t+$t+$t+$t+$t+$t+$t)
+						End if 
+						QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$color)
+						If ($type="Self")
+							SEND PACKET(vhDocref;$color+" "+[ColorPrintNumber]CPName+Char(13))
+						Else 
+							SEND PACKET(vhDocref;$type+" "+$color+" "+[ColorPrintNumber]CPName+Char(13))
+						End if 
+					End if 
+					NEXT RECORD([Changes])
+				End for 
+				NEXT RECORD([Orders])
+			End for 
+		End if 
+		If (atChange{$i}="NS@")
+		Else 
+			vsStyleNumber:=asStyleNumbers{$i}
+			If (atChange{$i}="@DV@") | (atHistChanger{$i}="@SC@") | (atHistChanger{$i}="@SR@") | (atHistChanger{$i}="@PC@") | (atHistChanger{$i}="@CC@")
+				LogOn_SpreadChange 
+			End if 
+		End if 
+	End if 
+End for 

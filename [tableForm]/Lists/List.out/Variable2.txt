@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n)
+$n:=1
+If (atListContents=1)
+	WinPrompt ("Select category")
+Else 
+	WinChoice ("This will take a few minutes. You will get a prompt when it is finished.";"Continue";"Stop")
+	If (ok=1)
+		FIRST RECORD([Lists])
+		For ($n;1;Records in selection([Lists]))
+			Case of 
+				: ([Lists]ListName="Fabric")
+					QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricName=[Lists]ListItem)
+				: ([Lists]ListName="Fiber")
+					QUERY([OrdersFabricXRef];[OrdersFabricXRef]FiberContent=[Lists]ListItem)
+				: ([Lists]ListName="Treatment")
+					QUERY([OrdersFabricXRef];[OrdersFabricXRef]Treatment=[Lists]ListItem)
+			End case 
+			[Lists]OrderCount:=Records in selection([OrdersFabricXRef])
+			SAVE RECORD([Lists])
+			NEXT RECORD([Lists])
+		End for 
+		ORDER BY([Lists];[Lists]OrderCount;<)
+		WinPrompt ("Calculated")
+	End if 
+End if 
+

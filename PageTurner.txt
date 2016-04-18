@@ -1,0 +1,112 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($router)
+C_BOOLEAN($continue)
+C_POINTER($tablePtr)
+C_BOOLEAN(vfUpdateShipping)
+<>vlCostRouter:=0
+
+$router:=$1
+
+  //
+SAVE RECORD([Designs])
+
+If ($router="Cost")
+	$router:="Order"
+	FORM GOTO PAGE(1)
+End if 
+
+If ($router="Order") | ($router="Update") | ($router="PO")
+	Revise_ClearFlags 
+End if 
+
+$tablePtr:=$3
+
+If ($4)
+	Case of 
+		: (<>PrcQteID>0) & ($router="Cost")
+			$continue:=True
+		: ($router="Update") | ($router="PO")
+			
+			Case of 
+				: (Position(" to ";[Orders]ShipInfo)<1) & (Position(" at ";[Orders]ShipInfo)<1) & (FORM Get current page=7)
+					WinPrompt ("Enter shipping destination")
+				: (Position(" to ";[Orders]ShipInfo)<1) & (Position(" at ";[Orders]ShipInfo)<1) & (FORM Get current page=8)
+					WinPrompt ("Enter shipping destination")
+				: (FORM Get current page=7) & (Not([Orders]ShipAir)) & (Not([Orders]ShipSea)) & (Not([Orders]ShipLDP)) & (Not([Orders]ShipFOB))
+					WinPrompt ("Enter shipping method")
+				Else 
+					$continue:=True
+			End case 
+		: ($router="Order")  // | ($router="Cost")
+			  //If (Order_Mandatory )
+			  //SAVE RECORD([Orders])
+			$continue:=True
+			  //End if 
+		: ($router="Design")
+			If (Design_Mandatory )
+				vfNewDesign:=False
+				OBJECT SET TITLE(bCancel;"Cancel")
+				$continue:=True
+			End if 
+	End case 
+End if 
+
+If ($continue)
+	SAVE RECORD($tablePtr->)
+	Case of 
+		: ($router="Order")
+	End case 
+	
+	Unload_Sales 
+	Case of 
+		: ($2="First")
+			FIRST RECORD($tablePtr->)
+		: ($2="Prev")
+			PREVIOUS RECORD($tablePtr->)
+		: ($2="Next")
+			
+			NEXT RECORD($tablePtr->)
+		: ($2="Last")
+			LAST RECORD($tablePtr->)
+	End case 
+	If ($router="Order") & (<>PrcQteID<1)
+		<>vlOrderNumber:=[Orders]OrderNum
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	End if 
+	
+	If ([Designs]Season="False") | ([Designs]Season="00/00/00")
+		[Designs]Season:=""
+	End if 
+	
+	If (Selected record number($tablePtr->)=1) | (Records in selection($tablePtr->)=1)
+		OBJECT SET ENABLED(bFrstHMS;False)
+		OBJECT SET ENABLED(bPrvHMS;False)
+	Else 
+		OBJECT SET ENABLED(bFrstHMS;True)
+		OBJECT SET ENABLED(bPrvHMS;True)
+	End if 
+	
+	If (Selected record number($tablePtr->)=Records in selection($tablePtr->)) | (Records in selection($tablePtr->)=1)
+		OBJECT SET ENABLED(bNxtHMS;False)
+		OBJECT SET ENABLED(bLstHMS;False)
+	Else 
+		OBJECT SET ENABLED(bNxtHMS;True)
+		OBJECT SET ENABLED(bLstHMS;True)
+	End if 
+	Design_NavButtons 
+	
+	<>Close:=True
+	
+	Case of 
+		: ($router="Order") | ($router="PO") | ($router="Update") | ($router="Cost@") | ($router="DCS")
+			Orders_FM_EnterOnLoad 
+			
+		: ($router="Design")
+			QUERY([DL_Other];[DL_Other]DesignKey=[Designs]DesignLibraryKey)
+			QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum)
+			QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+			vsRecInSelection:=String(Selected record number([Designs]))+"/"+String(Records in selection([Designs]))
+			OBJECT SET ENTERABLE([Designs]DesignNum;[Designs]DesignNum="")
+			Design_Load 
+	End case 
+End if 

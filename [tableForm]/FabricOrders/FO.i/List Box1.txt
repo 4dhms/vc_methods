@@ -1,0 +1,57 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($order;$line)
+C_TEXT($orderproc;$color)
+
+
+WinChoice ("Are you sure you want to delete this order?";"No";"Yes")
+If (ok=0)
+	$line:=asOrderNumbers
+	$orderproc:=asOrderNumbers{$line}
+	$color:=asCPNumbers{$line}
+	
+	If ($orderproc="SG@")
+		vlOrderNumber:=-1*(Abs(Num($orderproc)))
+	Else 
+		vlOrderNumber:=Abs(Num($orderproc))
+	End if 
+	
+	If ($color="")
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+		
+		APPLY TO SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey:=0)
+		DELETE FROM ARRAY(asOrderNumbers;$line;1)
+		DELETE FROM ARRAY(adPODate;$line;1)
+		DELETE FROM ARRAY(asStyleNumbers;$line;1)
+		DELETE FROM ARRAY(asDesignNumbers;$line;1)
+		DELETE FROM ARRAY(asTypeList;$line;1)
+		DELETE FROM ARRAY(asXFactory;$line;1)
+		DELETE FROM ARRAY(asCPNumbers;$line;1)
+		DELETE FROM ARRAY(alStyleFab;$line;1)
+		DELETE FROM ARRAY(alColorChange;$line;1)
+		
+	Else 
+		  //by color/print
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=vlOrderNumber)
+		QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=$color)
+		
+		APPLY TO SELECTION([CP_OrderXRef];[CP_OrderXRef]FabOrderKey:=0)
+		DELETE FROM ARRAY(asOrderNumbers;$line;1)
+		DELETE FROM ARRAY(adPODate;$line;1)
+		DELETE FROM ARRAY(asStyleNumbers;$line;1)
+		DELETE FROM ARRAY(asDesignNumbers;$line;1)
+		DELETE FROM ARRAY(asTypeList;$line;1)
+		DELETE FROM ARRAY(asXFactory;$line;1)
+		DELETE FROM ARRAY(asCPNumbers;$line;1)
+		DELETE FROM ARRAY(alStyleFab;$line;1)
+		DELETE FROM ARRAY(alColorChange;$line;1)
+	End if 
+	asOrderNumbers:=0
+	
+	UNLOAD RECORD([CP_OrderXRef])
+	UNLOAD RECORD([OrdersFabricXRef])
+	UNLOAD RECORD([Orders])
+	LISTBOX SELECT ROW(afOrderList;1000)
+	
+End if 

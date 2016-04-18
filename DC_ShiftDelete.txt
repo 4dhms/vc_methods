@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+C_LONGINT($process)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+
+$line:=asCustomers
+
+If (Form event=On Double Clicked) & (Shift down)
+	WinChoice ("Are you sure you want to delete "+asCustomers{$line}+"?")
+	If (ok=1)
+		QUERY([DC];[DC]OrderNumber=[Orders]OrderNum;*)
+		QUERY([DC];[DC]DCLine=alDCLine{$line})
+		If (Locked([DC]))
+			LOCKED BY([DC];$process;$user;$session;$processName)
+			WinPrompt ("You cannot delete this line. The record is being used by "+$user+" in process: "+$processname)
+		Else 
+			DELETE SELECTION([DC])
+			LISTBOX DELETE ROWS(DCBreakdown;$line)
+		End if 
+	End if 
+End if 
+

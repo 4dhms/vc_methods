@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([SpecTemplate];"Temps")
+ADD RECORD([SpecTemplate];*)
+ADD TO SET([SpecTemplate];"Temps")
+USE SET("Temps")
+CLEAR SET("Temps")

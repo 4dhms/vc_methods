@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+vtDescription:=""
+UPC_LookUp 
+
+  //LISTBOX SELECT ROW(afListBox1;1)

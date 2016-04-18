@@ -1,0 +1,51 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+ARRAY TEXT($designs;0)
+
+If (vAddTo=1)
+	CREATE SET([Designs];"designs")
+End if 
+
+If (vsQStyle#"")
+	QUERY([Orders];[Orders]StyleNumber=vsQStyle)
+	DISTINCT VALUES([Orders]DesignNumber;$designs)
+	QUERY([Samples];[Samples]StyleNum=vsQStyle)
+	If (Find in array($designs;[Samples]DesignNum)<1)
+		APPEND TO ARRAY($designs;[Samples]DesignNum)
+	End if 
+	
+	Case of 
+		: (Size of array($designs)=1)
+			QUERY([Designs];[Designs]DesignNum=$designs{1})
+		: (Size of array($designs)=2)
+			QUERY([Designs];[Designs]DesignNum=$designs{1};*)
+			QUERY([Designs]; | ;[Designs]DesignNum=$designs{2})
+		: (Size of array($designs)>2)
+			$n:=1
+			Case of 
+				: ($n=1)
+					QUERY([Designs];[Designs]DesignNum=$designs{1};*)
+				: ($n=Size of array($designs))
+					QUERY([Designs]; | ;[Designs]DesignNum=$designs{$n})
+				Else 
+					QUERY([Designs]; | ;[Designs]DesignNum=$designs{$n};*)
+			End case 
+	End case 
+	
+	
+Else 
+	QUERY([Designs];[Designs]DesignNum=vsQDesign)
+End if 
+
+If (vAddTo=1)
+	CREATE SET([Designs];"temp")
+	UNION("temp";"designs";"designs")
+	USE SET("designs")
+	CLEAR SET("designs")
+	CLEAR SET("temp")
+	vsQDesign:=""
+	vsQStyle:=""
+	GOTO OBJECT(vsQDesign)
+End if 
+
+SET WINDOW TITLE("Design Library: "+String(Records in selection([Designs]))+" of "+String(Records in table([Designs])))

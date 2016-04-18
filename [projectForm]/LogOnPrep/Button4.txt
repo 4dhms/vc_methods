@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($count;$i)
+C_BOOLEAN($process)
+
+$count:=Count in array(afLogOn;True)
+
+If ($count<1)
+	WinChoice ("Update all lines?")
+	If (ok=1)
+		$process:=True
+		$i:=1
+		For ($i;1;Size of array(afLogOn))
+			afLogOn{$i}:=True
+		End for 
+	End if 
+Else 
+	WinChoice ("Update these "+String($count)+" lines or all "+String(Size of array(asStyleNumbers))+"?";String($count);"All";"Cancel")
+	If (ok=1)
+		$process:=True
+		If (bchoice2=1)
+			$i:=1
+			For ($i;1;Size of array(afLogOn))
+				If (adActionDate{$i}<Current date(*))
+					afLogOn{$i}:=True
+				End if 
+			End for 
+		End if 
+	Else 
+		$process:=False
+	End if 
+End if 
+$i:=1
+For ($i;1;Size of array(alXBG))
+	If (afLogOn{$i}=True) & (alXBG{$i}=16711690)
+		afLogOn{$i}:=False
+	End if 
+End for 
+
+If ($process)
+	LogOn_Update 
+	vsQStyle:=""
+End if 
+
+  //LogOn_PrintSpread

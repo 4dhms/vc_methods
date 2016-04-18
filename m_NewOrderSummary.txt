@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		WinPrompt ("This report is unavailable at this time.")
+	: (<>vlNewOrdSum>0)
+		SHOW PROCESS(<>vlNewOrdSum)
+		BRING TO FRONT(<>vlNewOrdSum)
+	: (<>vlNewOrdSum=0)
+		<>vlNewOrdSum:=New process("WH_NewOrderReport";0;"Summary")
+	Else 
+		SHOW PROCESS(<>vlNewOrdSum)
+		HIDE PROCESS(<>vlNewOrdSum)
+		BRING TO FRONT(<>vlNewOrdSum)
+End case 

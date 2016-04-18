@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$top)
+
+If (Screen width>1150)
+	$left:=(Screen width/2)+450
+Else 
+	$left:=Screen width-160
+End if 
+
+If (Screen height>725)
+	$top:=(Screen height/2)-330
+Else 
+	$top:=50
+End if 
+
+Open window($left;$top;$left+150;$top+120;1984;"";"WincBox")
+DIALOG("Calendar")
+CLOSE WINDOW
+
+<>vlSLRCal:=0

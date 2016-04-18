@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtPart1:=""
+vtPart2:=""
+vtPart3:=""
+vtPart4:=""
+
+Phonebook_Edit 

@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbCostOther=1)
+	cbCostLA:=0
+	cbCostNY:=0
+	[CostSheets]OtherShip:=""
+End if 
+OBJECT SET VISIBLE([CostSheets]OtherShip;cbCostOther=1)
+OBJECT SET ENTERABLE([CostSheets]OtherShip;cbCostOther=1)

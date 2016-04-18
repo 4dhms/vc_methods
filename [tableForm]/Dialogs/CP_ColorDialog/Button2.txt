@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_PICTURE($blank)
+C_LONGINT($tix)
+
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber)
+If (Records in selection([ColorPrintNumber])=0) | (Not([ColorPrintNumber]Image))
+	WinPrompt ("There is no image of print "+vsCPNumber)
+Else 
+	GET PICTURE FROM LIBRARY("empty.jpg";vxSketch)
+	Picture_Get ([ColorPrintNumber]CPNumberKey;"CP")
+	$tix:=Tickcount
+	
+	Repeat 
+		vxSketch:=<>vxSketch
+	Until (Picture size(vxSketch)>1800) | (Tickcount-$tix>60)
+	
+	If (Picture size(vxSketch)>10)
+		Center Window (300;300;1;"")
+		DIALOG([Dialogs];"Print.i")
+		CLOSE WINDOW
+	Else 
+		vxSketch:=$blank
+	End if 
+End if 
+

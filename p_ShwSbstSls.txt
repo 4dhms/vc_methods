@@ -1,0 +1,8 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //This shows a subset in HMS Orders
+If (Records in set("UserSet")>0)
+	USE SET("UserSet")
+	SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+Else 
+	ALERT("Please highlight some records first.")
+End if 

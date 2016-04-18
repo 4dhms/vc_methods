@@ -1,0 +1,15 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+QUERY([StyleNumberGen];[StyleNumberGen]StyleNumber=<>vsStyleNumber)
+Case of 
+	: (Length([Samples]StyleNum)>10)
+		WinPrompt ("Style number can not exceed ten (10) characters.")
+		[Samples]StyleNum:=Substring([Samples]StyleNum;1;10)
+		
+	: (Records in selection([StyleNumberGen])<1)
+		WinChoice ("Style number "+<>vsStyleNumber+" doesn't exist in the style book. Do you want to add it?")
+		If (ok=1)
+			p_GetStyleNumber 
+		Else 
+			<>vsStyleNumber:=""
+		End if 
+End case 

@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Customers];[Customers]CustomerName="@ ")
+If (Records in selection([Customers])>0)
+	$i:=1
+	FIRST RECORD([Customers])
+	For ($i;1;Records in selection([Customers]))
+		[Customers]CustomerName:=Substring([Customers]CustomerName;1;Length([Customers]CustomerName)-1)
+		SAVE RECORD([Customers])
+		NEXT RECORD([Customers])
+	End for 
+End if 
+
+QUERY([Customers];[Customers]CustomerName=" @")
+If (Records in selection([Customers])>0)
+	$i:=1
+	FIRST RECORD([Customers])
+	For ($i;1;Records in selection([Customers]))
+		[Customers]CustomerName:=Substring([Customers]CustomerName;2;999)
+		SAVE RECORD([Customers])
+		NEXT RECORD([Customers])
+	End for 
+End if 

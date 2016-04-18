@@ -1,0 +1,71 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($size;$process)
+C_TEXT($user)
+C_TEXT($init)
+C_TEXT($procname)
+C_PICTURE(vxSketch)
+C_TEXT($path)
+C_BOOLEAN($continue)
+C_BOOLEAN($continue)
+
+If (Locked([Designs]))
+	LOCKED BY([Designs];$process;$user;$init;$procname)
+	WinPrompt ("D/N "+[Designs]DesignNum+" is locked on "+$user+"'s machine.)")
+Else 
+	
+	WinChoice ("Do you want to import from file, or paste?";"Import";"Copy";"Paste";"Cancel")
+	If (ok=1)
+		If (bChoice2=1)
+			SET PICTURE TO PASTEBOARD([Designs]Sketch)
+			<>xSketch:=[Designs]Sketch
+		Else 
+			Case of 
+				: (bChoice3=1)
+					[Designs]Sketch:=<>xSketch
+					[Designs]SketchProcessed:=False
+					SAVE RECORD([Designs])
+					
+				Else 
+					vhDocRef:=Open document("")
+					If (ok=1)
+						CLOSE DOCUMENT(vhDocRef)
+						
+						$path:=Document
+						
+						READ PICTURE FILE($path;vxSketch)
+						$size:=Picture size(vxSketch)
+						
+						If ($size>70000)
+							Picture_Scale 
+						End if 
+						If (Picture size(vxSketch)>128000)
+							WinPrompt ("Picture is too large at "+String(Int(Picture size(vxSketch)/1000))+"K")
+							  //GET PICTURE FROM LIBRARY(879;[Designs]Sketch)
+						Else 
+							[Designs]Sketch:=vxSketch
+							[Designs]PictureSIze:=Picture size([Designs]Sketch)
+							[Designs]SketchProcessed:=True
+							[Designs]History:=Current user+" "+String(Current date(*))+" "+String(Current time(*))+"  Sketch imported"+Char(13)+Char(13)+[Designs]History
+							SAVE RECORD([Designs])
+						End if 
+						
+						  //End if 
+					End if 
+			End case 
+			
+			
+			[Designs]PictureSIze:=Picture size([Designs]Sketch)
+			[Designs]ArchivedPict:=False
+			SAVE RECORD([Designs])
+			  //If (Size of array(◊asDN)>0)
+			  //WinChoice ("Do you want to update related designs?";"Yes";"No")
+			  //If (ok=1)
+			  //Design_BatchSketch 
+			  //End if 
+			  //End if 
+		End if 
+	End if 
+End if 
+If (Table name(Current form table)#"Dialogs")
+	  //$backup:=Execute on server("Picture_Backup";64*1024;"PictureBackup")
+End if 

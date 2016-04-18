@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_TEXT($request)
+
+If ([ColorPrintNumber]CPType#2) | ([ColorPrintNumber]SentTo#"")
+	$continue:=True
+Else 
+	$request:=Request("Where is this print going to be printed?";"";"Save";"Don't know")
+	If (ok=1)
+		[ColorPrintNumber]SentTo:=$request
+		$continue:=True
+	Else 
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	vsCPNumber:=[ColorPrintNumber]CPNumber
+	If (ColorPrint_Mandatories )
+		[ColorPrintNumber]NewCP:=False
+		SAVE RECORD([ColorPrintNumber])
+		RELATE MANY([ColorPrintNumber]CPNumberKey)
+		<>vNewCPNumber:=[ColorPrintNumber]CPNumber
+		If (Records in set("Prints")>0)
+			ADD TO SET([ColorPrintNumber];"Prints")
+			USE SET("Prints")
+			CLEAR SET("Prints")
+		End if 
+		ACCEPT
+	End if 
+End if 

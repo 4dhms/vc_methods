@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vStyle:=""
+FORM SET INPUT([Dialogs];"QuikDC")
+Center Window (600;500;0;"")
+DIALOG([Dialogs];"QuikDC")
+CLOSE WINDOW
+<>vlQuikDC:=0
+

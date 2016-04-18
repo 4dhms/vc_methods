@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlFabricTrack)
+  //
+Case of 
+	: (<>vlFabricTrack>0)
+		SHOW PROCESS(<>vlFabricTrack)
+		BRING TO FRONT(<>vlFabricTrack)
+	: (<>vlFabricTrack=0)
+		<>vlFabricTrack:=New process("p_FabricTrack";0;"FabricTrack")
+	Else 
+		SHOW PROCESS(<>vlFabricTrack)
+		BRING TO FRONT(<>vlFabricTrack)
+End case 

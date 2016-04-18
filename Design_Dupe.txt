@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($stripped)
+C_BOOLEAN($continue)
+C_TEXT($oldNumber;vtHistory)
+
+WinChoice ("Are you sure you want to duplicate this design?")
+If (ok=1)
+	If (Design_Mandatory )
+		  //This duplicates a record in Design Library
+		If (Records in set("DesSet")<1)
+			CREATE SET([Designs];"DesSet")
+		End if 
+		
+		$oldNumber:=[Designs]DesignNum
+		$stripped:=String(Num([Designs]DesignNum))
+		
+		CREATE SET([Designs];"DesSet")
+		CANCEL
+		
+		WinChoice ("Do you want to create a new design number or add a suffix to this one?";"New";"Suffix")
+		If (ok=1)
+			vsDesignNumber:=""
+			Design_GetNumber 
+			$continue:=True
+		Else 
+			<>asCategory:=0
+			vsDesignNumber:=StripToNumber ([Designs]DesignNum)
+			vsCategory:=[Designs]Division
+			Design_GetNumber 
+			$continue:=True
+			
+		End if 
+		
+		If (ok=1) & ($continue)
+			QUERY([Designs];[Designs]DesignNum=vsDesignNumber)
+			
+			If (Records in selection([Designs])>0)
+				WinPrompt (vsDesignNumber+" already exists.")
+				QUERY([Designs];[Designs]DesignNum=$oldNumber)
+			Else 
+				QUERY([Designs];[Designs]DesignNum=$oldNumber)
+				
+				SET WINDOW TITLE("Duplicating "+[Designs]DesignNum)
+				DUPLICATE RECORD([Designs])
+				[Designs]Provenance:="Design Number duped by "+Current user+" "+vtHistory
+				If ([Designs]DivisionCodeN="05-Cupio@")
+					[Designs]DivisionCodeN:="03-Cupio"
+				End if 
+				If ([Designs]PofE="")
+					[Designs]Dupe:=True
+				End if 
+				[Designs]ArchiveNumber:=0
+				[Designs]ArchivedPict:=False
+				[Designs]DesignNum:=vsDesignNumber
+				[Designs]Report:=False
+				[Designs]DesEntryDate:=Current date(*)
+				[Designs]Season:=""
+				[Designs]SeasonName:=""
+				[Designs]SeasonYear:=""
+				[Designs]SpecialDevelopment:=False
+				SAVE RECORD([Designs])
+				vfNewDesign:=True
+				ADD TO SET([Designs];"DesSet")
+				
+				MODIFY RECORD([Designs];*)
+				If (Records in set("DesSet")>0)
+					ADD TO SET([Designs];"DesSet")
+					SET WINDOW TITLE("Design Library: "+String(Records in selection([Designs]))+" of "+String(Records in table([Designs])))
+					USE SET("DesSet")
+				End if 
+			End if 
+		End if 
+	End if 
+End if 

@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+CREATE SET([CS_Status];"Statoi")
+CREATE RECORD([CS_Status])
+[CS_Status]ActionStatus:="Change Spec"
+[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+[CS_Status]ActionDate:=Current date(*)
+[CS_Status]CS_Sort:=[CS_Lines]CS_Sort
+[CS_Status]OKby:=Current user
+[CS_Status]Notes:="To: "+$2
+If ($3)
+	[CS_Status]HMSOrderNumber:=<>vlOrderNumber
+End if 
+
+SAVE RECORD([CS_Status])
+ADD TO SET([CS_Status];"Statoi")
+USE SET("Statoi")
+CLEAR SET("Statoi")
+ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)

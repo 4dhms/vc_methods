@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+
+$line:=Num(Request("Line Number"))
+
+
+OBJECT SET SCROLL POSITION([SLRReporter];$line;*)

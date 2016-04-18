@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	OBJECT SET TITLE(*;"Header1";"")
+	vfNew:=False
+	cbDivision:=1
+	Report_InitSubs 
+	Report_ArrayInit (0)
+	  //Report_Query 
+	OBJECT SET ENABLED(bPrint;False)
+	Report_LoadArrays 
+	pOne:=0
+	pTwo:=0
+	pThree:=0
+	pFour:=1
+End if 

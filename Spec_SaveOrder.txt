@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([SpecLibrary];[SpecLibrary]PartKey=vlRowCount)
+$i:=1
+FIRST RECORD([SpecLibrary])
+For ($i;1;Records in selection([SpecLibrary]))
+	If (Find in array(asList2;[SpecLibrary]SpecEnglish)<1)
+		[SpecLibrary]PartKey:=0
+		SAVE RECORD([SpecLibrary])
+	End if 
+	NEXT RECORD([SpecLibrary])
+End for 
+
+$i:=1
+For ($i;1;Size of array(asList2))
+	QUERY([SpecLibrary];[SpecLibrary]SpecEnglish=asList2{$i})
+	[SpecLibrary]PartKey:=vlRowCount
+	[SpecLibrary]SortOrder:=$i
+	SAVE RECORD([SpecLibrary])
+End for 
+UNLOAD RECORD([SpecLibrary])

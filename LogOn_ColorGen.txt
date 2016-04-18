@@ -1,0 +1,193 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($color;$rem;$test1;$test2;$thisone;$root;$lead)
+C_LONGINT($c;$d;$n;$i)
+C_BOOLEAN($done;$multi)
+
+If (Not(LogOn_ColorPreX ($1)))
+	ARRAY TEXT($built;0)
+	ARRAY TEXT($colorlist;0)
+	ARRAY TEXT($strip;0)
+	
+	APPEND TO ARRAY($colorlist;"navy")
+	APPEND TO ARRAY($colorlist;"jade")
+	APPEND TO ARRAY($colorlist;"black")
+	APPEND TO ARRAY($colorlist;"corla")
+	APPEND TO ARRAY($colorlist;"green")
+	APPEND TO ARRAY($colorlist;"olive")
+	APPEND TO ARRAY($colorlist;"blue")
+	APPEND TO ARRAY($colorlist;"grey")
+	APPEND TO ARRAY($colorlist;"pink")
+	APPEND TO ARRAY($colorlist;"olive")
+	APPEND TO ARRAY($colorlist;"purple")
+	APPEND TO ARRAY($colorlist;"ivory")
+	APPEND TO ARRAY($colorlist;"khaki")
+	APPEND TO ARRAY($colorlist;"lime")
+	APPEND TO ARRAY($colorlist;"adobe")
+	APPEND TO ARRAY($colorlist;"fern")
+	APPEND TO ARRAY($colorlist;"violet")
+	APPEND TO ARRAY($colorlist;"cream")
+	APPEND TO ARRAY($colorlist;"almond")
+	APPEND TO ARRAY($colorlist;"aloe")
+	APPEND TO ARRAY($colorlist;"amber")
+	APPEND TO ARRAY($colorlist;"amethyst")
+	APPEND TO ARRAY($colorlist;"bronze")
+	APPEND TO ARRAY($colorlist;"silver")
+	APPEND TO ARRAY($colorlist;"cobalt")
+	APPEND TO ARRAY($colorlist;"gold")
+	APPEND TO ARRAY($colorlist;"brass")
+	APPEND TO ARRAY($colorlist;"rose")
+	APPEND TO ARRAY($colorlist;"apple")
+	APPEND TO ARRAY($colorlist;"teal")
+	APPEND TO ARRAY($colorlist;"apricott")
+	APPEND TO ARRAY($colorlist;"aqua")
+	APPEND TO ARRAY($colorlist;"orange")
+	APPEND TO ARRAY($colorlist;"blonde")
+	APPEND TO ARRAY($colorlist;"heather")
+	APPEND TO ARRAY($colorlist;"auburn")
+	APPEND TO ARRAY($colorlist;"yellow")
+	APPEND TO ARRAY($colorlist;"banana")
+	APPEND TO ARRAY($colorlist;"lemon")
+	APPEND TO ARRAY($colorlist;"forest")
+	APPEND TO ARRAY($colorlist;"natural")
+	APPEND TO ARRAY($colorlist;"sand")
+	APPEND TO ARRAY($colorlist;"denim")
+	APPEND TO ARRAY($colorlist;"charcoal")
+	
+	APPEND TO ARRAY($strip;"slub")
+	APPEND TO ARRAY($strip;"shorts")
+	
+	C_TEXT($color;$rem;$thisone;$root;$lead)
+	C_LONGINT($c;)
+	
+	ARRAY TEXT($built;0)
+	
+	$color:=$1
+	
+	$color:=Substring($color;Position(" ";$color)+1;999)
+	
+	$c:=Position("[c]";$color)
+	
+	If ($c<1)
+		  //$color:=Substring($color;Position(" ";$color)+1;999)
+		APPEND TO ARRAY($built;Replace string($color;" ";""))
+	Else 
+		APPEND TO ARRAY($built;Substring($color;1;$c-2))
+		$rem:=Substring($color;$c+4;999)
+		$rem:=Substring($rem;Position(" ";$rem)+1;999)
+		$thisone:=Substring($rem;1;$c-1)
+		APPEND TO ARRAY($built;Replace string($thisone;" ";""))
+		
+		$c:=Position("[c]";$rem)
+		If ($c<1)
+			APPEND TO ARRAY($built;Replace string($rem;" ";""))
+		Else 
+			$rem:=Substring($color;$c+4;999)
+			$rem:=Substring($rem;Position(" ";$rem)+1;999)
+			$thisone:=Substring($rem;1;$c-1)
+			APPEND TO ARRAY($built;Replace string($thisone;" ";""))
+		End if 
+	End if 
+	  //ALERT(String(Size of array($built)))
+	  //TRACE
+	  //ALERT("1 "+$built{1}+"  2 "+$built{2}+"  3 "+$built{3})
+	
+	$i:=1
+	For ($i;1;Size of array($built))
+		$n:=1
+		For ($n;1;Size of array($strip))
+			$built{$i}:=Replace string($built{$i};$strip{$n};"")
+		End for 
+	End for 
+	
+	$color:=""
+	
+	If (Size of array($built)>1)
+		$test1:=Replace string($built{1};" ";"")
+		$test2:=Replace string($built{2};" ";"")
+	End if 
+	
+	  //singleton
+	Case of 
+		: (Size of array($built)=1)
+			$multi:=False
+		: (Size of array($built)>1) & ($test1=$test2)
+			$multi:=False
+		Else 
+			$multi:=True
+	End case 
+	
+	$i:=1
+	For ($i;1;Size of array($built))
+		$n:=1
+		For ($n;1;Size of array($colorlist))
+			If (Position($colorlist{$n};$built{$i})>0)
+				If ($multi)
+					$built{$i}:=$colorlist{$n}
+				End if 
+				If ($i=1)
+					$root:=$colorlist{$n}
+				End if 
+			End if 
+		End for 
+	End for 
+	
+	
+	If ($multi)
+		$i:=1
+		For ($i;1;Size of array($built))
+			Case of 
+				: ($i=1)
+					$color:=Uppercase($built{$i})
+				: ($i=2) & ($built{1}#$built{2})
+					$color:=Uppercase($color+$built{2})
+			End case 
+		End for 
+	Else 
+		$color:=$built{1}
+	End if 
+	
+	vtColor:=Replace string($color;" ";"")
+	vtColor:=LogOn_ColorShrink (vtColor;"dark";"dk";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"ss";"s";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"heather";"hthr";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"natural";"natrl";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"bright";"brt";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"able";"ble";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"horizon";"hor";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"outmeal";"oatml";10)
+	
+	vtColor:=LogOn_ColorShrink (vtColor;"ss";"s";10)
+	vtColor:=LogOn_ColorShrink (vtColor;"ee";"e";10)
+	
+	If (Length(vtColor)>10)
+		
+		$c:=Position($root;vtColor)
+		$d:=10-Length($root)
+		
+		If ($c>0)
+			If ($c=1)
+				$lead:=Replace string(vtColor;$root;"")
+			Else 
+				$lead:=Substring(vtColor;1;$c-1)
+			End if 
+			
+			$lead:=LogOn_ColorShrink ($lead;"u";"";$d)
+			$lead:=LogOn_ColorShrink ($lead;"o";"";$d)
+			$lead:=LogOn_ColorShrink ($lead;"i";"";$d)
+			$lead:=LogOn_ColorShrink ($lead;"a";"";$d)
+			$lead:=LogOn_ColorShrink ($lead;"e";"";$d)
+			$lead:=Substring($lead;1;$d)
+			
+			If ($c=1)
+				vtColor:=$root+$lead
+			Else 
+				vtColor:=$lead+$root
+			End if 
+		Else 
+			vtColor:=Substring(vtColor;1;10)
+		End if 
+	End if 
+End if 
+
+$0:=Uppercase(vtColor)
+

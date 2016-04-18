@@ -1,0 +1,17 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+SeasonArrays 
+
+Case of 
+	: (User in group(Current user;"Cupio")) | (User in group(Current user;"SpenseKnits"))
+		WinPrompt ("This report is unavailable at this time.")
+	Else 
+		Case of 
+			: (<>UsageProc=0) & (Current user="Designer") | (Current user="Angie") | (Current user="Spenser") & (Not(Shift down)) & (<>vlUsageRouter#2)
+				<>UsageProc:=New process("PrintUsage_Win";0;"Usage")
+			: (<>UsageProc=0)
+				<>UsageProc:=New process("UsageWin";0;"Usage")
+			Else 
+				SHOW PROCESS(<>UsageProc)
+				BRING TO FRONT(<>UsageProc)
+		End case 
+End case 

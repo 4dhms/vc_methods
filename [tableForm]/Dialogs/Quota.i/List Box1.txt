@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($type)
+
+$type:=Replace string(asDutyType{asDutyType};" (knit)";"")
+$type:=Replace string($type;" (woven)";"")
+
+C_LONGINT(<>vlDuty)
+
+QUERY([Quota];[Quota]HTSCode=asHTSCode{asHTSCode})
+QUERY SELECTION([Quota];[Quota]QuotaType=$type)
+If (Form event=On Double Clicked)
+	Case of 
+		: (<>vfDCS)
+			vtItemName:="Duty ("+<>asCategory{<>asCategory}+")"
+			vrCCostPrice:=arDutyRates{arDutyRates}
+			DCS_Show 
+			CANCEL
+		: (<>vlDuty>0)
+			asList1:=Find in array(asList1;$type)
+			Case of 
+				: ([Quota]KW="K")
+					asKWCS:=2
+				: ([Quota]KW="W")
+					asKWCS:=3
+				Else 
+					asKWCS:=1
+			End case 
+			FORM GOTO PAGE(2)
+		Else 
+			<>vlQuotaProc:=0
+			CANCEL
+			
+			vlColN:=vlTargetCol
+			Cost_QuotaGet 
+			Cost_CalcDutyAmt 
+			Cost_EntryCalculate 
+			Cost_UpdateCat (<>QuotaRouter;<>vsQuotaCat)
+			UNLOAD RECORD([Quota])
+			CALL PROCESS(Current process)
+			
+	End case 
+End if 

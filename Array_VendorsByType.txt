@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //creates array library
+ARRAY TEXT(asFabSpler;0)
+ARRAY TEXT(asButSpler;0)
+ARRAY TEXT(asTrmSpler;0)
+QUERY([Vendors];[Vendors]Button=True)
+SELECTION TO ARRAY([Vendors]VendorName;asButSpler)
+QUERY([Vendors];[Vendors]Trim=True)
+SELECTION TO ARRAY([Vendors]VendorName;asTrmSpler)
+QUERY([Vendors];[Vendors]Fabric=True)
+SELECTION TO ARRAY([Vendors]VendorName;asFabSpler)

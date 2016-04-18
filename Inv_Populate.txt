@@ -1,0 +1,31 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($pure)
+
+If (vdInvdate#!00-00-00!)
+	asPrevDate{1}:=String(vdInvDate)
+End if 
+If (vlInvQty>0)
+	asPrevQty{1}:=String(vlInvQty;"#,###,##0")
+End if 
+If (vrInvAmt>0)
+	If (arPrice>0)
+		$pure:=vlInvQty*arPrice{arPrice}
+	Else 
+		$pure:=vlInvQty*arPrice{1}
+	End if 
+	
+	  //$var:=vrInvAmt/$pure
+	  //If ($var<0.9) | ($var>1.1)
+	  //WinChoice ("Invoice Amount is "+String(Round($var*100;0))+"% of"+Char(13)+"Quantity X Price";"Allow";"Stop")
+	  //If (ok=1)
+	  //$calc:=True
+	  //End if 
+	  //Else 
+	  //$calc:=True
+	  //End if 
+	  //
+	  //If ($calc)
+	asPrevAmt{1}:=String(vrInvAmt;"###,##0.00")
+	  //End if 
+End if 
+

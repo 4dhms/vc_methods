@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_LONGINT($empty;$order;$pagenumber;$i;$c;$m)
+
+$pagenumber:=alHistKey{alHistKey}
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey;*)
+QUERY([DesignLineIncluded]; & ;[DesignLineIncluded]PageNumber=$pagenumber)
+
+If ([DesignLines]8Up)
+	$c:=8
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber<9)
+	If (Records in selection([DesignLineIncluded])>=8)
+		WinPrompt ("This page is full. Find space on another one.")
+	Else 
+		$continue:=True
+	End if 
+Else 
+	$c:=12
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber<13)
+	If (Records in selection([DesignLineIncluded])>=12)
+		WinPrompt ("This page is full. Find space on another one.")
+	Else 
+		$continue:=True
+	End if 
+End if 
+
+
+If ($continue)
+	ARRAY LONGINT($pages;0)
+	SELECTION TO ARRAY([DesignLineIncluded]ItemNumber;$pages)
+	$empty:=0
+	
+	$i:=1
+	For ($i;1;$c)
+		If (Find in array($pages;$i)<1) & ($empty=0)
+			$empty:=$i
+		End if 
+	End for 
+	
+	$order:=Num(Request("HMS Order Number:"))
+	If (ok=1)
+		QUERY([Orders];[Orders]OrderNum=$order)
+		If (Records in selection([Orders])=0)
+			WinPrompt ("Order #"+String($order)+" does not exist.")
+		Else 
+			CREATE RECORD([DesignLineIncluded])
+			If ([Orders]CancelMonth=!00-00-00!)
+				$m:=Month of([Orders]CancelDate)
+				If ($m=12)
+					[Orders]CancelMonth:=Date("12/31/"+String(Year of([Orders]CancelDate)))
+				Else 
+					[Orders]CancelMonth:=Date(String(Month of([Orders]CancelDate)+1)+"/1/"+String(Year of([Orders]CancelDate)))-1
+				End if 
+				SAVE RECORD([Orders])
+			End if 
+			[DesignLineIncluded]PageNumber:=$pagenumber
+			[DesignLineIncluded]ItemNumber:=$empty
+			[DesignLineIncluded]CancelDate:=[Orders]CancelMonth
+			[DesignLineIncluded]DesignNumber:=[Orders]DesignNumber
+			[DesignLineIncluded]DesignLineKey:=[DesignLines]DesignLineKey
+			[DesignLineIncluded]OrderNumber:=[Orders]OrderNum
+			[DesignLineIncluded]StyleNumber:=[Orders]StyleNumber
+			[DesignLines]Season:=[Orders]SeasonName+" "+[Orders]SeasonYear
+			[DesignLines]Division:=[Orders]OrderDivision
+			[DesignLineIncluded]Stock:=True
+			[DesignLineIncluded]MSRP:=[Orders]RetailPrice
+			[DesignLineIncluded]Price:=String(Round([Orders]RetailPrice/2;2);"###.00")
+			QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+			[DesignLineIncluded]Name:=[Designs]Description
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			[DesignLineIncluded]Fiber:=[OrdersFabricXRef]FabricName
+		End if 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		DL_PullColors (False)
+		SAVE RECORD([DesignLineIncluded])
+		UNLOAD RECORD([Orders])
+		DL_BuildPage ($pagenumber;True)
+	End if 
+End if 
+
+

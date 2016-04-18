@@ -1,0 +1,172 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$compID;$sortorder;$samplenumber;$batch)
+
+If (Records in selection([ComponentSheets])=0)
+	CS_GetSheet 
+End if 
+
+If (Table name(Current form table)="Orders")
+	$samplenumber:=Num([Orders]SGPO)*-1
+Else 
+	$samplenumber:=<>vlOrderNumber
+End if 
+$compID:=[ComponentSheets]CS_ID
+
+$i:=1
+For ($i;1;Size of array(alCompLineKey))
+	  //color keys
+	  //16765650 = new sample
+	  //16777170 = new order
+	  //14145535 = sample edit
+	  //13500370 = order edit
+	  //16711690 =  deleted
+	
+	QUERY([CS_Lines];[CS_Lines]CS_LineKey=alCompLineKey{$i})
+	
+	QUERY([CS_Tracking];[CS_Tracking]CS_LineKey=alCompLineKey{$i})
+	
+	
+	Case of 
+		: (alCompDeleted{$i}=16711690)  //deleted
+			If (<>vlOrderNumber>0)
+				CREATE RECORD([CS_OffOrder])
+				[CS_OffOrder]CL_LineKey:=alCompLineKey{$i}
+				[CS_OffOrder]HMSOrder:=<>vlOrderNumber
+				SAVE RECORD([CS_OffOrder])
+				Rev_CompChange ("Component deleted";"";asCompName{$i}+" deleted";->[Orders]OrderNum;->[Orders];<>vlOrderNumber)
+			Else 
+				Rev_CompChange ("Component deleted";"";asCompName{$i}+" deleted";->[Samples]SampleNumber;->[Samples];<>vlOrderNumber)
+				QUERY([CS_Lines];[CS_Lines]CS_LineKey=alCompLineKey{$i})
+				DELETE RECORD([CS_Lines])
+				
+			End if 
+		: (alCompDeleted{$i}=16765650) | (alCompDeleted{$i}=16777170)
+			
+			If (Records in selection([CS_Lines])=0) | (alCompLineKey{$i}=0)
+				CREATE RECORD([CS_Lines])
+				[CS_Lines]CS_ID:=$compID
+				[CS_Lines]CS_LineKey:=Sequence number([CS_Lines])
+				[CS_Lines]CS_Sort:=1000+[CS_Lines]CS_LineKey
+				[CS_Lines]FlagStatus:=1
+				[CS_Lines]Description:=atCompNote{$i}
+				
+				Case of 
+					: (alCompDeleted{$i}=16765650)  //new sample
+						vtOldData:=""
+						vtNewData:=asCompName{$i}
+						
+						Rev_LogChange ("Component";"Component added";$sampleNumber)
+						If (<>vlOrderNumber>0)
+							Rev_LogChange ("Component";"Component added";<>vlOrderNumber)
+							$batch:=New process("Comp_BatchHistory";0;"BatchHistory";[Orders]SGPO;"Component";"";asCompName{$i};"Component Added")
+						Else 
+							$batch:=New process("Comp_BatchHistory";0;"BatchHistory";String([Samples]SampleNumber);"Component Added";"";asCompName{$i};"Component Added")
+						End if 
+						
+					: (alCompDeleted{$i}=16777170)  //new order
+						[CS_Lines]OrderNumber:=alCompOrderNumber{$i}
+						vtOldData:=""
+						vtNewData:=asCompName{$i}+" (order only)"
+						Rev_LogChange (asCompName{$i};"Component added";<>vlOrderNumber)
+				End case 
+				
+				[CS_Lines]Count:=alCompQty{$i}
+				[CS_Lines]ComponentName:=asCompName{$i}
+				[CS_Lines]Minidescription:=asCompMini{$i}
+				[CS_Lines]ArticleNumber:=asCompArt{$i}
+				[CS_Lines]Source:=asCompSource{$i}
+				
+				SAVE RECORD([CS_Lines])
+				alCompLineKey{$i}:=$compID
+				
+				CREATE RECORD([CS_Status])
+				[CS_Status]OKby:=Current user
+				[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+				[CS_Status]ActionDate:=Current date(*)
+				[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+				[CS_Status]CS_Sort:=[CS_Lines]CS_Sort
+				[CS_Status]ActionStatus:="Component added"
+				[CS_Status]Notes:=atCompNote{$i}
+				SAVE RECORD([CS_Status])
+			Else 
+				
+				  //makes sure there is a status record
+				QUERY([CS_Status];[CS_Status]CS_LineKey=[CS_Lines]CS_LineKey)
+				If (Records in selection([CS_Status])=0)
+					CREATE RECORD([CS_Status])
+					[CS_Status]OKby:=Current user
+					[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+					[CS_Status]ActionDate:=Current date(*)
+					[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+					[CS_Status]CS_Sort:=[CS_Lines]CS_Sort
+					[CS_Status]ActionStatus:="Component added"
+					[CS_Status]Notes:=atCompNote{$i}
+					SAVE RECORD([CS_Status])
+				End if 
+				
+			End if 
+			
+		: (alCompDeleted{$i}=13500370)
+			$sortorder:=[CS_Lines]CS_Sort
+			If ([CS_Lines]OrderNumber=0)
+				If ([CS_Lines]Count>0)
+					vtOldData:=String([CS_Lines]Count)+" "+[CS_Lines]ComponentName
+					vtNewData:=String(alCompQty{$i})+" "+asCompName{$i}
+				Else 
+					vtOldData:=[CS_Lines]ComponentName
+					vtNewData:=asCompName{$i}
+				End if 
+				
+				CREATE RECORD([CS_Lines])
+				[CS_Lines]CS_ID:=$compID
+				[CS_Lines]CS_LineKey:=Sequence number([CS_Lines])
+				[CS_Lines]CS_Sort:=$sortOrder
+				[CS_Lines]FlagStatus:=1
+				[CS_Lines]Description:=atCompNote{$i}
+				[CS_Lines]OrderNumber:=alCompOrderNumber{$i}
+				[CS_Lines]Count:=alCompQty{$i}
+				[CS_Lines]ComponentName:=asCompName{$i}
+				[CS_Lines]Minidescription:=asCompMini{$i}
+				[CS_Lines]ArticleNumber:=asCompArt{$i}
+				[CS_Lines]Source:=asCompSource{$i}
+				SAVE RECORD([CS_Lines])
+				Rev_LogChange (asCompName{$i};"Order changed";<>vlOrderNumber)
+				
+				CREATE RECORD([CS_OffOrder])
+				[CS_OffOrder]CL_LineKey:=alCompLineKey{$i}
+				[CS_OffOrder]HMSOrder:=<>vlOrderNumber
+				SAVE RECORD([CS_OffOrder])
+				
+				CREATE RECORD([CS_Status])
+				[CS_Status]OKby:=Current user
+				[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+				[CS_Status]ActionDate:=Current date(*)
+				[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+				[CS_Status]CS_Sort:=[CS_Lines]CS_Sort
+				[CS_Status]ActionStatus:="Component added"
+				[CS_Status]Notes:=atCompNote{$i}
+				SAVE RECORD([CS_Status])
+			Else 
+				Rev_CompChange (asCompName{$i};[CS_Lines]ComponentName;asCompName{$i};->[CS_Lines]ComponentName;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+" Quantity";String([CS_Lines]Count);String(alCompQty{$i});->[CS_Lines]Count;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+" Article";[CS_Lines]ArticleNumber;asCompArt{$i};->[CS_Lines]ArticleNumber;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+" Descripton";[CS_Lines]Minidescription;asCompMini{$i};->[CS_Lines]Minidescription;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+" Source";[CS_Lines]Source;asCompSource{$i};->[CS_Lines]Source;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+" Note";[CS_Lines]Description;atCompNote{$i};->[CS_Lines]Description;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+" Status";[CS_Lines]CurrentStatus;asCompStatus{$i};->[CS_Lines]CurrentStatus;->[CS_Lines];<>vlOrderNumber)
+				Rev_CompChange (asCompName{$i}+"Status Date";String([CS_Lines]CurrentStatusDate);String(adCompStatusDate{$i});->[CS_Lines]CurrentStatusDate;->[CS_Lines];<>vlOrderNumber)
+			End if 
+			
+		: (alCompDeleted{$i}=14145535)
+			Rev_CompChange (asCompName{$i};[CS_Lines]ComponentName;asCompName{$i};->[CS_Lines]ComponentName;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+" Quantity";String([CS_Lines]Count);String(alCompQty{$i});->[CS_Lines]Count;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+" Article";[CS_Lines]ArticleNumber;asCompArt{$i};->[CS_Lines]ArticleNumber;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+" Descripton";[CS_Lines]Minidescription;asCompMini{$i};->[CS_Lines]Minidescription;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+" Source";[CS_Lines]Source;asCompSource{$i};->[CS_Lines]Source;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+" Note";[CS_Lines]Description;atCompNote{$i};->[CS_Lines]Description;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+" Status";[CS_Lines]CurrentStatus;asCompStatus{$i};->[CS_Lines]CurrentStatus;->[CS_Lines];$samplenumber)
+			Rev_CompChange (asCompName{$i}+"Status Date";String([CS_Lines]CurrentStatusDate);String(adCompStatusDate{$i});->[CS_Lines]CurrentStatusDate;->[CS_Lines];$samplenumber)
+	End case 
+End for 
+
+UNLOAD RECORD([CS_OffOrder])

@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$right;$top;$bottom;$w;$h)
+C_LONGINT($Rleft;$Rright;$Rtop;$Rbottom)
+C_BOOLEAN($largewindow)
+
+GET WINDOW RECT($left;$top;$right;$bottom)
+
+Case of 
+	: ($2="Details")
+		OBJECT GET COORDINATES([CostSheets]Details;$Rleft;$Rtop;$Rright;$Rbottom)
+	: ($2="Miscellany Notes")
+		OBJECT GET COORDINATES([CostSheets]MiscNotes;$Rleft;$Rtop;$Rright;$Rbottom)
+	: ($2="Shipping Notes")
+		OBJECT GET COORDINATES([CostSheets]ShipNotes;$Rleft;$Rtop;$Rright;$Rbottom)
+	: ($2="NY Misc Notes")
+		OBJECT GET COORDINATES([CostSheets]NYMiscNotes;$Rleft;$Rtop;$Rright;$Rbottom)
+	: ($2="FOB Notes")
+		OBJECT GET COORDINATES([CostSheets]FOBNotes;$Rleft;$Rtop;$Rright;$Rbottom)
+	: ($2="Quota Notes")
+		OBJECT GET COORDINATES([CostSheets]SpecialNotes;$Rleft;$Rtop;$Rright;$Rbottom)
+	: ($2="Status Report Notes")
+		OBJECT GET COORDINATES([Orders]ProdComments;$Rleft;$Rtop;$Rright;$Rbottom)
+		$largewindow:=True
+End case 
+
+Case of 
+	: (FORM Get current page=7)
+		$Rleft:=767
+	: (FORM Get current page=8)
+		If ($2="Miscellany Notes") | ($2="FOB Notes") | ($2="Shipping Notes")
+			$Rtop:=452
+		Else 
+			$Rtop:=391
+		End if 
+End case 
+
+$left:=$left+$Rleft
+$top:=$top+$Rtop
+
+Case of 
+	: ($largewindow)
+		$h:=500
+		$w:=600
+	Else 
+		$h:=140
+		$w:=215
+End case 
+
+Case of 
+	: (Screen height-$top<$h)
+		$top:=Screen height-($h+20)
+	: ($top<50)
+		$top:=50
+End case 
+
+Case of 
+	: (Screen width-$left<215)
+		$left:=Screen width-225
+	: ($left<10)
+		$left:=10
+End case 
+
+
+If ($2="@Fabric")
+	<>vtNotes:=$1->
+Else 
+	<>vtNotes:=$1->
+	vtSubject:=$2
+End if 
+
+Open window($left;$top;$left+$w;$top+$h;1)
+Case of 
+	: ($largewindow)
+		DIALOG([Dialogs];"FieldWindowLarge")
+	Else 
+		DIALOG([Dialogs];"FieldWindow")
+End case 
+CLOSE WINDOW
+
+$1->:=<>vtNotes
+SAVE RECORD([Orders])
+

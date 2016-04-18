@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSubCC;2)
+C_TEXT($message)
+
+If ([Orders]Customer="JC Retail") | ([Orders]Customer="J.C. Retail") | ([Orders]Customer="Wados@")
+	asSubCC{1}:="peter.goldberger@nubby.com"
+	asSubCC{2}:="phil@persinger.com"
+	
+	$message:="Style number: "+[Orders]StyleNumber+Char(13)
+	$message:=$message+"Design number: "+[Orders]DesignNumber+Char(13)
+	$message:=$message+"Order number: "+String([Orders]OrderNum)+Char(13)
+	$message:=$message+"Who: "+Current user+Char(13)
+	$message:=$message+"When: "+String(Current date(*))+"  "+String(Current time(*))+Char(13)+Char(13)
+	$message:=$message+"Units:  "+String([Orders]TotalOrderQuantity)+Char(13)
+	$message:=$message+"Price:  "+String([Orders]Price)
+	Mail_SimpleSend ("List";"None";"New "+[Orders]Customer+" Order";$message)
+End if 

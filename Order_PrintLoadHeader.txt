@@ -1,0 +1,23 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If ($1)
+	If (<>vlOrderNumber>0)
+		vOrd:=String([Orders]OrderNum)
+		<>vtCustomerStyle:=[Orders]CustomerStyle
+		<>vsStyleNumber:=[Orders]StyleNumber
+		<>vsDesignNumber:=[Orders]DesignNumber
+		vsFactory:=[Orders]Factory
+	Else 
+		<>vtCustomerStyle:=""
+		vOrd:="SG-"+String(Abs([Samples]SampleNumber))
+		<>vsStyleNumber:=[Samples]StyleNum
+		<>vsDesignNumber:=[Samples]DesignNum
+		vsFactory:=[Orders]Factory
+	End if 
+Else 
+	vOrd:=""
+	<>vtCustomerStyle:=""
+	<>vsStyleNumber:=""
+	<>vsDesignNumber:=""
+	vsFactory:=""
+End if 
+

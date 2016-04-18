@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>vlOrderNumber>0)
+	<>vsFactory:=[Orders]Factory
+	<>vsCustomer:=[Orders]Customer
+	<>vsLabel:=[Orders]Label
+	<>vsSource:=[Designs]Patt Srce
+	<>vlSGPO:=Num([Orders]SGPO)
+	<>vsDesignNumber:=[Orders]DesignNumber
+	<>vsKnitWoven:=[Orders]KWCnS
+	<>vdXFactory:=[Orders]ShipDateFactory
+	<>ComponentSheet:=False
+	<>vtCustomerStyle:=[Orders]CustomerStyle
+	<>vlTotal:=[Orders]TotalOrderQuantity
+	<>vfMasterSpec:=[Orders]MasterSpec
+	<>vfReorderPP:=[Orders]ReorderPP
+	SG_PO 
+Else 
+	<>vsFactory:=[Samples]SamGarFactry
+	<>vsCustomer:=[Samples]Customer
+	<>vsLabel:=[Samples]Label
+	<>vsSource:=[Designs]Patt Srce
+	<>vlSGPO:=Abs(<>vlOrderNumber)
+	<>vsDesignNumber:=[Samples]DesignNum
+	<>vsKnitWoven:=[Samples]KWCnS
+	<>vdXFactory:=[Samples]DueDate
+	<>vtCustomerStyle:=""
+	<>ComponentSheet:=False
+	<>vfReorderPP:=False
+End if 

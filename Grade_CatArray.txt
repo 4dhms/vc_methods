@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asGradeCat;0)
+ALL RECORDS([SpecGradeCats])
+ORDER BY([SpecGradeCats];[SpecGradeCats]GradeCatKey;>)
+SELECTION TO ARRAY([SpecGradeCats]ACatName;<>asGradeCat)
+INSERT IN ARRAY(<>asGradeCat;1;1)
+<>asGradeCat{1}:="Size Range"

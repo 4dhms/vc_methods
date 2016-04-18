@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	LISTBOX SELECT ROW(afListBox11;Find in array(asCustomers;vsCustomer+"@"))
+	OBJECT SET SCROLL POSITION(afListBox11;Find in array(asCustomers;vsCustomer+"@"))
+	
+	vsCustomer:=""
+End if 

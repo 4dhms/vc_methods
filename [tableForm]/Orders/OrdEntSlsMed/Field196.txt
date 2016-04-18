@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]ShipFOB)
+	[Orders]ShipLDP:=False
+	[Orders]ShipSea:=False
+	[Orders]ShipAir:=False
+	Rev_AirSea ("FOB")
+End if 
+Order_AirSeaBuild 

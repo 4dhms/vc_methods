@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (asKWCS=2)
+		[Quota]KW:="K"
+	: (asKWCS=3)
+		[Quota]KW:="W"
+End case 

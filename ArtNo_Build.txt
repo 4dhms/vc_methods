@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($percent;0)
+ARRAY TEXT($fiber;0)
+ARRAY LONGINT($sort;0)
+C_LONGINT($i;$c)
+
+If (atCost1>1) & (vlItem1>0)
+	APPEND TO ARRAY($fiber;atCost1{atCost1})
+	APPEND TO ARRAY($percent;vlItem1)
+End if 
+If (atCost2>1) & (vlItem2>0)
+	APPEND TO ARRAY($fiber;atCost1{atCost2})
+	APPEND TO ARRAY($percent;vlItem2)
+End if 
+If (atCost3>1) & (vlItem3>0)
+	APPEND TO ARRAY($fiber;atCost1{atCost3})
+	APPEND TO ARRAY($percent;vlItem3)
+End if 
+If (atCost4>1) & (vlItem4>0)
+	APPEND TO ARRAY($fiber;atCost1{atCost4})
+	APPEND TO ARRAY($percent;vlItem4)
+End if 
+If (atCost5>1) & (vlItem5>0)
+	APPEND TO ARRAY($fiber;atCost1{atCost5})
+	APPEND TO ARRAY($percent;vlItem5)
+End if 
+
+COPY ARRAY($percent;$sort)
+SORT ARRAY($sort;<)
+
+vsFiber1:=""
+
+$i:=1
+For ($i;1;Size of array($fiber))
+	$c:=Find in array($percent;$sort{$i})
+	If ($c>0)
+		vsFiber1:=vsFiber1+String($percent{$c})+"%"+$fiber{$c}+"/"
+		DELETE FROM ARRAY($percent;$c;1)
+		DELETE FROM ARRAY($fiber;$c;1)
+	End if 
+End for 
+
+If (cbAdd=1)
+	[FabricLibrary]SecondaryContent:=Substring(vsFiber1;1;Length(vsFiber1)-1)
+Else 
+	vsFiber:=Substring(vsFiber1;1;Length(vsFiber1)-1)
+	[FabricLibrary]FiberContent:=vsFiber
+End if 
+vsFlag:=String(vlItem1+vlItem2+vlItem3+vlItem4+vlItem5)+"%"

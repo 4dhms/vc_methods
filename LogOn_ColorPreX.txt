@@ -1,0 +1,48 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($temp))
+
+ARRAY LONGINT($orders;0)
+ARRAY LONGINT($self;0)
+
+QUERY([Orders];[Orders]StyleNumber=vtStyleNo)
+SELECTION TO ARRAY([Orders]OrderNum;$orders)
+
+LogOn_ColorBuild ($1)
+vtColor:=""
+
+$i:=1
+For ($i;1;Size of array($orders))
+	If (vtColor="")
+		QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i};*)
+		QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]LOColor#"";*)
+		QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{1})
+		If (Records in selection([CP_OrderXRef])>0)
+			$temp:=[CP_OrderXRef]LOColor
+			If (Size of array(atColorBuild)=1)
+				vtColor:=$temp
+			Else 
+				QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i};*)
+				QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{2})
+				If (Records in selection([CP_OrderXRef])>0)
+					If (Size of array(atColorBuild)=2)
+						vtColor:=$temp
+					Else 
+						QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$orders{$i};*)
+						QUERY([CP_OrderXRef]; & ;[CP_OrderXRef]CPNumber=atColorBuild{3})
+						If (Records in selection([CP_OrderXRef])>0)
+							vtColor:=$temp
+						End if 
+					End if 
+				End if 
+			End if 
+		End if 
+	End if 
+End for 
+
+If (vtColor="")
+	$0:=False
+Else 
+	$0:=True
+End if 
+

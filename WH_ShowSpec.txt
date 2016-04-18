@@ -1,0 +1,72 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Double Clicked)
+		WH_UndoLine 
+		
+	: (Form event=On Clicked)
+		If (alPOOrder>0)
+			
+			QUERY([Orders];[Orders]OrderNum=alPOOrder{alPOOrder})
+			QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+			Picture_RestoreOnTheFly 
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+			QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+			QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+			QUERY([Costing];[Costing]OrderNumber=alPOOrder{alPOOrder})
+			QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			QUERY SELECTION([CostSheets];[CostSheets]SheetName=asSheetNames{asSheetNames})
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=alPOOrder{alPOOrder})
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+			  //QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+			  //QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+			  //QUERY SELECTION([CostSheets];[CostSheets]SheetName=asSheetNames{asSheetNames})
+			OBJECT SET VISIBLE(*;"Text1";True)
+			OBJECT SET VISIBLE(*;"Text2";True)
+			OBJECT SET VISIBLE(*;"Text3";True)
+			OBJECT SET VISIBLE(*;"Text4";True)
+			OBJECT SET VISIBLE(*;"Text5";True)
+			OBJECT SET VISIBLE(vsSheetName;True)
+			OBJECT SET VISIBLE(vsEntryNumber;True)
+			OBJECT SET VISIBLE(vdWhenDate;True)
+			OBJECT SET VISIBLE(vrUnit1;True)
+			OBJECT SET VISIBLE(vrUnit2;True)
+			OBJECT SET VISIBLE(vrUnit3;True)
+			OBJECT SET VISIBLE(vrUnit4;True)
+			OBJECT SET VISIBLE(vrLDP;True)
+			OBJECT SET VISIBLE(cb1;True)
+			OBJECT SET VISIBLE(cb2;True)
+			OBJECT SET VISIBLE(cb3;True)
+			OBJECT SET VISIBLE(cb4;True)
+			OBJECT SET VISIBLE(cb5;True)
+			OBJECT SET VISIBLE(cb6;True)
+			OBJECT SET VISIBLE([Orders]OrderNum;True)
+			OBJECT SET VISIBLE([Orders]Customer;True)
+			OBJECT SET VISIBLE([Orders]Factory;True)
+			OBJECT SET VISIBLE([Orders]KWCnS;True)
+			OBJECT SET VISIBLE([Orders]ShipMethod;True)
+			OBJECT SET VISIBLE(bChoice1;True)
+			
+			  //asEnterer{asSheetNames}:=[CostSheets]CustomsEntryN
+			  //adXShip{asSheetNames}:=[CostSheets]CustomsDate
+			  //arMCol1{asSheetNames}:=[CostSheets]FreightBOAT
+			  //arMCol2{asSheetNames}:=[CostSheets]BrokerageChg
+			  //asSheetNames{asSheetNames}:=[CostSheets]SheetName
+			  //alCostLineKey{asSheetNames}:=[CostSheets]SheetID
+			  //arPrice{asSheetNames}:=[CostSheets]UnitCostSeaWC
+			  //arFOB{asSheetNames}:=[CostSheets]FOB
+			  //alXQty{asSheetNames}:=[CostSheets]ActualUnitsShipped
+			  //arMCol3{asSheetNames}:=[CostSheets]Quota
+			  //arMCol4{asSheetNames}:=[CostSheets]Duty1
+			  //
+			  //vrLDP:=[CostSheets]UnitCostSeaWC
+			vrUnit1:=0
+			vrUnit2:=0
+			vrUnit3:=0
+			vrUnit4:=0
+			vsEntryNumber:=[CostSheets]CustomsEntryN
+			vdWhenDate:=[CostSheets]CustomsDate
+			
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=alPOOrder{alPOOrder})
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		End if 
+End case 

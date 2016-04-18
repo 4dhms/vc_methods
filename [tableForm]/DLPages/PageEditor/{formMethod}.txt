@@ -1,0 +1,54 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Load)
+		SET WINDOW TITLE([DesignLines]Line+": "+[DesignLines]Season+" / "+[DesignLines]Title)
+		
+		QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DLPages]DLItemKey)
+		QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber=-6)
+		
+		zYes:=0
+		zNo:=1
+		OBJECT SET VISIBLE(zYes;[DesignLines]Stock)
+		OBJECT SET VISIBLE(zNo;[DesignLines]Stock)
+		
+		vlMove:=1
+		SET TIMER(60)
+		If (Records in selection([DesignLineIncluded])>0)
+			GET PICTURE FROM LIBRARY(885;vxTrash)
+		Else 
+			GET PICTURE FROM LIBRARY(884;vxTrash)
+		End if 
+		vlDragItem:=0
+		vlDropItem:=0
+		OBJECT SET VISIBLE(bAddStock;[DesignLines]Stock)
+		OBJECT SET VISIBLE(*;"xCover";vf8up)
+		OBJECT SET VISIBLE(*;"xNine";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xTen";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xEleven";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xTwelve";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xCover1";vf8up)
+		OBJECT SET VISIBLE(*;"xNine1";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xTen1";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xEleven1";Not(vf8up))
+		OBJECT SET VISIBLE(*;"xTwelve1";Not(vf8up))
+		LISTBOX SELECT ROW(afDLPages;1)
+		cbPrint:=1
+		cbEmail:=0
+		
+		$i:=1
+		For ($i;1;19)
+			OBJECT SET VISIBLE(*;"x"+String($i);False)
+			OBJECT SET VISIBLE(*;"g"+String($i);False)
+		End for 
+		
+		If (pOne=1)
+			LISTBOX DELETE COLUMN(afDLPages;5;1)
+		End if 
+		
+	: (Form event=On Timer)
+		vlMove:=vlMove+1
+	: (Form event=On Close Box)
+		DL_ClosePreview 
+End case 

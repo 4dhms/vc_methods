@@ -1,0 +1,130 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+OBJECT SET VISIBLE(atQueryText;False)
+
+Case of 
+	: (vsEntryNumber="")
+		WinPrompt ("Enter Design, Sample or Order Number before selecting Linkage.")
+		asSampleTypes:=1
+		
+	: (asSampleTypes=7)
+		QUERY([Samples];[Samples]StyleNum=vsEntryNumber)
+		ORDER BY([Samples];[Samples]StyleNum;>)
+		FIRST RECORD([Samples])
+		
+		Case of 
+			: (Records in selection([Samples])=0)
+				WinPrompt ("No samples for S/N: "+vsEntryNumber)
+			: (Records in selection([Samples])>1)
+				vsEntryNumber:=String([Samples]SampleNumber)
+				ARRAY TEXT(atQueryText;0)
+				$i:=1
+				For ($i;1;Records in selection([Samples]))
+					APPEND TO ARRAY(atQueryText;[Samples]StyleNum+"/"+String([Samples]SampleNumber))
+					NEXT RECORD([Samples])
+				End for 
+				
+				atQueryText:=1
+				OBJECT SET VISIBLE(atQueryText;True)
+				asSampleTypes:=3
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+			Else 
+				asSampleTypes:=3
+				vsEntryNumber:=String([Samples]SampleNumber)
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+		End case 
+		
+	: (asSampleTypes=8)
+		QUERY([Orders];[Orders]StyleNumber=vsEntryNumber)
+		ORDER BY([Orders];[Orders]StyleNumber;>)
+		FIRST RECORD([Orders])
+		
+		Case of 
+			: (Records in selection([Orders])=0)
+				WinPrompt ("No samples for S/N: "+vsEntryNumber)
+			: (Records in selection([Orders])>1)
+				vsEntryNumber:=String([Orders]OrderNum)
+				ARRAY TEXT(atQueryText;0)
+				$i:=1
+				For ($i;1;Records in selection([Orders]))
+					APPEND TO ARRAY(atQueryText;[Orders]StyleNumber+"/"+String([Orders]OrderNum))
+					NEXT RECORD([Orders])
+				End for 
+				
+				atQueryText:=1
+				OBJECT SET VISIBLE(atQueryText;True)
+				asSampleTypes:=4
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+			Else 
+				asSampleTypes:=3
+				vsEntryNumber:=String([Orders]OrderNum)
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+		End case 
+		
+		
+	: (asSampleTypes=5)
+		QUERY([Samples];[Samples]DesignNum=vsEntryNumber)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		ORDER BY([Samples];[Samples]Void;>;[Samples]SampleNumber;<)
+		FIRST RECORD([Samples])
+		
+		Case of 
+			: (Records in selection([Samples])=0)
+				WinPrompt ("No samples for D/N: "+vsEntryNumber)
+			: (Records in selection([Samples])>1)
+				ORDER BY([Samples]SampleNumber;>)
+				FIRST RECORD([Samples])
+				vsEntryNumber:=String([Samples]SampleNumber)
+				
+				ARRAY TEXT(atQueryText;0)
+				$i:=1
+				For ($i;1;Records in selection([Samples]))
+					APPEND TO ARRAY(atQueryText;[Samples]StyleNum+"/"+String([Samples]SampleNumber))
+					NEXT RECORD([Samples])
+				End for 
+				
+				OBJECT SET VISIBLE(atQueryText;True)
+				atQueryText:=1
+				asSampleTypes:=3
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+			Else 
+				asSampleTypes:=3
+				vsEntryNumber:=String([Samples]SampleNumber)
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+		End case 
+	: (asSampleTypes=6)
+		QUERY([Orders];[Orders]DesignNumber=vsEntryNumber)
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		ORDER BY([Orders];[Orders]Cancelled;>;[Orders]OrderNum;<)
+		FIRST RECORD([Orders])
+		Case of 
+			: (Records in selection([Orders])=0)
+				WinPrompt ("No orders for D/N: "+vsEntryNumber)
+			: (Records in selection([Orders])>1)
+				vsEntryNumber:=String([Orders]OrderNum)
+				ORDER BY([Orders]OrderNum;>)
+				ARRAY TEXT(atQueryText;0)
+				$i:=1
+				For ($i;1;Records in selection([Orders]))
+					APPEND TO ARRAY(atQueryText;[Orders]StyleNumber+"/"+String([Orders]OrderNum))
+					NEXT RECORD([Orders])
+				End for 
+				
+				atQueryText:=1
+				OBJECT SET VISIBLE(atQueryText;True)
+				asSampleTypes:=4
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+			Else 
+				asSampleTypes:=4
+				vsEntryNumber:=String([Orders]OrderNum)
+				DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+		End case 
+	Else 
+		DLink_GrabDesign (asSampleTypes-1;vsEntryNumber;0)
+End case 
+
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([CP_OrderXRef])

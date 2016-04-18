@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlLogOn)
+
+Case of 
+	: (<>vlLogOn>0)
+		SHOW PROCESS(<>vlLogOn)
+		BRING TO FRONT(<>vlLogOn)
+	: (<>vlLogOn=0)
+		<>vlLogOn:=New process("LogOn_Launch";0;"LogOn")
+	Else 
+		SHOW PROCESS(<>vlLogOn)
+		BRING TO FRONT(<>vlLogOn)
+End case 
+

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Double Clicked)
+	FORM GOTO PAGE(2)
+	vlWkNumber:=[SLRWks]WkNumber
+	vdDate:=[SLRWks]SLRWkEnd
+	vtUnitsTot:=String([SLRWks]SalesUnits;"###,##0")
+	vtSalesTot:=String([SLRWks]SalesTot;"###,##0")
+	vtOnHand:=String([SLRWks]OnHand)
+End if 

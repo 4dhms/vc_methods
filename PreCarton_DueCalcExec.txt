@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($dynamic)
+C_LONGINT($dynamicLT)
+
+If ([Orders]NeedByReport#!00-00-00!)
+	[Orders]NeedBy:=[Orders]NeedByReport
+Else 
+	QUERY([NeedByLib];[NeedByLib]Name=[Orders]Customer)
+	QUERY SELECTION([NeedByLib];[NeedByLib]Router=1)
+	$dynamic:=[NeedByLib]LeadtimeSpecial
+	If (Records in selection([NeedByLib])>0) & ($dynamic)
+		$dynamicLT:=[NeedByLib]Leadtime
+	Else 
+		$dynamicLT:=0
+	End if 
+	
+	If (Records in selection([NeedByLib])>0) & ([NeedByLib]Leadtime>0) & (Not($dynamic))
+		[Orders]NeedBy:=[Orders]ShipDateFactory-[NeedByLib]Leadtime
+	Else 
+		QUERY([NeedByLib];[NeedByLib]Name=[Orders]Factory)
+		QUERY SELECTION([NeedByLib];[NeedByLib]Router=2)
+		If (Records in selection([NeedByLib])>0) & ([NeedByLib]Leadtime>0)
+			[Orders]NeedBy:=[Orders]ShipDateFactory-[NeedByLib]Leadtime
+		Else 
+			Case of 
+				: ([Orders]Factory="@Now Cor@") | ([Orders]Factory="@Sara@Co@")
+					[Orders]NeedBy:=[Orders]ShipDateFactory-30
+				: ([Orders]Factory="@Weaver App@")
+					[Orders]NeedBy:=[Orders]ShipDateFactory-50
+				: ([Orders]Factory="Glory@") | ([Orders]Factory="@CMW@")
+					[Orders]NeedBy:=[Orders]ShipDateFactory-43
+				: ([Orders]Factory="@Rudiger@") | ([Orders]Factory="@Wangmian@") | ([Orders]Factory="@Fungyun@") | ([Orders]Factory="Yunting@")
+					[Orders]NeedBy:=[Orders]ShipDateFactory-43
+				: ([Orders]Factory="@Azul Clothing@") | ([Orders]Factory="@Alan Menchel@") | ([Orders]Factory="@Granco@") | ([Orders]Factory="@XYD@")
+					[Orders]NeedBy:=[Orders]ShipDateFactory-43
+				: ([Orders]Factory="JW@") | ([Orders]Factory="AO@")
+					[Orders]NeedBy:=[Orders]ShipDateFactory-vlLong
+				Else 
+					[Orders]NeedBy:=[Orders]ShipDateFactory-vlShort
+			End case 
+		End if 
+	End if 
+End if 
+If ($dynamic)
+	[Orders]NeedBy:=[Orders]NeedBy-$dynamicLT
+End if 

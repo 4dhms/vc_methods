@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($pass)
+C_LONGINT($1)
+C_TEXT(vtNewData)
+
+$pass:=True
+
+Case of 
+	: ($1=1)
+		vtNewData:="Petite"
+	: ($1=2)
+		vtNewData:="Missy"
+	: ($1=3)
+		vtNewData:="Large"
+End case 
+
+If (Table name(Current form table)="Orders")
+	[Orders]SizeCategory:=vtNewData
+	Order_RequiredFlag 
+Else 
+	[Samples]SizeCatagory:=vtNewData
+	Sample_RequiredFlag 
+End if 
+

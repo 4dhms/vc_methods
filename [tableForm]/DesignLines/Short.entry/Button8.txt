@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($total)
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+$total:=Records in selection([DesignLineIncluded])
+
+If (vDesign1#"")
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]DesignNumber=vDesign1)
+End if 
+If (vStyle#"")
+	QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]StyleNumber=vStyle)
+End if 
+vRecNum2:=String(Records in selection([DesignLineIncluded]))+" of "+String($total)+" in Line"

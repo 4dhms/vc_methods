@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($right;$left;$top;$bottom)
+
+GET WINDOW RECT($left;$top;$right;$bottom)
+vfGroup:=True
+
+FORM SET INPUT([SampleTrack];"Track.i")
+Repeat 
+	Open window($left+20;$top+30;$right-20;$top+90;1;"")
+	ADD RECORD([SampleTrack];*)
+Until (ok=0)
+CLOSE WINDOW
+vfGroup:=False
+

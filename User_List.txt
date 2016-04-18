@@ -1,0 +1,103 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($groupId;0)
+C_TEXT($startupMethod)
+C_TEXT($password)
+C_TEXT($Name)
+C_LONGINT($i;$n;$salesID;$designID;$logons)
+C_DATE($lastLogin)
+C_BOOLEAN($remove)
+
+User_FullList 
+
+GET GROUP LIST($groups;$groupID)
+$salesID:=$groupID{Find in array($groups;"Sales")}
+$designID:=$groupID{Find in array($groups;"Design")}
+
+$i:=1
+$n:=Size of array(asUsers)
+
+For ($i;1;Size of array(alUserID))
+	ARRAY LONGINT($memberships;0)
+	
+	If (alUserID{$n}=18)
+		  //SKIP CRASH DUMMY
+	Else 
+		GET USER PROPERTIES(alUserID{$n};$name;$startupMethod;$password;$logons;$lastLogin;$memberships)
+		
+		Case of 
+			: (User in group(asGroups{asGroups};"Factory"))
+				If (Find in array($memberships;$designID)>0)
+					$remove:=True
+				End if 
+			: (vfAll)
+			: (asGroups{asGroups}="Other")
+				If (Find in array($memberships;$designID)>0)
+					$remove:=True
+				End if 
+				If (Find in array($memberships;$salesID)>0)
+					$remove:=True
+				End if 
+			: (asGroups{asGroups}="Design")
+				If (Find in array($memberships;$designID)<1)
+					$remove:=True
+				End if 
+			: (asGroups{asGroups}="Sales")
+				If (Find in array($memberships;$salesID)<1)
+					$remove:=True
+				End if 
+		End case 
+		
+		
+		If ($remove)
+			$remove:=False
+			DELETE FROM ARRAY(asUsers;$n;1)
+			DELETE FROM ARRAY(alUserID;$n;1)
+		End if 
+		
+		$n:=$n-1
+	End if 
+	
+End for 
+
+$i:=1
+$n:=Size of array(asUsers)
+
+For ($i;1;Size of array(asUsers))
+	Case of 
+		: (asUsers{$n}="Admin") | (asUsers{$n}="") | (Position("spooler";asUsers{$n})>0) | (Position("unused";asUsers{$n})>0)
+			$remove:=True
+		: (asUsers{$n}="Production") | (asUsers{$n}="Sales") | (asUsers{$n}="Edward") | (asUsers{$n}="OldEdward") | (asUsers{$n}="_Crash Dummy")
+			$remove:=True
+		: (asUsers{$n}="Designer") & (Current user#"Designer")
+			$remove:=True
+	End case 
+	
+	If ($remove)
+		$remove:=False
+		DELETE FROM ARRAY(asUsers;$n;1)
+		DELETE FROM ARRAY(alUserID;$n;1)
+	End if 
+	$n:=$n-1
+End for 
+
+$i:=Size of array(asUsers)
+
+SORT ARRAY(asUsers;>)
+
+INSERT IN ARRAY(asUsers;1;2)
+asUsers{1}:="All"
+asUsers{2}:="Conference Room"
+
+Case of 
+	: (Find in array(asUsers;Current user)>0) & (vsUser="")
+		asUsers:=Find in array(asUsers;Current user)
+	: (vsUser#"")
+		asUsers:=Find in array(asUsers;vsUser)
+	Else 
+		asUsers:=1
+End case 
+
+If (Current user="Designer")
+	APPEND TO ARRAY(asUsers;"Designer")
+End if 
+

@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($req)
+
+Case of 
+	: ([Orders]Customer="EME Sweaters") | ([Orders]Customer="TABI") | ([Orders]Customer="Wados")
+		$req:=True
+	: ([Orders]Customer="Manteaux Manteaux") | ([Orders]Customer="Simons") | ([Orders]Customer="Le Chateau")
+		$req:=True
+	: ([Orders]Customer="Trade Secret") | ([Orders]Customer="BJ's Wholesale Club") | ([Orders]Customer="@The Shopping Channel@")
+		$req:=True
+	Else 
+		$req:=False
+End case 
+
+If ($req)
+	[Orders]CreditReq:=True
+End if 

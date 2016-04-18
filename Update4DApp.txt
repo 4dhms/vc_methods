@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+C_LONGINT($c)
+
+$path:=Application file
+$path:=Substring($path;1;Position(":";$path))+"Applications:"
+If (Test path name($path)#0)
+	  //error message
+Else 
+	$path:=$path+"4Dv14.3z.app"
+	If (Test path name($path)#0)
+		CONFIRM("You need to update your version of 4D. This will take a few minutes.";"Do it now";"Do it later")
+		If (ok=1)
+			
+			ALERT(String(Test path name($path))+"  "+$path)
+		End if 
+	End if 
+End if 

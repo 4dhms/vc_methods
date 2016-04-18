@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($header)
+
+If (Form event=On Load)
+	vsCategory:=""
+	vtGradeRange:=""
+	$i:=1
+	For ($i;1;10)
+		$header:="Header"+String($i+1)
+		OBJECT SET TITLE(*;$header;"")
+	End for 
+End if 

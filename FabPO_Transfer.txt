@@ -1,0 +1,52 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($move)
+C_TEXT($po)
+ARRAY TEXT(asColors;0)
+C_TEXT($color)
+
+SELECTION TO ARRAY([FabPOLines]ColorPrint;asColors)
+INSERT IN ARRAY(asColors;1;1)
+asColors{1}:="Select Color"
+asColors:=1
+
+vtFabric1:=""
+vlTotQty:=0
+
+Center Window (200;200;1;"")
+DIALOG("Fab_Transfer")
+CLOSE WINDOW
+If (ok=1)
+	$color:=asColors{asColors}
+	If (Position(" ";$color)>0)
+		$color:=Substring($color;1;Position(" ";$color))
+		$color:=Replace string($color;" ";"@")
+	End if 
+	
+	$po:="FB-"+vtFabric1
+	<>vlSending:=0
+	$move:=New process("FabPO_TransExec";0;"Transfer";$po;$color;vlTotQty;Replace string([FabricOrders]PONumber;"FB-";""))
+	
+	Repeat 
+	Until (<>vlSending#0) | (Shift down)
+	
+	If (<>vlSending=-1)
+		WinPrompt ("There is no "+asColors{asColors}+" on "+$po+".")
+	Else 
+		CREATE SET([FabPOLines];"pof")
+		CREATE RECORD([FabPOLines])
+		[FabPOLines]ColorPrint:=<>asFabTran{1}
+		[FabPOLines]POUnit:=<>asFabTran{2}
+		[FabPOLines]POWidth:=<>asFabTran{3}
+		[FabPOLines]UnitPrice:=Num(<>asFabTran{4})
+		[FabPOLines]Delivered:=vlTotQty
+		[FabPOLines]DeliveredCalc:=vlTotQty
+		[FabPOLines]Quantity:=vlTotQty
+		[FabPOLines]TransPO:="Fr "+vtFabric1
+		SAVE RECORD([FabPOLines])
+		ADD TO SET([FabPOLines];"pof")
+		USE SET("pof")
+		CLEAR SET("pof")
+		
+		WinPrompt ("Fabric has been moved.")
+	End if 
+End if 

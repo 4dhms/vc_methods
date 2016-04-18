@@ -1,0 +1,167 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSpecialGarment;0)
+C_BOOLEAN($show;<>vfOutsideSketch)
+
+OBJECT SET VISIBLE(bLabels;[Designs]DivisionCodeN="05-Cupio@")
+If (vfNewDesign)
+	REDUCE SELECTION([Orders];0)
+	REDUCE SELECTION([Samples];0)
+	
+	OBJECT SET TITLE(bCancel;"Delete")
+Else 
+	OBJECT SET TITLE(bCancel;"Cancel")
+End if 
+vsRecinSelection:=String(Selected record number([Designs]))+" / "+String(Records in selection([Designs]))
+OBJECT SET ENTERABLE([Designs]ArchivedPict;Current user="Designer")
+
+  //If (<>vfOutsideSketch)
+  //OffSketch_Pull ([Designs]DesignNum)
+  //Else 
+If ([Designs]ArchivedPict)
+	Picture_RestoreProc 
+End if 
+  //vxSketch:=[Designs]Sketch
+  //End if 
+
+If ([Designs]Season="False") | ([Designs]Season="00/00/00")
+	[Designs]Season:=""
+End if 
+
+If ([Designs]SeasonName="False")
+	[Designs]SeasonName:=""
+End if 
+If ([Designs]SeasonYear="False")
+	[Designs]SeasonYear:=""
+End if 
+
+vsSeason:=""
+vtOldData:=""
+
+If ([Designs]SeasonName#"") | ([Designs]Season="") | (Is new record([Designs]))
+	$show:=True
+	Case of 
+		: (Find in array(<>asSeasonName;[Designs]SeasonName)<1)
+			<>asSeasonName:=1
+		Else 
+			<>asSeasonName:=Find in array(<>asSeasonName;[Designs]SeasonName)
+	End case 
+	Case of 
+		: (Find in array(<>asSeasonYear;[Designs]SeasonYear)<1)
+			<>asSeasonYear:=1
+		Else 
+			<>asSeasonYear:=Find in array(<>asSeasonYear;[Designs]SeasonYear)
+	End case 
+Else 
+	$show:=False
+End if 
+
+OBJECT SET VISIBLE(<>asSeasonName;$show)
+OBJECT SET VISIBLE(<>asSeasonYear;$show)
+OBJECT SET VISIBLE([Designs]Season;Not($show))
+
+If (Is new record([Designs]))
+	[Designs]Designer:=Current user
+	[Designs]DesignNum:=vsDesignNumber
+	If (StripToNumber (vsDesignNumber)#vsDesignNumber)
+		[Designs]Provenance:="Design Number created by "+Current user+" "+vtHistory
+	End if 
+	
+	vsDesignNumber:=""
+	If (Length(vsCategory)>3)
+		[Designs]Division:=Substring(vsCategory;3;100)
+	End if 
+	[Designs]DivisionCodeN:=vsDivision
+	[Designs]DesEntryDate:=Current date(*)
+	[Designs]DesignLibraryKey:=Sequence number([Designs])
+	[Designs]Report:=True
+	SAVE RECORD([Designs])
+	
+	<>vlDesignKey:=[Designs]DesignLibraryKey
+	<>vlOrderNumber:=-1  //does not search for existing self and combos
+	<>vsDesignNumber:=[Designs]DesignNum
+	
+	Case of 
+		: ([Designs]DivisionCodeN="1-@") | ([Designs]DivisionCodeN="2-@") | ([Designs]DivisionCodeN="01-@") | ([Designs]DivisionCodeN="02-@")
+			[Designs]KWCnS:="Woven"
+			cbWoven:=1
+		: ([Designs]DivisionCodeN="6-@") | ([Designs]DivisionCodeN="06-@")
+			cbKnit:=1
+			[Designs]KWCnS:="Knit"
+		: ([Designs]DivisionCodeN="7-@")
+			[Designs]KWCnS:="CutSew"
+			cbCutSew:=1
+	End case 
+	Design_MustFlag 
+	
+Else 
+	cbWoven:=0
+	cbKnit:=0
+	cbCutSew:=0
+	Case of 
+		: ([Designs]KWCnS="Woven")
+			cbWoven:=1
+		: ([Designs]KWCnS="Knit")
+			cbKnit:=1
+		: ([Designs]KWCnS="CutSew")
+			cbCutSew:=1
+	End case 
+End if 
+
+OBJECT SET ENTERABLE([Designs]DesignNum;[Designs]DesignNum="")
+
+QUERY([Specs];[Specs]Design Num=[Designs]DesignNum)
+QUERY([DL_Other];[DL_Other]DesignKey=[Designs]DesignLibraryKey)
+If (<>SalesPrcID>0) & ([Orders]DesignNumber=[Designs]DesignNum)
+	OBJECT SET ENTERABLE([Designs]Description;False)
+	OBJECT SET VISIBLE(*;"xPO";True)
+	OBJECT SET VISIBLE(bEdit;True)
+Else 
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	If (Records in selection([Orders])>0) & (Not(User in group(Current user;"DesignEdit")))
+		OBJECT SET ENTERABLE([Designs]Description;False)
+		OBJECT SET VISIBLE(*;"xPO";True)
+		OBJECT SET VISIBLE(bEdit;True)
+	Else 
+		OBJECT SET ENTERABLE([Designs]Description;True)
+		OBJECT SET VISIBLE(*;"xPO";False)
+		OBJECT SET VISIBLE(bEdit;False)
+	End if 
+	UNLOAD RECORD([Orders])
+End if 
+
+OBJECT SET VISIBLE(pOne;False)
+OBJECT SET VISIBLE(pTwo;False)
+OBJECT SET VISIBLE(pThree;False)
+
+If ([Designs]GarmentPart1#"")
+	OBJECT SET VISIBLE(pOne;True)
+	pOne:=1
+End if 
+
+If ([Designs]GarmentPart2#"")
+	OBJECT SET VISIBLE(pTwo;True)
+	pTwo:=0
+End if 
+
+If ([Designs]GarmentPart3#"")
+	OBJECT SET VISIBLE(pThree;True)
+	pThree:=0
+End if 
+
+OBJECT SET VISIBLE([Designs]Designer;([Designs]Designer#"False") & ([Designs]Designer#""))
+OBJECT SET VISIBLE(*;"xDesigner";([Designs]Designer#"False") & ([Designs]Designer#""))
+
+Design_MustFlag 
+Design_NavButtons 
+
+  //If (User in group(Current user;"SuperCostsheets") & (<>vfSupersheet))
+  //LIST TO ARRAY("Special Garment";asSpecialGarment)
+  //SORT ARRAY(asSpecialGarment;>)
+  //INSERT IN ARRAY(asSpecialGarment;1;2)
+  //asSpecialGarment{1}:="Clear"
+  //asSpecialGarment{2}:="Add to List"
+  //FORM GOTO PAGE(3)
+  //End if 
+
+[Designs]PictureSIze:=Picture size([Designs]Sketch)

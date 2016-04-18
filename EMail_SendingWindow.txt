@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+vlWinWd:=150
+vlWinHt:=100
+vlWinType:=1
+vsWinTitle:=""
+
+<>CloseDialog:=False
+Center Window 
+DIALOG([Dialogs];"SendingMail")
+CLOSE WINDOW
+<>SendingWin:=0

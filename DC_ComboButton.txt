@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+vtType1:=""
+vtType2:=""
+vtType3:=""
+vtType4:=""
+
+Case of 
+	: ($1>Size of array(alDCRef))
+	Else 
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=alDCRef{$1})
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=[CP_OrderXRef]SelfKey)
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]SortOrder;>)
+		$i:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			Case of 
+				: ($i<5)
+					vtType1:=vtType1+[CP_OrderXRef]CPType+Char(13)
+					vtType2:=vtType2+[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName+Char(13)
+				: ($i<9)
+					vtType3:=vtType3+[CP_OrderXRef]CPType+Char(13)
+					vtType4:=vtType4+[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName+Char(13)
+					  //: ($i<13)
+					  //vtType5:=vtType5+[CP_OrderXRef]CPType+Char(13)
+					  //vtType6:=vtType6+[ColorPrintNumber]CPNumber+" "+[ColorPrintNumber]CPName+Char(13)
+			End case 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+End case 

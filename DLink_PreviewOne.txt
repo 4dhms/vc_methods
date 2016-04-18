@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($style;$design;$title;$price;$fabric;$MSRP;$sketch;$color;$size)
+
+If (1=2)
+	
+	$style:=Get pointer("vStyle"+String($1))
+	$design:=Get pointer("vDesign"+String($1))
+	$title:=Get pointer("vTitle"+String($1))
+	$price:=Get pointer("vsPrice"+String($1))
+	$fabric:=Get pointer("vtFabric"+String($1))
+	$MSRP:=Get pointer("vsMSRP"+String($1))
+	$sketch:=Get pointer("vxSketch"+String($1))
+	$color:=Get pointer("vtColor"+String($1))
+	$size:=Get pointer("vsSize"+String($1))
+	
+	vStyle:=$style->
+	vDesign:=$design->
+	vtTitle:=$title->
+	vsPrice:=$price->
+	vtFabric:=$fabric->
+	vsMSRP:=$MSRP->
+	vxSketch:=$sketch->
+	vtColor:=$color->
+	vsSize:=$size->
+	
+	<>CloseBox:=True
+	Center Window (270;390;5;"")
+	DIALOG("DLPreviewOne")
+	CLOSE WINDOW
+	
+Else 
+	ALERT("This mini preview is under development.")
+End if 

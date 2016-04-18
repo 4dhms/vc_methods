@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($daterange)
+C_LONGINT($i)
+PRINT SETTINGS
+
+If (ok=1)
+	
+	Case of 
+		: (asStartMonth{asStartMonth}="Q1")
+			$daterange:="Q1"
+		: (asStartMonth{asStartMonth}="Q2")
+			$daterange:="Q2"
+		: (asStartMonth{asStartMonth}="Q3")
+			$daterange:="Q3"
+		: (asStartMonth{asStartMonth}="Q4")
+			$daterange:="Q4"
+		Else 
+			$daterange:=asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}
+	End case 
+	
+	vtTitle:="Design Usage Report ("+$daterange+")     Printed "+String(Current date(*))
+	
+	SET PRINT OPTION(Orientation option;2)
+	Print form([Dialogs];"UsagePrint.pheader")
+	
+	$i:=1
+	For ($i;1;Size of array(asDivisions))
+		vsDivision:=asDivisions{$i}
+		vlItem1:=alChartPrints{$i}
+		vlItem2:=alChartPrintsUsed{$i}
+		vlItem3:=alChartPrintsRatio{$i}
+		vlItem4:=alPrintOrders{$i}
+		vlItem5:=alPrintUnits{$i}
+		vlItem6:=alVarPrints{$i}
+		vlItem7:=alVarPrintsUsed{$i}
+		vlItem8:=alVarPrintsRatio{$i}
+		vlItem9:=alVarOrders{$i}
+		vlItem10:=alVarUnits{$i}
+		vlItem11:=alChartOrderTot{$i}
+		vlitem12:=alChartUnitTot{$i}
+		vlitem13:=alOtherOrderTot{$i}
+		vlitem14:=alOtherUnitTot{$i}
+		Print form([Dialogs];"UsagePrint.o")
+	End for 
+	PAGE BREAK
+	
+End if 

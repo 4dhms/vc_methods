@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($costPO;$costInv)
+
+vrNetUnitPrice:=Round([Orders]Price*((100-[Orders]NetDiscount)*0.01);2)
+
+$costPO:=[Orders]RptUnitCost*[Orders]TotalOrderQuantity
+$costInv:=[Orders]RptUnitCost*[Orders]RptShipped
+
+vrNetProfit1a:=[Orders]RptGrossSales-$costPO
+vrNetPercent1a:=Round((vrNetProfit1a/[Orders]RptGrossSales)*100;0)
+
+vrNetProfit2a:=[Orders]RptActsSales-$costInv
+vrNetPercent2a:=Round((vrNetProfit2a/[Orders]RptGrossSales)*100;0)

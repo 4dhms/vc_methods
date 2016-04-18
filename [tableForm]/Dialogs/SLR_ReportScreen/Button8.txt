@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlSLRCal)
+
+If (<>vlSLRCal>0)
+	SHOW PROCESS(<>vlSLRCal)
+	BRING TO FRONT(<>vlSLRCal)
+Else 
+	<>vlSLRCal:=New process("SLR_Calendar";0;"slrcal")
+End if 

@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+asPrevDate{asPrevDate}:=String([Invoices]InvoiceDate)
+asPrevQty{asPrevQty}:=String([Invoices]InvoiceQuantity)
+asPrevAmt{asPrevAmt}:=String([Invoices]InvoiceAmount)
+[Invoices]InvoiceKey:=-1*(Abs([Invoices]InvoiceKey))
+
+SAVE RECORD([Invoices])
+ACCEPT

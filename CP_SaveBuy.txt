@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+If ([ColorPrintNumber]BuyDivision="") | ([ColorPrintNumber]BuyDivision="false")
+	[ColorPrintNumber]BuyDivision:=[ColorPrintNumber]Division
+	SAVE RECORD([ColorPrintNumber])
+End if 
+If ([ColorPrintNumber]BuySeason="") | ([ColorPrintNumber]BuySeason="false")
+	[ColorPrintNumber]BuySeason:=[ColorPrintNumber]SeasonName+" "+[ColorPrintNumber]SeasonYear
+	SAVE RECORD([ColorPrintNumber])
+End if 

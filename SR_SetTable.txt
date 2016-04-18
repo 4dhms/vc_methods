@@ -1,0 +1,26 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_DATE($dayOneCurrent;$dayOneLast;$dayOneNext)
+C_TEXT($day)
+
+If (asSeasonA=1)
+	$day:="1"
+Else 
+	$day:="7"
+End if 
+
+$dayOneCurrent:=Date("!"+$day+"/1/"+String(alYearA{alYearA})+"!")
+$dayOneLast:=Date("!"+$day+"/1/"+String(alYearA{alYearA}-1)+"!")
+$dayOneNext:=Date("!"+$day+"/1/"+String(alYearA{alYearA}+1)+"!")
+
+vdDayOne:=$dayOneCurrent
+vlLeadLine:=Num($day)
+
+SR_BuildSets ($dayOneLast;$dayOneNext)
+
+vrAvgA:=vlDollarsSubA/vlUnitsSubA
+vrAvgB:=vlDollarsSubB/vlUnitsSubB
+vrAvgAx:=vlDollarsSubAx/vlUnitsSubAx
+vrAvgBx:=vlDollarsSubBx/vlUnitsSubBx
+
+SR_Init (True)
+

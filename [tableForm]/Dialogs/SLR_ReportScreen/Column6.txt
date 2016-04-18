@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Double Clicked)
+		If (asStyleNumbers>0)
+			APPEND TO ARRAY(asXStyleNumbers;asStyleNumbers{asStyleNumbers})
+			SORT ARRAY(asXStyleNumbers;>)
+			DELETE FROM ARRAY(asStyleNumbers;asStyleNumbers;1)
+		End if 
+End case 

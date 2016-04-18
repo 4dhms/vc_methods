@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c)
+
+If (Shift down) & (Current user="Designer")
+	$i:=1
+	For ($i;1;Size of array(asDCcc))
+		asDCcc{$i}:=Substring(asDCcc{$i};1;6)
+	End for 
+	
+Else 
+	$i:=1
+	For ($i;1;Size of array(asDCcc))
+		$c:=1
+		For ($c;1;Size of array(asBDColorCode))
+			If (asBDSelf{$c}=asDClineColor{$i})
+				$n:=$c
+			End if 
+		End for 
+		
+		If (asDCcc{$i}#asBDColorCode{$n})
+			QUERY([DC_Spreads];[DC_Spreads]OrderNumber=<>vlOrderNumber)
+			ARRAY LONGINT($keys;0)
+			SELECTION TO ARRAY([DC_Spreads]DCSheetKey;$keys)
+			
+			$c:=1
+			For ($c;1;Size of array($keys))
+				QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=$keys{$c})
+				QUERY SELECTION([DC_SpreadLines];[DC_SpreadLines]ColorNumber=asDClineColor{$i})
+				If (Records in selection([DC_SpreadLines])=1)
+					asDCcc{$i}:=asBDColorCode{$n}
+					[DC_SpreadLines]ColorCode:=asBDColorCode{$n}
+					SAVE RECORD([DC_SpreadLines])
+				End if 
+			End for 
+			
+		End if 
+	End for 
+End if 

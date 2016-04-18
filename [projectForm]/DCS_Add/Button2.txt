@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinChoice ("Are you sure you want to delete "+vtItemName+"?")
+
+If (ok=1)
+	QUERY([DCS];[DCS]ItemKey=vlKey)
+	DELETE RECORD([DCS])
+	DELETE FROM ARRAY(asList11;asList11)
+	DELETE FROM ARRAY(asList12;asList11)
+	DELETE FROM ARRAY(asList13;asList11)
+	DELETE FROM ARRAY(asList14;asList11)
+	DELETE FROM ARRAY(asList15;asList11)
+	DELETE FROM ARRAY(alRecordKey;asList11)
+	
+End if 

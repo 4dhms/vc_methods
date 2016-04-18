@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($done)
+C_LONGINT($c;$length)
+C_TEXT($code)
+
+$code:=$1
+$length:=Length($2)
+$c:=Length($1)
+
+If (Position($2;$1)>0)
+	If (Shift down)
+		ALERT(String(Length($code))+"  "+String(vlChar))
+	End if 
+	If (Length($code)<=vlChar)
+		  //done
+		$0:=$1
+	Else 
+		If ($length=1)
+			Repeat 
+				Case of 
+					: (Shift down) & (Current user="Designer")
+						$done:=True
+					: (Length($code)<=vlChar)
+						$done:=True
+					: ($c<3)
+						$done:=True
+				End case 
+				
+				If ($code[[$c]]=$2)
+					$code:=Delete string($code;$c;1)
+				End if 
+				$c:=$c-1
+			Until ($done)
+		Else 
+			If (Length($code)-$length>2)
+				$code:=Replace string($code;"Bright";"BRT")
+				$code:=Replace string($code;"Gold";"GLD")
+				$code:=Replace string($code;"Silver";"SVR")
+				$code:=Replace string($code;"Black";"BK")
+				$code:=Replace string($code;"White";"WT")
+				$code:=Replace string($code;"Orange";"OR")
+			End if 
+		End if 
+		$0:=$code
+	End if 
+Else 
+	$0:=$1
+End if 
+

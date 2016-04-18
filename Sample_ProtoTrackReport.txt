@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_TEXT($path)
+
+USE SET("Protos")
+
+QUERY SELECTION([Samples];[Samples]OrderEnterer SG=asEnterer{asEnterer};*)
+QUERY SELECTION([Samples]; & ;[Samples]SampleDivision=asDivisions{asDivisions})
+
+If (Records in selection([Samples])=0)
+	WinPrompt ("No "+asDivisions{asDivisions}+" Protos for "+asEnterer{asEnterer})
+Else 
+	$docref:=Create document("";"xls")
+	If (ok=0)
+		$path:=Document
+		
+		CLOSE DOCUMENT($docref)
+	End if 
+End if 
+

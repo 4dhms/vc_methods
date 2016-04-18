@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (vsStyleNumber="")
+	WinPrompt ("Enter style number:")
+Else 
+	$i:=1
+	For ($i;1;Size of array(tracklist))
+		If (asStyleNumbers{$i}=vsStyleNumber)
+			tracklist{$i}:=True
+		Else 
+			tracklist{$i}:=False
+		End if 
+		
+	End for 
+	OBJECT SET SCROLL POSITION(tracklist;Find in array(asStyleNumbers;vsStyleNumber))
+End if 

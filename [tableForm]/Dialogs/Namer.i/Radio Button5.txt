@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbNew=1)
+	vlRecordNumber:=0
+	vsFlag:="New Costsheet Name"
+	vfImport:=False
+	FORM GOTO PAGE(2)
+	OBJECT SET ENABLED(bNameOk;True)
+End if 

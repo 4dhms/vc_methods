@@ -1,0 +1,75 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atNewData;0)
+
+  //Special Discount
+APPEND TO ARRAY(atNewData;String([CostSheets]SpecialDiscount))
+
+  //CMT
+APPEND TO ARRAY(atNewData;String([CostSheets]CMT))
+
+  //Misc
+APPEND TO ARRAY(atNewData;String([CostSheets]Misc))
+
+  //Broker Charge
+APPEND TO ARRAY(atNewData;String([CostSheets]BrokerageChg))
+
+  //NY Misc
+APPEND TO ARRAY(atNewData;String([CostSheets]NYMisc))
+
+  //My FOB
+If ([CostSheets]MyFOB)
+	APPEND TO ARRAY(atNewData;"True")
+Else 
+	APPEND TO ARRAY(atNewData;"False")
+End if 
+
+  //NY Misc
+APPEND TO ARRAY(atNewData;String([CostSheets]NYMisc))
+
+  //Ship
+  //Freight
+Case of 
+	: ([CostSheets]ShipSea)
+		APPEND TO ARRAY(atNewData;"Sea")
+		APPEND TO ARRAY(atNewData;String([CostSheets]FreightBOAT))
+	: ([CostSheets]ShipAir)
+		APPEND TO ARRAY(atNewData;"Air")
+		APPEND TO ARRAY(atNewData;String([CostSheets]FreightAIR))
+	: ([CostSheets]ShipLDP)
+		APPEND TO ARRAY(atNewData;"LDP")
+		APPEND TO ARRAY(atNewData;"")
+	: ([CostSheets]ShipFOB)
+		APPEND TO ARRAY(atNewData;"FOB")
+		APPEND TO ARRAY(atNewData;"")
+	Else 
+		APPEND TO ARRAY(atNewData;"")
+		APPEND TO ARRAY(atNewData;"")
+End case 
+
+  //Destination
+APPEND TO ARRAY(atNewData;[CostSheets]OtherShip)
+
+  //FOB
+APPEND TO ARRAY(atNewData;String([CostSheets]FOB))
+
+  //FOB 2
+APPEND TO ARRAY(atNewData;String([CostSheets]FOB2))
+
+  //Quota
+APPEND TO ARRAY(atNewData;String([CostSheets]Quota))
+
+  //Quota 2
+APPEND TO ARRAY(atNewData;String([CostSheets]Quota2))
+
+  //Duty
+APPEND TO ARRAY(atNewData;String([CostSheets]Duty1))
+
+  //Duty 2"
+APPEND TO ARRAY(atNewData;String([CostSheets]Duty2))
+
+
+
+
+
+
+

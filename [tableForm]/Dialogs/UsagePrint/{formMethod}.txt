@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+Case of 
+	: (Form event=On Load)
+		pOne:=0
+		pTwo:=1
+		cbAll:=1
+		
+		Usage_Array 
+		CP_BuildDivArray (4)
+		UsageInitArrays (0)
+		asSeasonName:=1
+		asSeasonYear:=1
+		If (<>vlUsageRouter=2)
+			FORM GOTO PAGE(2)
+		End if 
+	: (Form event=On Unload)
+		$i:=1
+		For ($i;1;10)
+			CLEAR SET(String($i-1))
+		End for 
+End case 

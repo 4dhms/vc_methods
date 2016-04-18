@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($add)
+
+Case of 
+	: ([Orders]RevisionNumber>0)
+		$add:=False
+	: ([Orders]Factory="Azul Clothing Company@")
+		$add:=True
+	: ([Orders]Factory="Now Corp@")
+		$add:=True
+	: ([Orders]Factory="Sarah Co@")
+		$add:=True
+	: ([Orders]Factory="Rudiger@")
+		$add:=True
+	: ([Orders]Factory="Sinosky@")
+		$add:=True
+	: ([Orders]Factory="Weaver Apparel@")
+		$add:=True
+	Else 
+		$add:=False
+End case 
+
+[Spooler]Robert:=$add

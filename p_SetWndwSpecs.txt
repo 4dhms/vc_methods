@@ -1,0 +1,2 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+SET WINDOW TITLE("Specs: "+String(Records in selection([Specs]))+" of "+String(Records in table([Specs])))

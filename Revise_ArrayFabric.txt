@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([FabricOrders]Void)
+		ARRAY TEXT(asPOv;2)
+		asPOv{1}:="Cancelled"
+		asPOv{2}:="UN-cancelled"
+		
+	Else 
+		ARRAY TEXT(asPOv;4)
+		If ([FabricOrders]ReviseNumber=0)
+			asPOv{1}:="Original order"
+		Else 
+			asPOv{1}:="Revise "+String([FabricOrders]ReviseNumber)
+		End if 
+		
+		asPOv{2}:="New Revision"
+		asPOv{3}:="Edit"
+		asPOv{4}:="Cancelled"
+End case 
+
+asPOv:=1

@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+QUERY([Designs];[Designs]ArchivedPict=False)
+
+$i:=1
+FIRST RECORD([Designs])
+For ($i;1;Records in selection([Designs]))
+	Picture_Backup 
+	NEXT RECORD([Designs])
+End for 

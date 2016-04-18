@@ -1,0 +1,36 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+QUERY([Appts];[Appts]ApptDate=vdCalToday)
+ORDER BY([Appts];[Appts]ApptStart;>;[Appts]ApptEnd;>)
+OBJECT SET VISIBLE(adDates;False)
+vsCustomer:=""
+vsUser:=""
+
+ARRAY TEXT(asGroups;4)
+asGroups{1}:="Sales"
+asGroups{2}:="Design"
+asGroups{3}:="Other"
+asGroups{4}:="All"
+
+Cal_BuildThumb 
+Cal_BuildClock 
+
+Case of 
+	: (User in group(Current user;"Sales"))
+		asGroups:=Find in array(asGroups;"Sales")
+	: (User in group(Current user;"Design"))
+		asGroups:=Find in array(asGroups;"Design")
+	Else 
+		asGroups:=Find in array(asGroups;"Other")
+End case 
+
+vfAll:=False
+
+User_List 
+ARRAY TEXT(asDivisions;0)
+LIST TO ARRAY("Division Code No";asDivisions)
+INSERT IN ARRAY(asDivisions;1;1)
+asDivisions{1}:="All"
+asDivisions:=1
+
+Cal_FindSched 
+Cal_ConflictFlag 

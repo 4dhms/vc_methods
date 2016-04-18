@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=vsCPNumber)
+If ([ColorPrintNumber]Customer=[PCatalog]Customer) & ([ColorPrintNumber]Division=[PCatalog]Division) & ([ColorPrintNumber]SeasonName=[PCatalog]SeasonName) & ([ColorPrintNumber]SeasonYear=[PCatalog]SeasonYear)
+	[ColorPrintNumber]Dropped:=False
+	SAVE RECORD([ColorPrintNumber])
+	[PCatalog]History:=[PCatalog]History+vsCPNumber+" updated in the Color/Print Library"+String(Current date(*))+" "+String(Current time(*))+Char(13)
+Else 
+	QUERY([CP_Customers];[CP_Customers]CPNumber=vsCPNumber)
+	QUERY SELECTION([CP_Customers];[CP_Customers]Customer=[PCatalog]Customer)
+	QUERY SELECTION([CP_Customers];[CP_Customers]Division=[PCatalog]Division)
+	
+	If (Records in selection([CP_Customers])>1)
+		QUERY SELECTION([CP_Customers];[CP_Customers]SeasonName=[PCatalog]SeasonName)
+		QUERY SELECTION([CP_Customers];[CP_Customers]SeasonYear=[PCatalog]SeasonYear)
+	End if 
+	
+	If (Records in selection([CP_Customers])=1)
+		DELETE RECORD([CP_Customers])
+		[PCatalog]History:=[PCatalog]History+Char(13)+vsCPNumber+" added to the Color/Print Library for "+[CP_Customers]SeasonName+" "+[CP_Customers]SeasonYear+String(Current date(*))+" "+String(Current time(*))
+	End if 
+End if 
+
+vsCPNumber:=""
+UNLOAD RECORD([ColorPrintNumber])

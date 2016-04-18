@@ -1,0 +1,37 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($percentRange;$difference;$quantity)
+C_REAL($work)
+C_TEXT($spellout)
+
+$quantity:=Cost_Quantity 
+
+Case of 
+	: ([CostSheets]ShipFOB)
+		$percentRange:=Int($quantity*0.025)
+	: ([Costing]Customer="Burlington Coat@")
+		$percentRange:=Int($quantity*0)
+	: ([Costing]Customer="Marmaxx@")
+		$percentRange:=Int($quantity*0.02)
+	Else 
+		$percentRange:=Int($quantity*0.05)
+End case 
+$difference:=Abs($quantity-[CostSheets]ActualUnitsShipped)
+
+$work:=Round(($difference/$quantity)*100;2)
+
+If ($quantity<[CostSheets]ActualUnitsShipped)
+	$spellout:="("+String(Abs($work))+"% over)"
+Else 
+	$spellout:="("+String(Abs($work))+"% under)"
+End if 
+
+Case of 
+	: ($quantity=[CostSheets]ActualUnitsShipped)
+		  //perfecto
+	: ($difference>=$percentRange) & ([CostSheets]ActualUnitsShipped>0)
+		WinChoice ("Are you sure of number of shipped units?"+Char(13)+$spellout)
+		If (ok=1)
+		Else 
+			[CostSheets]ActualUnitsShipped:=0
+		End if 
+End case 

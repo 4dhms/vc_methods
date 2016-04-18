@@ -1,0 +1,47 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($processname)
+C_LONGINT($processstate;$processtime)
+PROCESS PROPERTIES(Current process;$processname;$processstate;$processtime)
+
+
+If ($processname="/4DCGI@") | ($processname="Web Process@")
+	vfWebserver:=True
+Else 
+	vfWebserver:=False
+	vsWebUser:=Current user
+End if 
+
+Case of 
+	: ([Costing]OrderNumber<0)
+		  //do nothing
+	: ([CostSheets]SheetName="Weighted")
+		  //do nothing
+	: ([CostSheets]ShipLDP) | ([CostSheets]ShipFOB)
+		[CostSheets]FreightAIR:=0
+		[CostSheets]FreightBOAT:=0
+	: ([CostSheets]ShipSea) & (Not([CostSheets]ShipAir))
+		[CostSheets]FreightAIR:=0
+	: ([CostSheets]ShipAir) & (Not([CostSheets]ShipSea))
+		[CostSheets]FreightBOAT:=0
+End case 
+
+Case of 
+	: ([CostSheets]Duty1<=0) & ([CostSheets]Duty2<=0)
+		[CostSheets]DutyRate:=0
+	: ([CostSheets]Duty1>0) & ([CostSheets]Duty2>0)
+		[CostSheets]DutyRate:=([CostSheets]Duty1+[CostSheets]Duty2)/2
+	: ([CostSheets]Duty1>0)
+		[CostSheets]DutyRate:=[CostSheets]Duty1
+	: ([CostSheets]Duty2>0)
+		[CostSheets]DutyRate:=[CostSheets]Duty2
+End case 
+
+If (Not([CostSheets]MyFOB)) & ([CostSheets]SheetName#"Weighted")
+	Cost_CalcFOB 
+End if 
+
+Cost_CalcProcessor 
+
+If (Not(vfWebserver))
+	Cost_UpdateReport 
+End if 

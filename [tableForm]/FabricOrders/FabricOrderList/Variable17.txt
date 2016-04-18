@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($article)
+C_LONGINT($i)
+
+Case of 
+	: (vtQPrint="")
+		WinPrompt ("Enter color or print number.")
+	: (vtQArticle="")
+		WinPrompt ("Enter article number.")
+	Else 
+		QUERY([FabPOLines];[FabPOLines]ColorPrint=vtQPrint)
+		QUERY SELECTION([FabPOLines];[FabPOLines]LabDip=True)
+		
+		If (Records in selection([FabPOLines])=0)
+			WinPrompt ("There are no pre-existing lab dips for"+Char(13)+"Article #"+vtQArticle+Char(13)+vtQPrint)
+		Else 
+			$i:=1
+			CREATE EMPTY SET([FabricOrders];"FO")
+			FIRST RECORD([FabPOLines])
+			For ($i;1;Records in selection([FabPOLines]))
+				QUERY([FabricOrders];[FabricOrders]FabOrderKey=[FabPOLines]FabOrderKey)
+				ADD TO SET([FabricOrders];"FO")
+				NEXT RECORD([FabPOLines])
+			End for 
+			USE SET("FO")
+			CLEAR SET("FO")
+		End if 
+End case 
+
+ORDER BY([FabricOrders];[FabricOrders]FabOrderKey;<)

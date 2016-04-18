@@ -1,0 +1,47 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$pcount;$page)
+
+PRINT SETTINGS
+If (ok=1)
+	vtTitle:="Stock Report ("+String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+String(<>asStartYear)+" - "
+	vtTitle:=vtTitle+"Stock Report ("+String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+String(<>asEndYear)+")   "
+	If (asDivisions>1)
+		vtTitle:=vtTitle+asDivisions{asDivisions}
+	End if 
+	$page:=1
+	$pcount:=0
+	
+	$i:=1
+	For ($i;1;Size of array(alOrders))
+		If ($pcount<20)
+			Case of 
+				: ($page>1)
+					PAGE BREAK(>)
+					vsPrintingHeader:="Page "+String($page)
+				: ($page=1)
+					vsPrintingHeader:=""
+			End case 
+			$page:=$page+1
+			
+			Print form("Stock_PrintHead")
+			$pcount:=660
+		End if 
+		
+		If (alOrders{$i}=0)
+			vtPart1:=""
+		Else 
+			vtPart1:=String(alOrders{$i})
+		End if 
+		vtPart2:=asStyleNumbers{$i}
+		vtPart3:=String(alXQty{$i};"###,###")
+		vtPart4:=String(arSalePrice{$i};"###.00")
+		vtPart5:=String(arLDP{$i};"###.00")
+		vtPart6:=String(arXmarkup{$i};"###.0%")
+		vtPart7:=String(arAvgWt{$i};"###.00")
+		vtPart8:=String(arYmarkup{$i};"###.0%")
+		Print form("Stock_PrintLine")
+		$pcount:=$pcount-16
+	End for 
+	
+	PAGE BREAK
+End if 

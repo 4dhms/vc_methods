@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asCustomers;0)
+QUERY([Customers];[Customers]CustomerName#"")
+QUERY SELECTION([Customers];[Customers]CustomerName#" @ ")
+
+REDUCE SELECTION([Contacts];0)
+SELECTION TO ARRAY([Customers]CustomerName;asCustomers)
+SORT ARRAY(asCustomers;>)
+asCustomers:=0
+vsContact:=""
+vsCustomer:=""
+

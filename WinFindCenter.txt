@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($left;$right;$top;$bottom)
+GET WINDOW RECT($left;$top;$right;$bottom)
+
+Case of 
+	: ($bottom>Screen height) | ($top<0)
+		$right:=Screen width
+		$left:=0
+		$top:=50
+		$bottom:=Screen height
+		$0:=String((($right-$left)/2)+$left)+"/"+String((($bottom-$top)/2)+$top)
+	: ($right-$left<150) | ($bottom-$top<100)
+		$left:=20
+		$right:=Screen width-20
+		$top:=50
+		$bottom:=Screen height-10
+		
+		$0:=String((($right-$left)/2)+$left)+"/"+String((($bottom-$top)/2)+$top)
+	Else 
+		$left:=0
+		$right:=Screen width
+		$top:=50
+		$bottom:=Screen height-50
+		$0:=String((($right-$left)/2)+$left)+"/"+String((($bottom-$top)/2)+$top)
+End case 

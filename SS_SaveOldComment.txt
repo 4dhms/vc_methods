@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (Locked([SpecLineSample]))
+		WinPrompt ("Comment file is locked. This change will not be saved.")
+	End if 
+	SAVE RECORD([SpecLineSample])
+End if 

@@ -1,0 +1,71 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_REAL($running;$dutyrate;$dutypaid)
+
+ARRAY TEXT(asList11;0)
+ARRAY TEXT(asList12;0)
+ARRAY TEXT(asList13;0)
+ARRAY TEXT(asList14;0)
+ARRAY TEXT(asList15;0)
+ARRAY TEXT(asList16;0)
+ARRAY TEXT(asList17;0)
+ARRAY LONGINT(alRecordKey;0)
+
+DCS_Method 
+OBJECT SET VISIBLE(atMethod;User in group(Current user;"DCS"))
+
+QUERY([DCS];[DCS]SheetID=[CostSheets]SheetID)
+QUERY SELECTION([DCS];[DCS]SheetID>0)
+  //ALERT(String(Records in selection([DCS])))
+
+DCS_SortOrder 
+ORDER BY([DCS];[DCS]SortOrder;>;[DCS]ItemKey;>)
+
+$running:=0
+$i:=1
+FIRST RECORD([DCS])
+For ($i;1;Records in selection([DCS]))
+	APPEND TO ARRAY(asList11;[DCS]Item)
+	APPEND TO ARRAY(asList17;[DCS]Notes)
+	
+	Case of 
+		: ([DCS]Item="Boat") | ([DCS]Item="Air")
+			APPEND TO ARRAY(asList12;"")
+			APPEND TO ARRAY(asList13;"")
+			APPEND TO ARRAY(asList14;String([DCS]Ext;"##0.00"))
+			APPEND TO ARRAY(asList15;"")
+			APPEND TO ARRAY(asList16;String([DCS]Ext;"##0.00"))
+			$running:=$running+[DCS]Ext
+			
+		: ([DCS]Item="Duty@")
+			APPEND TO ARRAY(asList12;"")
+			APPEND TO ARRAY(asList13;String([DCS]Price;"#0.00%"))
+			$dutyrate:=[DCS]Price/100
+			$dutypaid:=Round($running*$dutyrate;2)
+			APPEND TO ARRAY(asList14;String($dutypaid;"##0.00"))
+			APPEND TO ARRAY(asList15;"")
+			APPEND TO ARRAY(asList16;String($dutypaid;"##0.00"))
+			$running:=$running+$dutypaid
+		Else 
+			APPEND TO ARRAY(asList12;String([DCS]Qty;"##0.00"))
+			APPEND TO ARRAY(asList13;String([DCS]Price;"##0.00"))
+			APPEND TO ARRAY(asList14;String([DCS]Ext;"##0.00"))
+			$running:=$running+[DCS]Ext
+			If ([DCS]Duty)
+				$dutyrate:=[DCS]DutyRate/100
+				$dutypaid:=Round([DCS]Ext*$dutyrate;2)
+				APPEND TO ARRAY(asList15;String([DCS]DutyRate;"##0.00%"))
+				APPEND TO ARRAY(asList16;String([DCS]Ext+$dutypaid;"##0.00"))
+				$running:=$running+$dutypaid
+			Else 
+				APPEND TO ARRAY(asList15;"")
+				APPEND TO ARRAY(asList16;String([DCS]Ext;"##0.00"))
+			End if 
+	End case 
+	APPEND TO ARRAY(alRecordKey;[DCS]ItemKey)
+	NEXT RECORD([DCS])
+End for 
+
+vrFOB:=$running
+
+DCS_Calc 

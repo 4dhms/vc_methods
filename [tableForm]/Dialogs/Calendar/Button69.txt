@@ -1,0 +1,3 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asList1;0)
+COPY ARRAY(asCustomers;asList1)

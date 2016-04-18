@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($char)
+C_TEXT(vtEmailAddress)
+vsFlag:="Sample"
+
+Dev_LogTest (String($1))
+QUERY([Samples];[Samples]SampleNumber=$1)
+QUERY SELECTION([Samples];[Samples]Void=False)
+QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+
+vtDescription:=[Designs]Description
+vsPatternSource:=[Designs]Patt Srce
+
+Case of 
+	: ([Samples]KWCnS="Woven")
+		vsKWCS:="Woven"
+	: ([Samples]KWCnS="Knit")
+		vsKWCS:="Knit"
+	: ([Samples]KWCnS="CutSew")
+		vsKWCS:="Cut and Sew"
+	Else 
+		vsKWCS:=""
+End case 
+
+vlOrderNumber:=[Samples]SampleNumber*-1
+vsOrderNumber:=String(Abs(vlOrderNumber))
+[Samples]TempEmailAddress:=vtEmailaddress
+vtFabricList:=Web_Fabric 
+vtCPList:=Web_CP 
+vtOrderTop:=Web_SampleTop 
+
+vComments:=Char(1)+"<font color=#336600 size=2 face="+Char(34)+"Times New Roman, Times, serif"+Char(34)+">Comments</font><br>"
+vComments:=vComments+"<font size=2 color=#000000 face="+Char(34)+"Verdana, Arial, Helvetica, san-serif"+Char(34)+">"
+
+For ($i;1;Length([Samples]CommtsSamGar))
+	$char:=Substring([Samples]CommtsSamGar;$i;1)
+	If (Character code($char)=13)
+		vComments:=vComments+"<br>"
+	Else 
+		vComments:=vComments+$char
+	End if 
+End for 
+vComments:=vComments+vtSpecB+"<br><br>"
+
+vtDescription:=[Designs]Description
+vtComponentList:=Web_Components 
+vtEmailAddress:=""
+
+vtGetPicture:="/4DCGI/DESIGN_"+[Samples]DesignNum
+
+
+WEB SEND FILE("samplepo.html")

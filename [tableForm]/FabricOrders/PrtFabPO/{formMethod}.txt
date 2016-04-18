@@ -1,0 +1,35 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtFullName)
+C_TEXT(vsFForwarder)
+C_TEXT(vsTerms)
+C_TEXT(vsVia)
+C_TEXT(vtFax)
+C_TEXT(vtPhone)
+C_TEXT($CR)
+
+$CR:=Char(13)
+  //
+Case of 
+	: (Form event=On Load)
+		FabPO_PrintPrep 
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE(*;"xCancel";[FabricOrders]Void=True)
+		OBJECT SET VISIBLE(*;"xCancel1";[FabricOrders]Void=True)
+		
+		FabPO_ChangedFieldList (1)
+		FabPO_PrintPrep 
+		  //Routes to the appropriate printing page
+		  //vsHeader:=◊asVendorTypes{◊asVendorTypes}+" Purchase Order No. "
+		  //«+[FabricOrders]PONumber
+		
+		
+		
+	: (Form event=On Header)
+		
+		If ([FabricOrders]ReviseNumber=0)
+			vsPOFlag:=""
+		Else 
+			vsPOFlag:="Revison "+String([FabricOrders]ReviseNumber)
+		End if 
+		vPageTxt:="Page "+String(Printing page)
+End case 

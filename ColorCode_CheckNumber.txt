@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($test)
+C_BOOLEAN($print)
+
+If (<>vlCodeCheck=0) & ($1#"")
+	Case of 
+		: (Position("-";$2)>4)
+			$print:=True
+		Else 
+			$print:=False
+	End case 
+	
+	$test:=$1
+	
+	Case of 
+		: (<>vlCodeCheck>0)
+			  //DONE
+		: (Length($test)>3)
+			If (Character code($test[[1]])>57) & (Character code($test[[2]])>57) & (Character code($test[[3]])>57) & (Character code($test[[4]])>57)
+				<>vlCodeCheck:=3
+			End if 
+		: (Length($test)>2)
+			If (Character code($test[[1]])>57) & (Character code($test[[2]])>57) & (Character code($test[[3]])>57)
+				<>vlCodeCheck:=3
+			End if 
+		: (Length($test)>1)
+			If (Character code($test[[1]])>57) & (Character code($test[[2]])>57)
+				<>vlCodeCheck:=3
+			End if 
+		: ($test="@GRPHC@")
+			<>vlCodeCheck:=2
+		: ($test="@ANMAL@") | ($test="@Black@") | ($test="@BOUCL@") | ($test="@CAMO@") | ($test="@CKGNG@") | ($test="@CONVR@") & ($print)
+			<>vlCodeCheck:=2
+		: ($test="@DPDYE@") | ($test="@DOT@") | ($test="@ETHST@") | ($test="@FLORL@") | ($test="@GRPHC@") | ($test="@JCQRD@") & ($print)
+			<>vlCodeCheck:=2
+		: ($test="@LACE@") | ($test="@ORNTL@") | ($test="@PASLY@") | ($test="@PLAID@") | ($test="@PUCCI@") | ($test="@PURPL@") & ($print)
+			<>vlCodeCheck:=2
+		: ($test="@multi@") | ($test="@Red@") | ($test="@SLDVR@") | ($test="@STRIP@") | ($test="@TIDYE@") | ($test="@TRPCL@") & ($print)
+			<>vlCodeCheck:=2
+		: ($test=$2)
+			<>vlCodeCheck:=1
+		Else 
+			<>vlCodeCheck:=3
+	End case 
+End if 
+

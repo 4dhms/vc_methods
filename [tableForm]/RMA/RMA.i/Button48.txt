@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([RMA]StoreID=0)
+	WinPrompt ("Error: Store improperly entered."+Char(13)+"Please try again.")
+	CANCEL
+End if 

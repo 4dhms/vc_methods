@@ -1,0 +1,53 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($process)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+C_LONGINT($i;$cell)
+C_POINTER($dn;$tn;$dp;$tp;$mp;$mn)
+C_BOOLEAN($done)
+
+QUERY([DL_Other];[DL_Other]DesignKey=[DesignLines]DesignLineKey)
+If (Locked([DL_Other]))
+	LOCKED BY([DL_Other];$process;$user;$session;$processName)
+	WinPrompt ("The Pasteboard record is locked by "+$user+" in process: "+$processname)
+Else 
+	If (Records in selection([DL_Other])=0)
+		CREATE RECORD([DL_Other])
+		[DL_Other]DesignKey:=[DesignLines]DesignLineKey
+		SAVE RECORD([DL_Other])
+	End if 
+	$tn:=Field(116;$1+3)
+	$dn:=Field(116;$1+15)
+	$mn:=Field(116;$1+28)
+	
+	$i:=1
+	For ($i;1;6)
+		If (Not($done))
+			$tp:=Field(49;$i+1)
+			$dp:=Field(49;$i+7)
+			$mp:=Field(49;$i+13)
+			$cell:=$i+12
+			
+			If ($tp->=0)
+				$done:=True
+			End if 
+		End if 
+	End for 
+	
+	If (Not($done))
+		WinPrompt ("Pasteboard is full.")
+	Else 
+		$tp->:=$tn->
+		$dp->:=$dn->
+		$mp->:=$mn->
+		$tn->:=0
+		$dn->:=""
+		$mn->:=""
+		SAVE RECORD([DL_Other])
+		
+		DLink_GrabDesign ($tp->;$dp->;$cell)
+		DLink_GrabDesign ($tn->;$dn->;$1)
+		
+	End if 
+End if 

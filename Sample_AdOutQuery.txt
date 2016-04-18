@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([Samples];"addto")
+Sample_AdOut (asSampleTypes{asSampleTypes})
+If (cbAddTo=1)
+	CREATE SET([Samples];"newset")
+	UNION("newset";"addto";"newset")
+	USE SET("newset")
+	CLEAR SET("newset")
+End if 
+SET WINDOW TITLE(String(Records in selection([Samples]))+" unreceived samples")
+vsPart1:=""
+vsPart2:=""
+vsPart3:=""
+vsPart4:=""
+vsPart5:=""
+vsPart6:=""
+vsPart7:=""
+vsPart8:=""
+vsPart9:=""
+vsPart10:=""
+CLEAR SET("addto")

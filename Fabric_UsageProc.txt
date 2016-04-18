@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asXColors;0)
+ARRAY LONGINT(alXhmsPO;0)
+ARRAY TEXT(asXStyleNumbers;0)
+ARRAY LONGINT(alXUnits;0)
+ARRAY TEXT(asXConsumption;0)
+ARRAY LONGINT(alXTotals;0)
+ARRAY LONGINT(alXColorKey;0)
+ARRAY TEXT(asXfabPO;0)
+ARRAY LONGINT(alXShip;0)
+ARRAY TEXT(asPOdate;0)
+ARRAY TEXT(asFBdate;0)
+vtArticleNumber:=$1
+vfExpand:=True
+
+READ ONLY([FabricOrders])
+vdDayOne:=Current date(*)-365
+Center Window (950;610;0;"")
+DIALOG("Usage_Expanded")
+CLOSE WINDOW
+READ WRITE([FabricOrders])
+<>vlFabricUsageProc:=0
+

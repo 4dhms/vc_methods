@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+GET HIGHLIGHTED RECORDS([Lists];"Lists")
+CREATE SET([Lists];"Remain")
+If (Records in set("UserSet")<1)
+	WinPrompt ("Select something.")
+Else 
+	USE SET("UserSet")
+	APPLY TO SELECTION([Lists];[Lists]KWCS:="Woven")
+End if 
+USE SET("Remain")
+CLEAR SET("Remain")
+ORDER BY([Lists];[Lists]OrderCount;<;[Lists]ListItem;>)
+SET WINDOW TITLE(String(Records in selection([Lists]))+" list items")
+cbWoven:=0
+HIGHLIGHT RECORDS([Lists];"Lists")

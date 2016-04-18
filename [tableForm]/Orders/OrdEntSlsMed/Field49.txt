@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Data Change)
+	If (Old([Orders]RetailPrice)#[Orders]RetailPrice)
+		[Orders]PriceTicket:=False
+	End if 
+End if 

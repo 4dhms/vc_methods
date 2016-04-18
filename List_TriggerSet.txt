@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked) & (Shift down)
+		WinChoice ("Are you sure you want to delete "+Char(13)+atListArt{atListArt}+"?")
+		If (ok=1)
+			DELETE FROM ARRAY(atListArt;atListContents;1)
+			DELETE FROM ARRAY(atListArt;atListArt;1)
+		End if 
+End case 

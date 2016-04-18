@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SLR_SaveWeek 
+vsStyleNumber:=""
+vtTitle:=""
+OBJECT SET VISIBLE(vxSketch;False)
+REDUCE SELECTION([SLRWks];0)
+ARRAY TEXT(asColors;0)
+UNLOAD RECORD([SLRAcct])
+FORM GOTO PAGE(1)
+GOTO OBJECT(vsStyleNumber)

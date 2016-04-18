@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+If (Records in selection([DLPages])>0) & (asDLGroupChoice{asDLGroupChoice}#[DesignLines]GroupChoice)
+	
+	If ([DesignLines]BuildStatus>0)
+		WinChoice ("This design line plan has been previously edited, do you want to rebuild?")
+	Else 
+		WinChoice ("These pages have been previously built grouped by  "+[DesignLines]GroupChoice+", do you want to rebuild?")
+	End if 
+	If (ok=1)
+		WinChoice ("Are you sure you want to rebuild this line, it will complete repaginate?";"Stop";"Do it")
+		If (ok=0)
+			[DesignLines]GroupChoice:=asDLGroupChoice{asDLGroupChoice}
+			  //0=rebuilt 1=edited 2=new items
+			[DesignLines]BuildStatus:=0
+			SAVE RECORD([DesignLines])
+			APPLY TO SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber:=0)
+			APPLY TO SELECTION([DesignLineIncluded];[DesignLineIncluded]DLGroup:=asDLGroupChoice{asDLGroupChoice})
+		End if 
+	Else 
+		asDLGroupChoice:=Find in array(asDLGroupChoice;[DesignLines]GroupChoice)
+	End if 
+Else 
+	[DesignLines]GroupChoice:=asDLGroupChoice{asDLGroupChoice}
+	SAVE RECORD([DesignLines])
+End if 

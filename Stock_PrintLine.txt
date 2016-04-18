@@ -1,0 +1,29 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$p)
+
+QUERY([DLPages];[DLPages]DLItemKey=[DesignLines]DesignLineKey)
+vlRecCount:=Records in selection([DLPages])
+
+vfPrinting:=True
+vPge:=1
+
+ORDER BY([DLPages];[DLPages]PageNumber;>)
+
+FORM SET OUTPUT([DLPages];"DLStock.print")
+
+vf8Up:=False
+
+PAGE SETUP([DLPages];"DesignLine.print")
+C_POINTER($tablePtr)
+C_BOOLEAN(vfEmail;vfPDF)
+
+If (Current user="Designer")
+	PRINT SELECTION([DLPages])
+Else 
+	PRINT SELECTION([DLPages];*)
+End if 
+vStyle:=""
+vfPrinting:=False
+vtBuyer:=String([StockOrders]BuyerKey)
+vsWebUser:="Stock"
+WebStock 

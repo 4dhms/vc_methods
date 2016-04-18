@@ -1,0 +1,52 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search for design number in design library
+C_LONGINT($i;$c)
+WinFind ("Find Style Number:")
+
+
+If (vAddTo=1)
+	CREATE SET([Designs];"Original")
+End if 
+
+If (OK=1)
+	QUERY([Orders];[Orders]StyleNumber=vsRequestString)
+	$i:=1
+	FIRST RECORD([Orders])
+	CREATE EMPTY SET([Designs];"Style")
+	For ($i;1;Records in selection([Orders]))
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		$c:=1
+		FIRST RECORD([Designs])
+		For ($c;1;Records in selection([Designs]))
+			ADD TO SET([Designs];"Style")
+			NEXT RECORD([Designs])
+		End for 
+		NEXT RECORD([Orders])
+	End for 
+	UNLOAD RECORD([Orders])
+	
+	QUERY([Samples];[Samples]StyleNum=vsRequestString)
+	$i:=1
+	FIRST RECORD([Samples])
+	For ($i;1;Records in selection([Samples]))
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		$c:=1
+		FIRST RECORD([Designs])
+		For ($c;1;Records in selection([Designs]))
+			ADD TO SET([Designs];"Style")
+			NEXT RECORD([Designs])
+		End for 
+		NEXT RECORD([Samples])
+	End for 
+	If (Records in set("Original")>0)
+		UNION("Style";"Original";"Style")
+		CLEAR SET("Original")
+	End if 
+	USE SET("Style")
+	
+	CLEAR SET("Style")
+	
+End if 
+SET WINDOW TITLE("Design Library: "+String(Records in selection([Designs]))+" of "+String(Records in table([Designs])))
+
+

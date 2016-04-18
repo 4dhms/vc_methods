@@ -1,0 +1,9 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //menu for Fabric Orders entry
+Case of 
+	: (<>Fab OrdID=0)
+		<>Fab OrdID:=New process("p_SamFab";0;"Fabric Orders")
+	Else 
+		SHOW PROCESS(<>Fab OrdID)
+		BRING TO FRONT(<>Fab OrdID)
+End case 

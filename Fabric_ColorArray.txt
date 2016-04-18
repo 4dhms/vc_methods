@@ -1,0 +1,148 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfShowCode)
+C_LONGINT($i;$s;$ordernumber)
+ARRAY TEXT(asTypeList;0)
+ARRAY TEXT(asCPLetter;0)
+ARRAY TEXT(asCPStyleNum;0)
+ARRAY TEXT(asCPNumbers;0)
+ARRAY TEXT(asCC;0)
+ARRAY BOOLEAN(afCCoverride;0)
+ARRAY TEXT(asCPColorName;0)
+ARRAY TEXT(asMillNumber;0)
+ARRAY TEXT(atThreadColor;0)
+ARRAY TEXT(asCarton;0)
+ARRAY TEXT(asColorStatus;0)
+ARRAY DATE(adStatusDate;0)
+ARRAY LONGINT(alCQty;0)
+ARRAY LONGINT(alSelfKey;0)
+ARRAY LONGINT(alStyleFab;0)
+ARRAY LONGINT(alShadeFab;0)
+ARRAY LONGINT(alColorChange;0)
+ARRAY LONGINT(alColorKey;0)
+ARRAY LONGINT($selfkeys;0)
+ARRAY LONGINT(alCPXref;0)
+ARRAY TEXT($typecheck;0)
+
+Order_PullCP ($1)
+$ordernumber:=$1
+  //vfNewRecord:=False
+
+DISTINCT VALUES([CP_OrderXRef]SelfKey;$selfkeys)
+SELECTION TO ARRAY([CP_OrderXRef]CPType;$typecheck)
+
+If (Find in array($selfkeys;0)>0)
+	DELETE FROM ARRAY($selfkeys;Find in array($selfkeys;0);1)
+End if 
+SORT ARRAY($selfkeys;>)
+
+$i:=1
+$s:=1
+FIRST RECORD([CP_OrderXRef])
+
+For ($i;1;Records in selection([CP_OrderXRef]))
+	APPEND TO ARRAY(alShadeFab;16777215)
+	APPEND TO ARRAY(asTypeList;[CP_OrderXRef]CPType)
+	
+	If ([CP_OrderXRef]CPType="Self")
+		If (<>vlOrderNumber>0)
+			APPEND TO ARRAY(asCarton;[CP_OrderXRef]Carton)
+		End if 
+		If ($1=$ordernumber)
+			APPEND TO ARRAY(alCQty;[CP_OrderXRef]Quantity)
+		Else 
+			APPEND TO ARRAY(alCQty;0)
+		End if 
+		APPEND TO ARRAY(alStyleFab;1)
+		APPEND TO ARRAY(alColorKey;[CP_OrderXRef]CPOrdID)
+		If ([Samples]MultipleStyles)
+			APPEND TO ARRAY(asCPStyleNum;[CP_OrderXRef]StyleNumber)
+		Else 
+			APPEND TO ARRAY(asCPStyleNum;"")
+		End if 
+	Else 
+		APPEND TO ARRAY(alStyleFab;2)
+		APPEND TO ARRAY(alColorKey;[CP_OrderXRef]CPOrdID)
+		APPEND TO ARRAY(alCQty;0)
+		Case of 
+			: ([CP_OrderXRef]CPType="Zipper") & (<>vlOrderNumber<0)
+				APPEND TO ARRAY(asCPStyleNum;[CP_OrderXRef]Carton)
+			: ([CP_OrderXRef]CPType="Zipper")
+				APPEND TO ARRAY(asCarton;[CP_OrderXRef]Carton)
+			Else 
+				APPEND TO ARRAY(asCarton;[CP_OrderXRef]Carton)
+				APPEND TO ARRAY(asCPStyleNum;"")
+		End case 
+	End if 
+	
+	APPEND TO ARRAY(asCPLetter;[CP_OrderXRef]LineKey)
+	APPEND TO ARRAY(asCPNumbers;[CP_OrderXRef]CPNumber)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+	QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+	APPEND TO ARRAY(asCPColorName;[ColorPrintNumber]CPName)
+	APPEND TO ARRAY(asMillNumber;[ColorPrintNumber]MillNumber)
+	
+	If ([CP_OrderXRef]ThreadColor#"")
+		APPEND TO ARRAY(atThreadColor;[CP_OrderXRef]ThreadColor)
+	Else 
+		<>vtColorCode:=""
+		Color_GetNameLaunch ([ColorPrintNumber]ThreadColor)
+		
+		Case of 
+			: (vtColor=[ColorPrintNumber]ThreadColor)
+				APPEND TO ARRAY(atThreadColor;[ColorPrintNumber]ThreadColor)
+			: (vtColor="")
+				APPEND TO ARRAY(atThreadColor;[ColorPrintNumber]ThreadColor)
+			: ([CP_OrderXRef]CPType="Zipper")
+				APPEND TO ARRAY(atThreadColor;[CP_OrderXRef]Status)
+			Else 
+				APPEND TO ARRAY(atThreadColor;[ColorPrintNumber]ThreadColor+" "+vtColor)
+		End case 
+	End if 
+	
+	
+	APPEND TO ARRAY(asColorStatus;[CP_OrderXRef]CPStatus)
+	APPEND TO ARRAY(adStatusDate;[CP_OrderXRef]CPStatusDate)
+	
+	[CP_OrderXRef]DontShowCode:=Not(ColorCode_Show )
+	SAVE RECORD([CP_OrderXRef])
+	If ([CP_OrderXRef]DontShowCode)
+		OBJECT SET COLOR(asCC;-(0+(256*0)))
+		vfShowCode:=False
+	Else 
+		OBJECT SET COLOR(asCC;-(15+(256*0)))
+		vfShowCode:=True
+	End if 
+	
+	Case of 
+		: ([CP_OrderXRef]CPType#"Self")
+			APPEND TO ARRAY(asCC;"")
+		: ([CP_OrderXRef]ColorCodeOverride)
+			APPEND TO ARRAY(asCC;[CP_OrderXRef]ColorCodeNew)
+		Else 
+			APPEND TO ARRAY(asCC;[CP_OrderXRef]ColorCode)
+	End case 
+	
+	APPEND TO ARRAY(afCCoverride;[CP_OrderXRef]ColorCodeOverride)
+	Case of 
+		: (vfNewRecord)
+			APPEND TO ARRAY(alCPXref;0)
+			APPEND TO ARRAY(alSelfKey;0)
+			alColorKey{$i}:=0
+		: ($ordernumber>0) & ([CP_OrderXRef]OrderNumber<0)  //bringing in from SGPO on a previously created order
+			APPEND TO ARRAY(alCPXref;0)
+			APPEND TO ARRAY(alSelfKey;0)
+			alColorKey{$i}:=0
+		Else 
+			APPEND TO ARRAY(alCPXref;[CP_OrderXRef]XrefID)
+			APPEND TO ARRAY(alSelfKey;[CP_OrderXRef]SelfKey)
+	End case 
+	
+	NEXT RECORD([CP_OrderXRef])
+	
+End for 
+UNLOAD RECORD([ColorPrintNumber])
+UNLOAD RECORD([CP_OrderXRef])
+  //UNLOAD RECORD([ColorPrintNumber])
+CLEAR SET("Colors")
+
+

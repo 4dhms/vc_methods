@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([FabricOrders]FinalDipDate=!00-00-00!)
+	[FabricOrders]FinalDipDate:=Current date(*)
+	OBJECT SET VISIBLE([FabricOrders]FinalDipDate;True)
+End if 

@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$tot;$ext;$in)
+
+
+QUERY([FabPOLines];[FabPOLines]FabOrderKey=[FabricOrders]FabOrderKey)
+FIRST RECORD([FabPOLines])
+$i:=1
+For ($i;1;Records in selection([FabPOLines]))
+	QUERY([Deliveries];[Deliveries]LineID=[FabPOLines]LineID)
+	ORDER BY([Deliveries];[Deliveries]DeliveryID;<)
+	If ([FabPOLines]LastDelivery#[Deliveries]DeliveryDate)
+		[FabPOLines]LastDelivery:=[Deliveries]DeliveryDate
+		SAVE RECORD([FabPOLines])
+	End if 
+	
+	$tot:=$tot+[FabPOLines]Quantity
+	$ext:=$ext+[FabPOLines]LineExt
+	$in:=$in+[FabPOLines]Delivered
+	NEXT RECORD([FabPOLines])
+End for 
+vsSubTot:="Total:  "+String($tot;"###,###.00")
+$ext:=$ext+[FabPOLines]LineExt
+[FabricOrders]InCount:=$in
+[FabricOrders]OutCount:=$in-$tot
+vrPOExt:=$ext

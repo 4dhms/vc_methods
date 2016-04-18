@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($ponumber)
+C_DATE($okdate)
+
+Case of 
+	: (Not([Orders]CreditOK))
+		WinPrompt ("Credit is unapproved.")
+	: ([Orders]CreditOKDate=!00-00-00!)
+		WinPrompt ("No approval date.")
+	: ([Orders]CustPONumber="")
+		WinPrompt ("No Customer PO Number.")
+	: (Order_Update )
+		WinChoice ("Do you want to approval credit on all orders on Customer PO "+[Orders]CustPONumber+"?")
+		If (ok=1)
+			$ponumber:=[Orders]CustPONumber
+			$okdate:=[Orders]CreditOKDate
+			ACCEPT
+			
+			QUERY([Orders];[Orders]CustPONumber=$ponumber)
+			QUERY SELECTION([Orders];[Orders]OrderNum#<>vlOrderNumber)
+			If (Records in selection([Orders])>0)
+				APPLY TO SELECTION([Orders];[Orders]CreditOK:=True)
+				APPLY TO SELECTION([Orders];[Orders]CreditOKDate:=$okdate)
+			End if 
+		End if 
+End case 
+SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))

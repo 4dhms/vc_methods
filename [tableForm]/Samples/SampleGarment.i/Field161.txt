@@ -1,0 +1,2 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+WinPrompt ("This field is in the process of being replaced by a invoice quantity window.")

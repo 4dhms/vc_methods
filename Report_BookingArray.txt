@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY REAL(arPrice;0)
+ARRAY TEXT(asCustomers;0)
+ARRAY LONGINT(alUnits;0)
+
+SELECTION TO ARRAY([Orders]TotalOrderQuantity;alUnits;[Orders]Customer;asCustomers;[Orders]Price;arPrice)

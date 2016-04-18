@@ -1,0 +1,12 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+Case of 
+	: ([Specs]Spl Type 2#"")
+		FORM GOTO PAGE(2)
+	Else 
+		WinChoice ("Create new spec?")
+		If (ok=1)
+			[Specs]Spl Lay 2 Date:=Current date(*)
+			[Specs]Spl Typ 3 REQ D:=Current date(*)+14
+			FORM GOTO PAGE(2)
+		End if 
+End case 

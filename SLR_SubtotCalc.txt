@@ -1,0 +1,268 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($colorline;0)
+ARRAY LONGINT($totline;0)
+ARRAY LONGINT($grandline;0)
+ARRAY LONGINT($supersub;0)
+ARRAY LONGINT($colorline;12)
+ARRAY LONGINT($totline;12)
+ARRAY LONGINT($grandline;12)
+ARRAY LONGINT($supersub;12)
+
+C_BOOLEAN($newtot)
+C_LONGINT($i;$reorder;$c;$test;$raw;$s;$p)
+C_REAL($header)
+
+  //finds highest reorder number
+$newtot:=True
+$i:=1
+For ($i;1;Size of array(asTableSpec))
+	$test:=Num(asTableSpec{$i}{8})
+	If ($test>$c) & ($test#999) & ($test<10)
+		$c:=$test
+	End if 
+End for 
+$c:=$c+1
+ARRAY LONGINT($subline;0;0)
+ARRAY LONGINT($subline;12;$c)
+
+  //1 unitM  2 totalM 3 unitS 4 totalS 5 unitY 6 totalY 7 unitL 8 totalL 9 ohM 10 ohS 11 ohY 12 ohL
+
+$i:=1
+
+For ($i;1;Size of array(alTableTot))
+	$header:=Num(asTableSpec{$i}{6})
+	$raw:=Num(asTableSpec{$i}{8})
+	
+	Case of 
+		: ($raw=999)
+			$reorder:=0
+		: ($raw>9)
+			$reorder:=$raw-10
+		Else 
+			$reorder:=$raw
+	End case 
+	
+	Case of 
+		: ($header=3)
+			ARRAY LONGINT($totline;0)
+			ARRAY LONGINT($totline;12)
+			ARRAY LONGINT($subline;0;0)
+			ARRAY LONGINT($subline;12;$c)
+			ARRAY LONGINT($supersub;0)
+			ARRAY LONGINT($supersub;12)
+			ARRAY LONGINT($colorline;0)
+			ARRAY LONGINT($colorline;12)
+			
+		: ($header=2) & (vfByStyle)
+			ARRAY LONGINT($subline;0;$c)
+			ARRAY LONGINT($subline;12;$c)
+			ARRAY LONGINT($supersub;0)
+			ARRAY LONGINT($supersub;12)
+			
+			ARRAY LONGINT($colorline;0)
+			ARRAY LONGINT($colorline;12)
+			
+		: ($header=2.5)
+			ARRAY LONGINT($subline;0;0)
+			ARRAY LONGINT($subline;12;$c)
+			ARRAY LONGINT($supersub;0)
+			ARRAY LONGINT($supersub;12)
+			ARRAY LONGINT($colorline;0)
+			ARRAY LONGINT($colorline;12)
+			
+		: ($header=2)  //& (Not($newtot))
+			ARRAY LONGINT($subline;0;$c)
+			ARRAY LONGINT($subline;12;$c)
+			ARRAY LONGINT($supersub;0)
+			ARRAY LONGINT($supersub;12)
+			ARRAY LONGINT($colorline;0)
+			ARRAY LONGINT($colorline;12)
+		: ($header=1)
+			ARRAY LONGINT($colorline;0)
+			ARRAY LONGINT($colorline;12)
+		: ($header=0) & ($reorder=0)
+			ARRAY LONGINT($colorline;0)
+			ARRAY LONGINT($colorline;12)
+		: ($header=-1)
+			alTableTot{$i}{1}:=$colorline{1}
+			alTableTot{$i}{3}:=$colorline{2}
+			alTableTot{$i}{5}:=$colorline{3}
+			alTableTot{$i}{7}:=$colorline{4}
+			alTableTot{$i}{2}:=$colorline{5}
+			alTableTot{$i}{4}:=$colorline{6}
+			alTableTot{$i}{6}:=$colorline{7}
+			alTableTot{$i}{8}:=$colorline{8}
+			If (Not(vfByStyle))
+				alTableTot{$i}{9}:=$colorline{9}
+				alTableTot{$i}{10}:=$colorline{10}
+				alTableTot{$i}{11}:=$colorline{11}
+				alTableTot{$i}{12}:=$colorline{12}
+			End if 
+		: ($header=-2) & ($raw=999)
+			alTableTot{$i}{1}:=$supersub{1}
+			alTableTot{$i}{3}:=$supersub{2}
+			alTableTot{$i}{5}:=$supersub{3}
+			alTableTot{$i}{7}:=$supersub{4}
+			alTableTot{$i}{2}:=$supersub{5}
+			alTableTot{$i}{4}:=$supersub{6}
+			alTableTot{$i}{6}:=$supersub{7}
+			alTableTot{$i}{8}:=$supersub{8}
+			If (Not(vfByStyle))
+				alTableTot{$i}{9}:=$supersub{9}
+				alTableTot{$i}{10}:=$supersub{10}
+				alTableTot{$i}{11}:=$supersub{11}
+				alTableTot{$i}{12}:=$supersub{12}
+			End if 
+			
+		: ($header=-2) | ($header=-2.5)
+			$s:=1
+			For ($s;1;12)
+				$p:=1
+				For ($p;1;$c)
+					If ($p>1)
+						$subline{$s}{1}:=$subline{$s}{1}+$subline{$s}{$p}
+					End if 
+				End for 
+			End for 
+			
+			alTableTot{$i}{1}:=$subline{1}{$reorder+1}
+			alTableTot{$i}{3}:=$subline{2}{$reorder+1}
+			alTableTot{$i}{5}:=$subline{3}{$reorder+1}
+			alTableTot{$i}{7}:=$subline{4}{$reorder+1}
+			alTableTot{$i}{2}:=$subline{5}{$reorder+1}
+			alTableTot{$i}{4}:=$subline{6}{$reorder+1}
+			alTableTot{$i}{6}:=$subline{7}{$reorder+1}
+			alTableTot{$i}{8}:=$subline{8}{$reorder+1}
+			If (Not(vfByStyle))
+				alTableTot{$i}{9}:=$subline{9}{$reorder+1}
+				alTableTot{$i}{10}:=$subline{10}{$reorder+1}
+				alTableTot{$i}{11}:=$subline{11}{$reorder+1}
+				alTableTot{$i}{12}:=$subline{12}{$reorder+1}
+			End if 
+			
+			ARRAY LONGINT($subline;0;0)
+			ARRAY LONGINT($subline;12;$c)
+			
+		: ($header=-3) & (vfByStyle)
+			alTableTot{$i}{1}:=$supersub{1}
+			alTableTot{$i}{3}:=$supersub{2}
+			alTableTot{$i}{5}:=$supersub{3}
+			alTableTot{$i}{7}:=$supersub{4}
+			alTableTot{$i}{2}:=$supersub{5}
+			alTableTot{$i}{4}:=$supersub{6}
+			alTableTot{$i}{6}:=$supersub{7}
+			alTableTot{$i}{8}:=$supersub{8}
+			  //alTableTot{$i}{9}:=$supersub{9}
+			  //alTableTot{$i}{10}:=$supersub{10}
+			  //alTableTot{$i}{11}:=$supersub{11}
+			  //alTableTot{$i}{12}:=$supersub{12}
+			
+			ARRAY LONGINT($supersub;0)
+			ARRAY LONGINT($supersub;12)
+			
+			
+		: ($header=-3) & (Not(vfByStyle))
+			alTableTot{$i}{1}:=$totline{1}
+			alTableTot{$i}{3}:=$totline{2}
+			alTableTot{$i}{5}:=$totline{3}
+			alTableTot{$i}{7}:=$totline{4}
+			alTableTot{$i}{2}:=$totline{5}
+			alTableTot{$i}{4}:=$totline{6}
+			alTableTot{$i}{6}:=$totline{7}
+			alTableTot{$i}{8}:=$totline{8}
+			alTableTot{$i}{9}:=$totline{9}
+			alTableTot{$i}{10}:=$totline{10}
+			alTableTot{$i}{11}:=$totline{11}
+			alTableTot{$i}{12}:=$totline{12}
+		: ($header=-4)
+			alTableTot{$i}{1}:=$grandline{1}
+			alTableTot{$i}{3}:=$grandline{2}
+			alTableTot{$i}{5}:=$grandline{3}
+			alTableTot{$i}{7}:=$grandline{4}
+			alTableTot{$i}{2}:=$grandline{5}
+			alTableTot{$i}{4}:=$grandline{6}
+			alTableTot{$i}{6}:=$grandline{7}
+			alTableTot{$i}{8}:=$grandline{8}
+			  //alTableTot{$i}{9}:=$grandline{9}
+			  //alTableTot{$i}{10}:=$grandline{10}
+			  //alTableTot{$i}{11}:=$grandline{11}
+			  //alTableTot{$i}{12}:=$grandline{12}
+			
+	End case 
+	
+	Case of 
+		: ($header=-2)
+			ARRAY LONGINT($subline;0;0)
+			ARRAY LONGINT($subline;12;$c)
+		: ($header=-3)
+			ARRAY LONGINT($subline;0;0)
+			ARRAY LONGINT($subline;12;$c)
+		: ($header>=0)  //& ($header#2.5)
+			$colorline{1}:=alTableTot{$i}{1}+$colorline{1}
+			$colorline{2}:=alTableTot{$i}{3}+$colorline{2}
+			$colorline{3}:=alTableTot{$i}{5}+$colorline{3}
+			$colorline{4}:=alTableTot{$i}{7}+$colorline{4}
+			$colorline{5}:=alTableTot{$i}{2}+$colorline{5}
+			$colorline{6}:=alTableTot{$i}{4}+$colorline{6}
+			$colorline{7}:=alTableTot{$i}{6}+$colorline{7}
+			$colorline{8}:=alTableTot{$i}{8}+$colorline{8}
+			$colorline{9}:=alTableTot{$i}{9}+$colorline{9}
+			$colorline{10}:=alTableTot{$i}{10}+$colorline{10}
+			$colorline{11}:=alTableTot{$i}{11}+$colorline{11}
+			$colorline{12}:=alTableTot{$i}{12}+$colorline{12}
+			
+			$subline{1}{$reorder+1}:=alTableTot{$i}{1}+$subline{1}{$reorder+1}
+			$subline{2}{$reorder+1}:=alTableTot{$i}{3}+$subline{2}{$reorder+1}
+			$subline{3}{$reorder+1}:=alTableTot{$i}{5}+$subline{3}{$reorder+1}
+			$subline{4}{$reorder+1}:=alTableTot{$i}{7}+$subline{4}{$reorder+1}
+			$subline{5}{$reorder+1}:=alTableTot{$i}{2}+$subline{5}{$reorder+1}
+			$subline{6}{$reorder+1}:=alTableTot{$i}{4}+$subline{6}{$reorder+1}
+			$subline{7}{$reorder+1}:=alTableTot{$i}{6}+$subline{7}{$reorder+1}
+			$subline{8}{$reorder+1}:=alTableTot{$i}{8}+$subline{8}{$reorder+1}
+			$subline{9}{$reorder+1}:=alTableTot{$i}{9}+$subline{9}{$reorder+1}
+			$subline{10}{$reorder+1}:=alTableTot{$i}{10}+$subline{10}{$reorder+1}
+			$subline{11}{$reorder+1}:=alTableTot{$i}{11}+$subline{11}{$reorder+1}
+			$subline{12}{$reorder+1}:=alTableTot{$i}{12}+$subline{12}{$reorder+1}
+			
+			$supersub{1}:=alTableTot{$i}{1}+$supersub{1}
+			$supersub{2}:=alTableTot{$i}{3}+$supersub{2}
+			$supersub{3}:=alTableTot{$i}{5}+$supersub{3}
+			$supersub{4}:=alTableTot{$i}{7}+$supersub{4}
+			$supersub{5}:=alTableTot{$i}{2}+$supersub{5}
+			$supersub{6}:=alTableTot{$i}{4}+$supersub{6}
+			$supersub{7}:=alTableTot{$i}{6}+$supersub{7}
+			$supersub{8}:=alTableTot{$i}{8}+$supersub{8}
+			$supersub{9}:=alTableTot{$i}{9}+$supersub{9}
+			$supersub{10}:=alTableTot{$i}{10}+$supersub{10}
+			$supersub{11}:=alTableTot{$i}{11}+$supersub{11}
+			$supersub{12}:=alTableTot{$i}{12}+$supersub{12}
+			
+			$totline{1}:=alTableTot{$i}{1}+$totline{1}
+			$totline{2}:=alTableTot{$i}{3}+$totline{2}
+			$totline{3}:=alTableTot{$i}{5}+$totline{3}
+			$totline{4}:=alTableTot{$i}{7}+$totline{4}
+			$totline{5}:=alTableTot{$i}{2}+$totline{5}
+			$totline{6}:=alTableTot{$i}{4}+$totline{6}
+			$totline{7}:=alTableTot{$i}{6}+$totline{7}
+			$totline{8}:=alTableTot{$i}{8}+$totline{8}
+			$totline{9}:=alTableTot{$i}{9}+$totline{9}
+			$totline{10}:=alTableTot{$i}{10}+$totline{10}
+			$totline{11}:=alTableTot{$i}{11}+$totline{11}
+			$totline{12}:=alTableTot{$i}{12}+$totline{12}
+			
+			$grandline{1}:=alTableTot{$i}{1}+$grandline{1}
+			$grandline{2}:=alTableTot{$i}{3}+$grandline{2}
+			$grandline{3}:=alTableTot{$i}{5}+$grandline{3}
+			$grandline{4}:=alTableTot{$i}{7}+$grandline{4}
+			$grandline{5}:=alTableTot{$i}{2}+$grandline{5}
+			$grandline{6}:=alTableTot{$i}{4}+$grandline{6}
+			$grandline{7}:=alTableTot{$i}{6}+$grandline{7}
+			$grandline{8}:=alTableTot{$i}{8}+$grandline{8}
+			$grandline{9}:=alTableTot{$i}{9}+$grandline{9}
+			$grandline{10}:=alTableTot{$i}{10}+$grandline{10}
+			$grandline{11}:=alTableTot{$i}{11}+$grandline{11}
+			$grandline{12}:=alTableTot{$i}{12}+$grandline{12}
+			
+	End case 
+	
+End for 

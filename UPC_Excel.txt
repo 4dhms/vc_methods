@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TIME($docref)
+C_LONGINT($i)
+C_TEXT($path)
+
+$docref:=Create document("";"txt")
+If (ok=1)
+	$path:=Document
+	SEND PACKET($docref;"Style"+Char(9)+"Color"+Char(9)+"NRF Color"+Char(9)+"Size"+Char(9)+"NRF Size"+Char(9)+"UPC"+Char(13))
+	
+	$i:=1
+	For ($i;1;Size of array(asStyleNumbers))
+		SEND PACKET($docref;asStyleNumbers{$i}+Char(9)+asColors{$i}+Char(9)+asList1{$i}+Char(9))
+		SEND PACKET($docref;asSizes{$i}+Char(9)+asList2{$i}+Char(9)+" "+asColorCodes{$i}+" "+Char(13))
+	End for 
+	
+	CLOSE DOCUMENT($docref)
+	SHOW ON DISK($path)
+End if 

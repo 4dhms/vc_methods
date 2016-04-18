@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Orders]DomesticGroup)
+	[Orders]SZGroup:=False
+	[Orders]HZGroup:=False
+	  //[Orders]DomesticGroup:=False
+	[Orders]VietnamGroup:=False
+End if 
+

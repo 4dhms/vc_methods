@@ -1,0 +1,613 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfRev)
+C_TEXT(vtCarton)
+C_BOOLEAN($sgpo;vfRoberta;vfContinue)
+ARRAY LONGINT(alFoundKeys;0)
+C_TEXT(vOrd)
+C_LONGINT($n;$height;$pdepth)
+vlPage:=vlPage+1
+vfContinue:=True
+
+Order_CleanUpEmpty 
+READ ONLY([ChineseHeads])
+ALL RECORDS([ChineseHeads])
+FIRST RECORD([ChineseHeads])
+
+$pdepth:=630
+Case of 
+	: (Current user="Roberta")
+		vfRoberta:=True
+		  //: (Current user="Designer") 
+		  //vfRoberta:=True
+	Else 
+		vfRoberta:=False
+End case 
+If (vfRoberta)
+	WinChoice ("Print regular or first page at 115%?";"Regular";"One page")
+	If (ok=1)
+		vfRoberta:=False
+	End if 
+End if 
+
+If (PrintOrder_PrinterSetup )
+	If (vfRoberta)
+		SET PRINT OPTION(Scale option;115)
+		SET PRINT OPTION(Orientation option;2)
+	End if 
+	
+	  //vxSketch:=[Designs]Sketch
+	
+	If (<>vlOrderNumber>0)
+		If (vfPO)
+			
+			Print form([Orders];"PrintPO_Main")
+			vlPrintedPixels:=277
+		Else 
+			Print form([Orders];"PrintOrder_Main")
+			vlPrintedPixels:=216
+		End if 
+		
+		Pix_Label 
+		
+		If ([Orders]Care Label="")
+			vlPrintedPixels:=vlPrintedPixels+9
+			Print form([Orders];"PrintOrder_3pt")
+			Print form([Orders];"PrintOrder_3pt")
+			Print form([Orders];"PrintOrder_3pt")
+		Else 
+			If (Find in array(alFieldNumber;11)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			vtTitle:="Care and Content Label:"
+			Print form([Orders];"PrintOrder_ColHeads")
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]Care Label
+			vlColorFieldNum:=11
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth-24;"Care Label")
+				PrintOrder_Strip 
+				Print form([Orders];"PrintOrder_Notes")
+				vlPrintedPixels:=vlPrintedPixels+12
+			End while 
+		End if 
+		
+		vfRev:=False
+		
+		vlPrintedPixels:=vlPrintedPixels+6
+		Print form([Orders];"PrintOrder_FabFibHead")
+		vlPrintedPixels:=vlPrintedPixels+14
+	Else 
+		Print form([Samples];"PrintSample_Main")
+		vlPrintedPixels:=272
+		Pix_Label 
+	End if 
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+	Order_Fab_Sort 
+	
+	$n:=1
+	FIRST RECORD([OrdersFabricXRef])
+	For ($n;1;Records in selection([OrdersFabricXRef]))
+		  //populate zipper article
+		If ([OrdersFabricXRef]OrdType="Zipper")
+			vsArticle:=""
+			If ([OrdersFabricXRef]FabArtNo="")
+				QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=[OrdersFabricXRef]XrefID)
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPStatus#"")
+				ARRAY TEXT($art;0)
+				DISTINCT VALUES([CP_OrderXRef]CPStatus;$art)
+				
+				If (Size of array($art)=1)
+					vsArticle:=$art{1}
+				End if 
+			Else 
+				vsArticle:=[OrdersFabricXRef]FabArtNo
+			End if 
+		End if 
+		
+		QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=[OrdersFabricXRef]FabArtNo)
+		If ([FabricLibrary]SecondaryFabric="")
+			If ([OrdersFabricXRef]OrdType="Zipper")
+				Print form([OrdersFabricXRef];"Zipper.print")
+				vlPrintedPixels:=vlPrintedPixels+36
+			Else 
+				Print form([OrdersFabricXRef];"PrtOrderInfoIncl")
+				vlPrintedPixels:=vlPrintedPixels+43
+			End if 
+		Else 
+			vtFabric11:=[FabricLibrary]SecondaryFabric
+			vtFabric12:=[FabricLibrary]SecondaryContent
+			If ([OrdersFabricXRef]OrdType="Zipper")
+				Print form([OrdersFabricXRef];"Zipper.print")
+				vlPrintedPixels:=vlPrintedPixels+21
+			Else 
+				Print form([OrdersFabricXRef];"PrtCompoundInfoIncl")
+				vlPrintedPixels:=vlPrintedPixels+78
+			End if 
+			UNLOAD RECORD([OrdersFabricXRef])
+		End if 
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+	vlPrintedPixels:=vlPrintedPixels+3
+	Print form([Orders];"PrintOrder_3pt")
+	Print form([Orders];"PrintOrder_3pt")
+	
+	  //Components
+	CS_GetSheet 
+	
+	If (<>vlOrderNumber>0)
+		If ([Orders]SGPO#"") | (Records in selection([ComponentSheets])>0)
+			$sgpo:=True
+		End if 
+	Else 
+		$sgpo:=True
+	End if 
+	
+	If ($sgpo)
+		
+		If (Records in selection([ComponentSheets])>0)
+			QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID)
+			QUERY SELECTION([CS_Lines];[CS_Lines]OrderNumber=0;*)
+			QUERY SELECTION([CS_Lines]; | ;[CS_Lines]OrderNumber=<>vlOrderNumber)
+			CS_StripHidden 
+			
+			If (Records in selection([CS_Lines])>0)
+				PrintOrder_NewPage ($pdepth+36;"")
+				vtTitle:="COMPONENTS"
+				vsHeader:="Sample Garment Order "+[Orders]SGPO
+				If (vlPrintedPixels>48)
+					If (vfContinue)
+						Print form([Orders];"PrintOrder_SectRule")
+					End if 
+				End if 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Section")
+					Print form([Orders];"ComponentDescHead")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+32
+				
+				$n:=1
+				FIRST RECORD([CS_Lines])
+				For ($n;1;Records in selection([CS_Lines]))
+					If (vfContinue)
+						Print form([Orders];"PrintOrder_Rule")
+					End if 
+					vlPrintedPixels:=vlPrintedPixels+4
+					
+					Print form("ComponentDesc")
+					vlPrintedPixels:=vlPrintedPixels+16
+					
+					PrintOrder_Component 
+					vtRemaining:=vtLine
+					While (Length(vtRemaining)>0)
+						PrintOrder_NewPage ($pdepth;"Components")
+						PrintOrder_Strip 
+						If (vfContinue)
+							Print form("ComponentDesc2")
+						End if 
+						vlPrintedPixels:=vlPrintedPixels+11
+					End while 
+					NEXT RECORD([CS_Lines])
+				End for 
+				
+				QUERY([CS_Issues];[CS_Issues]CS_ID=[ComponentSheets]CS_ID)
+				If (Records in selection([CS_Issues])>0)
+					PrintOrder_NewPage ($pdepth;"")
+					vtTitle:="ISSUES"
+					vsHeader:=""
+					If (vlPrintedPixels>48)
+						If (vfContinue)
+							Print form([Orders];"PrintOrder_SectRule")
+						End if 
+					End if 
+					If (vfContinue)
+						Print form([Orders];"PrintOrder_Section")
+					End if 
+					vlPrintedPixels:=vlPrintedPixels+16
+					
+					$n:=1
+					FIRST RECORD([CS_Issues])
+					For ($n;1;Records in selection([CS_Issues]))
+						PrintOrder_NewPage ($pdepth;"Issues")
+						If (vfContinue)
+							Print form([Orders];"PrintOrder_Rule")
+						End if 
+						vlPrintedPixels:=vlPrintedPixels+4
+						PrintOrder_Issue 
+						vtRemaining:=vtLine
+						While (Length(vtRemaining)>0)
+							PrintOrder_NewPage ($pdepth;"Issues")
+							PrintOrder_Strip 
+							If (vfContinue)
+								Print form([Orders];"PrintOrder_Notes")
+							End if 
+							vlPrintedPixels:=vlPrintedPixels+11
+						End while 
+						NEXT RECORD([CS_Issues])
+					End for 
+				End if 
+			End if 
+		End if 
+	End if 
+	
+	If (vfContinue)
+		PrintOrder_NewPage ($pdepth;"")
+		If (<>vlOrderNumber>0)
+			Print form([Orders];"PrintOrder_FabHead")
+		Else 
+			Print form([Samples];"PrintSampleCPHead")
+		End if 
+	End if 
+	vlPrintedPixels:=vlPrintedPixels+24
+	If (<>vlOrderNumber>0)
+		Orders_CalcQty 
+	Else 
+		SampGar_CalcQty 
+	End if 
+	
+	Order_PullCP (<>vlOrderNumber)
+	UNLOAD RECORD([ColorPrintNumber])
+	
+	  //ARRAY LONGINT(alSelfKey;0)
+	  //COPY ARRAY(alFoundKeys;alSelfKey)
+	
+	ARRAY BOOLEAN($show;0)
+	SELECTION TO ARRAY([CP_OrderXRef]DontShowCode;$show)
+	If (Find in array($show;True)>0)
+		vfShowCode:=True
+	End if 
+	
+	$n:=1
+	FIRST RECORD([CP_OrderXRef])
+	vtCarton:=[CP_OrderXRef]Carton
+	
+	For ($n;1;Records in selection([CP_OrderXRef]))
+		
+		[CP_OrderXRef]DontShowCode:=Not(ColorCode_Show )
+		If (PrintOrder_NewPage ($pdepth;""))
+			If (vfContinue)
+				If (<>vlOrderNumber>0)
+					Print form([Orders];"PrintOrder_FabHead")
+				Else 
+					Print form([Samples];"PrintSampleCPHead")
+				End if 
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+24
+			
+		End if 
+		
+		
+		If (vfContinue)
+			PrintOrder_NewPage ($pdepth;"")
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			
+			Case of 
+				: ([CP_OrderXRef]CPType="Zipper") & (<>vlOrderNumber>0)
+					Print form([CP_OrderXRef];"Zipper.p")
+					vlPrintedPixels:=vlPrintedPixels+48
+				: ([CP_OrderXRef]CPType="Zipper")
+					Print form([CP_OrderXRef];"ZipperSG.p")
+				: (Length([CP_OrderXRef]CPNumber)>10) | (Length([ColorPrintNumber]CPName)>30) & (<>vlOrderNumber<0)
+					Print form([CP_OrderXRef];"ColorsSG2.print")
+					vlPrintedPixels:=vlPrintedPixels+24
+				: (Length([CP_OrderXRef]CPNumber)>10) | (Length([ColorPrintNumber]CPName)>30) & (<>vlOrderNumber>0)
+					Print form([CP_OrderXRef];"Colors2.print")
+					vlPrintedPixels:=vlPrintedPixels+24
+				: (<>vlOrderNumber>0)
+					Print form([CP_OrderXRef];"Colors.print")
+				Else 
+					Print form([CP_OrderXRef];"ColorsSG.print")
+			End case 
+		End if 
+		vlPrintedPixels:=vlPrintedPixels+28
+		If ([ColorPrintNumber]CPType=2) | ([ColorPrintNumber]CPType=5) | ([ColorPrintNumber]CPType=6) | ([ColorPrintNumber]CPNumber="YD@") | ([ColorPrintNumber]CPNumber="WD@") & ([ColorPrintNumber]ThreadColor#"")
+			If ([CP_OrderXRef]ThreadColor#"")
+				vtThreadColor:=[CP_OrderXRef]ThreadColor
+			Else 
+				Color_GetNameLaunch ([ColorPrintNumber]ThreadColor)
+				vtThreadColor:=[ColorPrintNumber]ThreadColor+" "+vtColor
+			End if 
+			Print form([CP_OrderXRef];"PrintThreadColor")
+			vlPrintedPixels:=vlPrintedPixels+16
+		End if 
+		
+		If ([ColorPrintNumber]MillNumber#"") & ([ColorPrintNumber]CPNumber#"")
+			Print form([CP_OrderXRef];"PrintMillnumber")
+			vlPrintedPixels:=vlPrintedPixels+16
+		End if 
+		
+		If ($n=Records in selection([CP_OrderXRef])) & (vtCarton#"")
+			Print form([CP_OrderXRef];"Carton.print")
+			vlPrintedPixels:=vlPrintedPixels+12
+		End if 
+		CP_SaveBuy 
+		
+		NEXT RECORD([CP_OrderXRef])
+		
+		If ([CP_OrderXRef]CPType="Self") & (vtCarton#"")
+			Print form([CP_OrderXRef];"Carton.print")
+			vtCarton:=[CP_OrderXRef]Carton
+			vlPrintedPixels:=vlPrintedPixels+12
+		End if 
+	End for 
+	
+	If (<>vlOrderNumber>0)
+		If (vfContinue)
+			Print form([Orders];"PrintOrder_Quantity")
+		End if 
+		vlPrintedPixels:=vlPrintedPixels+11
+		
+		If (Not(vfRoberta))
+			Order_PrintBreakdown 
+		End if 
+		
+		If ([Orders]Comments_Sales#"")
+			If (Find in array(alFieldNumber;20)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			
+			PrintOrder_NewPage ($pdepth-36;"")
+			vtTitle:="Revisions:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]Comments_Sales
+			vlColorFieldNum:=20
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Comments")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]Special_Instructions#"")
+			If (Find in array(alFieldNumber;30)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth-36;"")
+			vtTitle:="Special_Instructions:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]Special_Instructions
+			vlColorFieldNum:=30
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Special Instructions")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]FitNotes#"") & (Not(vfPO))
+			If (Find in array(alFieldNumber;30)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth-36;"")
+			vtTitle:="Fit Notes:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]FitNotes
+			vlColorFieldNum:=30
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Fit Notes")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]FabricNotes#"") & (Not(vfPO))
+			If (Find in array(alFieldNumber;30)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth-36;"")
+			vtTitle:="Fabric Notes:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]FabricNotes
+			vlColorFieldNum:=30
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Fabric Notes")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]TrimNotes#"") & (Not(vfPO))
+			If (Find in array(alFieldNumber;30)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth-36;"")
+			vtTitle:="Trim Notes:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]TrimNotes
+			vlColorFieldNum:=30
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Trim Notes")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]InspectionReport#"") & (Not(vfPO))
+			If (Find in array(alFieldNumber;30)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth-36;"")
+			vtTitle:="Inspection Report:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]InspectionReport
+			vlColorFieldNum:=30
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Inspection Report")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]ProdComments#"") & (Not(vfPO))
+			If (Find in array(alFieldNumber;150)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth;"")
+			vtTitle:="Production Status Notes:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]ProdComments
+			vlColorFieldNum:=150
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth-24;"Production Status Notes")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		vfRev:=False
+		
+		If ([Orders]TimeActionNotes#"") & (Not(vfPO))
+			If (Find in array(alFieldNumber;150)>0)
+				vfRev:=True
+			Else 
+				vfRev:=False
+			End if 
+			PrintOrder_NewPage ($pdepth;"")
+			vtTitle:="Time and Action Notes:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Orders]TimeActionNotes
+			vlColorFieldNum:=150
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth-24;"Time and Action Notes")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+			
+			vlPrintedPixels:=vlPrintedPixels+6
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_3pt")
+				Print form([Orders];"PrintOrder_3pt")
+			End if 
+		End if 
+		vfRev:=False
+		
+	Else 
+		If (vfContinue)
+			Print form([Samples];"PrintSample_Quantity")
+		End if 
+		vlPrintedPixels:=vlPrintedPixels+11
+		If ([Samples]CommtsSamGar#"")
+			PrintOrder_NewPage ($pdepth;"")
+			vtTitle:="Comments:"
+			If (vfContinue)
+				Print form([Orders];"PrintOrder_ColHeads")
+			End if 
+			vlPrintedPixels:=vlPrintedPixels+14
+			vtRemaining:=[Samples]CommtsSamGar
+			vlColorFieldNum:=2
+			While (Length(vtRemaining)>0)
+				PrintOrder_NewPage ($pdepth;"Comments")
+				PrintOrder_Strip 
+				If (vfContinue)
+					Print form([Orders];"PrintOrder_Notes")
+				End if 
+				vlPrintedPixels:=vlPrintedPixels+11
+			End while 
+		End if 
+		
+		
+		If (vfContinue)
+			Print form([Orders];"PrintOrder_3pt")
+		End if 
+		vlPrintedPixels:=vlPrintedPixels+9
+		vlColorFieldNum:=9999
+	End if 
+	
+	If (Not(vfRoberta))
+		QUERY([SpecPix];[SpecPix]OrderNumber=<>vlOrderNumber)
+		If (Records in selection([SpecPix])>0)
+			Pix_Load 
+			Pix_Print (1)
+			Pix_Print (3)
+		End if 
+		While (vlPrintedPixels<636)
+			vlPrintedPixels:=vlPrintedPixels+3
+			Print form([Orders];"PrintOrder_3pt")
+		End while 
+		If (cbStrip=1)
+			vsPrintingFooter:="PAGE 1 ONLY"
+		Else 
+			vsPrintingFooter:="END of JOB"
+		End if 
+		$height:=Print form([Orders];"PrintOrder_Foot")
+		
+	End if 
+	
+	
+	If (vfPO) & ([Orders]FlagChange)
+		[Orders]FlagChange:=False
+		SAVE RECORD([Orders])
+		LOAD RECORD([Orders])
+	End if 
+End if 
+
+  //UNLOAD RECORD([OrdersFabricXRef])
+  //UNLOAD RECORD([Orders])

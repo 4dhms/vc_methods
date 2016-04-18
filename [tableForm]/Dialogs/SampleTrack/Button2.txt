@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($right;$left;$top;$bottom)
+
+GET WINDOW RECT($left;$top;$right;$bottom)
+
+FORM SET INPUT([SampleTrack];"Track.i")
+Open window($left+20;$top+30;$right-20;$top+90;1;"")
+ADD RECORD([SampleTrack];*)
+CLOSE WINDOW

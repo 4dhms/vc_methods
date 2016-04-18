@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlMailer)
+
+  //vtOrderChanges:=vtOrderChanges+"_Color"
+
+If (Order_Mandatory ) & (Order_Update )
+	Order_Email 
+	ACCEPT
+End if 

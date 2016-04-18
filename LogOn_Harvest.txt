@@ -1,0 +1,142 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$p;cbDay1;cb11;cb12)
+C_DATE($testdate)
+C_BOOLEAN($done;$add)
+
+ARRAY LONGINT(alCtnIn;0)
+ARRAY TEXT(atLOStyleSet;0)
+ARRAY DATE(adCreateDate;0)
+LogOn_ArrayInit 
+
+vdStart:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+If (cbDay1=1)
+	vdEnd:=vdStart
+Else 
+	vdEnd:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+End if 
+
+If (vdStart<=vdEnd)
+	<>vtMessage:="To cancel hold down shift"
+	EMail_SendingProc 
+	
+	$i:=0
+	Repeat 
+		If (Shift down)
+			CANCEL
+		End if 
+		$testdate:=vdStart+$i
+		APPEND TO ARRAY(adCreateDate;$testdate)
+		$i:=$i+1
+		Case of 
+			: ($testdate>=vdEnd)
+				$done:=True
+			: (Shift down)
+				$done:=True
+		End case 
+	Until ($done)
+	
+	LogOn_StyleSet 
+	
+	$i:=1
+	If (vfOneStyle)
+		$c:=1
+	Else 
+		$c:=Size of array(adCreateDate)
+	End if 
+	
+	For ($i;1;$c)
+		If (Shift down)
+			CANCEL
+		End if 
+		vdCreateDate:=adCreateDate{$i}
+		  //ALERT(String(vdCreateDate))
+		  //LogOn_UpdateHistory 
+		If (vdCreateDate<=vdEnd)  //| (vfOneStyle)
+			LogOn_FindNewStyle 
+		End if 
+		
+		If (vfOneStyle)
+			$p:=1
+			For ($p;1;Size of array(alSRstyle))
+				If (Shift down)
+					CANCEL
+				End if 
+				Case of 
+					: (Size of array(alSRstyle)=1)
+						QUERY([Changes];[Changes]OrderNumber=alSRstyle{$p})
+					: ($p=1)
+						QUERY([Changes];[Changes]OrderNumber=alSRstyle{$p};*)
+					: ($p=Size of array(alSRstyle))
+						QUERY([Changes]; | ;[Changes]OrderNumber=alSRstyle{$p})
+					Else 
+						QUERY([Changes]; | ;[Changes]OrderNumber=alSRstyle{$p};*)
+				End case 
+			End for 
+		Else 
+			QUERY([Changes];[Changes]RevDate=adCreateDate{$i})
+		End if 
+		
+		QUERY SELECTION([Changes];[Changes]OrderNumber>0)
+		
+		QUERY SELECTION([Changes];[Changes]FieldName="Size Range";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="SeasonName";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="StyleNumber";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="Price";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="OrderDivision";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="Self Color@";*)
+		QUERY SELECTION([Changes]; | ;[Changes]FieldName="Combo@Color@")
+		
+		ORDER BY([Changes];[Changes]Tag;>;[Changes]OrderNumber;>)
+		
+		$n:=1
+		FIRST RECORD([Changes])
+		For ($n;1;Records in selection([Changes]))
+			If (Shift down)
+				CANCEL
+			End if 
+			
+			<>vlCounter:=($n/Records in selection([Changes]))*100
+			CALL PROCESS(<>SendingWin)
+			QUERY([Orders];[Orders]OrderNum=[Changes]OrderNumber)
+			  //If (1=1)
+			
+			If (Find in array(atLOStyleSet;[Orders]StyleNumber)>0) | (vfOneStyle)
+				If ([Changes]FieldName="Price")
+					QUERY([Orders];[Orders]StyleNumber=[Orders]StyleNumber)
+					ORDER BY([Orders];[Orders]Price;<)
+					If (Num([Changes]NewChange)>[Orders]Price)
+						$add:=True
+					Else 
+						$add:=False
+					End if 
+				Else 
+					$add:=True
+				End if 
+				
+				If (vfOneStyle)
+					If (Find in array(alSRstyle;[Changes]OrderNumber)<1)
+						$add:=False
+					End if 
+				End if 
+				
+				If ($add)
+					Logon_AddColor 
+					Logon_AddChange 
+					<>vlCounter:=0
+					OBJECT SET VISIBLE(vlProgress;True)
+				End if 
+			End if 
+			NEXT RECORD([Changes])
+		End for 
+	End for 
+	UNLOAD RECORD([Orders])
+	If (cb12=1)
+		LogOn_HarvestRelated 
+	End if 
+	If (Shift down)
+		CANCEL
+	End if 
+	<>CloseDialog:=True
+	CALL PROCESS(<>SendingWin)
+End if 
+

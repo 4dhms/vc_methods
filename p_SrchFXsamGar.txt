@@ -1,0 +1,20 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([Samples];[Designs]DivisionCodeN="5-Color FX";*)
+QUERY([Samples]; | ;[Designs]DivisionCodeN="05-@";*)
+QUERY([Samples]; & ;[Samples]DivisionOverride=False)
+CREATE SET([Samples];"Regular")
+
+QUERY([Samples];[Samples]SampleDivision="5-Color FX")
+FIRST RECORD([Samples])
+$i:=1
+For ($i;1;Records in selection([Samples]))
+	ADD TO SET([Samples];"Regular")
+	NEXT RECORD([Samples])
+End for 
+
+USE SET("Regular")
+CLEAR SET("Regular")
+
+SET WINDOW TITLE("Sample Garments: "+String(Records in selection([Samples]))+" of "+String(Records in table([Samples])))

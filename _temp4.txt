@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+QUERY([SpecSheetLines];[SpecSheetLines]SF_KeyNumber=249673)
+
+ALERT(String(Records in selection([SpecSheetLines])))
+
+$i:=1
+CREATE EMPTY SET([SpecLineCols];"move")
+FIRST RECORD([SpecSheetLines])
+
+For ($i;1;Records in selection([SpecSheetLines]))
+	QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey)
+	ADD TO SET([SpecLineCols];"move")
+	NEXT RECORD([SpecSheetLines])
+End for 
+
+USE SET("move")
+

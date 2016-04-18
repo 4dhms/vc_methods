@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Header)
+		vsPrintingHeader:=String(Current date(*))+"  Page "+String(Printing page)
+	: (Form event=On Printing Break)
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE(*;"xVoid";[Orders]Cancelled=True)
+End case 

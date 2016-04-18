@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($unique)
+
+If (Form event=On Load)
+	Picture_RestoreOnTheFly 
+	If ([DesignLines]DesignLineKey=0)
+		$unique:=Num(String(Current time(*)))/1000000
+		[DesignLineIncluded]ItemKey:=[DesignLines]DesignLineKey+$unique
+		REDUCE SELECTION([DesignBreakDown];0)
+	Else 
+		QUERY([DesignBreakDown];[DesignBreakDown]ItemKey=[DesignLineIncluded]ItemKey)
+	End if 
+End if 

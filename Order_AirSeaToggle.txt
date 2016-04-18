@@ -1,0 +1,64 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfPDF)
+C_BOOLEAN(<>vfPreview;vfPDF)
+cbNY:=0
+cbLA:=0
+cbOther:=0
+
+Case of 
+	: (<>vfPreview) | (vfPDF)
+		
+	: (Table name(Current form table)="Orders")
+		OBJECT SET VISIBLE([Orders]OtherShip;[Orders]OtherShip#"")
+		Case of 
+			: ([Orders]ShipInfo="")
+				cbNY:=0
+				cbLA:=0
+				cbOther:=0
+				Case of 
+					: ([Orders]ShipAir)
+						[Orders]ShipInfo:="Air "
+					: ([Orders]ShipSea)
+						[Orders]ShipInfo:="Sea "
+					: ([Orders]ShipLDP)
+						[Orders]ShipInfo:="LDP "
+					: ([Orders]ShipFOB)
+						[Orders]ShipInfo:="FOB "
+				End case 
+			: ([Orders]ShipInfo="Air ") | ([Orders]ShipInfo="Sea ")
+				cbNY:=0
+				cbLA:=0
+				cbOther:=0
+		End case 
+		
+		Case of 
+			: (Position("NY";[Orders]ShipInfo)>0)
+				cbNY:=1
+				cbLA:=0
+				cbOther:=0
+				
+			: (Position("LA";[Orders]ShipInfo)>0)
+				cbNY:=0
+				cbLA:=1
+				cbOther:=0
+				
+			: ([Orders]OtherShip#"")
+				cbNY:=0
+				cbLA:=0
+				cbOther:=1
+		End case 
+		
+		If ([CostSheets]OtherShip="00/00/00") | ([CostSheets]OtherShip="False")
+			[CostSheets]OtherShip:=""
+		End if 
+		
+		Case of 
+			: (<>vlOrderNumber>0)
+				Cost_NYLA 
+			Else 
+		End case 
+End case 
+
+
+
+

@@ -1,0 +1,50 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c;$i)
+
+ARRAY TEXT(asPOM;0)
+ARRAY TEXT(atProcessed;0)
+ARRAY TEXT(atGarment;0)
+ARRAY LONGINT(alStyleFab;0)
+
+QUERY([Steps];[Steps]Garment#"")
+DISTINCT VALUES([Steps]Garment;atGarment)
+SORT ARRAY(atGarment;>)
+INSERT IN ARRAY(atGarment;1;1)
+atGarment{1}:="Templates"
+atGarment:=1
+
+Grade_CatArray 
+<>asGradeCat:=1
+QUERY([ChineseDictionary];[ChineseDictionary]EnglishName#"")
+SELECTION TO ARRAY([ChineseDictionary]EnglishName;asPOM)
+SORT ARRAY(asPOM;>)
+
+$c:=Size of array(asPOM)
+
+ARRAY TEXT(asList1;$c)
+ARRAY TEXT(asList2;$c)
+ARRAY TEXT(asList3;$c)
+ARRAY TEXT(asList4;$c)
+ARRAY TEXT(asList5;$c)
+ARRAY TEXT(asList6;$c)
+ARRAY TEXT(asList7;$c)
+ARRAY TEXT(asList8;$c)
+ARRAY TEXT(asList9;$c)
+ARRAY TEXT(asList10;$c)
+ARRAY LONGINT(alStyleFab;$c)
+
+  //$i:=1
+  //For ($i;1;Size of array(asPOM))
+  //QUERY([SpecLibrary];[SpecLibrary]SpecEnglish=asPOM{$i})
+  //If (Records in selection([SpecLibrary])=0)
+  //alStyleFab{$i}:=3
+  //Else 
+  //alStyleFab{$i}:=0
+  //End if 
+  //End for 
+
+Center Window (850;600;0;"")
+DIALOG("GradeSteps")
+CLOSE WINDOW
+
+<>vlSteps:=0

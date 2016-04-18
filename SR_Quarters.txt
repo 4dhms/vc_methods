@@ -1,0 +1,66 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$line;$n)
+C_REAL($netsales)
+C_LONGINT($thisyear;$lastyear;$m;$year)
+C_POINTER($col)
+C_DATE($start;$end)
+
+$thisyear:=$2
+$lastyear:=$2-1
+
+$i:=1
+FIRST RECORD([Orders])
+For ($i;1;6)
+	Case of 
+		: ($i=1)
+			$col:=Get pointer("arMCol1")
+			$m:=$1
+		: ($i=2)
+			$col:=Get pointer("arMCol4")
+			$m:=$1+1
+		: ($i=3)
+			$col:=Get pointer("arMCol7")
+			$m:=$1+2
+		: ($i=4)
+			$col:=Get pointer("arMCol2")
+			$m:=$1
+		: ($i=5)
+			$m:=$1+1
+			$col:=Get pointer("arMCol5")
+		: ($i=6)
+			$col:=Get pointer("arMCol8")
+			$m:=$1+2
+	End case 
+	
+	If ($i>3)
+		$year:=$lastyear
+	Else 
+		$year:=$thisyear
+	End if 
+	
+	$start:=Date(String($m)+"/1/"+String($year))
+	If ($i=3) | ($i=6) & ($1=10)
+		$end:=Date("1/1/"+String($year+1))
+	Else 
+		$end:=Date(String($m+1)+"/1/"+String($year))
+	End if 
+	
+	USE SET("quarter")
+	QUERY SELECTION([Orders];[Orders]CancelDate>=$start;*)
+	QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$end)
+	
+	$n:=1
+	FIRST RECORD([Orders])
+	For ($n;1;Records in selection([Orders]))
+		
+		$netSales:=Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+		$line:=Find in array(asCustomers;[Orders]Customer)
+		
+		If ($line>0)
+			$col->{$line}:=$col->{$line}+$netSales
+		End if 
+		
+		NEXT RECORD([Orders])
+	End for 
+End for 
+

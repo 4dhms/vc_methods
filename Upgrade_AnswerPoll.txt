@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($path)
+C_LONGINT($p;$o;$m)
+
+PLATFORM PROPERTIES($p;$o;$m)
+
+$path:=Substring(Application file;1;Position(":4D";Application file))+"4Dv14.3.app"
+
+If ($p<3)
+	If (Test path name($path)#1)
+		CREATE RECORD([Changes])
+		[Changes]RevDate:=Current date(*)
+		[Changes]FieldName:="upgrade"
+		[Changes]NewChange:=Current machine owner
+		[Changes]Writer:=Current user
+		SAVE RECORD([Changes])
+		UNLOAD RECORD([Changes])
+	End if 
+End if 

@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Screen width<780)
+		Center Window (Screen width-20;Screen height-100;4;"";"WincBox")
+	: (Screen height<660)
+		Center Window (Screen width;Screen height-100;4;"";"WincBox")
+	Else 
+		Center Window (940;610;4;"";"WincBox")
+End case 

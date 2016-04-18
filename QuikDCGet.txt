@@ -1,0 +1,77 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+C_POINTER($title;$varPtr;$keyPtr;$countPtr)
+
+ARRAY LONGINT(alSelfKey;0)
+ARRAY TEXT($colors;0)
+ARRAY LONGINT($quant;0)
+
+QUERY([Orders];[Orders]OrderNum=asDCOrder{asDCOrder})
+If (Records in selection([Orders])=0)
+	WinPrompt ("No such number.")
+	QuikDCInit (False)
+Else 
+	
+	QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]SelfKey>0)
+	ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+	SELECTION TO ARRAY([CP_OrderXRef]CPOrdID;alSelfKey;[CP_OrderXRef]CPNumber;$colors;[CP_OrderXRef]Quantity;$quant)
+	
+	ARRAY LONGINT(alShadeFab;Size of array(alSelfKey))
+	
+	
+	vlOrderNumber:=[Orders]OrderNum
+	vStyle:=[Orders]StyleNumber
+	vDesign:=[Orders]DesignNumber
+	vdCancel:=!00-00-00!
+	vlTotQty:=[Orders]TotalOrderQuantity
+	vrPrice:=[Orders]RetailPrice
+	vtNote:=""
+	
+	Order_DC 
+	
+	$i:=1
+	For ($i;1;10)
+		$varptr:=Get pointer("vlItem"+String($i))
+		$countPtr:=Get pointer("vlItem"+String($i+10))
+		$keyPtr:=Get pointer("vlItem"+String($i+20))
+		$title:=Get pointer("vtColor"+String($i))
+		
+		If ($i>Size of array($colors))
+			$varptr->:=0
+			$countptr->:=0
+			$title->:=""
+			OBJECT SET VISIBLE($varptr->;False)
+			OBJECT SET VISIBLE($countptr->;False)
+			OBJECT SET VISIBLE($title->;False)
+		Else 
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$colors{$i})
+			
+			$keyPtr->:=alSelfKey{$i}
+			QUERY([DC];[DC]CPOrdID=alSelfKey{$i})
+			$c:=1
+			$countPtr->:=0
+			FIRST RECORD([DC])
+			For ($c;1;Records in selection([DC]))
+				$countPtr->:=$countPtr->+[DC]Count
+				NEXT RECORD([DC])
+			End for 
+			
+			
+			$countPtr->:=$quant{$i}-$countPtr->
+			
+			$title->:=$colors{$i}+"  "+[ColorPrintNumber]CPName
+			
+			OBJECT SET VISIBLE($varptr->;True)
+			OBJECT SET VISIBLE($countptr->;True)
+			OBJECT SET VISIBLE($title->;True)
+		End if 
+	End for 
+	vlTotDiff:=vlTotQty-$countPtr->
+	
+	QuikDCInit (True)
+	UNLOAD RECORD([DC])
+	UNLOAD RECORD([Orders])
+	FORM GOTO PAGE(2)
+End if 

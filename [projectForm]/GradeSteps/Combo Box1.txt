@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asGradeCat>1) & (cbKnit+cbWoven+cbCutSew>0)
+	Grade_PopSteps 
+End if 

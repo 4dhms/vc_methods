@@ -1,0 +1,37 @@
+  //%attributes = {"publishedWeb":true,"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtType1;vtType2;vtType3;vtType4;vtType5;vtType6;vtType7)
+C_TEXT(vtSolid1;vtSolid2;vtSolid3;vtSolid4;vtSolid5;vtSolid6;vtSolid7)
+C_TEXT(vtFabric1;vtFabric2;vtFabric3;vtFabric4;vtFabric5;vtFabric6;vtFabric7)
+C_TEXT(vtFiber1;vtFiber2;vtFiber3;vtFiber4;vtFiber5;vtFiber6;vtFiber7)
+C_TEXT(vtPart1;vtPart2;vtPart3;vtPart4;vtPart5;vtPart6;vtPart7)
+C_POINTER($colPtr1;$colPtr2;$colPtr3;$colPtr4;$colPtr5)
+C_LONGINT($i)
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="Combo@")
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]FabOrdType;>)
+
+$i:=1
+FIRST RECORD([OrdersFabricXRef])
+For ($i;1;Records in selection([OrdersFabricXRef]))
+	$colPtr1:=Get pointer("vtType"+String($i))
+	$colPtr2:=Get pointer("vtSolid"+String($i))
+	$colPtr3:=Get pointer("vtFabric"+String($i))
+	$colPtr4:=Get pointer("vtFiber"+String($i))
+	$colPtr5:=Get pointer("vtPart"+String($i))
+	
+	$colPtr1->:=""
+	$colPtr2->:=""
+	$colPtr3->:=""
+	$colPtr4->:=""
+	$colPtr5->:=""
+	
+	$colPtr1->:=[OrdersFabricXRef]OrdType
+	$colPtr2->:=[OrdersFabricXRef]SolidPrint
+	$colPtr3->:=[OrdersFabricXRef]FabricName
+	$colPtr4->:=[OrdersFabricXRef]FiberContent
+	$colPtr5->:=[OrdersFabricXRef]Part
+	
+	NEXT RECORD([OrdersFabricXRef])
+End for 
+

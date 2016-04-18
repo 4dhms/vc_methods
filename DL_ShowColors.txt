@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($colorptr)
+
+$i:=1
+For ($i;1;12)
+	$colorptr:=Get pointer("vtColor"+String($i))
+	OBJECT SET VISIBLE($colorptr->;cbColors=1)
+End for 

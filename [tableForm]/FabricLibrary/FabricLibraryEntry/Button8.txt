@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+CREATE SET([FabricLibRates];"add")
+CREATE RECORD([FabricLibRates])
+
+[FabricLibRates]FabricLibKey:=[FabricLibrary]FabricLibKey
+[FabricLibRates]SortOrder:=0
+[FabricLibRates]Content:=[FabricLibrary]FiberContent
+SAVE RECORD([FabricLibRates])
+ADD TO SET([FabricLibRates];"add")
+USE SET("add")
+CLEAR SET("add")
+ORDER BY([FabricLibRates];[FabricLibRates]SortOrder;>)
+GOTO OBJECT(bValidate)
+POST KEY(9)
+

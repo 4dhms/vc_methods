@@ -1,0 +1,19 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT(vtTable;$HTML)
+vtOrderTop:=Char(1)
+vtOrderTop:=vtOrderTop+"<IMG SRC=<!--4DVAR vtGetLogo--> width=200 height=200 align=left>"
+vtOrderTop:=vtOrderTop+"<br><br>"
+vsWebUser:=Replace string(vsWebUser;" ";"_")
+
+$HTML:=Char(1)
+$HTML:=$HTML+"<font color=#000000 face=Verdana, Arial, Helvetica, sans-serif size=2><b>"
+$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?newgcoc"+vsWebsession+">New GCOC</A><BR><BR>"
+$HTML:=$HTML+"<A href=/4DCGI/["+vsWebUser+"&"+vsWebSession+"]?labs"+vsWebsession+">Testing Labs</A><BR><BR>"
+
+$HTML:=$HTML+"</font></b>"
+Web_UserField 
+
+vtTable:=$HTML
+vtGetLogo:="/4DCGI/LOGO"
+
+WEB SEND FILE("menu.html")

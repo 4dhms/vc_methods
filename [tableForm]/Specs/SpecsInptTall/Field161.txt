@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([Specs]NotAppvdProd)
+	[Specs]AppvdForProd:=False
+	[Specs]ProdAppvdDate:=!00-00-00!
+End if 

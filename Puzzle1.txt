@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($I)
+
+ARRAY LONGINT(alBD1;0)
+ARRAY LONGINT(alBD2;0)
+ARRAY LONGINT(alBD3;0)
+ARRAY LONGINT(alBD4;0)
+ARRAY LONGINT(alBD5;0)
+ARRAY LONGINT(alBD6;0)
+
+$i:=1
+For ($i;1;6)
+	APPEND TO ARRAY(alBD1;0+$i)
+	APPEND TO ARRAY(alBD2;6+$i)
+	APPEND TO ARRAY(alBD3;12+$i)
+	APPEND TO ARRAY(alBD4;18+$i)
+	APPEND TO ARRAY(alBD5;24+$i)
+	APPEND TO ARRAY(alBD6;30+$i)
+End for 
+
+Center Window (500;500;0;"")
+DIALOG("Concentration")
+CLOSE WINDOW

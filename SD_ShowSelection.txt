@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT(<>vtSpecialGarment)
+
+Case of 
+	: (<>SamGarPrcID>0)
+		WinPrompt ("Close sample garment before pulling related designs.")
+		SHOW PROCESS(<>SamGarPrcID)
+		BRING TO FRONT(<>SamGarPrcID)
+	: (<>PrcQteID>0)
+		BRING TO FRONT(<>PrcQteID)
+		WinPrompt ("Close cost sheet screen before pulling related designs.")
+	: (<>SalesPrcID>0) & (Not(Shift down))
+		SHOW PROCESS(<>SalesPrcID)
+		BRING TO FRONT(<>SalesPrcID)
+	Else 
+		m_SalesEntry 
+End case 

@@ -1,0 +1,73 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$oldLineKey)
+
+QUERY([ComponentSheets];[ComponentSheets]HMSOrderNumber=vlOldOrderNumber)
+
+vlOldCSKey:=[ComponentSheets]CS_ID
+
+If (Records in selection([ComponentSheets])>0)
+	DUPLICATE RECORD([ComponentSheets])
+	[ComponentSheets]HMSOrderNumber:=vlDupeOrderNumber
+	[ComponentSheets]CS_ID:=Sequence number([ComponentSheets])
+	vlDupeCSKey:=[ComponentSheets]CS_ID
+	SAVE RECORD([ComponentSheets])
+	
+	Dupe_Other 
+	
+	QUERY([CS_Lines];[CS_Lines]CS_ID=vlOldCSKey;*)
+	QUERY([CS_Lines]; | ;[CS_Lines]OrderNumber=vlOldOrderNumber)
+	CS_StripHidden 
+	
+	ARRAY LONGINT($alLineKeys;Records in selection([CS_Lines]))
+	
+	$i:=1
+	FIRST RECORD([CS_Lines])
+	For ($i;1;Size of array($alLineKeys))
+		$alLineKeys{$i}:=Record number([CS_Lines])
+		NEXT RECORD([CS_Lines])
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($alLineKeys))
+		GOTO RECORD([CS_Lines];$alLineKeys{$i})
+		$oldLineKey:=[CS_Lines]CS_LineKey
+		DUPLICATE RECORD([CS_Lines])
+		[CS_Lines]CS_ID:=vlDupeCSKey
+		[CS_Lines]CS_LineKey:=Sequence number([CS_Lines])
+		[CS_Lines]Approved:=False
+		[CS_Lines]ApprovedDate:=!00-00-00!
+		[CS_Lines]Cancelled:=False
+		SAVE RECORD([CS_Lines])
+		
+		
+		QUERY([CS_Status];[CS_Status]CS_LineKey=$oldLineKey)
+		
+		ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)
+		DUPLICATE RECORD([CS_Status])
+		[CS_Status]CS_LineKey:=[CS_Lines]CS_LineKey
+		  //  [CS_Status]Received:=False
+		  //[CS_Status]Approved:=False
+		  //[CS_Status]Rejected:=False
+		[CS_Status]ActionDate:=Current date(*)
+		[CS_Status]CS_StatusKey:=Sequence number([CS_Status])
+		  //Case of 
+		  //  : ([CS_Status]ActionStatus="Duplicated") | ([CS_Status]ActionStatus="") | (Pos
+		  //   [CS_Status]ActionStatus:="Dupe order"
+		  //   [CS_Status]ActionStatus:=[CS_Status]ActionStatus+"[d]"
+		  //End case 
+		SAVE RECORD([CS_Status])
+	End for 
+End if 
+
+UNLOAD RECORD([ComponentSheets])
+UNLOAD RECORD([CS_Lines])
+UNLOAD RECORD([CS_Other])
+UNLOAD RECORD([CS_Issues])
+UNLOAD RECORD([CS_Status])
+
+<>vlOrderNumber:=vlDupeOrderNumber
+If (vlDupeOrderNumber>0)
+	SG_PO 
+Else 
+	<>vlSGPO:=vlDupeOrderNumber
+End if 

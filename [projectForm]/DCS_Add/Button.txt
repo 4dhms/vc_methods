@@ -1,0 +1,84 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($c)
+
+Case of 
+	: (vtItemName="Duty@") & (vrCCostPrice=0)
+		WinPrompt ("Enter Duty")
+	: (vtItemName#"Duty@") & (vrCCostTotal=0)
+		WinPrompt ("Enter amount")
+	Else 
+		  //$itemPos:=Selected list items(hlDCS)
+		  //GET LIST ITEM(hlDCS;$itemPos;$itemRef;$itemText;$sub;$exp)
+		
+		If (vfNew)
+			vfNew:=False
+			CREATE RECORD([DCS])
+			[DCS]CreateDate:=Current date(*)
+			[DCS]SheetNumber:=[Costing]SheetNumber
+			[DCS]SheetID:=[CostSheets]SheetID
+			[DCS]ItemKey:=Sequence number([DCS])
+			APPEND TO ARRAY(asList11;vtItemName)
+			asList11:=Size of array(asList11)
+			
+			Case of 
+				: (vtItemName="Boat") | (vtItemName="Air")
+					APPEND TO ARRAY(asList12;"")
+					APPEND TO ARRAY(asList13;"")
+					APPEND TO ARRAY(asList14;String(vrCCostTotal;"##0.00"))
+					APPEND TO ARRAY(asList15;"")
+					APPEND TO ARRAY(asList16;"")
+				: (vtItemName="Duty@")
+					APPEND TO ARRAY(asList12;"")
+					APPEND TO ARRAY(asList13;String(vrCCostPrice;"#0%"))
+					APPEND TO ARRAY(asList14;"")
+					APPEND TO ARRAY(asList15;"")
+					APPEND TO ARRAY(asList16;"")
+				Else 
+					APPEND TO ARRAY(asList12;String(vrCCostCount;"##0.00"))
+					APPEND TO ARRAY(asList13;String(vrCCostPrice;"##0.00"))
+					APPEND TO ARRAY(asList14;String(vrCCostTotal;"##0.00"))
+					APPEND TO ARRAY(asList15;"")
+					APPEND TO ARRAY(asList16;"")
+			End case 
+			APPEND TO ARRAY(asList17;vtNote)
+			APPEND TO ARRAY(alRecordKey;[DCS]ItemKey)
+		Else 
+			QUERY([DCS];[DCS]ItemKey=vlKey)
+			Case of 
+				: (vtItemName="Boat") | (vtItemName="Air")
+					asList12{asList11}:=""
+					asList13{asList11}:=""
+					asList14{asList11}:=String(vrCCostTotal;"##0.00")
+				: (vtItemName="Duty@")
+					asList12{asList11}:=""
+					asList13{asList11}:=String(vrCCostPrice;"#0%")
+					asList14{asList11}:=""
+				Else 
+					asList12{asList11}:=String(vrCCostCount;"##0.00")
+					asList13{asList11}:=String(vrCCostPrice;"##0.00")
+					asList14{asList11}:=String(vrCCostTotal;"##0.00")
+					If (cbDuty=1)
+						asList15{asList11}:=String(vrCCostDuty;"##0.00")
+					Else 
+						asList15{asList11}:=""
+					End if 
+			End case 
+			asList17{asList11}:=vtNote
+		End if 
+		
+		[DCS]Item:=vtItemName
+		[DCS]Qty:=vrCCostCount
+		[DCS]Price:=vrCCostPrice
+		[DCS]Ext:=vrCCostTotal
+		[DCS]Notes:=vtNote
+		If (cbDuty=1)
+			[DCS]Duty:=True
+			[DCS]DutyRate:=vrCCostDuty
+		End if 
+		SAVE RECORD([DCS])
+		
+		QUERY([DCS];[DCS]SheetID=[CostSheets]SheetID)
+		ORDER BY([DCS];[DCS]ItemKey;>)
+		DCS_BuildArray 
+		CANCEL
+End case 

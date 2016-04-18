@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Position("-";vsCPNumber)>0) & (asTypeList{asTypeList}="Self") & (asSolidPrint{1}="solid")
+		WinPrompt ("This is a print."+Char(13)+"Correct the fabric information.")
+	: (Position("-";vsCPNumber)<1) & (asTypeList{asTypeList}="Self") & (asSolidPrint{1}="print")
+		WinPrompt ("This is a solid color."+Char(13)+"Correct the fabric information.")
+End case 
+
+If (vsCPNumber#"")
+	vfNewFabric:=False
+	vtOrderChanges:=vtOrderChanges+"_Color"
+	ACCEPT
+End if 

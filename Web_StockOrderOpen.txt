@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+
+If (Records in selection([StockOrders])=0)
+	CREATE RECORD([StockOrders])
+	[StockOrders]TempID:=vsWebSession
+	[StockOrders]SODate:=Current date(*)
+End if 
+If ([StockOrders]BuyerKey=0) & (Num(vtContactKey)>0)
+	[StockOrders]BuyerKey:=Num(vtContactKey)
+End if 
+SAVE RECORD([StockOrders])
+UNLOAD RECORD([StockOrders])
+

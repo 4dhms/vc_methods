@@ -1,0 +1,33 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
+
+WinChoice ("Are you sure you want to renumber all the weeks?")
+If (ok=1)
+	WinChoice ("Sort by Week Number or Week End?";"Number";"End")
+	If (ok=1)
+		ORDER BY([SLRWks];[SLRWks]WkNumber;<)
+		ARRAY DATE($sunday;0)
+		$c:=Records in selection([SLRWks])
+		$i:=1
+		For ($i;1;$c)
+			APPEND TO ARRAY($sunday;vdWeekOne+(($i-1)*7))
+		End for 
+		
+		$i:=1
+		For ($i;1;Records in selection([SLRWks]))
+			[SLRWks]SLRWkEnd:=$sunday{[SLRWks]WkNumber}
+			[SLRWks]SLRWkStart:=[SLRWks]SLRWkEnd-6
+			SAVE RECORD([SLRWks])
+			NEXT RECORD([SLRWks])
+		End for 
+	Else 
+		ORDER BY([SLRWks];[SLRWks]SLRWkEnd;<)
+		LAST RECORD([SLRWks])
+		$i:=1
+		For ($i;1;Records in selection([SLRWks]))
+			[SLRWks]WkNumber:=$i
+			SAVE RECORD([SLRWks])
+			PREVIOUS RECORD([SLRWks])
+		End for 
+	End if 
+End if 

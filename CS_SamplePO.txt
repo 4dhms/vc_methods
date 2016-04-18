@@ -1,0 +1,99 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_TEXT($oldStyle;$oldDesign)
+C_BOOLEAN($updateDesign;$updateStyle)
+C_TEXT($message)
+C_LONGINT($sampleNumber)
+
+$sampleNumber:=Num([Orders]SGPO)
+
+QUERY([Samples];[Samples]SampleNumber=$sampleNumber)
+QUERY SELECTION([Samples];[Samples]Void=False)
+
+If (Records in selection([Samples])<1)
+	WinPrompt ("There is no Sample Order No:"+[Orders]SGPO+"."+Char(13)+"Try again.")
+	[Orders]SGPO:=""
+	GOTO OBJECT([Orders]SGPO)
+	
+Else 
+	$oldDesign:=[Orders]DesignNumber
+	$oldStyle:=[Orders]StyleNumber
+	
+	  //------originial entry
+	If ([Orders]DesignNumber="") & ([Orders]StyleNumber="")
+		$message:="Using component sheet for"+Char(13)+"Sample Order No: "+[Orders]SGPO+Char(13)
+		If ([Samples]StyleNum#"")
+			$message:=$message+"Style No: "+[Samples]StyleNum+Char(13)
+		End if 
+		$message:=$message+"Design No: "+[Samples]DesignNum
+		WinChoice ($message)
+		If (ok=1)
+			[Orders]DesignNumber:=[Samples]DesignNum
+			If ([Samples]StyleNum#"Multiple@")
+				[Orders]StyleNumber:=[Samples]StyleNum
+			End if 
+			[Orders]KWCnS:=[Samples]KWCnS
+			  //[Orders]SizeCat:=[Samples]SizeCat
+			Case of 
+				: ([Orders]KWCnS="Knit")
+					cbKnit:=1
+				: ([Orders]KWCnS="Woven")
+					cbWoven:=1
+				: ([Orders]KWCnS="CutSew")
+					cbCutSew:=1
+			End case 
+			Case of 
+				: ([Orders]SizeCategory="Petite")
+					rPetite:=1
+				: ([Orders]SizeCategory="Missy")
+					rMissy:=1
+				: ([Orders]SizeCategory="Large")
+					rLarge:=1
+			End case 
+			
+			QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+			vtDescription:=[Designs]Description
+		End if 
+		
+	Else 
+		Case of 
+			: ($oldDesign#[Samples]DesignNum) & ($oldStyle=[Samples]StyleNum)
+				WinChoice ("Do you want to update Style Number "+$oldStyle+" with "+[Samples]StyleNum+"?")
+				If (ok=1)
+					$updateStyle:=True
+				End if 
+				WinChoice ("Do you want to update Design Number "+$oldDesign+" with "+[Samples]DesignNum+"?")
+				If (ok=1)
+					$updateDesign:=True
+				End if 
+			: ($oldDesign#[Samples]DesignNum)
+				WinChoice ("Do you want to update Design Number "+$oldDesign+" with "+[Samples]DesignNum+"?")
+				If (ok=1)
+					$updateDesign:=True
+				End if 
+			: ($oldStyle=[Samples]StyleNum)
+				WinChoice ("Do you want to update Style Number "+$oldStyle+" with "+[Samples]StyleNum+"?")
+				If (ok=1)
+					$updateStyle:=True
+				End if 
+		End case 
+		If ($updateDesign)
+			[Orders]DesignNumber:=[Samples]DesignNum
+		End if 
+		If ($updateStyle)
+			[Orders]StyleNumber:=[Samples]StyleNum
+		End if 
+	End if 
+	  //SAVE RECORD([Orders])
+	  //SET ENTERABLE([Orders]SGPO;False)
+	<>vlSGPO:=-1*[Samples]SampleNumber
+	If ([Samples]CommtsSamGar#"")
+		WinChoice ("Do you want to import sample comments?")
+		If (ok=1)
+			[Orders]ProdComments:="(Sample comments:)"+Char(13)+[Samples]CommtsSamGar+Char(13)+"(End sample comments)"+Char(13)+Char(13)+[Orders]ProdComments
+		End if 
+	End if 
+	  // 
+End if 
+
+
+QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)

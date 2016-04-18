@@ -1,0 +1,71 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($samplenumber)
+C_POINTER($designSource;$styleSource)
+
+If (Not(<>vfPreview)) & ([CostSheets]SheetName#"Fr@") & ([CostSheets]SheetName#"Weighted")
+	
+	  //If ([CostSheets]SheetName=asSheetNames{1})
+	
+	If (<>vlOrderNumber>0)
+		$designSource:=->[Orders]DesignNumber
+		$styleSource:=->[Orders]StyleNumber
+		If ([Orders]OrderNum#<>vlOrderNumber)
+			QUERY([Orders];[Orders]OrderNum=<>vlOrderNumber)
+		End if 
+		If ([Orders]Price#[CostSheets]Price)
+			[CostSheets]Price:=[Orders]Price
+			SAVE RECORD([CostSheets])
+		End if 
+		If ([Orders]TotalOrderQuantity#[CostSheets]Quantity)
+			[CostSheets]Quantity:=[Orders]TotalOrderQuantity
+			SAVE RECORD([CostSheets])
+		End if 
+		
+	Else 
+		$designSource:=->[Samples]DesignNum
+		$styleSource:=->[Samples]StyleNum
+		$samplenumber:=Abs(<>vlOrderNumber)
+		If ([Samples]SampleNumber#$samplenumber)
+			QUERY([Samples];[Samples]SampleNumber=$samplenumber)
+			QUERY SELECTION([Samples];[Samples]Void=False)
+		End if 
+		If ([Samples]Price#[CostSheets]Price)
+			[CostSheets]Price:=[Samples]Price
+			SAVE RECORD([CostSheets])
+		End if 
+		If ([Samples]SGQuantity#[CostSheets]Quantity)
+			[CostSheets]Quantity:=[Samples]SGQuantity
+			SAVE RECORD([CostSheets])
+		End if 
+	End if 
+	
+	  //checks design and sample numbers
+	Case of 
+		: ($designSource->#[Costing]DesignNumber) & ($styleSource->#[Costing]StyleNumber)
+			WinChoice ("Design and Style Numbers have been changed to:"+Char(13)+"D/N: "+$designSource->+"   S/N: "+$styleSource->+Char(13)+Char(13)+"Do you want to update this cost sheet?")
+			If (ok=1)
+				[Costing]DesignNumber:=$designSource->
+				[Costing]StyleNumber:=$styleSource->
+				SAVE RECORD([Costing])
+			End if 
+		: ($designSource->#[Costing]DesignNumber)
+			WinChoice ("Design Number has been changed to:"+Char(13)+$designSource->+Char(13)+Char(13)+"Do you want to update this cost sheet?")
+			If (ok=1)
+				[Costing]DesignNumber:=$designSource->
+				SAVE RECORD([Costing])
+			End if 
+		: ($styleSource->#[Costing]StyleNumber)
+			If ([Costing]StyleNumber="")
+				[Costing]StyleNumber:=$styleSource->
+				SAVE RECORD([Costing])
+			Else 
+				WinChoice ("Style Numbers has been changed to:"+Char(13)+$styleSource->+Char(13)+Char(13)+"Do you want to update this cost sheet?")
+				If (ok=1)
+					[Costing]StyleNumber:=$styleSource->
+					SAVE RECORD([Costing])
+				End if 
+			End if 
+	End case 
+	  //End if 
+End if 
+

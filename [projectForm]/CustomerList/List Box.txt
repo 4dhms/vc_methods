@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Clicked)
+		vsCustomer:=asCustomers{asCustomers}
+	: (Form event=On Double Clicked)
+		WinChoice ("Are you sure you want to delete "+asCustomers{asCustomers}+"?")
+		If (ok=1)
+			QUERY([CustomerList];[CustomerList]Customer=asCustomers{asCustomers})
+			If (Records in selection([CustomerList])=1)
+				DELETE RECORD([CustomerList])
+				DELETE FROM ARRAY(asCustomers;asCustomers)
+			End if 
+		End if 
+End case 
+

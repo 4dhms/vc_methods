@@ -1,0 +1,46 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($daterange)
+C_LONGINT($i)
+C_TEXT($stripper)
+
+$daterange:=Current date(*)-90
+
+QUERY([Samples];[Samples]SampleOrderDate>$daterange)
+QUERY SELECTION([Samples];[Samples]SampleReceived=!00-00-00!)
+QUERY SELECTION([Samples];[Samples]Void=False)
+
+QUERY SELECTION([Samples];[Samples]Sam Type=$1)
+If (asEnterer>1)
+	QUERY SELECTION([Samples];[Samples]OrderEnterer SG=asEnterer{asEnterer})
+End if 
+QUERY SELECTION([Samples];[Samples]Sam Type=$1)
+If (asDivisions>1)
+	If ([Samples]DivisionOverride)
+		QUERY SELECTION([Samples];[Samples]SampleDivision=asDivisions{asDivisions})
+	Else 
+		QUERY SELECTION([Samples];[Designs]DivisionCodeN=asDivisions{asDivisions})
+	End if 
+End if 
+
+If (cbKnit=1)
+	QUERY SELECTION([Samples];[Samples]KWCnS="Knit")
+End if 
+If (cbWoven=1)
+	QUERY SELECTION([Samples];[Samples]KWCnS="Woven")
+End if 
+If (cbCutSew=1)
+	QUERY SELECTION([Samples];[Samples]KWCnS="CutSew")
+End if 
+
+
+FIRST RECORD([Samples])
+$i:=1
+For ($i;1;Records in selection([Samples]))
+	If ([Samples]HMSOrderNumber=0) & (Position([Samples]CommtsSamGar;"Created from HMS Order")>0)
+		$stripper:=Replace string([Samples]CommtsSamGar;"Created from HMS Order ";"")
+		[Samples]HMSOrderNumber:=Num(Substring($stripper;1;5))
+		SAVE RECORD([Samples])
+	End if 
+	NEXT RECORD([Samples])
+End for 
+

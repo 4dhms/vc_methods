@@ -1,0 +1,79 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_DATE($start)
+C_DATE($end)
+
+
+CREATE EMPTY SET([SLRWks];"build")
+  //Case of 
+  //: (asPOdate{asPOdate}="Last week")
+  //vdQStart:=vdWTD
+  //: (asPOdate{asPOdate}="Month")
+  //vdQStart:=vdMTD
+  //: (asPOdate{asPOdate}="Season")
+  //vdQStart:=vdSTD
+  //: (asPOdate{asPOdate}="Year")
+  //vdQStart:=vdYTD
+  //: (asPOdate{asPOdate}="Life")
+  //vdQStart:=!02/01/2010!
+  //End case 
+
+$i:=1
+For ($i;1;Size of array(afBatchList))
+	If (afBatchList{$i}=True) | (vfByStyle)
+		QUERY([SLRWks];[SLRAcct]Division=asDivisions{$i})
+		QUERY SELECTION([SLRWks];[SLRAcct]SLRAcct#"@ CL")
+		  //QUERY SELECTION([SLRWks];[SLRWks]SLRWkEnd>=$start)
+		CREATE SET([SLRWks];"temp")
+		UNION("temp";"build";"build")
+	End if 
+End for 
+USE SET("build")
+CLEAR SET("build")
+CLEAR SET("temp")
+
+RELATE ONE SELECTION([SLRWks];[SLRColor])
+RELATE ONE SELECTION([SLRColor];[SLRAcct])
+CREATE SET([SLRAcct];"range")
+
+RELATE MANY SELECTION([SLRColor]SLRAcctKey)
+RELATE MANY SELECTION([SLRWks]SLRColorKey)
+QUERY SELECTION([SLRWks];[SLRWks]SLRWkEnd#!00-00-00!)
+ORDER BY([SLRWks];[SLRWks]SLRWkEnd;>)
+$start:=[SLRWks]SLRWkEnd-6
+
+ORDER BY([SLRAcct];[SLRAcct]SLRAcct;>;[SLRAcct]SLRAcctKey;>)
+DISTINCT VALUES([SLRAcct]SLRAcct;asDCCustomer)
+APPEND TO ARRAY(asDCCustomer;"Neiman Marcus")
+SORT ARRAY(asDCCustomer;>)
+
+Case of 
+	: (FORM Get current page=1) | (FORM Get current page=3)
+		OBJECT SET VISIBLE(asDCCustomer;True)
+End case 
+
+If ($start=!00-00-00!) & (Not(vfByStyle))
+	asDivisions:=0
+	WinPrompt ("Nothing entered for that division")
+Else 
+	$end:=adWkEnd{adWkEnd}
+	
+	ARRAY DATE(adDates;0)
+	Repeat 
+		APPEND TO ARRAY(adDates;$end)
+		$end:=$end-7
+	Until ($start>=$end) | (Shift down)
+	
+	vdCreateDate:=adDates{Size of array(adDates)}
+	
+End if 
+
+OBJECT SET VISIBLE(zYes;True)
+
+OBJECT SET VISIBLE(zYes;True)
+OBJECT SET VISIBLE(zNo;True)
+OBJECT SET VISIBLE(asPOdate;True)
+OBJECT SET VISIBLE(adWkEnd;True)
+OBJECT SET VISIBLE(asSeasonName;True)
+OBJECT SET VISIBLE(asSeasonYear;True)
+

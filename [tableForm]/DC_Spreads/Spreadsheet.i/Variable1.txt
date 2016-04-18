@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (FORM Get current page=4)
+	LISTBOX SELECT ROW(Breakdown;0)
+	
+	FORM GOTO PAGE(1)
+Else 
+	CANCEL
+End if 

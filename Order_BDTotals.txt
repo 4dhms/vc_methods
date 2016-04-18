@@ -1,0 +1,194 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($subtot;$packs;$count;$i;$bd1;$bd2;$bd3;$bd4;$bd5;$bd6;$bd7;$bd8;$bd9;$bd10)
+C_LONGINT($subd1;$subd2;$subd3;$subd4;$subd5;$subd6;$subd7;$subd8;$subd9;$subd10)
+C_TEXT($letterKey)
+C_LONGINT($lastSelf)
+
+
+  //clears old subtotal lines
+$i:=Size of array(asBDSelf)
+While ($i>0)
+	If (asBDLetter{$i}="@Total")
+		Order_BDDelete ($i)
+	End if 
+	$i:=$i-1
+End while 
+vlTotQty:=0
+
+$i:=Size of array(asBDSelf)
+$letterKey:=Substring(asBDLetter{$i};1;1)
+$lastSelf:=alBDSelfKeys{Size of array(alBDSelfkeys)}
+
+Repeat 
+	Case of 
+		: (asBDSelf{$i}="Grand total@")
+			
+		: ($i=Size of array(asBDSelf)) & (vfMultipleBreaks)
+			Order_BDInsert ($i+1)
+			asBDLetter{$i+1}:=asBDLetter{$i}+"  Total"
+			alBDKey{$i+1}:=alBDKey{$i}
+			alBDColor{$i+1}:=14149350
+			asBDSelf{$i+1}:=asBDSelf{$i}
+			$lastSelf:=alBDSelfKeys{$i}
+		: (alBDSelfKeys{$i}#$lastself) & (vfMultipleBreaks)
+			Order_BDInsert ($i+1)
+			asBDLetter{$i+1}:=asBDLetter{$i}+"  Total"
+			alBDKey{$i+1}:=alBDKey{$i}
+			alBDColor{$i+1}:=14149350
+			asBDSelf{$i+1}:=asBDSelf{$i}
+			$lastSelf:=alBDSelfKeys{$i}
+		Else 
+			$lastSelf:=alBDSelfKeys{$i}
+	End case 
+	$i:=$i-1
+	
+Until ($i<1)
+
+$i:=1
+
+$subtot:=0
+$packs:=0
+$count:=0
+$bd1:=0
+$bd2:=0
+$bd3:=0
+$bd4:=0
+$bd5:=0
+$bd6:=0
+$bd7:=0
+$bd8:=0
+$bd9:=0
+$bd10:=0
+$subd1:=0
+$subd2:=0
+$subd3:=0
+$subd4:=0
+$subd5:=0
+$subd6:=0
+$subd7:=0
+$subd8:=0
+$subd9:=0
+$subd10:=0
+
+For ($i;1;Size of array(asBDSelf))
+	Case of 
+		: (asBDSelf{$i}="Grand total@")
+			
+		: (asBDLetter{$i}="@Total")
+			alBDStores{$i}:=$subtot
+			alBDPack{$i}:=0
+			alBDPackTot{$i}:=$count
+			alBD1{$i}:=$bd1
+			alBD2{$i}:=$bd2
+			alBD3{$i}:=$bd3
+			alBD4{$i}:=$bd4
+			alBD5{$i}:=$bd5
+			alBD6{$i}:=$bd6
+			alBD7{$i}:=$bd7
+			alBD8{$i}:=$bd8
+			alBD9{$i}:=$bd9
+			alBD10{$i}:=$bd10
+			vlTotQty:=vlTotQty+alBDPackTot{$i}
+			
+			  //albdPack{$i}:=alBD1{$i}+alBD2{$i}+alBD3{$i}+alBD4{$i}+alBD5{$i}+alBD6{$i}+alBD7{$i}+alBD8{$i}+alBD9{$i}+alBD10{$i}
+			  //alBDPackTot{$i}:=alBDPack{$i}*alBDStores{$i}
+			$subtot:=0
+			$packs:=0
+			$count:=0
+			$bd1:=0
+			$bd2:=0
+			$bd3:=0
+			$bd4:=0
+			$bd5:=0
+			$bd6:=0
+			$bd7:=0
+			$bd8:=0
+			$bd9:=0
+			$bd10:=0
+			
+		Else 
+			albdPack{$i}:=alBD1{$i}+alBD2{$i}+alBD3{$i}+alBD4{$i}+alBD5{$i}+alBD6{$i}+alBD7{$i}+alBD8{$i}+alBD9{$i}+alBD10{$i}
+			alBDPackTot{$i}:=alBDPack{$i}*alBDStores{$i}
+			$subtot:=$subtot+alBDStores{$i}
+			$packs:=$packs+alBDPack{$i}
+			$count:=$count+alBDPackTot{$i}
+			$bd1:=$bd1+(alBD1{$i}*alBDStores{$i})
+			$bd2:=$bd2+(alBD2{$i}*alBDStores{$i})
+			$bd3:=$bd3+(alBD3{$i}*alBDStores{$i})
+			$bd4:=$bd4+(alBD4{$i}*alBDStores{$i})
+			$bd5:=$bd5+(alBD5{$i}*alBDStores{$i})
+			$bd6:=$bd6+(alBD6{$i}*alBDStores{$i})
+			$bd7:=$bd7+(alBD7{$i}*alBDStores{$i})
+			$bd8:=$bd8+(alBD8{$i}*alBDStores{$i})
+			$bd9:=$bd9+(alBD9{$i}*alBDStores{$i})
+			$bd10:=$bd10+(alBD10{$i}*alBDStores{$i})
+			$lastSelf:=alBDSelfKeys{$i}
+			
+			$subd1:=$subd1+(alBD1{$i}*alBDStores{$i})
+			$subd2:=$subd2+(alBD2{$i}*alBDStores{$i})
+			$subd3:=$subd3+(alBD3{$i}*alBDStores{$i})
+			$subd4:=$subd4+(alBD4{$i}*alBDStores{$i})
+			$subd5:=$subd5+(alBD5{$i}*alBDStores{$i})
+			$subd6:=$subd6+(alBD6{$i}*alBDStores{$i})
+			$subd7:=$subd7+(alBD7{$i}*alBDStores{$i})
+			$subd8:=$subd8+(alBD8{$i}*alBDStores{$i})
+			$subd9:=$subd9+(alBD9{$i}*alBDStores{$i})
+			$subd10:=$subd10+(alBD10{$i}*alBDStores{$i})
+	End case 
+End for 
+vlTotDiff:=[Orders]TotalOrderQuantity-vlTotQty
+
+vlBDGrandTot:=$subd1+$subd2+$subd3+$subd4+$subd5+$subd6+$subd7+$subd8+$subd9+$subd10
+
+If (Find in array(asBDSelf;"Grand total@")>0)
+	$i:=Size of array(asBDSelf)
+Else 
+	$i:=Size of array(asBDSelf)+1
+	Order_BDInsert ($i)
+End if 
+asBDSelf{$i}:="Grand total: "+String(vlBDGrandTot;"###,###,###")
+alBD1{$i}:=$subd1
+alBD2{$i}:=$subd2
+alBD3{$i}:=$subd3
+alBD4{$i}:=$subd4
+alBD5{$i}:=$subd5
+alBD6{$i}:=$subd6
+alBD7{$i}:=$subd7
+alBD8{$i}:=$subd8
+alBD9{$i}:=$subd9
+alBD10{$i}:=$subd10
+
+$i:=1
+For ($i;1;Size of array(asBDSelf))
+	Case of 
+		: (asBDSelf{$i}="Grand total@")
+			alBDColor{$i}:=16777215
+		: (Not(vfMultipleBreaks))
+			alBDColor{$i}:=16777215
+		: ($i=Size of array(asBDSelf))
+			alBDColor{$i}:=16777215
+		: (asBDLetter{$i}="@total")
+			alBDColor{$i}:=16777215
+		: (asBDLetter{$i}=asBDLetter{$i+1}) | (asBDLetter{$i+1}="@total")
+			alBDColor{$i}:=14149350
+		Else 
+			alBDColor{$i}:=16777215
+	End case 
+End for 
+
+Case of 
+	: (vlBDGrandTot=0)
+		vsRelated:=""
+	: (vlBDGrandTot=[Orders]TotalOrderQuantity)
+		vsRelated:="Breakdown complete"
+		OBJECT SET COLOR(vsRelated;-(15+(256*0)))
+	: (vlBDGrandTot>[Orders]TotalOrderQuantity)
+		vsRelated:="Over by "+String(vlBDGrandTot-[Orders]TotalOrderQuantity)
+		OBJECT SET COLOR(vsRelated;-(3+(256*0)))
+	: (vlBDGrandTot<[Orders]TotalOrderQuantity)
+		vsRelated:="Under by "+String([Orders]TotalOrderQuantity-vlBDGrandTot)
+		OBJECT SET COLOR(vsRelated;-(3+(256*0)))
+End case 
+OBJECT SET VISIBLE(vsRelated;vsRelated#"")
+
+LISTBOX SELECT ROW(Breakdown;0;Listbox remove from selection)

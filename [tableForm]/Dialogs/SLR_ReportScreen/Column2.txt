@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Clicked)
+	afBatchList{asDIvisions}:=True
+	ARRAY TEXT(asStyleNumbers;0)
+	ARRAY TEXT(asCustomers;0)
+	SLR_Range 
+	vfSort:=False
+End if 

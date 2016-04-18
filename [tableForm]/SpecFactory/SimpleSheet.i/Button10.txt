@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($history)
+
+vfNewFactory:=False
+vlAddPartStatus:=0
+
+SAVE RECORD([SpecLineSample])
+SAVE RECORD([SpecFactory])
+ARRAY TEXT(asDesignNumbers;0)
+Center Window (400;450;1984;"")
+DIALOG([Dialogs];"SketchWindow.d")
+CLOSE WINDOW
+
+If (ok=1)
+	OBJECT SET ENABLED(bHistory;True)
+	ssNewSample:=0
+	SS_NewColumnExecute 
+	$history:=[SpecFactory]Colhead+" created "+String(Current date(*))+" by "+Current user+Char(13)+Char(13)
+	
+	[SpecFactory]History:=$history+[SpecFactory]History
+	
+	vlColNo1:=vlColNo1+1
+End if 

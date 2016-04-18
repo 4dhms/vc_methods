@@ -1,0 +1,62 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($rem1;$rem2)
+C_BOOLEAN($done)
+C_LONGINT($c;$i;$n;$cr;$sr)
+C_POINTER($line)
+C_POINTER($rem)
+
+$rem1:=vtType1
+$rem2:=vtType2
+$c:=40
+
+$done:=False
+
+Repeat 
+	Case of 
+		: ($rem1+$rem2="")
+			$done:=True
+		: (Shift down)
+			$done:=True
+			
+		Else 
+			$n:=1
+			For ($n;1;2)
+				$line:=Get pointer("vtType"+String($n))
+				$rem:=Get pointer("$rem"+String($n))
+				
+				If ($rem->="")
+					$line->:=""
+				Else 
+					$i:=$c
+					$cr:=Position(Char(13);$rem->)
+					$sr:=Position(Char(10);$rem->)
+					
+					Case of 
+						: ($cr<$c) & ($cr>0)
+							
+							$line->:=Substring($rem->;1;$cr)
+							$rem->:=Substring($rem->;$cr+1;999)
+						: ($sr<$c) & ($sr>0)
+							$line->:=Substring($rem->;1;$sr)
+							$rem->:=Substring($rem->;$sr+1;999)
+						: (Length($rem->)<=$c)
+							$line->:=$rem->
+							$rem->:=""
+						Else 
+							Repeat 
+								$i:=$i-1
+							Until ($i=10) | ($rem->[[$i]]=" ") | ($rem->[[$i]]=Char(13)) | ($rem->[[$i]]=Char(10)) | ($rem->[[$i]]="/") | (Shift down)
+							$line->:=Substring($rem->;1;$i)
+							$rem->:=Substring($rem->;$i+1;999)
+					End case 
+				End if 
+			End for 
+			Customer_PrintHeader 
+			Print form([Customers];"Customers.sub")
+			vlPrintedPixels:=vlPrintedPixels-13
+			
+	End case 
+Until ($done)
+
+vtType1:=""
+vtType2:=""

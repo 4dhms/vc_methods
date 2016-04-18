@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($path)
+If ([Designs]DesignNum#"")
+	
+	$choice:=Pop up menu("Get Sketch;Move to Desktop;Close Menu")
+	
+	Case of 
+		: ($choice=1)
+			Sketch_Get 
+			
+		: ($choice=2)
+			$path:=Substring(Get 4D folder;1;Position("Library";Get 4D folder)-1)+"Desktop:"
+			
+			$path:=$path+[Designs]DesignNum+".jpg"
+			vtPathName:=$path
+			WRITE PICTURE FILE(vtPathName;[Designs]Sketch;"JPEG")
+	End case 
+End if 

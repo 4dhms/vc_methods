@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($baseDN)
+WinFind ("Enter Design Number:";5)
+$baseDN:=vsRequestString
+If (ok=1)
+	vsFlag:="Related Design Numbers"
+	QUERY([Costing];[Costing]DesignNumber=$baseDN+"@")
+	ORDER BY([Costing];[Costing]DesignNumber;>)
+	If (Records in selection([Costing])>0)
+		Cost_HList 
+		vlNamerState:=14
+	Else 
+		vlNamerState:=1
+	End if 
+End if 
+

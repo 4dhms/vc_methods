@@ -1,0 +1,11 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		ARRAY TEXT(asNames;0)
+		vsCustomer:=""
+		vsPOFlag:=""
+		If (Current user="Peter G") | (Current user="Designer")
+			GOTO OBJECT(vsCustomer)
+		End if 
+		
+End case 

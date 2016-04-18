@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Printing Detail)
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum;*)
+	QUERY([OrdersFabricXRef]; & ;[OrdersFabricXRef]OrdType=[CP_OrderXRef]CPType)
+	QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+	vtFullName:=[OrdersFabricXRef]FabricName+" - "+[OrdersFabricXRef]FiberContent
+End if 

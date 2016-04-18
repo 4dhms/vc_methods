@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line)
+
+vlDCShow:=-1
+$line:=alBDPack
+
+Center Window (200;300;1;"")
+DIALOG("DC_Ctn")
+CLOSE WINDOW
+
+If (ok=1) & (vlDCcount>0)
+	APPEND TO ARRAY(alCtnKey;0)
+	APPEND TO ARRAY(asCtnColor;asBDSelf{$line})
+	APPEND TO ARRAY(asCtnColorCode;asBDColorCode{$line})
+	APPEND TO ARRAY(alCtnQty;vlTotQty)
+	APPEND TO ARRAY(alCtnBG;0)
+	
+	APPEND TO ARRAY(alCtnIn;vlRunningTotal)
+	APPEND TO ARRAY(asCtnBreak;vsPart1)
+	APPEND TO ARRAY(alCtnCount;vlCtnCount)
+	APPEND TO ARRAY(asCtnPO;vtDCpo)
+	APPEND TO ARRAY(asCtnPack;vtDCNote)
+	
+	DC_Ctn_Color 
+	Ctn_Total 
+End if 
+

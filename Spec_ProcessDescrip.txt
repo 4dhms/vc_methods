@@ -1,0 +1,13 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (Position("[";[SpecLibrary]SpecEnglish)>0)
+	[SpecLibrary]DescriptionA:=Replace string(Substring([SpecLibrary]SpecEnglish;1;Position("[";[SpecLibrary]SpecEnglish)-1);Char(64);"";*)
+	[SpecLibrary]DescriptionA:=[SpecLibrary]DescriptionA
+	[SpecLibrary]DescriptionB:=Substring([SpecLibrary]SpecEnglish;Position("]";[SpecLibrary]SpecEnglish);999)
+	[SpecLibrary]DecriptConnect:="@ ["
+Else 
+	[SpecLibrary]DescriptionA:=[SpecLibrary]SpecEnglish
+	[SpecLibrary]DescriptionB:=""
+	[SpecLibrary]DecriptConnect:=""
+End if 
+SAVE RECORD([SpecLibrary])
+

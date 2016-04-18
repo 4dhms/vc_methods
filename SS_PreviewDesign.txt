@@ -1,0 +1,10 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+READ ONLY([Designs])
+<>CloseBox:=True
+QUERY([Designs];[Designs]DesignNum=$1)
+Center Window (780;550;1;"")
+  //MODIFY RECORD([Designs];*)
+DIALOG([Designs];"Design Info Ent")
+CLOSE WINDOW
+READ WRITE([Designs])
+<>DesProcID:=0

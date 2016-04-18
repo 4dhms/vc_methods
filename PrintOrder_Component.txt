@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($article)
+RELATE MANY([CS_Lines]CS_LineKey)
+ORDER BY([CS_Status];[CS_Status]CS_StatusKey;<)
+vtNotes:=[CS_Status]Notes
+
+QUERY([CS_Tracking];[CS_Tracking]CS_LineKey=[CS_Lines]CS_LineKey)
+QUERY SELECTION([CS_Tracking];[CS_Tracking]OrderNumber=<>vlOrderNumber;*)
+QUERY SELECTION([CS_Tracking]; | ;[CS_Tracking]OrderNumber=0)
+
+Case of 
+	: (Records in selection([CS_Tracking])>0) & ([CS_Tracking]AltDescription#"")
+		vtNotes:=[CS_Tracking]AltDescription+Char(13)+vtNotes
+End case 
+vtLine:=[CS_Lines]Minidescription
+
+If ([CS_Lines]Description#"")
+	vtLine:=vtLine+[CS_Lines]Description
+End if 
+
+vDesc:=[CS_Lines]ComponentName
+
+OBJECT SET VISIBLE(*;"xLine";True)
+
+vtLine:=Replace string(vtLine;"()";"")+" -- "+[CS_Status]ActionStatus+"  "+String([CS_Status]ActionDate)
+If (Length(vtNotes)>0)
+	vtLine:=vtLine+Char(13)+"          "+vtNotes
+End if 
+
+If ([CS_Lines]OrderNumber=0)
+	OBJECT SET FONT STYLE(vtLine;0)
+Else 
+	OBJECT SET FONT STYLE(vtLine;6)
+End if 

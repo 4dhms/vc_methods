@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (DC_SpreadSave )
+	vlPage:=1
+	If (Records in selection([Orders])>1)
+		WinChoice ("Print one or group?";"One";"Group")
+		If (ok=1)
+			vfPrintOne:=True
+		Else 
+			vfPrintOne:=False
+		End if 
+	Else 
+		vfPrintOne:=False
+	End if 
+	
+	vlDCKey:=0
+	Order_PrintDCsOnly 
+	PAGE BREAK
+End if 

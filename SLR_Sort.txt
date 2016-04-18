@@ -1,0 +1,265 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(c1;c2;c3;c4;nav1;nav2;$i;cbGroup)
+C_TEXT($core)
+C_BOOLEAN(vfSort)
+CREATE SET([SLRReporter];"sortbuild")
+
+If ($1=1)
+	Case of 
+		: (c5=1)
+			SLR_WkSort 
+		: (vfByStyle)
+			  //QUERY SELECTION([SLRReporter];[SLRReporter]Header=-3;*)
+			  //QUERY SELECTION([SLRReporter]; | ;[SLRReporter]Header=-2.5)
+		: (zPrint=1)  //print ranking
+			QUERY SELECTION([SLRReporter];[SLRReporter]LineItem="@-@")
+			
+		: (cbDigest=1) | (zNo=1) | (cbGroup=1)
+			QUERY SELECTION([SLRReporter];[SLRReporter]Header=-2;*)
+			QUERY SELECTION([SLRReporter]; | [SLRReporter]Header=2.5)
+		: (vfByStyle)
+			vfSort:=True
+			QUERY SELECTION([SLRReporter];[SLRReporter]Header>=0)
+		Else 
+			vfSort:=True
+			QUERY SELECTION([SLRReporter];[SLRReporter]Header>=0;*)
+			QUERY SELECTION([SLRReporter]; | ;[SLRReporter]Header=-3)
+	End case 
+End if 
+
+Case of 
+	: (Records in selection([SLRReporter])=0)
+		  //no sort
+	: (c1+c2+c3+c4+c5=0) & (nav1+nav2>0)
+		  //creating sort
+	: (c5=1) & (nav1=1)
+		ORDER BY([SLRReporter];[SLRReporter]SortOrder;>;[SLRReporter]StyleNumber;>)
+	: (c5=1) & (nav2=1)
+		ORDER BY([SLRReporter];[SLRReporter]SortOrder;<;[SLRReporter]StyleNumber;>)
+		
+	: (zPrint=1) & (nav1=1)
+		ORDER BY([SLRReporter];[SLRReporter]TotLTDAmt;>;[SLRReporter]TotYTDAmt;>;[SLRReporter]TotMTDAmt;>)
+	: (zPrint=1) & (nav2=1)
+		ORDER BY([SLRReporter];[SLRReporter]TotLTDAmt;<;[SLRReporter]TotYTDAmt;<;[SLRReporter]TotMTDAmt;<)
+		
+	: (c4=1) & (nav1=1)  //mark up
+		ORDER BY([SLRReporter];[SLRReporter]MU_LTD;>;[SLRReporter]MU_YTD;>;[SLRReporter]MU_STD;>)
+	: (c4=1) & (nav2=1)  //mark up
+		ORDER BY([SLRReporter];[SLRReporter]MU_LTD;<;[SLRReporter]MU_YTD;<;[SLRReporter]MU_STD;<)
+		
+	: (zNo=1)
+		Case of 
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Last Week")  //up unit week
+				ORDER BY([SLRReporter];[SLRReporter]Units1;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Last Week")  //down unit week
+				ORDER BY([SLRReporter];[SLRReporter]Units1;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Last Week")  //up selloff week
+				ORDER BY([SLRReporter];[SLRReporter]SOP1;>;[SLRReporter]MTDSO;>;[SLRReporter]STDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Last Week")  //down selloff week
+				ORDER BY([SLRReporter];[SLRReporter]SOP1;<;[SLRReporter]MTDSO;<;[SLRReporter]STDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Last Week")  //up sales week
+				ORDER BY([SLRReporter];[SLRReporter]Total1;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Last Week")  //down sales week
+				ORDER BY([SLRReporter];[SLRReporter]Total1;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]MTDSO;>;[SLRReporter]STDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]MTDSO;<;[SLRReporter]STDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDAmt;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]STDSO;>;[SLRReporter]STDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]STDSO;<;[SLRReporter]STDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDAmt;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]YTDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]YTDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDAmt;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]LTDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]LTDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDAmt;<)
+				  //ORDER BY([SLRReporter];[SLRReporter]MU_LTD;<)
+			: (c1+c2+c3+nav1+nav2+c4=0) & (cbDigest=0)
+				OBJECT SET VISIBLE(*;"Rebuild";True)
+				REDUCE SELECTION([SLRReporter];0)
+				OBJECT SET ENABLED(bPrint;False)
+		End case 
+		
+	: (zYes=1)
+		Case of 
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Last Week")  //up unit week
+				ORDER BY([SLRReporter];[SLRReporter]Units1;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Last Week")  //down unit week
+				ORDER BY([SLRReporter];[SLRReporter]Units1;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Last Week")  //up selloff week
+				ORDER BY([SLRReporter];[SLRReporter]SOP1;>;[SLRReporter]MTDSO;>;[SLRReporter]STDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Last Week")  //down selloff week
+				ORDER BY([SLRReporter];[SLRReporter]SOP1;<;[SLRReporter]MTDSO;<;[SLRReporter]STDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Last Week")  //up sales week
+				ORDER BY([SLRReporter];[SLRReporter]Total1;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Last Week")  //down sales week
+				ORDER BY([SLRReporter];[SLRReporter]Total1;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]MTDSO;>;[SLRReporter]STDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]MTDSO;<;[SLRReporter]STDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Month")
+				ORDER BY([SLRReporter];[SLRReporter]TotMTDAmt;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]STDSO;>;[SLRReporter]STDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]STDSO;<;[SLRReporter]STDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]TotSTDAmt;<)
+			: (c4=1) & (nav1=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]MU_STD;>)
+			: (c4=1) & (nav2=1) & (asPOdate{asPOdate}="Season")
+				ORDER BY([SLRReporter];[SLRReporter]MU_STD;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]YTDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]YTDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Year")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDAmt;<)
+				
+			: (c1=1) & (nav1=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDUnit;>)
+			: (c1=1) & (nav2=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDUnit;<)
+			: (c2=1) & (nav1=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]LTDSO;>)
+			: (c2=1) & (nav2=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]LTDSO;<)
+			: (c3=1) & (nav1=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotLTDAmt;>)
+			: (c3=1) & (nav2=1) & (asPOdate{asPOdate}="Life")
+				ORDER BY([SLRReporter];[SLRReporter]TotYTDAmt;<)
+		End case 
+	Else 
+		ORDER BY([SLRReporter];[SLRReporter]SortOrder;>)
+End case 
+
+Case of 
+	: (vfByStyle)
+		ARRAY TEXT($styleorder;0)
+		SELECTION TO ARRAY([SLRReporter]StyleNumber;$styleorder)
+		$i:=1
+		For ($i;1;Size of array($styleorder))
+			$styleorder{$i}:=StripToNumber ($styleorder{$i})
+		End for 
+		
+		FIRST RECORD([SLRReporter])
+		$i:=1
+		For ($i;1;Records in selection([SLRReporter]))
+			$core:=StripToNumber ([SLRReporter]StyleNumber)
+			[SLRReporter]PrimeSort:=Find in array($styleorder;$core)
+			SAVE RECORD([SLRReporter])
+			NEXT RECORD([SLRReporter])
+		End for 
+		USE SET("sortbuild")
+		  //QUERY SELECTION([SLRReporter];[SLRReporter]Header=-3;*)
+		  //QUERY SELECTION([SLRReporter]; | ;[SLRReporter]Header=-2.5)
+		
+		ORDER BY([SLRReporter];[SLRReporter]PrimeSort;>;[SLRReporter]Header;<)
+		
+		
+	: (cbDigest=1)
+	: (zYes=1)
+		$i:=1
+		FIRST RECORD([SLRReporter])
+		For ($i;1;Records in selection([SLRReporter]))
+			If ([SLRReporter]Header<=-3)
+				[SLRReporter]GroupedSort:=9999
+			Else 
+				[SLRReporter]GroupedSort:=$i
+			End if 
+			SAVE RECORD([SLRReporter])
+			NEXT RECORD([SLRReporter])
+		End for 
+		ORDER BY([SLRReporter];[SLRReporter]GroupedSort;>)
+	: (cbGroup=1) | (zNo=1)
+		ARRAY LONGINT($builder;0)
+		ARRAY LONGINT(alSortlist;0)
+		
+		SELECTION TO ARRAY([SLRReporter]PrimeSort;$builder)
+		
+		$i:=1
+		For ($i;1;Size of array($builder))
+			If (Find in array(alSortList;$builder{$i})<1)
+				APPEND TO ARRAY(alSortList;$builder{$i})
+			End if 
+		End for 
+		USE SET("sortbuild")
+		
+		$i:=1
+		FIRST RECORD([SLRReporter])
+		For ($i;1;Records in selection([SLRReporter]))
+			If ([SLRReporter]Header<=-3)
+				[SLRReporter]GroupedSort:=9999
+			Else 
+				[SLRReporter]GroupedSort:=Find in array(alSortlist;[SLRReporter]PrimeSort)
+			End if 
+			SAVE RECORD([SLRReporter])
+			NEXT RECORD([SLRReporter])
+		End for 
+		ORDER BY([SLRReporter];[SLRReporter]GroupedSort;>;[SLRReporter]ColorSort;>;[SLRReporter]Header;<)
+End case 
+
+CLEAR SET("sortbuild")
+

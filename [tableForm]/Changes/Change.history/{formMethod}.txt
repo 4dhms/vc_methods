@@ -1,0 +1,32 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($break)
+
+Case of 
+	: (Form event=On Header)
+		If (<>vlOrderNumber>0)
+			vtTitle:="HMS Order: "+String(<>vlOrderNumber)+" (changes and additions)"
+		End if 
+		vsPrintingHeader:=String(Current date(*))+"  PAGE "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		vtHistory:=""
+		If (Length([Changes]OldData)+Length([Changes]NewChange)>39)
+			$break:=Char(13)
+		Else 
+			$break:="  "
+		End if 
+		Case of 
+			: ([Changes]FieldName="@Removed")
+				vtHistory:=[Changes]OldData
+			: ([Changes]FieldName="@Changed")
+				vtHistory:="From: "+Char(34)+[Changes]OldData+Char(34)+$break
+				vtHistory:=vtHistory+"To: "+Char(34)+[Changes]NewChange+Char(34)
+			: ([Changes]FieldName="@color Added@")
+				vtHistory:=[Changes]OldData
+			: ([Changes]FieldName="@fabric Added@")
+				vtHistory:=[Changes]OldData
+			Else 
+				vtHistory:="From: "+Char(34)+[Changes]OldData+Char(34)+$break
+				vtHistory:=vtHistory+"To: "+Char(34)+[Changes]NewChange+Char(34)
+		End case 
+End case 

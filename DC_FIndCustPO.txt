@@ -1,0 +1,38 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($custpo)
+
+
+CREATE EMPTY SET([Orders];"dcpo")
+
+$custpo:=Request("Enter Customer PO:")
+
+QUERY([DC_Spreads];[DC_Spreads]CustPO=$custpo)
+QUERY([DC];[DC]Note="@"+$custpo+"@")
+
+If (Records in selection([DC_Spreads])=0) & (Records in selection([DC])=0)
+	WinPrompt ("There are no orders including "+$custpo)
+Else 
+	ARRAY LONGINT($orders;0)
+	SELECTION TO ARRAY([DC_Spreads]OrderNumber;$orders)
+	UNLOAD RECORD([DC_Spreads])
+	
+	ARRAY LONGINT($add;0)
+	SELECTION TO ARRAY([DC]OrderNumber;$add)
+	UNLOAD RECORD([DC])
+	
+	$i:=1
+	For ($i;1;Size of array($add))
+		APPEND TO ARRAY($orders;$add{$i})
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($orders))
+		QUERY([Orders];[Orders]OrderNum=$orders{$i})
+		ADD TO SET([Orders];"dcpo")
+	End for 
+	
+	USE SET("dcpo")
+	CLEAR SET("dcpo")
+	SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+End if 

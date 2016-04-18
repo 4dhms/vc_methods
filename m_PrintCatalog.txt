@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlPrintCat)
+
+Case of 
+	: (<>vlPrintCat=0)
+		<>vlPrintCat:=New process("p_PrintCatalog";0;"PrintCatalog")
+	Else 
+		SHOW PROCESS(<>vlPrintCat)
+		BRING TO FRONT(<>vlPrintCat)
+End case 

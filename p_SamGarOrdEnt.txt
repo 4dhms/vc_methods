@@ -1,0 +1,83 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //p_SamGarOrdEnt global procedure
+
+ARRAY TEXT(<>asCopyGrade;0)
+<>vfMTL:=False
+<>vlSGPO:=0
+Closed:=False
+ARRAY TEXT(asSGStatus;3)
+asSGStatus{1}:="Status"
+asSGStatus{2}:="Report"
+asSGStatus{3}:="Received"
+
+ARRAY TEXT(asQuikfind;4)
+asQuikFind{1}:="Quik Find"
+asQuikFind{2}:="Order Number"
+asQuikFind{3}:="Style Number"
+asQuikFind{4}:="Design Number"
+asQuikFind:=1
+
+Grade_CatArray 
+  //vsList1Name:="SGReportNote"
+  //PullDownList_Build (->asList1;vsList1Name)
+  //vsList2Name:="Pattern"
+  //PullDownList_Build (->asList2;vsList2Name)
+  //vsList3Name:="Sewer"
+  //PullDownList_Build (->asList3;vsList3Name)
+
+SET MENU BAR(4)
+
+  //QUERY([Samples];[Samples]Void=False)
+ALL RECORDS([Samples])
+
+Case of 
+	: (Screen width<780)
+		FORM SET OUTPUT([Samples];"LargeList.o")
+		FORM SET INPUT([Samples];"SampleGarment.i")
+		If (User in group(Current user;"Restricted"))
+			Center Window (Screen width-5;Screen height-100;8;"";"WincBox")
+		Else 
+			Center Window (Screen width-5;Screen height-100;8;"")
+		End if 
+	: (Shift down)
+		FORM SET OUTPUT([Samples];"LargeList.o")
+		FORM SET INPUT([Samples];"SampleGarment.i")
+		If (User in group(Current user;"Restricted"))
+			Center Window (940;610;8;"";"WincBox")
+		Else 
+			Center Window (940;610;8;"")
+		End if 
+	: (Screen height<710)
+		FORM SET OUTPUT([Samples];"LargeList.o")
+		FORM SET INPUT([Samples];"SampleGarment.i")
+		If (User in group(Current user;"Restricted"))
+			Center Window (940;Screen height-100;8;"";"WincBox")
+		Else 
+			Center Window (940;Screen height-100;8;"")
+		End if 
+	Else 
+		
+		FORM SET OUTPUT([Samples];"LargeList.o")
+		FORM SET INPUT([Samples];"SampleGarment.i")
+		If (User in group(Current user;"Restricted"))
+			Center Window (940;610;8;"";"WincBox")
+		Else 
+			Center Window (940;610;8;"")
+		End if 
+End case 
+
+<>CloseBox:=False
+
+
+p_SetWndwSamGar 
+AccessMode (->[Samples];True)
+TheFile:=->[Samples]
+ORDER BY([Samples];[Samples]SampleNumber;<)
+
+If (Screen height<760)
+	MODIFY SELECTION([Samples])
+Else 
+	MODIFY SELECTION([Samples];*)
+End if 
+CLOSE WINDOW
+<>SamGarPrcID:=0

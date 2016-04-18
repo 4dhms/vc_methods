@@ -1,0 +1,59 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+C_TEXT($combo)
+CREATE EMPTY SET([CP_OrderXRef];"ColorWay")
+
+QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=vlOldOrderNumber)
+
+QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self";*)
+QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="Combo @";*)
+QUERY SELECTION([OrdersFabricXRef]; | ;[OrdersFabricXRef]OrdType="Zipper")
+
+ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]XrefID;>)
+
+If (Records in selection([OrdersFabricXRef])>0)
+	ARRAY LONGINT($alStatusKeys;Records in selection([OrdersFabricXRef]))
+	ARRAY LONGINT(alXrefKeys;Records in selection([OrdersFabricXRef]))
+	$n:=1
+	For ($n;1;Size of array($alStatusKeys))
+		$alStatusKeys{$n}:=Record number([OrdersFabricXRef])
+		NEXT RECORD([OrdersFabricXRef])
+	End for 
+	
+	$i:=1
+	For ($i;1;Size of array($alStatusKeys))
+		GOTO RECORD([OrdersFabricXRef];$alstatusKeys{$i})
+		If ([OrdersFabricXRef]XrefID#0)
+			vlXRefKey:=[OrdersFabricXRef]XrefID
+			
+			QUERY([CP_OrderXRef];[CP_OrderXRef]XrefID=vlXRefKey)
+			Dupe_BuildColorSet 
+			
+			DUPLICATE RECORD([OrdersFabricXRef])
+			[OrdersFabricXRef]OrderNumber:=vlDupeOrderNumber
+			[OrdersFabricXRef]XrefID:=10000+Sequence number([OrdersFabricXRef])
+			[OrdersFabricXRef]FabricOrderKey:=0
+			[OrdersFabricXRef]Consumed:=0
+			[OrdersFabricXRef]Usage:=0
+			SAVE RECORD([OrdersFabricXRef])
+			$combo:="Combo "+String($i-1)
+			Case of 
+				: ([OrdersFabricXRef]OrdType="Self")
+					alXrefKeys{1}:=[OrdersFabricXRef]XrefID
+				: ([OrdersFabricXRef]OrdType=$combo)
+					alXrefKeys{$i}:=[OrdersFabricXRef]XrefID
+			End case 
+			
+		End if 
+	End for 
+	  //WinChoice ("Do you want to duplicated colors/prints?";"Yes";"No")
+	  //If (ok=1)
+	  //Dupe_ColorWay 
+	  //End if 
+	UNLOAD RECORD([CP_OrderXRef])
+	UNLOAD RECORD([OrdersFabricXRef])
+	REDUCE SELECTION([CP_OrderXRef];0)
+	REDUCE SELECTION([OrdersFabricXRef];0)
+	
+	<>vlOrderNumber:=vlDupeOrderNumber
+End if 

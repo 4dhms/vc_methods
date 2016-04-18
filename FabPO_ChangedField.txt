@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($fieldNumber)
+C_TEXT($code)
+
+If ([FabricOrders]POSent) | ([FabricOrders]ReviseNumber>0)
+	$fieldnumber:=Field($1)
+	If ($fieldnumber<10)
+		$code:="A0"+String($fieldnumber)
+	Else 
+		$code:="A"+String($fieldnumber)
+	End if 
+	
+	
+	  //fields
+	  //7 = date
+	
+	[FabricOrders]ChangedFields:=[FabricOrders]ChangedFields+$code
+	
+End if 

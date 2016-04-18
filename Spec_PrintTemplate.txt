@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($needed;$i;vlRemaining)
+C_BOOLEAN($keepPrinting)
+
+Case of 
+	: (cbKnit=1)
+		vsCategory:="KNIT"
+	: (cbWoven=1)
+		vsCategory:="WOVEN"
+	Else 
+		vsCategory:="CUT & SEW"
+End case 
+
+vsNewGarmentPart:=[SpecTemplate]Template
+
+vlRemaining:=0
+$keepPrinting:=True
+vlPage:=0
+SET PRINT OPTION(Orientation option;1)
+SET PRINT OPTION(Mac spool file format option;0)
+
+If (Not(vfPDF))
+	PRINT SETTINGS
+Else 
+	vtPathName:=Select folder+[SpecTemplate]Template+".pdf"
+	SET PRINT OPTION(Destination option;3;vtPathName)
+End if 
+
+$needed:=(Records in selection([SpecSheetLines])*15)+60
+vlPage:=vlPage+1
+vsPrintingHeader:="Printed: "+String(Current date(*))+"   Page "+String(vlPage)
+PAGE BREAK(>)
+vlremaining:=760
+
+SET PRINT OPTION(Orientation option;1)
+If (vfPDF)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+End if 
+
+Print form([SpecTempBuilder];"Temp.header")
+
+vlremaining:=660
+$i:=1
+FIRST RECORD([SpecTempBuilder])
+
+For ($i;1;Records in selection([SpecTempBuilder]))
+	Case of 
+		: (vlremaining<30)
+			vlPage:=vlPage+1
+			vsPrintingHeader:="Printed: "+String(Current date(*))+"   Page "+String(vlPage)
+			PAGE BREAK(>)
+			Print form([SpecTempBuilder];"Temp.header")
+			vlremaining:=600
+	End case 
+	QUERY([ChineseDictionary];[ChineseDictionary]LexKey=[SpecTempBuilder]SpecLibKey)
+	
+	Print form([SpecTempBuilder];"TempLine.o")
+	vlremaining:=vlremaining-31
+	NEXT RECORD([SpecTempBuilder])
+End for 
+PAGE BREAK

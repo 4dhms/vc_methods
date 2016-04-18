@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Array_BuildDates 
+
+Center Window (800;800;4;"";"WincBox")
+DIALOG("StockReport")
+CLOSE WINDOW
+<>vlStockReport:=0

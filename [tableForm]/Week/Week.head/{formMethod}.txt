@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtTitle:="Appointment Schedule ("+asUsers{asUsers}+")     Week of "+String(vdPaperwork)
+vtTitle1:="Monday     "+String(vdPaperwork)
+vtTitle2:="Tuesday     "+String(vdPaperwork+1)
+vtTitle3:="Wednesday    "+String(vdPaperwork+2)
+vtTitle4:="Thursday    "+String(vdPaperwork+3)
+vtTitle5:="Friday     "+String(vdPaperwork+4)
+vsPrintingHeader:="PRINTED "+String(Current date(*))+" "+String(Current time(*);HH MM)+"  PAGE "+String(Printing page)

@@ -1,0 +1,17 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($samplenumber)
+
+$samplenumber:=Abs(Num($1))
+
+QUERY([Samples];[Samples]SampleNumber=$samplenumber)
+
+If (Records in selection([Samples])=0)
+	WinPrompt ("That sample has been archived.")
+Else 
+	vfNewRecord:=False
+	
+	FORM SET INPUT([Samples];"Preview.i")
+	Center Window (800;600;1;"")
+	MODIFY RECORD([Samples];*)
+	CLOSE WINDOW
+End if 

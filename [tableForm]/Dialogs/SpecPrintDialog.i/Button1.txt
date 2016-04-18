@@ -1,0 +1,20 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbChinese=1)
+	vfPrintChinese:=True
+Else 
+	vfPrintChinese:=False
+End if 
+
+If (cbPrintGrade=1)
+	vfPrintGrade:=True
+Else 
+	vfPrintGrade:=False
+End if 
+If (cbPrintImages=1)
+	vfPrintImages:=True
+Else 
+	vfPrintImages:=False
+End if 
+
+vtProdStatGuide:=String(cbPrintGrade)+String(cbPrintImages)
+ACCEPT

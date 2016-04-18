@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_DATE($wk)
+$wk:=vdWeekOne
+
+LAST RECORD([SLRWks])
+For ($i;1;Records in selection([SLRWks]))
+	[SLRWks]SLRWkEnd:=$wk
+	$wk:=$wk+7
+	SAVE RECORD([SLRWks])
+	PREVIOUS RECORD([SLRWks])
+End for 
+QUERY([SLRWks];[SLRWks]SLRColorKey=[SLRColor]SLRColorKey)
+ORDER BY([SLRWks];[SLRWks]SLRWkEnd;<)

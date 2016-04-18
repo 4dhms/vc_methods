@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vlKey:=<>vlMailKey
+		SET TIMER(180)
+	: (Form event=On Timer)
+		QUERY([Spooler];[Spooler]SpoolKey=vlKey)
+		Case of 
+			: (Records in selection([Spooler])=0)
+				CANCEL
+			: ([Spooler]Status=-1)
+				
+				FORM GOTO PAGE(2)
+			: ([Spooler]Status=0)
+				CANCEL
+		End case 
+		UNLOAD RECORD([Spooler])
+End case 

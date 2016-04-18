@@ -1,0 +1,462 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($novelty;0)
+ARRAY TEXT($comboArt;0)
+
+C_TEXT($comboline;$combo;$usagetext)
+C_TEXT($emptynote)
+C_LONGINT($order;$i;cbComments;$cycle;$n;$c;$s;$r;$p)
+C_POINTER($sketch;$design;$fabric;$article;$color;$color2;$track;$stitch;$price;$size;$title;$style;$clear)
+C_BOOLEAN($blank;vfPrinting;$use2;$usage)
+C_POINTER($note)
+C_LONGINT(cbCombo)
+
+If ($3<13)
+	$note:=Field(116;$3+41)
+Else 
+	$note:=->$emptynote
+End if 
+vtNote:=""
+
+$i:=1
+For ($i;1;12)
+	If (Length([DesignLinkedPages]Novelty)<$i)
+		APPEND TO ARRAY($novelty;0)
+	Else 
+		APPEND TO ARRAY($novelty;Num([DesignLinkedPages]Novelty[[$i]]))
+	End if 
+End for 
+
+$order:=(Num($2))
+$sketch:=Get pointer("vxSketch"+String($3))
+$design:=Get pointer("vDesign"+String($3))
+$fabric:=Get pointer("vtFabric"+String($3))
+$article:=Get pointer("vtArtNo"+String($3))
+$color:=Get pointer("vtColor"+String($3))
+$color2:=Get pointer("vtColor"+String($3+8))
+$track:=Get pointer("vsPart"+String($3))
+$stitch:=Get pointer("vtStitch"+String($3))
+$price:=Get pointer("vsPrice"+String($3))
+$size:=Get pointer("vsSize"+String($3))
+$style:=Get pointer("vStyle"+String($3))
+$title:=Get pointer("vtTitle"+String($3))
+
+$color->:=""
+$color2->:=""
+ARRAY TEXT($colorlist;0)
+ARRAY LONGINT($selfkeys;0)
+
+afCancel{$3}:=False
+
+If ($1=0)
+	$blank:=True
+Else 
+	Case of 
+		: ($1=-1)
+			QUERY([DL_Custom];[DL_Custom]CustomKey=$2)
+			QUERY([Designs];[Designs]DesignNum=[DL_Custom]Design)
+			If ([Designs]ArchivedPict)
+				Picture_RestoreProc 
+			End if 
+			$sketch->:=[Designs]Sketch
+			$order:=-0
+			$price->:=""
+			$size->:=""
+			$style->:="S/N: "+[Samples]StyleNum
+			vsSubhead:="S/N: "+[Samples]StyleNum+Char(13)+"D/N: "+[Samples]DesignNum
+			
+		: ($1=1)
+			QUERY([Designs];[Designs]DesignNum=$2)
+			vsSubhead:=""
+			$fabric->:=""
+			$article->:=""
+			$color->:=""
+			$color2->:=""
+			$track->:=""
+			$stitch->:=""
+			$price->:=""
+			$size->:=""
+			$style->:=""
+			
+		: ($1=4)  //design from sample
+			QUERY([Samples];[Samples]DesignNum=$2)
+			QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+			ORDER BY([Samples];[Samples]SampleNumber;<)
+			FIRST RECORD([Samples])
+			Case of 
+				: (asList10=1)
+					$stitch->:=[Designs]Stitch
+				: (asList10=2)
+					$stitch->:=[Samples]SamGarFactry
+				: (asList10=3) | (asList10=4)
+					$stitch->:=[OrdersFabricXRef]FabArtNo
+			End case 
+			$order:=-1*[Samples]SampleNumber
+			$track->:="S:"+String(Abs($order))
+			$style->:="S/N: "+[Samples]StyleNum
+			vsSubhead:="S/N: "+[Samples]StyleNum+Char(13)+"D/N: "+[Samples]DesignNum
+			If ([Samples]Void)
+				afCancel{$3}:=True
+			End if 
+			
+		: ($1=5)  //design from order
+			QUERY([Orders];[Orders]DesignNumber=$2)
+			QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+			ORDER BY([Orders];[Orders]OrderNum;<)
+			FIRST RECORD([Orders])
+			Case of 
+				: (asList10=1)
+					$stitch->:=[Designs]Stitch
+				: (asList10=2)
+					$stitch->:=[Orders]Factory
+				: (asList10=3) | (asList10=4)
+					$stitch->:=[OrdersFabricXRef]FabArtNo
+			End case 
+			$order:=[Orders]OrderNum
+			$track->:="B:"+String(Abs($order))
+			$style->:="S/N: "+[Orders]StyleNumber
+			vsSubhead:="S/N: "+[Orders]StyleNumber+Char(13)+"D/N: "+[Orders]DesignNumber
+			If ([Orders]Cancelled)
+				afCancel{$3}:=True
+			End if 
+			
+		: ($1=2) | ($1=3)
+			If ($1=2)
+				QUERY([Samples];[Samples]SampleNumber=$order)
+				
+				QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+				Case of 
+					: (asList10=1)
+						$stitch->:=[Designs]Stitch
+					: (asList10=2)
+						$stitch->:=[Samples]SamGarFactry
+					: (asList10=3) | (asList10=4)
+						$stitch->:=[OrdersFabricXRef]FabArtNo
+				End case 
+				$order:=-1*$order
+				$track->:="S:"+String(Abs($order))
+				$price->:=""
+				$size->:=""
+				If (cbCrec=1)
+					If ([Samples]ProtoRecvDate#!00-00-00!)
+						$size->:="P:"+String([Samples]ProtoRecvDate)+"  "
+					End if 
+					If ([Samples]SampleReceived#!00-00-00!)
+						$size->:=$size->+"S:"+String([Samples]SampleReceived)
+					End if 
+				End if 
+				
+				$style->:="S/N: "+[Samples]StyleNum
+				vsSubhead:="S/N: "+[Samples]StyleNum+Char(13)+"D/N: "+[Samples]DesignNum
+				If ([Samples]Void)
+					afCancel{$3}:=True
+				End if 
+			Else 
+				$track->:="B:"+String($order)
+				QUERY([Orders];[Orders]OrderNum=$order)
+				QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+				Case of 
+					: (asList10=1)
+						$stitch->:=[Designs]Stitch
+					: (asList10=2)
+						$stitch->:=[Orders]Factory
+					: (asList10=3) | (asList10=4)
+						$stitch->:=[OrdersFabricXRef]FabArtNo
+				End case 
+				
+				vsSubhead:="S/N: "+[Orders]StyleNumber+Char(13)+"D/N: "+[Orders]DesignNumber
+				$size->:=[Orders]BrkdnCutRatio
+				$style->:="S/N: "+[Orders]StyleNumber
+				$price->:=String([Orders]Price;"###.00")
+				If ([Orders]Cancelled)
+					afCancel{$3}:=True
+				End if 
+			End if 
+			
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+			CREATE SET([OrdersFabricXRef];"all")
+			
+			$p:=1
+			$c:=Records in selection([OrdersFabricXRef])
+			
+			For ($p;1;$c)
+				If ($p=1)
+					USE SET("all")
+					QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+					QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]Usage>0)
+					If (Records in selection([OrdersFabricXRef])>0)
+						$usagetext:="[Self] "+String([OrdersFabricXRef]Usage)+" yd"
+					End if 
+				Else 
+					USE SET("all")
+					QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo "+String($p-1))
+					QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]Usage>0)
+					
+					If (Records in selection([OrdersFabricXRef])>0)
+						If ($usagetext#"")
+							$usagetext:=$usagetext+"  "
+						End if 
+						$usagetext:=$usagetext+"[C"+String($p-1)+"] "+String([OrdersFabricXRef]Usage)+" yd"
+					End if 
+				End if 
+			End for 
+			USE SET("all")
+			CLEAR SET("all")
+			
+			If (asList10=4)
+				ORDER BY([OrdersFabricXRef];[OrdersFabricXRef]SortOrder;>)
+				$r:=1
+				FIRST RECORD([OrdersFabricXRef])
+				For ($r;1;Records in selection([OrdersFabricXRef]))
+					If ([OrdersFabricXRef]OrdType="Combo@")
+						If ([OrdersFabricXRef]FabArtNo="")
+							$combo:="N/A "
+						Else 
+							$combo:=[OrdersFabricXRef]FabArtNo
+						End if 
+						$comboline:=$comboline+Replace string([OrdersFabricXRef]OrdType;"Combo ";"C")+": "+$combo+"   "
+						
+						If (Num([OrdersFabricXRef]OrdType)%2=0) | ($r=Records in selection([OrdersFabricXRef])) | (cbBlock=1)
+							APPEND TO ARRAY($comboArt;$comboline)
+							$comboline:=""
+						End if 
+					End if 
+					NEXT RECORD([OrdersFabricXRef])
+					
+				End for 
+				APPEND TO ARRAY($comboArt;"  ")
+			End if 
+			
+			Case of 
+				: ($3<13)
+					Case of 
+						: (cbBlock=1)
+							QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+							ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+							
+						: ($novelty{$3}=1)
+							QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Combo 1")
+							QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+							
+							QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Combo 1")
+							If (Records in selection([OrdersFabricXRef])=0)
+								$clear:=Get pointer("cb"+String($3))
+								$clear->:=0
+								QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=$order)
+								QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+								QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+								QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+							End if 
+						Else 
+							QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+							QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+							QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+							  //might be missing stitch HERE
+					End case 
+				Else 
+					QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]OrdType="Self")
+					QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=$order)
+					QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+			End case 
+			  //Case of 
+			  //: (asList10=1)
+			  //$stitch->:=[Designs]Stitch
+			  //: (asList10=2)
+			  //$stitch->:=$factory
+			  //: (asList10=3) | (asList10=4)
+			  //$stitch->:=[OrdersFabricXRef]FabArtNo
+			  //End case 
+			
+			$fabric->:=[OrdersFabricXRef]FabricName
+			$article->:=[OrdersFabricXRef]FabArtNo
+			
+	End case 
+	
+	
+	Case of 
+		: ($1=-1)
+			$color->:=[DL_Custom]Color
+			$design->:=[DL_Custom]Design
+			$fabric->:=[DL_Custom]Fabric
+			$title->:=[DL_Custom]Title
+			$article->:=[DL_Custom]ArticleNo
+			$stitch->:=[DL_Custom]ArticleNo
+			$size->:=[DL_Custom]Size
+			$style->:="S/N: "+[DL_Custom]Style
+			  //$title:=Get pointer("vtTitle"+String($3))
+		: ($1=2) | ($1=3)
+			ARRAY TEXT($combos;0)
+			If (cbBlock=1)
+				DISTINCT VALUES([CP_OrderXRef]CPType;$combos)
+				If (Find in array($combos;"Self")>0)
+					DELETE FROM ARRAY($combos;Find in array($combos;"Self");1)
+				End if 
+				SORT ARRAY($combos;<)
+				If (Size of array($combos)>0)
+					$cycle:=Num($combos{1})+1
+				Else 
+					$cycle:=1
+				End if 
+			End if 
+			
+			  //adds note
+			
+			If (asList10=4)
+				If (asList10=4) & (Size of array($comboArt)>1)
+					$r:=1
+					For ($r;1;Size of array($comboArt))
+						If ($comboArt{$r}="")
+						Else 
+							APPEND TO ARRAY($colorlist;$comboArt{$r})
+							APPEND TO ARRAY($selfkeys;0)
+						End if 
+					End for 
+				End if 
+			End if 
+			
+			If ($note->#"") & ($3<13)
+				vtRemaining:=$note->
+				Repeat 
+					APPEND TO ARRAY($colorlist;Util_WrapManual (vtRemaining;18))
+					APPEND TO ARRAY($selfkeys;0)
+				Until (Length(vtRemaining)<=18) | (Shift down)
+				vtRemaining:=""
+				
+				$s:=Size of array($colorlist)
+				
+				Case of 
+					: ($s=$cycle)
+						$c:=$cycle
+					: ($s>$cycle)
+						$c:=$s-($s%$cycle)
+					Else 
+						$c:=$s-($cycle%$s)
+				End case 
+				
+				$i:=1
+				For ($i;1;$c)
+					APPEND TO ARRAY($colorlist;"")
+					APPEND TO ARRAY($selfkeys;0)
+				End for 
+			End if 
+			
+			
+			$i:=1
+			FIRST RECORD([CP_OrderXRef])
+			For ($i;1;Records in selection([CP_OrderXRef]))
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				Case of 
+					: ([CP_OrderXRef]CPType="Self") & (cbBlock=1)
+						APPEND TO ARRAY($colorlist;Substring([CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName;1;18))
+					: ([CP_OrderXRef]CPType="Combo@") & (cbBlock=1)
+						APPEND TO ARRAY($colorlist;"    "+Substring([CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName;1;15))
+					Else 
+						APPEND TO ARRAY($colorlist;[CP_OrderXRef]CPNumber+" "+[ColorPrintNumber]CPName)
+				End case 
+				
+				APPEND TO ARRAY($selfkeys;[CP_OrderXRef]SelfKey)
+				NEXT RECORD([CP_OrderXRef])
+			End for 
+			UNLOAD RECORD([ColorPrintNumber])
+			
+			If (Size of array($colorlist)>0)
+				$i:=1
+				For ($i;1;Size of array($colorlist))
+					Case of 
+						: ($i%$cycle=1) & ($i+$cycle>9) & (Not($use2))
+							$use2:=True
+							Case of 
+								: (Size of array($colorlist)<=16)
+									$color2->:=Char(13)+Char(13)+Char(13)+Char(13)+Char(13)+Char(13)+Char(13)+Char(13)+Char(13)+Char(13)
+								: (Size of array($colorlist)<28)
+									$n:=1
+									For ($n;1;27-Size of array($colorlist)-3)
+										$color2->:=$color2->+Char(13)
+									End for 
+							End case 
+					End case 
+					
+					If ($selfkeys{$i}>0)
+						QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$selfkeys{$i})
+						If ([CP_OrderXRef]ReceivedColor) | ([CP_OrderXRef]CPStatus="RECD") & (cbComments=1)
+							If ($colorlist{$i}#"  @")
+								If (cbBlock=1)
+									$colorlist{$i}:="(*)"+Substring($colorlist{$i};1;15)
+								Else 
+									$colorlist{$i}:="(*)"+$colorlist{$i}
+								End if 
+							End if 
+						End if 
+					End if 
+					
+					If ($use2)
+						$color2->:=$color2->+$colorlist{$i}+Char(13)
+					Else 
+						$color->:=$color->+$colorlist{$i}+Char(13)
+					End if 
+				End for 
+			End if 
+	End case 
+	
+	
+	Case of 
+		: ($1=-1) & (Records in selection([Designs])=0)
+			
+			Case of 
+				: (Not(vfPrinting)) & ($3<9)
+					  //OBJECT MOVE($color->;-75;41;75;-41)
+				: (cbGroup=0) & (vfPrinting)
+					$color->:=""
+				: ([DesignLines]8Up) & ($3<9) & (vfPrinting)
+					OBJECT MOVE($color->;0;-118;0;110)
+				: ($3<13) & (vfPrinting)
+					OBJECT MOVE($color->;-71;0;70;0)
+			End case 
+		: ($2#"") & (Records in selection([Designs])>0)
+			If ([Designs]ArchivedPict)
+				Picture_RestoreProc 
+			End if 
+			Case of 
+				: ($1=-1)
+					$sketch->:=[Designs]Sketch
+					vxSketch:=[Designs]Sketch
+					$design->:="D/N: "+[Designs]DesignNum
+				: ($3=0)
+					vxSketch:=[Designs]Sketch
+					vtTitle:=[Designs]Description
+				Else 
+					$sketch->:=[Designs]Sketch
+					If (asList10=1)
+						$stitch->:=[Designs]Stitch
+					End if 
+					$design->:="D/N: "+[Designs]DesignNum
+					$title->:=[Designs]Description
+			End case 
+		Else 
+			$blank:=True
+	End case 
+End if 
+  //ALERT(String($3)+"  "+$color2->)
+
+If (cbCombo=1)
+	$color->:=$color->+$usagetext
+End if 
+
+If ($blank=True)
+	GET PICTURE FROM LIBRARY("empty.jpg";$sketch->)
+	$design->:=""
+	$fabric->:=""
+	$article->:=""
+	$fabric->:=""
+	$color->:=""
+	$track->:=""
+	$style->:=""
+	$price->:=""
+	$title->:=""
+	$stitch->:=""
+	$size->:=""
+End if 
+UNLOAD RECORD([Designs])
+UNLOAD RECORD([Orders])
+UNLOAD RECORD([Samples])
+UNLOAD RECORD([OrdersFabricXRef])
+UNLOAD RECORD([CP_OrderXRef])

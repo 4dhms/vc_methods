@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Lists];[Lists]ListName="DC";*)
+QUERY([Lists]; & ;[Lists]ListItem=asCustomers{asCustomers})
+
+If (Records in selection([Lists])>0)
+	vtPart11:=[Lists]ListItem
+	vtPart12:=[Lists]ListCode
+	vlListRouter:=2
+	
+	Center Window (250;450;1;"")
+	DIALOG("DC_Customer")
+	CLOSE WINDOW
+	UNLOAD RECORD([Lists])
+	
+End if 

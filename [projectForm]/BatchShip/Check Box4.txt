@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+If (cb5=1)
+	cb5:=0
+	$i:=1
+	For ($i;1;Size of array(arMCol3))
+		If (afShipping{$i}=True)
+			arMCol3{$i}:=vrUnit3
+			WH_LineUpdateLDP ($i)
+			afBatchList{$i}:=True
+		End if 
+	End for 
+End if 

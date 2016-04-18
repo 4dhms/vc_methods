@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+vtVendor:=[SpecFactory]Factory
+Email_Confirm ("Spec";"Specsheet")
+vfPDF:=False

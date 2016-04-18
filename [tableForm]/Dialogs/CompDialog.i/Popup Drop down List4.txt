@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asCompSource>0)
+	If (<>asCompSource=1)
+		List_Var ("Comp Source";->vsCSSource)
+		If (ok=1)
+			ARRAY TEXT(<>asCompSource;0)
+			QUERY([Lists];[Lists]UserName=Current user)
+			QUERY SELECTION([Lists];[Lists]ListName="Comp Source")
+			SELECTION TO ARRAY([Lists]ListItem;<>asCompSource)
+			SORT ARRAY(<>asCompSource;>)
+			INSERT IN ARRAY(<>asCompSource;1;1)
+			<>asCompSource{1}:="Add/edit list"
+		End if 
+	Else 
+		vsCSSource:=<>asCompSource{<>asCompSource}
+	End if 
+End if 
+

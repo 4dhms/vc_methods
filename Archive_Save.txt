@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+If (Size of array(asList1)>0)
+	$i:=1
+	[ShipArchive]POs:="POs: "
+	For ($i;1;Size of array(asList1))
+		If ($i>1)
+			[ShipArchive]POs:=[ShipArchive]POs+", "
+		End if 
+		[ShipArchive]POs:=[ShipArchive]POs+asList1{$i}
+	End for 
+End if 
+
+If (Size of array(asList2)>0)
+	$i:=1
+	[ShipArchive]Invoices:="Invoices: "
+	For ($i;1;Size of array(asList2))
+		If ($i>1)
+			[ShipArchive]Invoices:=[ShipArchive]Invoices+", "
+		End if 
+		[ShipArchive]Invoices:=[ShipArchive]Invoices+asList2{$i}
+	End for 
+End if 
+
+SAVE RECORD([ShipArchive])
+ACCEPT

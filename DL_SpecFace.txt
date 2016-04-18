@@ -1,0 +1,29 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //$1 points to field
+  //$2 font
+  //$3 size
+  //$4 printing
+
+C_TEXT($font)
+C_LONGINT($size)
+C_BOOLEAN($show)
+
+Case of 
+	: (vfPrinting) | ($3<0)
+		$show:=True
+End case 
+
+If ($show) & ($2#"")
+	$font:=$2
+Else 
+	$font:="Arial"
+End if 
+
+If (Abs($3)>6)
+	$size:=Abs($3)
+Else 
+	$size:=11
+End if 
+
+OBJECT SET FONT SIZE($1->;$size)
+OBJECT SET FONT($1->;$font)

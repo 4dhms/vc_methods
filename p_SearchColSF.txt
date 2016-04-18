@@ -1,0 +1,22 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+  //global procedure to search for colors in Sample Fabrics
+SAVE RECORD([SampleFabrics])
+vColNum:=Request("Find color:")
+If (OK=1)
+	QUERY([SampleFabrics];[SampleFabrics]Sam Col 1="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 2="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 3="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 4="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 5="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 6="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 7="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 8="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 9="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 10="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 11="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 12="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 13="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 14="@"+vColNum+"@";*)
+	QUERY([SampleFabrics]; | ;[SampleFabrics]Sam Col 15="@"+vColNum+"@")
+End if 
+p_SetWndwSamF 

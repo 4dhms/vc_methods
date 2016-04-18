@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlRevisionNumber)
+
+Case of 
+	: (vfRev)
+		OBJECT SET FONT STYLE(vtLine;3)
+		OBJECT SET COLOR(vtLine;-(3+(256*0)))
+	: (<>vlRevisionNumber>0)
+		If (Find in array(alFieldNumber;vlColorFieldNum)>0)
+			OBJECT SET FONT STYLE(vtLine;3)
+			OBJECT SET COLOR(vtLine;-(3+(256*0)))
+		End if 
+	Else 
+		OBJECT SET FONT STYLE(vtLine;0)
+		OBJECT SET COLOR(vtLine;-(15+(256*0)))
+End case 

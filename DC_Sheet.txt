@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_POINTER($head)
+
+QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+QUERY SELECTION([DC_Spreads];[DC_Spreads]DCKey=alDCkeys{$1})
+QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=[DC_Spreads]DCSheetKey)
+ORDER BY([DC_SpreadLines];[DC_SpreadLines]SortOrder;>;[DC_SpreadLines]DCLineKey;>)
+$i:=1
+For ($i;1;10)
+	$head:=Get pointer("vsSize"+String($i))
+	If ($i>Size of array(asColHeader))
+		$head->:=""
+	Else 
+		$head->:=asColHeader{$i}
+	End if 
+End for 
+
+FORM SET INPUT([DC_Spreads];"Spreadsheet.i")
+MODIFY RECORD([DC_Spreads];*)
+

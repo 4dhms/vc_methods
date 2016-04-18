@@ -1,0 +1,16 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($letter)
+cbAll:=0
+
+If (cbAdd=1)
+	$letter:=Substring(asCustomers{asCustomers};1;1)+"@"
+	
+	ARRAY TEXT(asXCustomer;0)
+	QUERY([Lists];[Lists]ListName="DC")
+	QUERY SELECTION([Lists];[Lists]ListItem=$letter)
+	
+	SELECTION TO ARRAY([Lists]ListItem;asXCustomer)
+	SORT ARRAY(asXCustomer;>)
+Else 
+	
+End if 

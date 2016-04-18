@@ -1,0 +1,74 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($message)
+
+If (1=1) & (asBDLetter{asBDLetter}#"")
+	C_LONGINT($i)
+	C_TEXT($message)
+	
+	If (Size of array(asOrderType)>1)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=alBDSelfKeys{asBDLetter})
+		$i:=1
+		FIRST RECORD([CP_OrderXRef])
+		For ($i;1;Records in selection([CP_OrderXRef]))
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+			$message:=$message+[CP_OrderXRef]CPType+": "+[ColorPrintNumber]CPName
+			If ($i<Records in selection([CP_OrderXRef]))
+				$message:=$message+";"
+			End if 
+			NEXT RECORD([CP_OrderXRef])
+		End for 
+		$choice:=Pop up menu($message)
+	End if 
+	
+Else 
+	C_POINTER($size)
+	C_LONGINT($i)
+	WinPrompt ("If you use this trigger, please write to Phil and tell him what it does. He forgo"+"t.")
+	
+	Case of 
+		: (Form event=On Double Clicked)
+			If (asBDLetter{asBDLetter}#"@Total")
+				For ($i;1;Size of array(asBDSelf))
+					Case of 
+						: ($i=Size of array(asBDSelf))
+							alBDColor{$i}:=16777215
+						: (asBDLetter{$i}="@total")
+							alBDColor{$i}:=16777215
+						: (asBDLetter{$i}=asBDLetter{$i+1}) | (asBDLetter{$i+1}="@total")
+							alBDColor{$i}:=14149350
+						Else 
+							alBDColor{$i}:=16777215
+					End case 
+				End for 
+				alBDColor{asBDLetter}:=16776969
+				vlLeadLine:=asBDLetter
+				OBJECT SET VISIBLE(bAll;True)
+			End if 
+		: (Form event=On Clicked)
+			If (asBDLetter{asBDLetter}#"@Total")
+				If (Macintosh control down) | (Windows Ctrl down)
+					vlLeadLine:=asBDLetter
+					Case of 
+						: (vlLeadLine=0)
+							WinPrompt ("Select the line you want to clone.")
+						: (alBDColor{asBDLetter}=16711690)
+							alBDColor{asBDLetter}:=14149350
+						Else 
+							alBDColor{asBDLetter}:=16711690
+							OBJECT SET VISIBLE(bUpdate;True)
+					End case 
+				End if 
+			End if 
+			
+	End case 
+	
+	$i:=1
+	For ($i;1;12)
+		$size:=Get pointer("vsSize"+String($i))
+		OBJECT SET VISIBLE($size->;False)
+	End for 
+	OBJECT SET VISIBLE(bSaveBD;False)
+	LISTBOX SELECT ROW(Breakdown;0;Listbox remove from selection)
+End if 
+

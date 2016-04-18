@@ -1,0 +1,9 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([DesignLines])
+ACCEPT
+  //ALL RECORDS([DesignLines])
+  //If (cbSampleRoom=1)
+  //QUERY SELECTION([DesignLines];[DesignLines]SampleRoom=True)
+  //Else 
+  //QUERY SELECTION([DesignLines];[DesignLines]SampleRoom=False)
+  //End if 

@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		SET TIMER(120)
+		vfPrinting:=False
+	: (Form event=On Timer)
+		If (Not(vfPrinting)) & (cbStockPrint=1)
+			QUERY([StockOrders];[StockOrders]Print=True)
+			If (Records in selection([StockOrders])>0)
+				FIRST RECORD([StockOrders])
+				
+				If ([StockOrders]MyLine)
+					Stock_MyLinePrint 
+				Else 
+					Stock_PrintOrder (False)
+				End if 
+			End if 
+		End if 
+		QUERY([StockOrders];[StockOrders]MyLine=False)
+		ORDER BY([StockOrders];[StockOrders]SONumber;<)
+End case 

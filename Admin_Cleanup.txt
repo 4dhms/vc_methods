@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($purgedate;$lockdate)
+
+$purgedate:=Current date(*)-365
+$lockdate:=Current date(*)-2
+
+QUERY([Changes];[Changes]RevDate<=$purgedate)
+DELETE SELECTION([Changes])
+
+ALL RECORDS([Dialogs])
+REDUCE SELECTION([Dialogs];Records in table([Dialogs])-2)
+DELETE SELECTION([Dialogs])
+
+$purgedate:=Current date(*)-7
+QUERY([EMailSent];[EMailSent]EMSentDate<$purgedate)
+DELETE SELECTION([EMailSent])
+
+QUERY([Spooler];[Spooler]Waiting=False)
+QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+DELETE SELECTION([Spooler])
+
+QUERY([EMailLog];[EMailLog]EMLogDate<$purgedate)
+DELETE SELECTION([EMailLog])

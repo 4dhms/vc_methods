@@ -1,0 +1,40 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vsFactory:=""
+		vRecNum:=""
+		ARRAY TEXT(asSGStatus;3)
+		asSGStatus{1}:="Show All"
+		asSGStatus{2}:="Incomplete"
+		asSGStatus{3}:="Approved"
+		asSGStatus:=2
+		
+		OBJECT SET ENABLED(bPrint;False)
+		Case of 
+			: (<>asStartMonth>0)
+				  //do nothing
+			: (Month of(Current date(*))=11)
+				<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+				<>asStartMonth:=11
+				<>asEndMonth:=11
+				<>asEndYear:=<>asStartYear+1
+			: (Month of(Current date(*))=12)
+				<>asStartYear:=Size of array(<>asStartYear)
+				<>asStartMonth:=12
+				<>asEndMonth:=12
+				<>asEndYear:=<>asStartYear
+			Else 
+				<>asStartMonth:=Month of(Current date(*))+1
+				<>asEndMonth:=<>asStartMonth+1
+				<>asStartYear:=Find in array(<>asStartYear;String(Year of(Current date(*))))
+				<>asEndYear:=<>asStartYear
+		End case 
+		<>asStartDay:=1
+		<>asEndDay:=1
+		Array_BuildDays ("Start";<>asStartMonth)
+		Array_BuildDays ("End";<>asEndMonth)
+	: (Form event=On Unload)
+		If (Records in set("Orders")>0)
+			CLEAR SET("Orders")
+		End if 
+End case 

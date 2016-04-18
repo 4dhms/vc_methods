@@ -1,0 +1,10 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+If (vlColorKey>0)
+	CREATE RECORD([FabricStatus])
+	[FabricStatus]LibraryKey:=vlColorKey
+	[FabricStatus]StatusDate:=vdCPStatusDate
+	[FabricStatus]Status:=vsCPStatus
+	[FabricStatus]Approver:=Current user
+	[FabricStatus]StatusKey:=Sequence number([FabricStatus])
+	SAVE RECORD([FabricStatus])
+End if 

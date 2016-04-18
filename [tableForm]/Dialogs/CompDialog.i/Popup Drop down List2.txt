@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>asCompList>0)
+	If (<>asCompList=1)
+		List_Var ("Comp Name";->vsCSName)
+		If (ok=1)
+			ARRAY TEXT(<>asCompList;0)
+			QUERY([Lists];[Lists]UserName=Current user)
+			QUERY SELECTION([Lists];[Lists]ListName="comp name")
+			SELECTION TO ARRAY([Lists]ListItem;<>asCompList)
+			SORT ARRAY(<>asCompList;>)
+			INSERT IN ARRAY(<>asCompList;1;1)
+			<>asCompList{1}:="Add/edit list"
+		End if 
+	Else 
+		vsCSName:=<>asCompList{<>asCompList}
+	End if 
+	Comp_CSLists 
+End if 

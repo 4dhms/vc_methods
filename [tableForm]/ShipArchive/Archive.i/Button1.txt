@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+SAVE RECORD([ShipArchive])
+If (Find in array(asList1;vsPart1)>0)
+	WinPrompt ("That invoice is already in the list.")
+Else 
+	Archive_Add 
+End if 

@@ -1,0 +1,4 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[Speedpost Form]NewPost:=False
+SAVE RECORD([Speedpost Form])
+ACCEPT

@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (SG_Mandatories )
+	Sample_SeasonSort 
+	SAVE RECORD([Samples])
+	Fab_UpdateActual 
+	
+	If (Position("Fabric";vtOrderChanges)>0)
+		Fabric_ArraySave 
+	End if 
+	
+	If (Position("Color";vtOrderChanges)>0)
+		Color_Save 
+	End if 
+	
+	If (Position("Components";vtOrderChanges)>0)
+		Comp_Save 
+	End if 
+	
+	If (<>SalesPrcID>0)
+		Order_NavButtons 
+		OBJECT SET ENABLED(bCancelSample;True)
+		OBJECT SET ENABLED(bDupe;True)
+	End if 
+	ACCEPT
+	
+End if 

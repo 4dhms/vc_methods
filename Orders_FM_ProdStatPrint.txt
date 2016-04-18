@@ -1,0 +1,132 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlSubtotal;$i)
+
+Case of 
+	: (Form event=On Printing Footer)
+		OBJECT SET VISIBLE(vsPrintingHeader;True)
+		OBJECT SET VISIBLE(vlGrandTotal;True)
+		OBJECT SET VISIBLE(vlPageTotal;True)
+		OBJECT SET VISIBLE(*;"xInternal";True)
+		OBJECT SET VISIBLE(*;"xPage";True)
+		OBJECT SET VISIBLE(*;"xGrand";True)
+		
+	: (Form event=On Header)
+		OBJECT SET VISIBLE(*;"xInternal";vfInternal)
+		vlPageTotal:=0
+		vsPrintingHeader:="MORE"
+		vDesc:=""
+		  //clears running total
+		vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Orders]))+" Orders   "+"Page "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		OBJECT SET VISIBLE(*;"xVoid";[Orders]Cancelled)
+		OBJECT SET VISIBLE(vsPrintingHeader;False)
+		OBJECT SET VISIBLE(vlGrandTotal;False)
+		OBJECT SET VISIBLE(vlPageTotal;False)
+		OBJECT SET VISIBLE(*;"xInternal";False)
+		OBJECT SET VISIBLE(*;"xPage";False)
+		OBJECT SET VISIBLE(*;"xGrand";False)
+		OBJECT SET VISIBLE(*;"xCredit";[Orders]CreditOK)
+		OBJECT SET VISIBLE([Orders]CreditOKDate;[Orders]CreditOK)
+		Order_Print_Lineending 
+		
+		<>vlOrderNumber:=[Orders]OrderNum
+		SG_PO 
+		
+		If (vfComponents)
+			CS_GetSheet 
+			
+			QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID)
+			QUERY SELECTION([CS_Lines];[CS_Lines]OrderNumber=0;*)
+			QUERY SELECTION([CS_Lines]; | ;[CS_Lines]OrderNumber=<>vlOrderNumber)
+			
+			CS_StripHidden 
+			  //RELATE MANY SELECTION([CS_Status]CS_LineKey)
+			CREATE EMPTY SET([CS_Status];"Current")
+			$i:=1
+			FIRST RECORD([CS_Lines])
+			For ($i;1;Records in selection([CS_Lines]))
+				If ([CS_Lines]CS_ID#0)
+					QUERY([CS_Status];[CS_Status]CS_LineKey=[CS_Lines]CS_LineKey)
+					CREATE SET([CS_Status];"Temp")
+					QUERY SELECTION([CS_Status];[CS_Status]HMSOrderNumber=<>vlOrderNumber;*)
+					QUERY SELECTION([CS_Status]; | ;[CS_Status]HMSOrderNumber=0)
+					If (Records in selection([CS_Status])>0)
+					Else 
+						USE SET("Temp")
+					End if 
+					ORDER BY([CS_Status];[CS_Status]ActionDate;<;[CS_Status]CS_StatusKey;<)
+					CLEAR SET("Temp")
+					ADD TO SET([CS_Status];"Current")
+				End if 
+				NEXT RECORD([CS_Lines])
+			End for 
+			USE SET("Current")
+			CLEAR SET("Current")
+			ORDER BY([CS_Status];[CS_Lines]OrderNumber;>;[CS_Status]CS_Sort;>;[CS_Status]CS_LineKey;>)
+			
+		End if 
+		
+		OBJECT SET VISIBLE(*;"xDiv3";(vfVisible) & ([Orders]ProdComments#""))
+		Order_Print_Lineending 
+		
+		vfShow:=False  //dividing line for pos
+		
+		QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+		vlPageTotal:=vlPageTotal+[Orders]TotalOrderQuantity
+		
+		If (Selected record number([Orders])=Records in selection([Orders]))
+			vsPrintingHeader:="LAST PAGE"
+		End if 
+		
+		OBJECT SET VISIBLE(*;"CommText";(vfVisible) & ([Orders]ProdComments#""))
+		OBJECT SET VISIBLE(*;"xDivLine2";(vfVisible) & ([Orders]ProdComments#""))
+		OBJECT SET VISIBLE([Orders]ProdComments;vfVisible)
+		OBJECT SET VISIBLE([Orders]Fab Rcv Dt;[Orders]Fab Rcv Dt#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]CancelDate;vfInternal)
+		OBJECT SET VISIBLE(*;"xNY";vfInternal)
+		OBJECT SET VISIBLE([Orders]InDC;vfInternal)
+		OBJECT SET VISIBLE(*;"xDC";vfInternal)
+		OBJECT SET VISIBLE([Orders]ShipDateFactory;[Orders]ShipDateFactory#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]Schedule Date;[Orders]Schedule Date#!00-00-00!)
+		OBJECT SET VISIBLE([Orders]ActualDeliveryDate;[Orders]ActualDeliveryDate#!00-00-00!)
+		
+		  //-------------------------
+		Orders_CalcQty 
+		vlSubtotal:=vlSubtotal+([Orders]TotalOrderQuantity)
+		QUERY([Designs];[Designs]DesignNum=[Orders]DesignNumber)
+		Picture_RestoreOnTheFly 
+		QUERY([Specs];[Specs]Design Num=[Orders]DesignNumber)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=[Orders]OrderNum)
+		Order_Fab_Sort 
+		ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+		
+		If (vfComponents)
+			  //CS_GetSheet 
+			  //RELATE MANY SELECTION([CS_Lines]CS_ID)
+			  //RELATE MANY SELECTION([CS_Status]CS_LineKey)
+			OBJECT SET VISIBLE(*;"xLine";Records in selection([CS_Lines])>0)
+			
+			If (vfStatus)
+				CS_CurrentOnly 
+			End if 
+			
+			
+			
+			ORDER BY([CS_Issues];[CS_Issues]OrderNumber;>;[CS_Issues]Resolved;<;[CS_Issues]CS_IssueKey;>)
+			ORDER BY([CS_Status];[CS_Status]CS_Sort;>)
+			
+		Else 
+			  //no components
+			REDUCE SELECTION([CS_Status];0)
+			REDUCE SELECTION([CS_Issues];0)
+			REDUCE SELECTION([CP_OrderXRef];0)
+		End if 
+		
+		SampFit_RecDate 
+		OBJECT SET VISIBLE([Orders]ApprovalDate;[Orders]ApprovalDate#!00-00-00!)
+		
+		  //____________TEMPORARY
+		
+		
+End case 

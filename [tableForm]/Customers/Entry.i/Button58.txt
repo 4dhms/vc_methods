@@ -1,0 +1,18 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+[Customers]DefaultAddress:=Replace string([Customers]DefaultAddress;Char(13);Char(10);*)
+
+  //Customer_History 
+
+SAVE RECORD([Customers])
+
+Case of 
+	: (asCustomers=0)
+		INSERT IN ARRAY(asCustomers;1;1)
+		asCustomers{1}:=[Customers]CustomerName
+		asCustomers:=0
+		SORT ARRAY(asCustomers;>)
+	: (asCustomers{asCustomers}#[Customers]CustomerName)
+		asCustomers{asCustomers}:=[Customers]CustomerName
+		SORT ARRAY(asCustomers;>)
+End case 
+ACCEPT

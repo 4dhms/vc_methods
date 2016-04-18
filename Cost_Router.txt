@@ -1,0 +1,40 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($number;$rev)
+
+vsSheetName:=asRouter{asRouter}
+
+  //If (asRouter<1)
+  // asRouter:=1
+  //End if 
+
+
+If (Position("Actual";vsSheetName)>0)
+	vfActual:=True
+Else 
+	vfActual:=False
+End if 
+
+If (Position("(";vsSheetName)>0)
+	$number:=Num(Substring(vsSheetName;1;Position("(";vsSheetName)))
+	$rev:=Num(Substring(vsSheetName;Position(String($number);vsSheetName)+1;999))
+Else 
+	$number:=Num(vsSheetName)
+	$rev:=1
+End if 
+
+Case of 
+	: (Position("Estimate";vsSheetName)>0)
+		vlSortRouter:=1000
+	: (Position("Quote";vsSheetName)>0)
+		vlSortRouter:=2000
+	: (Position("Confirmed";vsSheetName)>0)
+		vlSortRouter:=3000
+	: (Position("Actual";vsSheetName)>0)
+		vlSortRouter:=4000
+	: (Position("Weighted";vsSheetName)>0)
+		vlSortRouter:=5000
+End case 
+
+vlSortRouter:=vlSortRouter+($number*100)+$rev
+
+ACCEPT

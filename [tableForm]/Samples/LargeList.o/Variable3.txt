@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Current user="Designer") | (Current user="Sandie") & (Shift down)
+	WinChoice ("Make status spreadsheet?")
+	If (ok=1)
+		SG_StatusSpread 
+	End if 
+Else 
+	FORM SET OUTPUT([Samples];"SGList.print")
+	  //vsSubhead:=Request("Report Title:")
+	  //If (vsSubhead="")
+	vsSubhead:="Sample Garment Orders"
+	  //End if 
+	Print_Selection (->[Samples])
+	FORM SET OUTPUT([Samples];"LargeList.o")
+End if 

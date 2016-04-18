@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN(vfReorder)
+
+If (vfReorder)
+	WinPrompt ("A reorder category has already been created on this style number.")
+Else 
+	WinChoice ("Are you sure you want to reorder Style Number "+vsStyleNumber+"?")
+	If (ok=1)
+		QUERY([SLRWkLibrary];[SLRWkLibrary]WkStart<=Current date(*);*)
+		QUERY([SLRWkLibrary]; & ;[SLRWkLibrary]WkEnd>=Current date(*))
+		vdWeekOne:=[SLRWkLibrary]WkEnd-7
+		
+		CREATE RECORD([SLRAcct])
+		[SLRAcct]SLRAcct:=vsCustomer
+		[SLRAcct]SLRAcctKey:=Sequence number([SLRAcct])
+		[SLRAcct]WeekOne:=vdWeekOne
+		[SLRAcct]SLRStyleNumber:=vsStyleNumber
+		[SLRAcct]Reorder:=vlReorderCount+1
+		[SLRAcct]Division:=vsDivision
+		SAVE RECORD([SLRAcct])
+		OBJECT SET ENABLED(bMore;True)
+		REDUCE SELECTION([SLRWks];0)
+		FORM GOTO PAGE(1)
+	End if 
+End if 

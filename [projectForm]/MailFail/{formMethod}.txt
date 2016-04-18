@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Form event=On Load)
+		vlCounter:=0
+		SET TIMER(20)
+	: (Form event=On Timer)
+		vlCounter:=vlCounter+1
+		If (vlCounter%2=0)
+			OBJECT SET VISIBLE(*;"xBG";True)
+		Else 
+			OBJECT SET VISIBLE(*;"xBG";False)
+		End if 
+End case 

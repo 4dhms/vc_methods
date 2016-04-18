@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asField>0)
+	INSERT IN ARRAY(asSortOrder;Size of array(asSortOrder)+1;1)
+	asSortOrder{Size of array(asSortOrder)}:=asField{asField}
+	DELETE FROM ARRAY(asField;asField;1)
+	asField:=0
+End if 

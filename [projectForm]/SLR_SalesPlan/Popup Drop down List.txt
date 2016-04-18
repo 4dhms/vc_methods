@@ -1,0 +1,7 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (asCustomerBuild>0)
+	QUERY([SLRCustomers];[SLRCustomers]SLRCustomer=asCustomerBuild{asCustomerBuild})
+	
+	QUERY([SLRSeasonPlan];[SLRSeasonPlan]SLRCustKey=[SLRCustomers]SLRCustKey)
+	ORDER BY([SLRSeasonPlan];[SLRSeasonPlan]WkEnd;<)
+End if 

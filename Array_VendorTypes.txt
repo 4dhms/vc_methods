@@ -1,0 +1,6 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asVendorTypes;4)
+<>asVendorTypes{1}:="Show All"
+<>asVendorTypes{2}:="Button"
+<>asVendorTypes{3}:="Fabric"
+<>asVendorTypes{4}:="Trim"

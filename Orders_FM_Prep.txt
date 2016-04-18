@@ -1,0 +1,25 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+<>vfAdd:=False
+<>vlOrderNumber:=[Orders]OrderNum
+<>vsDesignNumber:=[Orders]DesignNumber
+<>vsStyleNumber:=[Orders]StyleNumber
+<>vtCustomerStyle:=[Orders]CustomerStyle
+<>vlRevisionNumber:=[Orders]RevisionNumber
+If ([Orders]WHNotes="0")
+	[Orders]WHNotes:=""
+End if 
+
+ARRAY LONGINT(alFieldNumber;0)
+ARRAY LONGINT(alFieldChange;0)
+Rev_ArrayInit (0)
+
+If (User in group(Current user;"Costsheets"))
+	OBJECT SET ENABLED(bCost;True)
+Else 
+	OBJECT SET ENABLED(bCost;False)
+End if 
+
+vsRecInSelection:=String(Selected record number([Orders]))+"/"+String(Records in selection([Orders]))
+<>newCS:=False
+
+

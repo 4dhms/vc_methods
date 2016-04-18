@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$days;$dayCount;$today)
+If (Not(Shift down))
+	vlTotQty:=0
+	vlTotNetSales:=0
+End if 
+vlTotInvQty:=0
+vlTotDiff:=0
+vlTotDiffPC:=0
+vlTotActual:=0
+vlTotDiffSales:=0
+vlTotDiffSalesPC:=0
+
+$dayCount:=$2
+
+
+Case of 
+	: ($dayCount=2)
+		If (Num(<>asEndYear{<>asEndYear})%4=0)
+			$days:=29
+		Else 
+			$days:=28
+		End if 
+	: ($dayCount=1) | ($dayCount=3) | ($dayCount=5) | ($dayCount=7) | ($dayCount=8) | ($dayCount=10) | ($dayCount=12)
+		$days:=31
+	: ($dayCount=9) | ($dayCount=4) | ($dayCount=6) | ($dayCount=11)
+		$days:=30
+End case 
+
+Case of 
+	: ($1="Start")
+		ARRAY TEXT(<>asStartDay;$days)
+	: ($1="End")
+		ARRAY TEXT(<>asEndDay;$days)
+End case 
+
+$i:=1
+For ($i;1;$days)
+	Case of 
+		: ($1="Start")
+			<>asStartDay{$i}:=String($i)
+			<>asStartDay:=1
+		: ($1="End")
+			<>asEndDay{$i}:=String($i)
+			$today:=Day of(Current date(*))
+			<>asEndDay:=Size of array(<>asEndDay)
+	End case 
+End for 

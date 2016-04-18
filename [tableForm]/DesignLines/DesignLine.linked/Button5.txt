@@ -1,0 +1,19 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($title)
+
+SAVE RECORD([DesignLines])
+vfPDF:=True
+
+$title:=Replace string([DesignLines]Title;"/";"_")
+$title:=Replace string($title;":";"_")
+
+vtPathName:=Request("File name:";$title)+".pdf"
+vtPathName:=Select folder("Select destination:")+vtPathName
+
+If (ok=1)
+	SET PRINT OPTION(Mac spool file format option;0)
+	SET PRINT OPTION(Destination option;3;vtPathName)
+	DLink_Print 
+	SHOW ON DISK(vtPathName)
+End if 
+vfPDF:=False

@@ -1,0 +1,49 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($oldKey;$newKey;$i)
+
+$oldKey:=[DesignLines]DesignLineKey
+DUPLICATE RECORD([DesignLines])
+[DesignLines]DesignLineKey:=Sequence number([DesignLines])
+[DesignLines]DLCreationDate:=Current date(*)
+[DesignLines]DLCreator:=Current user
+[DesignLines]Title:="DUPE ("+[DesignLines]Title+")"
+$newKey:=[DesignLines]DesignLineKey
+SAVE RECORD([DesignLines])
+
+  //dupes elements
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=$oldKey)
+$i:=1
+FIRST RECORD([DesignLineIncluded])
+ARRAY LONGINT($fileNumbers;Records in selection([DesignLineIncluded]))
+
+For ($i;1;Records in selection([DesignLineIncluded]))
+	$fileNumbers{$i}:=Record number([DesignLineIncluded])
+	NEXT RECORD([DesignLineIncluded])
+End for 
+
+$i:=1
+For ($i;1;Size of array($fileNumbers))
+	GOTO RECORD([DesignLineIncluded];$fileNumbers{$i})
+	DUPLICATE RECORD([DesignLineIncluded])
+	[DesignLineIncluded]DesignLineKey:=$newKey
+	SAVE RECORD([DesignLineIncluded])
+End for 
+
+  //builds pages
+QUERY([DLPages];[DLPages]DLItemKey=$oldKey)
+
+ARRAY REAL($pageNumber;0)
+ARRAY TEXT($pageTitle;0)
+ARRAY REAL($newNumber;0)
+
+SELECTION TO ARRAY([DLPages]PageNumber;$pageNumber;[DLPages]PageTitle;$pageTitle;[DLPages]NewPageNumber;$newNumber)
+
+$i:=1
+For ($i;1;Size of array($pageNumber))
+	CREATE RECORD([DLPages])
+	[DLPages]DLItemKey:=$newKey
+	[DLPages]PageNumber:=$pageNumber{$i}
+	[DLPages]PageTitle:=$pageTitle{$i}
+	[DLPages]NewPageNumber:=$newNumber{$i}
+	SAVE RECORD([DLPages])
+End for 

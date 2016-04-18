@@ -1,0 +1,137 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($start;$end)
+C_LONGINT($i;$c;$s;$year;$subtot;$linetotal;$n)
+C_TIME($docref)
+C_TEXT($path)
+
+ARRAY LONGINT($months;0)
+ARRAY TEXT($customers;0)
+
+$year:=alYearA{alYearA}
+
+If (asSeasonA{asSeasonA}="Spring")
+	$start:=Date("1/1/"+String($year))
+	$end:=Date("12/31/"+String(alYearA{alYearA}))
+	$c:=0
+Else 
+	$start:=Date("7/1/"+String($year))
+	$end:=Date("6/30/"+String($year+1))
+	$c:=6
+End if 
+
+$i:=1
+For ($i;1;12)
+	APPEND TO ARRAY($months;$c+$i)
+End for 
+
+USE SET("Master")
+
+QUERY SELECTION([Orders];[Orders]CancelDate>=$start;*)
+QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$end)
+
+Case of 
+	: (asDivisions{asDivisions}="All Divisions")
+		Case of 
+			: (Current user="Mark")
+				QUERY SELECTION([Orders];[Orders]OrderDivision="2-@";*)
+				QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="1-@";*)
+				QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="4-@")
+				  //QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="8-@")
+		End case 
+	: (asDivisions{asDivisions}="03-@")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="03@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="05@")
+		
+	: (asDivisions{asDivisions}="06-C&G + 07-Ts")
+		QUERY SELECTION([Orders];[Orders]OrderDivision="06@";*)
+		QUERY SELECTION([Orders]; | ;[Orders]OrderDivision="07@")
+		
+	Else 
+		QUERY SELECTION([Orders];[Orders]OrderDivision=asDivisions{asDivisions})
+End case 
+
+vsDivision:=asDivisions{asDivisions}
+CREATE SET([Orders];"report")
+
+DISTINCT VALUES([Orders]Customer;$customers)
+SORT ARRAY($customers;>)
+
+$docref:=Create document("";"xls")
+
+If (ok=1)
+	$path:=document
+	EMail_SendingProc 
+	SEND PACKET($docref;"Customer"+Char(9))
+	$i:=1
+	For ($i;1;12)
+		If ($c=0)
+			SEND PACKET($docref;String($c+$i)+"/"+String($year)+Char(9))
+		Else 
+			If ($i<7)
+				SEND PACKET($docref;String($c+$i)+"/"+String($year)+Char(9))
+			Else 
+				SEND PACKET($docref;String($i-6)+"/"+String($year+1)+Char(9))
+			End if 
+		End if 
+	End for 
+	SEND PACKET($docref;"Line Total"+Char(13))
+	$i:=1
+	For ($i;1;Size of array($customers))
+		<>vlCounter:=Int(($i/Size of array($customers))*100)
+		CALL PROCESS(<>SendingWin)
+		SEND PACKET($docref;$customers{$i}+Char(9))
+		
+		$linetotal:=0
+		
+		$s:=1
+		For ($s;1;12)
+			Case of 
+				: ($c=0) & ($s=12)
+					$start:=Date(String($c+$s)+"/1/"+String($year))
+					$end:=Date("1/1/"+String($year+1))
+				: ($c=0)
+					$start:=Date(String($c+$s)+"/1/"+String($year))
+					$end:=Date(String($c+$s+1)+"/1/"+String($year))
+				: ($c=6) & ($s>6)
+					$start:=Date(String($s-6)+"/1/"+String($year+1))
+					$end:=Date(String($s-5)+"/1/"+String($year+1))
+				: ($c=6) & ($s=6)
+					$start:=Date("12/1/"+String($year))
+					$end:=Date("1/1/"+String($year+1))
+				: ($c=6) & ($s<7)
+					$start:=Date(String($c+$s)+"/1/"+String($year))
+					$end:=Date(String($c+$s+1)+"/1/"+String($year))
+			End case 
+			USE SET("report")
+			QUERY SELECTION([Orders];[Orders]Customer=$customers{$i};*)
+			QUERY SELECTION([Orders]; & ;[Orders]CancelDate>=$start;*)
+			QUERY SELECTION([Orders]; & ;[Orders]CancelDate<$end)
+			
+			$n:=1
+			FIRST RECORD([Orders])
+			$subtot:=0
+			For ($n;1;Records in selection([Orders]))
+				$subtot:=$subtot+Round([Orders]TotalOrderQuantity*([Orders]Price*((100-[Orders]NetDiscount)/100));0)
+				NEXT RECORD([Orders])
+			End for 
+			$linetotal:=$linetotal+$subtot
+			
+			SEND PACKET($docref;String($subtot;"###,###,###")+Char(9))
+			
+			If (Shift down)
+				TRACE
+			End if 
+			
+		End for 
+		SEND PACKET($docref;String($linetotal;"###,###,###")+Char(13))
+	End for 
+End if 
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+CLOSE DOCUMENT($docref)
+CLEAR SET("report")
+
+SHOW ON DISK($path)
+
+

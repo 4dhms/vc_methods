@@ -1,0 +1,47 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_POINTER($dayPtr)
+C_LONGINT($i)
+C_LONGINT($dayNumb)
+C_LONGINT($prevLast;$prevMonth)
+
+$prevMonth:=vlMonth-1
+If ($prevMonth=0)
+	$prevMonth:=12
+End if 
+
+Case of 
+	: ($prevMonth=2)
+		If (Year of(Current date(*))%4=0)
+			$prevLast:=29
+		Else 
+			$prevLast:=28
+		End if 
+	: ($prevMonth=1) | ($prevmonth=3) | ($prevmonth=5) | ($prevmonth=7) | ($prevmonth=8) | ($prevmonth=10) | ($prevmonth=12)
+		$prevLast:=31
+	: ($prevMonth=9) | ($prevmonth=4) | ($prevmonth=6) | ($prevmonth=11)
+		$prevLast:=30
+End case 
+
+For ($i;1;42)
+	
+	$dayPtr:=Get pointer("vlItem"+String($i))
+	$dayNumb:=$i-(vlCalAdj-1)
+	Case of 
+		: (($dayNumb>0) & ($dayNumb<=vlDayCount))
+			$dayPtr->:=String($dayNumb)
+		: ($dayNumb>vlDayCount)
+			$dayPtr->:=String(Abs(vlDayCount-$dayNumb))
+		Else 
+			$dayPtr->:=String($prevLast-(vlCalAdj-$i)+1)
+	End case 
+	
+	  // SET VISIBLE($dayPtr->;(($dayNumb>0) & ($dayNumb<=vlDayCount)))
+	Case of 
+		: ($dayNumb=Day of(vdCalToday)) & (Not(vfNewMonth))
+			OBJECT SET COLOR($dayPtr->;-(0+(256*15)))
+		: (($dayNumb>0) & ($dayNumb<=vlDayCount))
+			OBJECT SET COLOR($dayPtr->;-(15+(256*0)))
+		Else 
+			OBJECT SET COLOR($dayPtr->;-(15+(256*12)))
+	End case 
+End for 

@@ -1,0 +1,64 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($selection)
+vsPrintingFooter:=""
+
+ORDER BY([Samples];[Samples]SampleNumber;>)
+
+vfPO:=True
+vfEmail:=True
+vlLastPage:=1
+vlPage:=1
+vlRecCount:=1
+vGroupName:=""
+
+UNLOAD RECORD([Samples])
+ORDER BY([Samples];[Samples]SampleNumber;>)
+FIRST RECORD([Orders])
+<>vlOrderNumber:=-1*[Samples]SampleNumber
+Order_PrintLoadHeader (False)
+
+FORM SET OUTPUT([Samples];"PrtSGwCPFabric")
+PAGE SETUP([Samples];"PrtSGwCPFabric")
+
+If (Records in selection([Samples])>1)
+	vtPDFName:="SGs"
+	$selection:=True
+Else 
+	vtPDFName:="SG"+String([Samples]SampleNumber)+"_DN"+[Samples]DesignNum
+	$selection:=False
+End if 
+C_LONGINT($i)
+vlPage:=0
+$i:=1
+
+
+FIRST RECORD([Samples])
+For ($i;1;Records in selection([Samples]))
+	<>vlOrderNumber:=-1*[Samples]SampleNumber
+	Order_Print 
+	If ($i<Records in selection([Samples]))
+		PAGE BREAK(>)
+	Else 
+		PAGE BREAK
+	End if 
+	CREATE RECORD([Changes])
+	[Changes]OrderNumber:=-1*[Samples]SampleNumber
+	[Changes]FieldName:="Emailed"
+	[Changes]RevTime:=Current time(*)
+	[Changes]Writer:=Current user
+	[Changes]RevDate:=Current date(*)
+	If ([Samples]RevisionNumber=0)
+		[Changes]NewChange:="Original order "
+	Else 
+		[Samples]RevisionHist:="Revision "+String([Samples]RevisionNumber)
+	End if 
+	SAVE RECORD([Changes])
+	NEXT RECORD([Samples])
+End for 
+
+UNLOAD RECORD([ComponentSheets])
+UNLOAD RECORD([CS_Lines])
+UNLOAD RECORD([CS_Other])
+UNLOAD RECORD([CS_Issues])
+UNLOAD RECORD([CS_Status])

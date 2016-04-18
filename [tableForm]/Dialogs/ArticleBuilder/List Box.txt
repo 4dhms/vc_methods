@@ -1,0 +1,44 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+Case of 
+	: (Form event=On Clicked)
+		vsFind:=asFabArtNo{asFabArtNo}
+	: (Form event=On Double Clicked)
+		If (vfFabPO)
+			vfFabPO:=False
+			[FabricOrders]ArticleNo:=vsFind
+			If (vsFind#"")
+				[FabricOrders]ArticleNo:=vsFind
+				  //[FabricOrders]ItemName:=asList2{Find in array(asFabArtNo;vsFind)}
+				  //[FabricOrders]FiberContent:=asList3{Find in array(asFabArtNo;vsFind)}
+				[FabricOrders]ItemName:=asList2{asList2}
+				[FabricOrders]FiberContent:=asList3{asList3}
+			End if 
+			If ([FabricOrders]POType=0)
+			Else 
+				QUERY([FabricLibrary];[FabricLibrary]ArticleNumber=vsFind)
+				If (Records in selection([FabricLibrary])=1) & ([FabricLibrary]Supplier#"")
+					Case of 
+						: ([FabricOrders]VendorName="")
+							[FabricOrders]VendorName:=[FabricLibrary]Supplier
+							[FabricOrders]VendorKey:=[FabricLibrary]VendorKey
+							
+						: ([FabricOrders]VendorName#[FabricLibrary]Supplier)
+							WinChoice ("Do you want to replace"+Char(13)+[FabricLibrary]Supplier+" with "+[FabricOrders]VendorName+"?")
+							If (ok=1)
+								[FabricOrders]VendorName:=[FabricLibrary]Supplier
+								[FabricOrders]VendorKey:=[FabricLibrary]VendorKey
+							End if 
+					End case 
+				End if 
+			End if 
+		Else 
+			vsArt:=asFabArtNo{asFabArtNo}
+			vtFabric:=asList2{asList2}
+			vsFiber:=asList3{asList3}
+			vtYarnSize:=asList5{asList5}
+			vtSupplier:=asList6{asList6}
+		End if 
+		ACCEPT
+End case 
+

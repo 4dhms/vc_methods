@@ -1,0 +1,33 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($selection)
+vsPrintingFooter:=""
+
+ORDER BY([Orders];[Orders]OrderNum;>)
+
+
+vfPO:=True
+
+vlLastPage:=1
+vlPage:=1
+vlRecCount:=1
+vGroupName:=""
+
+UNLOAD RECORD([Orders])
+ORDER BY([Orders];[Orders]OrderNum;>)
+FIRST RECORD([Orders])
+Order_PrintLoadHeader (False)
+
+If (Records in selection([Orders])>1)
+	vtPDFName:="POs"
+	$selection:=True
+Else 
+	vtPDFName:="PO"+String([Orders]OrderNum)
+	$selection:=False
+End if 
+Order_PrintMany 
+
+UNLOAD RECORD([ComponentSheets])
+UNLOAD RECORD([CS_Lines])
+UNLOAD RECORD([CS_Other])
+UNLOAD RECORD([CS_Issues])
+UNLOAD RECORD([CS_Status])

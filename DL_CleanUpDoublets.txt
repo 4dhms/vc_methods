@@ -1,0 +1,42 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT($pasteboard;0)
+C_LONGINT($page;$item;$i;$c)
+
+QUERY([DesignLineIncluded];[DesignLineIncluded]DesignLineKey=[DesignLines]DesignLineKey)
+
+$i:=1
+For ($i;1;6)
+	APPEND TO ARRAY($pasteboard;$i+12)
+End for 
+
+FIRST RECORD([DesignLineIncluded])
+$i:=1
+For ($i;1;Records in selection([DesignLineIncluded]))
+	If (Find in array($pasteboard;[DesignLineIncluded]ItemNumber)>0)
+		DELETE FROM ARRAY($pasteboard;Find in array($pasteboard;[DesignLineIncluded]ItemNumber))
+	End if 
+	NEXT RECORD([DesignLineIncluded])
+End for 
+
+QUERY SELECTION([DesignLineIncluded];[DesignLineIncluded]ItemNumber<13)
+
+ORDER BY([DesignLineIncluded];[DesignLineIncluded]PageNumber;>;[DesignLineIncluded]ItemNumber;>)
+$i:=1
+$c:=1
+For ($i;1;Records in selection([DesignLineIncluded]))
+	If ($i=1)
+		$page:=[DesignLineIncluded]PageNumber
+		$item:=[DesignLineIncluded]ItemNumber
+	Else 
+		If ([DesignLineIncluded]PageNumber=$page) & ([DesignLineIncluded]ItemNumber=$item) & ($item#0) & ($item#-6)
+			If ($c<=Size of array($pasteboard))
+				[DesignLineIncluded]ItemNumber:=$pasteboard{$c}
+				SAVE RECORD([DesignLineIncluded])
+				$c:=$c+1
+			End if 
+		End if 
+		$page:=[DesignLineIncluded]PageNumber
+		$item:=[DesignLineIncluded]ItemNumber
+	End if 
+	NEXT RECORD([DesignLineIncluded])
+End for 

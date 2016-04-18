@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vfHMSart)
+		FORM SET INPUT([HMSArtNo];"HMSArticle.i")
+		ADD RECORD([HMSArtNo];*)
+	: (vfTrim)
+		FORM SET INPUT([FabricLibrary];"TrimLibraryEntry")
+		ADD RECORD([FabricLibrary];*)
+	Else 
+		FORM SET INPUT([FabricLibrary];"FabricLibraryEntry")
+		ADD RECORD([FabricLibrary];*)
+End case 
+

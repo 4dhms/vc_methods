@@ -1,0 +1,61 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($available;0)
+ARRAY TEXT($carton;0)
+C_BOOLEAN($done)
+C_LONGINT($i;$n)
+
+$i:=1
+For ($i;1;Size of array(asBDSelf))
+	If (Find in array(asCtnColor;asBDSelf{$i})<1) | (Find in array(asDClineColor;asBDSelf{$i})<1)
+		APPEND TO ARRAY($available;asBDSelf{$i})
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array(asCtnColor))
+	If (Find in array(asBDSelf;asCtnColor{$i})<1)
+		APPEND TO ARRAY($carton;asCtnColor{$i})
+	End if 
+End for 
+
+  //$i:=1
+  //For ($i;1;Size of array(asDClineColor))
+  //If (Find in array(asBDSelf;asDClineColor{$i})<1) | (Find in array(asBDSelf;asDClineColor{$i})<1)
+  //APPEND TO ARRAY($DC;asDClineColor{$i})
+  //End if 
+  //End for 
+
+$i:=1
+$done:=False
+For ($i;1;Size of array($carton))
+	$n:=1
+	For ($n;1;Size of array($available))
+		If (Not($done))
+			WinChoice ($carton{$i}+" has been changed, do you want to replace it in the carton breakdown with "+Char(13)+$available{$n})
+			If (ok=1)
+				QUERY([Cartons];[Cartons]OrderNumber=[Orders]OrderNum)
+				QUERY SELECTION([Cartons];[Cartons]CtnColor=$carton{$i})
+				[Cartons]CtnColor:=$available{$n}
+				[Cartons]CtnColorCode:=""
+				SAVE RECORD([Cartons])
+				asCtnColor{Find in array(asCtnColor;$carton{$i})}:=$available{$n}
+				$done:=True
+			End if 
+		End if 
+	End for 
+End for 
+
+  //$i:=1
+  //$done:=False
+  //For ($i;1;Size of array($DC))
+  //$n:=1
+  //For ($n;1;Size of array($available))
+  //If (Not($done))
+  //WinChoice ($carton{$i}+" has been changed, do you want to replace it in the distribution list with "+Char(13)+$available{$n})
+  //If (ok=1)
+  //$done:=True
+  //End if 
+  //End if 
+  //End for 
+  //End for 
+  //

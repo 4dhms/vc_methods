@@ -1,0 +1,26 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Size of array(asCustomerBuild)=1)
+	vsCustomer:=asCustomerBuild{1}
+	OBJECT SET VISIBLE(asCustomerBuild;False)
+End if 
+QUERY([ReturnStores];[ReturnStores]StoreName=vsCustomer)
+
+If (Records in selection([ReturnStores])=0)
+	WinChoice (vsCustomer+" does not exist. Do you want to create it?")
+	If (ok=1)
+		CREATE RECORD([ReturnStores])
+		[ReturnStores]StoreID:=Sequence number([ReturnStores])
+		[ReturnStores]StoreName:=vsCustomer
+		SAVE RECORD([ReturnStores])
+		FORM SET INPUT([RMA];"RMA.i")
+		ADD RECORD([RMA];*)
+	End if 
+Else 
+	QUERY([RMA];[RMA]StoreID=[ReturnStores]StoreID)
+	ORDER BY([RMA];[RMA]RMAdate;<)
+End if 
+
+
+If (Records in selection([ReturnStores])>0)
+	OBJECT SET ENABLED(bNewRMA;True)
+End if 

@@ -1,0 +1,48 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(<>asAndOr;2)
+ARRAY TEXT(<>asComparison;6)
+
+Case of 
+	: ($1="Order")
+		vsFlag:="ORDER"
+		ARRAY TEXT(<>asQuery;6)
+		<>asQuery{1}:="Factory"
+		<>asQuery{2}:="Cancel"
+		<>asQuery{3}:="Actual Delivery Date"
+		<>asQuery{4}:="Ship Date Factory"
+		<>asQuery{5}:="Start Cancel Date"
+	: ($1="Sample")
+		vsFlag:="SAMPLE"
+		ARRAY TEXT(<>asQuery;5)
+		<>asQuery{1}:="Factory"
+		<>asQuery{2}:="Cancel"
+		<>asQuery{3}:="Actual Delivery Date"
+End case 
+
+
+Case of 
+	: ($1="Order")
+		INSERT IN ARRAY(<>asQuery;1;5)
+		<>asQuery{1}:="Order Number"
+		<>asQuery{2}:="Style Number"
+		<>asQuery{3}:="Design Number"
+		<>asQuery{4}:="Sample Number"
+		<>asQuery{5}:="Customer"
+	: ($1="Sample")
+		INSERT IN ARRAY(<>asQuery;1;3)
+		<>asQuery{1}:="Sample Number"
+		<>asQuery{2}:="Style Number"
+		<>asQuery{3}:="Design Number"
+End case 
+
+
+<>asAndOr{1}:="And"
+<>asAndOr{2}:="Or"
+
+<>asComparison{1}:="is equal to"
+<>asComparison{2}:="is greater than"
+<>asComparison{3}:="is greater than or equal to"
+<>asComparison{4}:="is less than"
+<>asComparison{5}:="is less than or equal to"
+<>asComparison{6}:="contains"
+

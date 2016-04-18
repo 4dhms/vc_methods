@@ -1,0 +1,103 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c)
+C_TEXT($setname)
+READ ONLY([Orders])
+
+ARRAY TEXT(asSSDesignNumber;0)
+ARRAY TEXT(asSSDescript;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY LONGINT(alUnits;0)
+ARRAY LONGINT(alSSSamples;0)
+ARRAY LONGINT(alDNColor;0)
+
+ARRAY TEXT($designs;0)
+
+If (cb11=1)
+	$setname:=Substring(asChartDivisions{asChartDivisions};1;2)
+	USE SET($setname)
+	Case of 
+		: (asDivisions{asDivisions}="Knit")
+			QUERY SELECTION([Designs];[Designs]KWCnS="Knit")
+		: (asDivisions{asDivisions}="Woven")
+			QUERY SELECTION([Designs];[Designs]KWCnS="Woven")
+		: (asDivisions{asDivisions}="Cut@")
+			QUERY SELECTION([Designs];[Designs]KWCnS="Cut@")
+	End case 
+Else 
+	$setname:=Substring(asDivisions{asDivisions};1;2)
+	USE SET($setname)
+End if 
+SELECTION TO ARRAY([Designs]DesignNum;$designs)
+CREATE EMPTY SET([Designs];"var")
+EMail_SendingProc 
+
+$i:=1
+For ($i;1;Size of array($designs))
+	QUERY([Designs];[Designs]DesignNum=$designs{$i}+"@")
+	$n:=1
+	FIRST RECORD([Designs])
+	For ($n;1;Records in selection([Designs]))
+		ADD TO SET([Designs];"var")
+		NEXT RECORD([Designs])
+	End for 
+End for 
+
+USE SET("var")
+CLEAR SET("var")
+
+$c:=Records in selection([Designs])
+ARRAY TEXT(asSSDesignNumber;$c)
+ARRAY TEXT(asSSDescript;$c)
+ARRAY LONGINT(alOrders;$c)
+ARRAY LONGINT(alUnits;$c)
+ARRAY LONGINT(alSSSamples;$c)
+ARRAY LONGINT(alDNColor;$c)
+
+<>vtMessage:="Building report"
+<>vlCounter:=0
+
+vlTotQty:=0
+vlColCount:=0
+vlTotalSamp:=0
+
+ORDER BY([Designs];[Designs]DesignNum;>)
+
+$i:=1
+FIRST RECORD([Designs])
+For ($i;1;Records in selection([Designs]))
+	If ($i%5=0)
+		<>vlCounter:=($i/Records in selection([Designs])*100)
+		CALL PROCESS(<>SendingWin)
+	End if 
+	
+	asSSDesignNumber{$i}:=[Designs]DesignNum
+	asSSDescript{$i}:=[Designs]Description
+	QUERY([Orders];[Orders]DesignNumber=[Designs]DesignNum)
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	
+	alOrders{$i}:=Records in selection([Orders])
+	vlColCount:=vlColCount+Records in selection([Orders])
+	alUnits{$i}:=Sum([Orders]TotalOrderQuantity)
+	vlTotQty:=vlTotQty+Sum([Orders]TotalOrderQuantity)
+	QUERY([Samples];[Samples]DesignNum=[Designs]DesignNum)
+	alSSSamples{$i}:=Records in selection([Samples])
+	vlTotalSamp:=vlTotalSamp+Records in selection([Samples])
+	
+	If (Records in selection([Orders])>0)
+		alDNColor{$i}:=16777215
+	Else 
+		alDNColor{$i}:=16765650
+	End if 
+	NEXT RECORD([Designs])
+End for 
+
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+<>CloseBox:=True
+Center Window (600;660;1;"")
+DIALOG([Dialogs];"UsageDesignDetail")
+
+CLOSE WINDOW
+SET WINDOW TITLE("")
+

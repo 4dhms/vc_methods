@@ -1,0 +1,29 @@
+  //%attributes = {"folder":"Specsheets","lang":"en"} comment added and reserved by 4D.
+If ($1<5)
+	WinChoice ("What do you want to do to this column?";"Copy";"Paste";"Clear";"Cancel")
+	If (ok=1)
+		Case of 
+			: (bChoice2=1)
+				SS_PasteColumn ($1)
+			: (bChoice3=1)
+				ARRAY TEXT($clear;0)
+				ARRAY TEXT($clear;Records in selection([SpecSheetLines]))
+				Case of 
+					: ($1=2)
+						ARRAY TO SELECTION($clear;[SpecSheetLines]Spec1A)
+					: ($1=3)
+						ARRAY TO SELECTION($clear;[SpecSheetLines]Spec1B)
+					: ($1=4)
+						ARRAY TO SELECTION($clear;[SpecSheetLines]Spec1C)
+				End case 
+			Else 
+				SS_CopyColumn ($1)
+		End case 
+	End if 
+Else 
+	WinChoice ("Copy this column?";"Yes";"No")
+	If (ok=1)
+		SS_CopyColumn ($1)
+	End if 
+End if 
+

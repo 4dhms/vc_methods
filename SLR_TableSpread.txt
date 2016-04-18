@@ -1,0 +1,308 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT($customer;0)
+ARRAY TEXT($style;0)
+ARRAY TEXT($color;0)
+ARRAY TEXT($design;0)
+ARRAY REAL($header;0)
+ARRAY LONGINT($rowkey;0)
+
+C_TEXT($wkholder)
+C_REAL($pricecalc;$netcalc;$avgcalc;$thisheader)
+C_LONGINT($lasttest)
+
+QUERY([SLRReporter];[SLRReporter]User="")
+ARRAY TEXT($user;0)
+
+ARRAY LONGINT($acctkey;0)
+ARRAY REAL($netprice;0)
+ARRAY REAL($price;0)
+ARRAY LONGINT($reorder;0)
+ARRAY REAL($sop1;0)
+ARRAY LONGINT($units1;0)
+ARRAY LONGINT($total1;0)
+ARRAY LONGINT($onhand1;0)
+ARRAY BOOLEAN($subtotal;0)
+ARRAY LONGINT($units2;0)
+ARRAY LONGINT($total2;0)
+ARRAY LONGINT($onhand2;0)
+
+ARRAY LONGINT($units3;0)
+ARRAY LONGINT($total3;0)
+ARRAY LONGINT($onhand3;0)
+
+ARRAY LONGINT($units4;0)
+ARRAY LONGINT($total4;0)
+ARRAY LONGINT($onhand4;0)
+
+ARRAY LONGINT($units5;0)
+ARRAY LONGINT($total5;0)
+ARRAY LONGINT($onhand5;0)
+
+ARRAY LONGINT($units6;0)
+ARRAY LONGINT($total6;0)
+ARRAY LONGINT($onhand6;0)
+
+ARRAY LONGINT($unitsM;0)
+ARRAY LONGINT($unitsS;0)
+ARRAY LONGINT($unitsY;0)
+ARRAY LONGINT($unitsL;0)
+
+ARRAY LONGINT($totalM;0)
+ARRAY LONGINT($totalS;0)
+ARRAY LONGINT($totalY;0)
+ARRAY LONGINT($totalL;0)
+
+ARRAY LONGINT($lastonhand;0)
+
+ARRAY REAL($muW;0)
+ARRAY REAL($muM;0)
+ARRAY REAL($muS;0)
+ARRAY REAL($muY;0)
+ARRAY REAL($muL;0)
+
+ARRAY REAL($soM;0)
+ARRAY REAL($soS;0)
+ARRAY REAL($soY;0)
+ARRAY REAL($soL;0)
+
+ARRAY LONGINT($primesort;0)
+ARRAY LONGINT($colorsort;0)
+
+C_REAL($selloffM;$selloffS;$selloffY;$selloffL)
+C_LONGINT($i;$n;$s;$c;$p;$r;$hiwk;$subhiwk)
+C_LONGINT($soUnitsM)
+C_LONGINT($soUnitsS)
+C_LONGINT($soUnitsY)
+C_LONGINT($soUnitsL)
+C_LONGINT($soOHM)
+C_LONGINT($soOHS)
+C_LONGINT($soOHY)
+C_LONGINT($soOHL)
+
+ARRAY LONGINT($week1;0)
+ARRAY LONGINT($week2;0)
+ARRAY LONGINT($week3;0)
+ARRAY LONGINT($week4;0)
+ARRAY LONGINT($week5;0)
+ARRAY LONGINT($week6;0)
+ARRAY LONGINT($ohM;0)
+ARRAY LONGINT($ohS;0)
+ARRAY LONGINT($ohY;0)
+ARRAY LONGINT($ohL;0)
+
+$i:=1
+$s:=1
+vlRunningTotal:=0
+
+For ($i;1;Size of array(alTablePop))
+	$n:=1
+	
+	Case of 
+		: ($i%4=1) & ($i<Size of array(alTablePop))
+			If (vfByStyle)
+				APPEND TO ARRAY($primesort;Num(StripToNumber (asTableSpec{$s}{3})))
+			Else 
+				APPEND TO ARRAY($primesort;Num(asTableSpec{$s}{9}))
+			End if 
+			APPEND TO ARRAY($colorsort;Num(asTableSpec{$s}{10}))
+			APPEND TO ARRAY($acctkey;Num(asTableSpec{$s}{11}))
+			APPEND TO ARRAY($rowkey;$i)
+			APPEND TO ARRAY($customer;asTableSpec{$s}{2})
+			
+			APPEND TO ARRAY($style;Uppercase(asTableSpec{$s}{3}))
+			APPEND TO ARRAY($reorder;Num(asTableSpec{$s}{8}))
+			
+			APPEND TO ARRAY($color;asTableSpec{$s}{4})
+			APPEND TO ARRAY($design;asTableSpec{$s}{5})
+			
+			$thisHeader:=Num(asTableSpec{$s}{6})
+			APPEND TO ARRAY($header;$thisheader)
+			
+			If ($thisheader=-2) | ($thisheader=2.5)
+				APPEND TO ARRAY($subtotal;True)
+			Else 
+				APPEND TO ARRAY($subtotal;False)
+			End if 
+			
+			$pricecalc:=Num(asTableSpec{$s}{1})
+			$netcalc:=Num(asTableSpec{$s}{7})
+			APPEND TO ARRAY($price;$pricecalc)
+			If ($pricecalc<0)
+				APPEND TO ARRAY($netprice;Abs($pricecalc))
+			Else 
+				APPEND TO ARRAY($netprice;Round($pricecalc*((100-$netcalc)/100);2))
+			End if 
+			
+			$soUnitsM:=alTableTot{$s}{1}
+			$soUnitsS:=alTableTot{$s}{3}
+			$soUnitsY:=alTableTot{$s}{5}
+			$soUnitsL:=alTableTot{$s}{7}
+			
+			APPEND TO ARRAY($unitsM;$soUnitsM)
+			APPEND TO ARRAY($unitsS;$soUnitsS)
+			APPEND TO ARRAY($unitsY;$soUnitsY)
+			APPEND TO ARRAY($unitsL;$soUnitsL)
+			
+			APPEND TO ARRAY($totalM;alTableTot{$s}{2})
+			APPEND TO ARRAY($totalS;alTableTot{$s}{4})
+			APPEND TO ARRAY($totalY;alTableTot{$s}{6})
+			APPEND TO ARRAY($totalL;alTableTot{$s}{8})
+			
+			$soOHM:=alTableTot{$s}{9}
+			$soOHS:=alTableTot{$s}{10}
+			$soOHY:=alTableTot{$s}{11}
+			$soOHL:=alTableTot{$s}{12}
+			
+			APPEND TO ARRAY($ohM;$soOHM)
+			APPEND TO ARRAY($ohS;$soOHS)
+			APPEND TO ARRAY($ohY;$soOHY)
+			APPEND TO ARRAY($ohL;$soOHL)
+			
+			  //sell off
+			$selloffM:=($soUnitsM/($soUnitsM+$soOHM))*100
+			$selloffS:=($soUnitsS/($soUnitsS+$soOHS))*100
+			$selloffY:=($soUnitsY/($soUnitsY+$soOHY))*100
+			$selloffL:=($soUnitsL/($soUnitsL+$soOHL))*100
+			
+			APPEND TO ARRAY($soM;Round($selloffM;1))
+			APPEND TO ARRAY($soS;Round($selloffS;1))
+			APPEND TO ARRAY($soY;Round($selloffY;1))
+			APPEND TO ARRAY($soL;Round($selloffL;1))
+			
+			$s:=$s+1
+			
+			APPEND TO ARRAY($user;Current user)
+			APPEND TO ARRAY($units1;alTablePop{$i}{1})
+			APPEND TO ARRAY($units2;alTablePop{$i}{2})
+			APPEND TO ARRAY($units3;alTablePop{$i}{3})
+			APPEND TO ARRAY($units4;alTablePop{$i}{4})
+			APPEND TO ARRAY($units5;alTablePop{$i}{5})
+			APPEND TO ARRAY($units6;alTablePop{$i}{6})
+			
+		: ($i%4=2)
+			APPEND TO ARRAY($total1;alTablePop{$i}{1})
+			APPEND TO ARRAY($total2;alTablePop{$i}{2})
+			APPEND TO ARRAY($total3;alTablePop{$i}{3})
+			APPEND TO ARRAY($total4;alTablePop{$i}{4})
+			APPEND TO ARRAY($total5;alTablePop{$i}{5})
+			APPEND TO ARRAY($total6;alTablePop{$i}{6})
+		: ($i%4=3)
+			APPEND TO ARRAY($onhand1;alTablePop{$i}{1})
+			APPEND TO ARRAY($onhand2;alTablePop{$i}{2})
+			APPEND TO ARRAY($onhand3;alTablePop{$i}{3})
+			APPEND TO ARRAY($onhand4;alTablePop{$i}{4})
+			APPEND TO ARRAY($onhand5;alTablePop{$i}{5})
+			APPEND TO ARRAY($onhand6;alTablePop{$i}{6})
+			
+			$lasttest:=0
+			$r:=1
+			For ($r;1;Size of array(alTablePop{$i}))
+				If ($lasttest=0)
+					$lasttest:=alTablePop{$i}{$r}
+				End if 
+			End for 
+			APPEND TO ARRAY($lastonhand;$lasttest)
+			
+		Else 
+			If ($header{Size of array($header)}=-1)
+				$c:=$c-4  //moves previous week number to subtotal line
+			Else 
+				$c:=$i
+			End if 
+			
+			  //finds high week
+			$p:=1
+			$hiwk:=0
+			For ($p;1;Size of array(adDates))
+				If (alTablePop{$c}{$p}>$hiwk)
+					$hiwk:=alTablePop{$c}{$p}
+				End if 
+				If ($hiwk>$subhiwk)
+					$subhiwk:=$hiwk
+				End if 
+			End for 
+			
+			Case of 
+				: ($thisheader=-2) & (vfByStyle)
+					$wkholder:="  "+String($hiwk)+" wk"
+					$style{Size of array($style)}:=$style{Size of array($style)}+"  "+String($hiwk)+" wk"
+				: ($thisheader>=0)
+					$wkholder:="  "+String($hiwk)+" wk"
+					$style{Size of array($style)}:=$style{Size of array($style)}+"  "+String($hiwk)+" wk"
+					  //: ($thisheader=-3)
+					  //$style{Size of array($style)}:=""
+				: ($thisheader=-2)
+					$style{Size of array($style)}:=$style{Size of array($style)}+$wkholder
+					$subhiwk:=0
+				Else 
+					$style{Size of array($style)}:=$style{Size of array($style)}+$wkholder
+			End case 
+			
+			APPEND TO ARRAY($week1;alTablePop{$c}{1})
+			APPEND TO ARRAY($week2;alTablePop{$c}{2})
+			APPEND TO ARRAY($week3;alTablePop{$c}{3})
+			APPEND TO ARRAY($week4;alTablePop{$c}{4})
+			APPEND TO ARRAY($week5;alTablePop{$c}{5})
+			APPEND TO ARRAY($week6;alTablePop{$c}{6})
+	End case 
+End for 
+  //avg mark up
+$i:=1
+For ($i;1;Size of array($netprice))
+	If (($i*4)+2<Size of array(alTablePop))
+		$avgcalc:=Round($total1{$i}/$units1{$i};2)
+		APPEND TO ARRAY($muW;Round((($avgcalc-$netprice{$i})/$avgcalc)*100;2))
+		$avgcalc:=Round($totalM{$i}/$unitsM{$i};2)
+		APPEND TO ARRAY($muM;Round((($avgcalc-$netprice{$i})/$avgcalc)*100;2))
+		$avgcalc:=Round($totalS{$i}/$unitsS{$i};2)
+		APPEND TO ARRAY($muS;Round((($avgcalc-$netprice{$i})/$avgcalc)*100;2))
+		$avgcalc:=Round($totalY{$i}/$unitsY{$i};2)
+		APPEND TO ARRAY($muY;Round((($avgcalc-$netprice{$i})/$avgcalc)*100;2))
+		$avgcalc:=Round($totalL{$i}/$unitsL{$i};2)
+		APPEND TO ARRAY($muL;Round((($avgcalc-$netprice{$i})/$avgcalc)*100;2))
+	End if 
+End for 
+
+$i:=1
+For ($i;1;Size of array($units1))
+	APPEND TO ARRAY($sop1;Round(($units1{$i}/($units1{$i}+$onhand1{$i})*100);1))
+End for 
+
+ARRAY TO SELECTION($user;[SLRReporter]User;$header;[SLRReporter]Header;$rowkey;[SLRReporter]RowKey;$netprice;[SLRReporter]Price)
+ARRAY TO SELECTION($units1;[SLRReporter]Units1;$total1;[SLRReporter]Total1;$onhand1;[SLRReporter]OHU1;$sop1;[SLRReporter]SOP1)
+ARRAY TO SELECTION($units2;[SLRReporter]Units2;$total2;[SLRReporter]Total2;$onhand2;[SLRReporter]OHU2)
+ARRAY TO SELECTION($units3;[SLRReporter]Units3;$total3;[SLRReporter]Total3;$onhand3;[SLRReporter]OHU3)
+ARRAY TO SELECTION($units4;[SLRReporter]Units4;$total4;[SLRReporter]Total4;$onhand4;[SLRReporter]OHU4)
+ARRAY TO SELECTION($units5;[SLRReporter]Units5;$total5;[SLRReporter]Total5;$onhand5;[SLRReporter]OHU5)
+ARRAY TO SELECTION($units6;[SLRReporter]Units6;$total6;[SLRReporter]Total6;$onhand6;[SLRReporter]OHU6;$lastonhand;[SLRReporter]LastOnHand)
+ARRAY TO SELECTION($week1;[SLRReporter]WkNumber1)
+ARRAY TO SELECTION($week2;[SLRReporter]WkNumber2)
+ARRAY TO SELECTION($week3;[SLRReporter]WkNumber3;$week4;[SLRReporter]WkNumber4;$week5;[SLRReporter]WkNumber5;$week6;[SLRReporter]WkNumber6)
+ARRAY TO SELECTION($soM;[SLRReporter]MTDSO;$soS;[SLRReporter]STDSO;$soY;[SLRReporter]YTDSO;$soL;[SLRReporter]LTDSO)
+ARRAY TO SELECTION($customer;[SLRReporter]Customer;$style;[SLRReporter]StyleNumber;$color;[SLRReporter]LineItem;$design;[SLRReporter]DesignNumber)
+ARRAY TO SELECTION($reorder;[SLRReporter]Reorder;$primesort;[SLRReporter]PrimeSort;$colorsort;[SLRReporter]ColorSort;$subtotal;[SLRReporter]Subtotal)
+
+ARRAY TO SELECTION($muW;[SLRReporter]MU_WTD;$muM;[SLRReporter]MU_MTD;$muS;[SLRReporter]MU_STD;$muY;[SLRReporter]MU_YTD;$muL;[SLRReporter]MU_LTD)
+ARRAY TO SELECTION($unitsM;[SLRReporter]TotMTDUnit;$unitsS;[SLRReporter]TotSTDUnit;$unitsY;[SLRReporter]TotYTDUnit;$unitsL;[SLRReporter]TotLTDUnit)
+ARRAY TO SELECTION($totalM;[SLRReporter]TotMTDAmt;$totalS;[SLRReporter]TotSTDAmt;$totalY;[SLRReporter]TotYTDAmt;$totalL;[SLRReporter]TotLTDAmt)
+ARRAY TO SELECTION($ohM;[SLRReporter]TotMTDOH;$ohS;[SLRReporter]TotSTDOH;$ohY;[SLRReporter]TotYTDOH;$ohL;[SLRReporter]TotLTDOH)
+
+ARRAY TO SELECTION($color;[SLRReporter]LineItem;$style;[SLRReporter]StyleNumber)
+ARRAY TO SELECTION($design;[SLRReporter]DesignNumber)
+ARRAY TO SELECTION($acctkey;[SLRReporter]SLRAcctKey)
+
+CREATE SET([SLRReporter];"report")
+
+ARRAY TEXT(asTableColor;0)
+ARRAY TEXT(asTableDesign;0)
+
+  //prime sort
+  //$i:=1
+  //ARRAY LONGINT($prime;Size of array($style))
+  //For ($i;1;Size of array($prime))
+  //$prime{$i}:=$i
+  //End for 
+  //ARRAY TO SELECTION($prime;[SLRReporter]PrimeSort)
+
+QUERY([SLRReporter];[SLRReporter]User=Current user)
+

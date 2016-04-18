@@ -1,0 +1,23 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_POINTER($wkhd)
+C_LONGINT($i)
+C_DATE($wk)
+
+
+vsPrintingHeader:="Printed "+String(Current date(*))+"  Page "+String(vlPage)
+
+If (vfDigest)
+	Print form("SLRHeader.digest")
+Else 
+	$i:=1
+	For ($i;1;12)
+		$wk:=[SLRReporter]Wk1-(($i-1)*7)
+		$wkhd:=Get pointer("vtTitle"+String($i))
+		$wkhd->:=String(Month of($wk))+"/"+String(Day of($wk))
+	End for 
+	If (qLetter=1)
+		Print form("SLR_Header4Wks")
+	Else 
+		Print form("SLRHeader.digest")
+	End if 
+End if 

@@ -1,0 +1,55 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($add)
+
+QUERY([CostSheets];[CostSheets]Quota>0)
+QUERY SELECTION([CostSheets];[CostSheets]Quota1Confirm=False)
+CREATE SET([CostSheets];"Quota1")
+
+QUERY([CostSheets];[CostSheets]Quota2>0)
+QUERY SELECTION([CostSheets];[CostSheets]Quota2Confirm=False)
+CREATE SET([CostSheets];"Quota2")
+
+CREATE EMPTY SET([CostSheets];"Result")
+UNION("Quota1";"Quota2";"Result")
+USE SET("Result")
+CLEAR SET("Quota1")
+CLEAR SET("Quota2")
+CLEAR SET("Result")
+
+RELATE ONE SELECTION([CostSheets];[Costing])
+QUERY SELECTION([Costing];[Costing]OrderNumber>0)
+
+$i:=1
+FIRST RECORD([Costing])
+CREATE EMPTY SET([Orders];"Unapproved")
+
+For ($i;1;Records in selection([Costing]))
+	RELATE MANY([Costing]SheetNumber)
+	  //  QUERY SELECTION([CostSheets];[CostSheets]SheetName#"Weighted")
+	ORDER BY([CostSheets];[CostSheets]SheetID;<)
+	If ([CostSheets]SheetName="Weighted")
+		NEXT RECORD([CostSheets])
+	End if 
+	
+	Case of 
+		: ([CostSheets]Quota>0) & (Not([CostSheets]Quota1Confirm))
+			$add:=True
+		: ([CostSheets]Quota2>0) & (Not([CostSheets]Quota2Confirm))
+			$add:=True
+		Else 
+			$add:=False
+	End case 
+	If ($add)
+		QUERY([Orders];[Orders]OrderNum=[Costing]OrderNumber)
+		If (Not([Orders]Cancelled))
+			ADD TO SET([Orders];"Unapproved")
+		End if 
+	End if 
+	NEXT RECORD([Costing])
+End for 
+UNLOAD RECORD([Costing])
+USE SET("Unapproved")
+CLEAR SET("Unapproved")
+p_SetWindowHMS 
+

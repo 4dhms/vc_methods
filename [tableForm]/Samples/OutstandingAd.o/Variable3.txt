@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+FORM SET OUTPUT([Samples];"Outstanding.print")
+vtTitle:=Request("Report title:";"Outstanding Sample Report")
+PRINT SELECTION([Samples])
+FORM SET OUTPUT([Samples];"OutstandingAd.o")

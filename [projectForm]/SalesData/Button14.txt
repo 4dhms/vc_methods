@@ -1,0 +1,34 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($newcolor)
+
+$newcolor:=Request("New color name:")
+
+If (ok=1)
+	If (Find in array(asColors;$newcolor)>0)
+		WinPrompt ("That color already exists in the color list.")
+	Else 
+		
+		If (vfNew)
+			vfNew:=False
+			CREATE RECORD([SLRAcct])
+			[SLRAcct]SLRAcct:=vsCustomer
+			[SLRAcct]SLRAcctKey:=Sequence number([SLRAcct])
+			[SLRAcct]WeekOne:=vdWeekOne
+			[SLRAcct]SLRStyleNumber:=vsStyleNumber
+			[SLRAcct]Division:=vsDivision
+			SAVE RECORD([SLRAcct])
+			OBJECT SET ENABLED(bMore;True)
+		End if 
+		
+		CREATE RECORD([SLRColor])
+		[SLRColor]SLRAcctKey:=[SLRAcct]SLRAcctKey
+		[SLRColor]SLRColorKey:=Sequence number([SLRColor])
+		[SLRColor]SLRColor:=$newcolor
+		[SLRColor]Reorder:=[SLRAcct]Reorder
+		[SLRColor]CustomColor:=True
+		SAVE RECORD([SLRColor])
+		
+		APPEND TO ARRAY(asColors;$newcolor)
+		SORT ARRAY(asColors;>)
+	End if 
+End if 

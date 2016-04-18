@@ -1,0 +1,11 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($option)
+
+$option:="<OPTION>"
+For ($i;1;Size of array(<>asAndOr))
+	$option:=$option+"<OPTION>"+<>asAndOr{$i}
+End for 
+$0:=Char(1)+$option
+
+

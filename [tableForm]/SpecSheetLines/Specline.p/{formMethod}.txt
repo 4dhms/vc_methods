@@ -1,0 +1,60 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_REAL($unit)
+
+Case of 
+	: (Form event=On Printing Detail)
+		QUERY([SpecLibrary];[SpecLibrary]SpecLibKey=[SpecSheetLines]SpecLibKey)
+		OBJECT SET VISIBLE(vsSize0;[SpecLibrary]DescriptionB#"")
+		
+		
+		Case of 
+			: ([SpecSheetLines]OtherDescription#"")
+				vtDescription:=[SpecSheetLines]OtherDescription
+				vsSize0:=""
+				vsField:=""
+			: ([SpecLibrary]DescriptionB="")
+				vtDescription:=[SpecLibrary]DescriptionA
+				vsField:=""
+				vsSize0:=""
+			Else 
+				vtDescription:=[SpecLibrary]DescriptionA+[SpecLibrary]DecriptConnect+[SpecSheetLines]SpecialMeasure+[SpecLibrary]DescriptionB
+				vsSize0:="["+[SpecSheetLines]SpecialMeasure+"]"+Char(34)
+				$unit:=1
+				OBJECT MOVE(vsSize0;([SpecLibrary]CharacterCount*$unit);0)
+				
+		End case 
+		vtDescription:=Replace string(vtDescription;Char(13);" ";*)
+		
+		SS_PrintLineInit 
+		
+		Case of 
+			: (vlColNo1>2)
+				vsSize7:=[SpecSheetLines]Spec1A
+				vsSize8:=[SpecSheetLines]Spec1B
+				vsSize9:=[SpecSheetLines]Spec1C
+				QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey;*)
+				QUERY([SpecLineCols]; & ;[SpecLineCols]ColumnNumber=vlColNo1-1)
+				vsSize4:=[SpecLineCols]SpecA
+				vsSize5:=[SpecLineCols]SpecB
+				vsSize6:=[SpecLineCols]SpecC
+				QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey;*)
+				QUERY([SpecLineCols]; & ;[SpecLineCols]ColumnNumber=vlColNo1-2)
+				vsSize1:=[SpecLineCols]SpecA
+				vsSize2:=[SpecLineCols]SpecB
+				vsSize3:=[SpecLineCols]SpecC
+				
+			: (vlColNo1=2)
+				vsSize4:=[SpecSheetLines]Spec1A
+				vsSize5:=[SpecSheetLines]Spec1B
+				vsSize6:=[SpecSheetLines]Spec1C
+				QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=[SpecSheetLines]SpecLineKey;*)
+				QUERY([SpecLineCols]; & ;[SpecLineCols]ColumnNumber=vlColNo1-1)
+				vsSize1:=[SpecLineCols]SpecA
+				vsSize2:=[SpecLineCols]SpecB
+				vsSize3:=[SpecLineCols]SpecC
+			Else 
+				vsSize1:=[SpecSheetLines]Spec1A
+				vsSize2:=[SpecSheetLines]Spec1B
+				vsSize3:=[SpecSheetLines]Spec1C
+		End case 
+End case 

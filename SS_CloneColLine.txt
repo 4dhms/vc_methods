@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+ARRAY LONGINT($alCols;0)
+
+  //[SpecFactory]Note:=vtSpecNotes
+
+$i:=1
+For ($i;1;Size of array(alOldSpecLineKeys))
+	QUERY([SpecLineCols];[SpecLineCols]SpecLineKey=alOldSpecLineKeys{$i})
+	
+	CREATE SET([SpecLineCols];"Lines")
+	SELECTION TO ARRAY([SpecLineCols]ColumnNumber;$alCols)
+	$n:=1
+	
+	For ($n;1;Size of array($alCols))
+		USE SET("Lines")
+		QUERY SELECTION([SpecLineCols];[SpecLineCols]ColumnNumber=$alCols{$n})
+		
+		DUPLICATE RECORD([SpecLineCols])
+		[SpecLineCols]SpecLineKey:=alNewSpecLineKeys{$i}
+		SAVE RECORD([SpecLineCols])
+	End for 
+	CLEAR SET("Lines")
+End for 
+If (Size of array(alNewSpecLineKeys)>0)
+	OBJECT SET ENABLED(bHistory;True)
+End if 

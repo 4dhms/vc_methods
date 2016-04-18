@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($n;$ordernumber)
+C_TEXT($set)
+$set:=String(Tickcount)
+
+
+$n:=1
+If ($1<0)
+	CREATE EMPTY SET([Samples];$set)
+	FIRST RECORD([Samples])
+	For ($n;1;Records in selection([Samples]))
+		$ordernumber:=-1*[Samples]SampleNumber
+		QUERY([Costing];[Costing]OrderNumber=$ordernumber)
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		Case of 
+			: ($1=-1) & (Records in selection([CostSheets])>0)
+				ADD TO SET([Samples];$set)
+			: ($1=-2) & (Records in selection([CostSheets])=0)
+				ADD TO SET([Samples];$set)
+		End case 
+		NEXT RECORD([Samples])
+	End for 
+Else 
+	CREATE EMPTY SET([Orders];$set)
+	FIRST RECORD([Orders])
+	For ($n;1;Records in selection([Orders]))
+		QUERY([Costing];[Costing]OrderNumber=[Orders]OrderNum)
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber)
+		Case of 
+			: ($1=1) & (Records in selection([CostSheets])>0)
+				ADD TO SET([Orders];$set)
+			: ($1=2) & (Records in selection([CostSheets])=0)
+				ADD TO SET([Orders];$set)
+			Else 
+		End case 
+		NEXT RECORD([Orders])
+	End for 
+End if 
+
+USE SET($set)
+CLEAR SET($set)

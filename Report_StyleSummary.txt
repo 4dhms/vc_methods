@@ -1,0 +1,101 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_TEXT($style;$color;$customer;$path)
+C_BOOLEAN($colorY;$customerY;$continue)
+C_TIME($docref)
+C_LONGINT($i;$n;$c;$s)
+
+$style:=Request("Enter style number:")
+If (ok=1)
+	$color:=Request("Enter color number (optional):")
+	If (ok=1) & ($color#"")
+		$colorY:=True
+	End if 
+	
+	QUERY([Orders];[Orders]StyleNumber=$style)
+	
+	$customer:=Request("Enter customer (optional):")
+	If (ok=1) & ($customer#"")
+		$customerY:=True
+	End if 
+	
+	If ($customerY)
+		QUERY SELECTION([Orders];[Orders]Customer=$customer)
+	End if 
+	QUERY SELECTION([Orders];[Orders]Cancelled=False)
+	
+	If ($colorY)
+		FIRST RECORD([Orders])
+		CREATE SET([Orders];"color")
+		
+		$i:=1
+		For ($i;1;Records in selection([Orders]))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=$color)
+			
+			If (Records in selection([CP_OrderXRef])=0)
+				REMOVE FROM SET([Orders];"color")
+			Else 
+				If ($customerY)
+					$s:=1
+				End if 
+			End if 
+			NEXT RECORD([Orders])
+		End for 
+		USE SET("color")
+		CLEAR SET("color")
+	End if 
+	
+	ORDER BY([Orders];[Orders]Customer;>;[Orders]OrderNum;>)
+	
+	$docref:=Create document("";"xls")
+	If (ok=1)
+		$path:=document
+		SEND PACKET($docref;"Style"+Char(9)+"Cancel"+Char(9)+"Order"+Char(9))
+		SEND PACKET($docref;"Color"+Char(9)+Char(9))
+		SEND PACKET($docref;"Qty"+Char(9)+"Size Range"+Char(9)+"Price"+Char(9))
+		SEND PACKET($docref;Char(13))
+		
+		FIRST RECORD([Orders])
+		$i:=1
+		For ($i;1;Records in selection([Orders]))
+			QUERY([CP_OrderXRef];[CP_OrderXRef]OrderNumber=[Orders]OrderNum)
+			QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+			If ($colorY)
+				QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPNumber=$color)
+			End if 
+			ARRAY TEXT($cp;0)
+			ARRAY LONGINT($cpqty;0)
+			SELECTION TO ARRAY([CP_OrderXRef]CPNumber;$cp;[CP_OrderXRef]Quantity;$cpqty)
+			
+			ORDER BY([CP_OrderXRef];[CP_OrderXRef]CPOrdID;>)
+			SEND PACKET($docref;[Orders]StyleNumber+Char(9)+String([Orders]CancelDate)+Char(9)+String([Orders]OrderNum)+Char(9))
+			QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cp{1})
+			If (Size of array($cpqty)>0)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cp{1})
+				SEND PACKET($docref;$cp{1}+Char(9)+[ColorPrintNumber]CPName+Char(9)+String($cpqty{1})+Char(9))
+				DELETE FROM ARRAY($cp;1;1)
+				DELETE FROM ARRAY($cpqty;1;1)
+			Else 
+				SEND PACKET($docref;Char(9)+Char(9)+Char(9))
+			End if 
+			SEND PACKET($docref;[Orders]BrkdnCutRatio+Char(9)+String([Orders]Price;"###.00")+Char(9))
+			SEND PACKET($docref;Char(13))
+			
+			$c:=Size of array($cp)
+			$n:=1
+			For ($n;1;$c)
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$cp{$n})
+				SEND PACKET($docref;Char(9)+Char(9)+Char(9))
+				If ($n>Size of array($cp))
+					SEND PACKET($docref;Char(9)+Char(9)+Char(13))
+				Else 
+					SEND PACKET($docref;$cp{$n}+Char(9)+[ColorPrintNumber]CPName+Char(9)+String($cpqty{$n})+Char(13))
+				End if 
+			End for 
+			NEXT RECORD([Orders])
+		End for 
+		CLOSE DOCUMENT($docref)
+		SHOW ON DISK($path)
+	End if 
+End if 
+

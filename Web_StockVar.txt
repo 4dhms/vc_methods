@@ -1,0 +1,81 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN(vfPrint)
+C_TEXT(vtCheckedText)
+
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+
+WEB GET VARIABLES($name;$value)
+
+$i:=1
+For ($i;1;Size of array($name))
+	ALERT($name{$i}+"  "+$value{$i})
+	
+	Case of 
+		: ($name{$i}="cbPrint")
+			If ($value{$i}="on")
+				vfPrinting:=True
+			Else 
+				vfPrinting:=False
+			End if 
+		: ($name{$i}="cb@")
+			If ($value{$i}="on")
+				vtCheckedText:=vtCheckedText+"_"+Replace string($name{$i};"cb";"")
+			End if 
+		: ($name{$i}="vsWebUser")
+		: ($name{$i}="vtBuyer")
+			vtBuyer:=$value{$i}
+		: ($name{$i}="vsWebSession")
+			vsWebSession:=$value{$i}
+		: ($name{$i}="vtContactKey")
+			vtContactKey:=$value{$i}
+		: ($name{$i}="vtCustomer")
+			vtCustomer:=$value{$i}
+		: ($name{$i}="vsUser")
+			vsUser:=$value{$i}
+		: ($name{$i}="vtEmail")
+			vtEmail:=$value{$i}
+		: ($name{$i}="vtCustomerAddress")
+			vtCustomerAddress:=$value{$i}
+		: ($name{$i}="vtShipTo")
+			vtShipTo:=$value{$i}
+		: ($name{$i}="vtShipVia")
+			vtShipVia:=$value{$i}
+		: ($name{$i}="vtTelephone")
+			vtTelephone:=$value{$i}
+		: ($name{$i}="vtTelephone2")
+			vtTelephone2:=$value{$i}
+		: ($name{$i}="vtCell")
+			vtCell:=$value{$i}
+		: ($name{$i}="vtFax")
+			vtFax:=$value{$i}
+		: ($name{$i}="vtTerms")
+			vtTerms:=$value{$i}
+		: ($name{$i}="vtDLKey")
+			vtDLKey:=$value{$i}
+		: ($name{$i}="vlKey")
+			vlKey:=Num($value{$i})
+			vtCheckedText:=String(vlKey)+"#"+vtCheckedText
+		: ($name{$i}="vlPage")
+			vlPage:=Num($value{$i})
+			vtCheckedText:=String(vlPage)+"&"+vtCheckedText
+		: ($name{$i}="vtTitle")
+			vtTitle:=$value{$i}
+		: ($name{$i}="print")
+			If ($value{$i}="print")
+				vfPrintOrder:=True
+			Else 
+				vfPrintOrder:=False
+			End if 
+		: ($name{$i}="vlCount")
+			vlCount:=Num($value{$i})
+		: ($name{$i}="same")
+			If ($value{$i}="same")
+				vfSameAdd:=True
+			Else 
+				vfSameAdd:=False
+			End if 
+	End case 
+End for 
+

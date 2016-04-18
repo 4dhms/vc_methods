@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  //QUERY([Quota];[Quota]Category=◊vsQuotaCat)
+Case of 
+	: (asHTSCode{asDutyType}#"") & (<>QuotaRouter=1)
+		[Costing]QType1:=asDutyType{asDutyType}
+		[CostSheets]QuotaCat1:=<>asCategory{asDutyType}
+		[Costing]QCat1:=<>asCategory{asDutyType}
+		[Costing]QHTS1:=asHTSCode{asDutyType}
+		[Costing]QDesc1:=asNames{asDutyType}
+		[CostSheets]Duty1:=arDutyRates{asDutyType}
+		vsHead1:=asNames{asDutyType}
+		SAVE RECORD([Costing])
+	: (asHTSCode{asDutyType}#"") & (<>QuotaRouter=2)
+		[Costing]QType2:=asDutyType{asDutyType}
+		[CostSheets]QuotaCat2:=<>asCategory{asDutyType}
+		[Costing]QCat2:=<>asCategory{asDutyType}
+		[Costing]QHTS2:=asHTSCode{asDutyType}
+		[Costing]QDesc2:=asNames{asDutyType}
+		[CostSheets]Duty2:=arDutyRates{asDutyType}
+		vsHead2:=asNames{asDutyType}
+		SAVE RECORD([Costing])
+		
+	: (<>QuotaRouter=1)
+		[Costing]QType1:=""
+		[CostSheets]QuotaCat1:=<>asCategory{asDutyType}
+		[Costing]QCat1:=<>asCategory{asDutyType}
+		[Costing]QHTS1:=""
+		[Costing]QDesc1:=asNames{asDutyType}
+		[CostSheets]Duty1:=arDutyRates{asDutyType}
+		vsHead1:=asNames{asDutyType}
+	: (<>QuotaRouter=2)
+		[Costing]QType2:=""
+		[CostSheets]QuotaCat2:=<>asCategory{asDutyType}
+		[Costing]QCat2:=<>asCategory{asDutyType}
+		[Costing]QHTS2:=""
+		[Costing]QDesc2:=asNames{asDutyType}
+		[CostSheets]Duty2:=arDutyRates{asDutyType}
+		vsHead2:=asNames{asDutyType}
+End case 
+
+UNLOAD RECORD([Quota])

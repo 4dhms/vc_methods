@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT(<>vlCK)
+
+Case of 
+	: (Current user#"Joann") & (Current user#"William") & (Current user#"CK") & (Current user#"Designer")
+		WinPrompt ("Under development")
+	: (<>vlCK>0)
+		SHOW PROCESS(<>vlCK)
+		BRING TO FRONT(<>vlCK)
+	: (<>vlCK=0)
+		<>vlCK:=New process("Cost_CK";0;"CK")
+	Else 
+		SHOW PROCESS(<>vlCK)
+		BRING TO FRONT(<>vlCK)
+End case 

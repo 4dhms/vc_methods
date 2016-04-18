@@ -1,0 +1,143 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$c;$p)
+ARRAY TEXT(asPrintNumber;0)
+ARRAY TEXT(asPrintName;0)
+ARRAY LONGINT(alSamples;0)
+ARRAY LONGINT(alChartOrders;0)
+ARRAY LONGINT(alTotalUnits;0)
+ARRAY LONGINT(alDNColor;0)
+ARRAY LONGINT(alUnits;0)
+C_TEXT($div)
+C_LONGINT($used)
+C_TEXT($strip)
+
+<>vtMessage:="Building report"
+<>vlCounter:=0
+EMail_SendingProc 
+UsagePrint_SearchEngine 
+vlTotCount:=0
+vlColCount:=0
+vlTotalSamp:=0
+READ ONLY([Orders])
+
+If (asDivisions{asDivisions}#"All Divisions")
+	$div:=Substring(asDivisions{asDivisions};1;Position("-";asDivisions{asDivisions}))+"@"
+	QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]Division=$div)
+End if 
+
+QUERY SELECTION([ColorPrintNumber];[ColorPrintNumber]CPNumber#"")
+
+ARRAY TEXT($printnumbers;0)
+SELECTION TO ARRAY([ColorPrintNumber]CPNumber;$printNumbers)
+SORT ARRAY($printnumbers;>)
+
+$i:=1
+CREATE SET([ColorPrintNumber];"Prints")
+For ($i;1;Size of array($printnumbers))
+	$strip:=Substring($printnumbers{$i};1;Position("-";$printnumbers{$i}))+"@"
+	If ($strip=Char(64))
+		  //do nothing
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$strip)
+		
+		$n:=1
+		FIRST RECORD([ColorPrintNumber])
+		For ($n;1;Records in selection([ColorPrintNumber]))
+			ADD TO SET([ColorPrintNumber];"Prints")
+			NEXT RECORD([ColorPrintNumber])
+		End for 
+	End if 
+End for 
+
+USE SET("Prints")
+CLEAR SET("Prints")
+
+ORDER BY([ColorPrintNumber]CPNumber;>)
+
+$i:=1
+For ($i;1;Records in selection([ColorPrintNumber]))
+	  //If (Shift down)
+	  //ALERT("1st FOR  "+String($i)+"  "+String(Records in selection([ColorPrintNumber])))
+	  //CONFIRM("Trace")
+	  //If (ok=0)
+	  //TRACE
+	  //End if 
+	  //End if 
+	APPEND TO ARRAY(asPrintNumber;[ColorPrintNumber]CPNumber)
+	APPEND TO ARRAY(asPrintName;[ColorPrintNumber]CPName)
+	QUERY([CP_OrderXRef];[CP_OrderXRef]CPNumber=[ColorPrintNumber]CPNumber)
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPOrdID>0)
+	CREATE SET([CP_OrderXRef];"Used")
+	
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber<0)
+	APPEND TO ARRAY(alSamples;Records in selection([CP_OrderXRef]))
+	vlTotalSamp:=vlTotalSamp+Records in selection([CP_OrderXRef])
+	
+	USE SET("Used")
+	CLEAR SET("Used")
+	QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]OrderNumber>0)
+	  //strips out void and redundant
+	$p:=1
+	CREATE SET([CP_OrderXRef];"stripvoid")
+	FIRST RECORD([CP_OrderXRef])
+	
+	
+	ARRAY LONGINT($testcolor;0)
+	For ($p;1;Records in selection([CP_OrderXRef]))
+		  //If (Shift down)
+		  //CONFIRM("Trace")
+		  //If (ok=0)
+		  //TRACE
+		  //End if 
+		  //End if 
+		
+		QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+		Case of 
+			: ([Orders]Cancelled)
+				REMOVE FROM SET([CP_OrderXRef];"stripvoid")
+			: (Find in array($testcolor;[Orders]OrderNum)>0)
+				REMOVE FROM SET([CP_OrderXRef];"stripvoid")
+		End case 
+		APPEND TO ARRAY($testcolor;[Orders]OrderNum)
+		
+		
+		
+		NEXT RECORD([CP_OrderXRef])
+	End for 
+	USE SET("stripvoid")
+	CLEAR SET("stripvoid")
+	
+	APPEND TO ARRAY(alChartOrders;Records in selection([CP_OrderXRef]))
+	vlColCount:=vlColCount+Records in selection([CP_OrderXRef])
+	ARRAY LONGINT($totals;0)
+	SELECTION TO ARRAY([CP_OrderXRef]Quantity;$totals)
+	APPEND TO ARRAY(alTotalUnits;Util_Array_Sum (->$totals))
+	vlTotCount:=vlTotCount+Util_Array_Sum (->$totals)
+	Case of 
+			  //: ([Orders]OrderDivision#[ColorPrintNumber]Division)
+			  //APPEND TO ARRAY(alDNColor;16777155)
+		: (alTotalUnits{Size of array(alTotalUnits)}<1)
+			APPEND TO ARRAY(alDNColor;16765650)
+		Else 
+			APPEND TO ARRAY(alDNColor;16777215)
+	End case 
+	
+	NEXT RECORD([ColorPrintNumber])
+End for 
+
+$used:=alChartPrintsRatio{alChartPrintsRatio}
+
+$c:=Records in selection([ColorPrintNumber])
+SET WINDOW TITLE(asDivisions{asDivisions}+"  "+String(Records in selection([ColorPrintNumber]))+" Prints ("+String($used)+"%")
+vtTitle:=asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+"  "+asDivisions{asDivisions}+"  "+String(Records in selection([ColorPrintNumber]))+" Prints ("+String($used)+"%)"
+<>CloseDialog:=True
+CALL PROCESS(<>SendingWin)
+
+<>CloseBox:=True
+Center Window (600;660;1;"")
+DIALOG([Dialogs];"UsagePrintDetail")
+
+CLOSE WINDOW
+SET WINDOW TITLE("")
+

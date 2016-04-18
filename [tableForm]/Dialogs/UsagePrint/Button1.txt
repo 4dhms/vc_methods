@@ -1,0 +1,13 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (vsFactory#"") & (cb2=1)
+		vtTitle:=vsFactory+"    "+asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+" - To Date     "+asChartDivisions{asChartDivisions}
+	: (vsFactory#"")
+		vtTitle:=vsFactory+"    "+asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+"     "+asChartDivisions{asChartDivisions}
+	Else 
+		vtTitle:=asStartMonth{asStartMonth}+" "+asSeasonYear{asSeasonYear}+"     "+asChartDivisions{asChartDivisions}
+End case 
+
+FORM SET OUTPUT([Dialogs];"UsagePrintPrint")
+SET PRINT OPTION(Orientation option;2)
+PRINT RECORD([Dialogs])

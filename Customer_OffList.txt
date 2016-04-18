@@ -1,0 +1,172 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_BOOLEAN($save)
+
+ARRAY TEXT($customers;0)
+LIST TO ARRAY("Customers";$customers)
+
+$i:=1
+QUERY([Orders];[Orders]Customer="@ ")
+
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	[Orders]Customer:=Substring([Orders]Customer;1;Length([Orders]Customer)-1)
+	SAVE RECORD([Orders])
+	NEXT RECORD([Orders])
+End for 
+
+$i:=1
+QUERY([Orders];[Orders]Customer#"")
+
+CREATE SET([Orders];"offlist")
+
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	If (Find in array($customers;[Orders]Customer)>0) | ([Orders]Customer="HSN@") | ([Orders]Customer="Ross Missy@") | ([Orders]Customer="test")
+		REMOVE FROM SET([Orders];"offlist")
+	Else 
+		$save:=True
+		Case of 
+			: ([Orders]Customer="Dillard@Fort Worth")
+				[Orders]Customer:="Dillards-FTW"
+				
+			: ([Orders]Customer="Dillards- FL") | ([Orders]Customer="Dillards Florida") | ([Orders]Customer="Dillards FLA") | ([Orders]Customer="Dillards FLA") | ([Orders]Customer="Dillards - Florida")
+				[Orders]Customer:="Dillards-FL"
+				
+			: ([Orders]Customer="DillardsFLA") | ([Orders]Customer="Dillards- FL") | ([Orders]Customer="Dillards--FL") | ([Orders]Customer="Dillards--FLA") | ([Orders]Customer="Dillards - Florida")
+				[Orders]Customer:="Dillards-FL"
+				
+			: ([Orders]Customer="Dillards-FLA Shop")
+				[Orders]Customer:="Dillards-FLA Shops"
+				
+			: ([Orders]Customer="Pea in the Pod")
+				[Orders]Customer:="A Pea in the Pod"
+				
+			: ([Orders]Customer="HCI Direct@")
+				[Orders]Customer:="HCI Direct Inc."
+				
+			: ([Orders]Customer="Venus (aka@")
+				[Orders]Customer:="Venus (aka Venus Fashion Inc)"
+				
+			: ([Orders]Customer="Filene's Basement Wo@")
+				[Orders]Customer:="Filene's Basement Woman"
+				
+			: ([Orders]Customer="Von Maur Petites")
+				[Orders]Customer:="Von Maur Petite"
+				
+			: ([Orders]Customer="VERSONA  (CATO)") | ([Orders]Customer="VERSONA")
+				[Orders]Customer:="Versona (CATO)"
+				
+			: ([Orders]Customer="Belk Women")
+				[Orders]Customer:="Belk Woman"
+				
+			: ([Orders]Customer="J.C.Penney")
+				[Orders]Customer:="J.C. Penney"
+				
+			: ([Orders]Customer="Lord & Taylor")
+				[Orders]Customer:="L&T"
+				
+			: ([Orders]Customer="Atlantis Trading Co.") | ([Orders]Customer="Atlantis Trading Corp")
+				[Orders]Customer:="Atlantis Trading Corp."
+				
+			: ([Orders]Customer="AAFES@")
+				[Orders]Customer:="AAFES"
+				
+			: ([Orders]Customer="stock.")
+				[Orders]Customer:="Stock"
+				
+			: ([Orders]Customer="Stage Doors")
+				[Orders]Customer:="Stage Stores"
+				
+			: ([Orders]Customer="Dillards-St. Louis") | ([Orders]Customer="Dillards-St.Louis") | ([Orders]Customer="Dillard's-St. Louis") | ([Orders]Customer="Dillard's STL") | ([Orders]Customer="Dillards STL") | ([Orders]Customer="Dillards - St. Louis")
+				[Orders]Customer:="Dillards-STL"
+				
+			: ([Orders]Customer="Dillard'sFLA") | ([Orders]Customer="Dillard's- FL") | ([Orders]Customer="Dillard's--FL") | ([Orders]Customer="Dillard's Florida") | ([Orders]Customer="Dillards-FLA") | ([Orders]Customer="Dillards - FLA") | ([Orders]Customer="Dillards - FL") | ([Orders]Customer="Dillards FL")
+				[Orders]Customer:="Dillards-FL"
+				
+			: ([Orders]Customer="Dillards LTR")
+				[Orders]Customer:="Dillards-LTR"
+				
+			: ([Orders]Customer="MarkShale")
+				[Orders]Customer:="Mark Shale"
+				
+			: ([Orders]Customer="Anthony")
+				[Orders]Customer:="Anthony's"
+				
+			: ([Orders]Customer="Macy's.com Petite") | ([Orders]Customer="Macys.com Petite") | ([Orders]Customer="MACY'S COM PETITE") | ([Orders]Customer="Macy's com Petites")
+				[Orders]Customer:="Macys.com Petite"
+				
+			: ([Orders]Customer="MACY'S COM WOMAN") | ([Orders]Customer="MACY'S.COM WOMAN") | ([Orders]Customer="MACY'S COM WOMAN") | ([Orders]Customer="Macy's com women's")
+				[Orders]Customer:="Macys.com Woman"
+				
+			: ([Orders]Customer="DRESS  BARN PETITE") | ([Orders]Customer="DRESS  BARN PETITES") | ([Orders]Customer="Dress Barn Petite@")
+				[Orders]Customer:="Dress Barn Petite"
+				
+			: ([Orders]Customer="Dillards--AZ") | ([Orders]Customer="Dillards-AZ") | ([Orders]Customer="Dillard's AZ") | ([Orders]Customer="Dillards Arizona") | ([Orders]Customer="Dillards AZ") | ([Orders]Customer="Dillards - AR") | ([Orders]Customer="Dillards - AZ")
+				[Orders]Customer:="Dillards-AZ"
+				
+			: ([Orders]Customer="Dillards-Ft. Worth") | ([Orders]Customer="DILLARD'S  FTW") | ([Orders]Customer="Dillards FTW") | ([Orders]Customer="Dillards--FTW") | ([Orders]Customer="Dillards FT Worth") | ([Orders]Customer="Dillards@FT Worth")
+				[Orders]Customer:="Dillards-FTW"
+				
+			: ([Orders]Customer="Dillards-FT. WORTH") | ([Orders]Customer="Dillards-Fort Worth")
+				[Orders]Customer:="Dillards-FTW"
+				
+			: ([Orders]Customer="Dillards - Ft. Worth") | ([Orders]Customer="Dillards-Ft.Worth") | ([Orders]Customer="Dillards-Ft. Wroth") | ([Orders]Customer="Dillards-FTWorth") | ([Orders]Customer="Dillards-Font Worth")
+				[Orders]Customer:="Dillards-FTW"
+				
+			: ([Orders]Customer="Dillards-Fort Worth") | ([Orders]Customer="Dillard's FTW") | ([Orders]Customer="Dillard's FTW") | ([Orders]Customer="DILLADR's FTW") | ([Orders]Customer="Dillard's FTW")
+				[Orders]Customer:="Dillards-FTW"
+				
+			: ([Orders]Customer="Dillards-Fort Worth") | ([Orders]Customer="Dillards - Fort Worth") | ([Orders]Customer="Dillards - Ft Worth") | ([Orders]Customer="Dillar's - Ft. Worth")
+				[Orders]Customer:="Dillards-FTW"
+				
+			: ([Orders]Customer="Griffin 88 Stores Inc")
+				[Orders]Customer:="Griffin 88 Stores, Inc"
+				
+			: ([Orders]Customer="Casual Living USA")
+				[Orders]Customer:="Casual Living"
+				
+			: ([Orders]Customer="Macy's West") | ([Orders]Customer="Macy's East") | ([Orders]Customer="Macy's Central") | ([Orders]Customer="Macy's Florida")
+				[Orders]Customer:="Macy's"
+				
+			: ([Orders]Customer="Macy's West Woman") | ([Orders]Customer="Macy's East Woman")
+				[Orders]Customer:="Macy's Woman"
+				
+			: ([Orders]Customer="Macy's West Petite")
+				[Orders]Customer:="Macy's Petite"
+				
+			: ([Orders]Customer="Macy's East Petite")
+				[Orders]Customer:="Macy's Petite"
+				
+			: ([Orders]Customer="Dress Barn") | ([Orders]Customer="Dress  Barn")
+				[Orders]Customer:="Dress Barn Missy"
+				
+			: ([Orders]Customer="Wados - Chile")
+				[Orders]Customer:="Wados-Chile"
+				
+				
+			Else 
+				$save:=False
+		End case 
+		
+		If ($save)
+			Rev_LogChanges (->[Orders]Customer)
+			SAVE RECORD([Orders])
+		End if 
+	End if 
+	NEXT RECORD([Orders])
+End for 
+
+FIRST RECORD([Orders])
+For ($i;1;Records in selection([Orders]))
+	If (Find in array($customers;[Orders]Customer)>0) | ([Orders]Customer="HSN@")
+		REMOVE FROM SET([Orders];"offlist")
+	End if 
+	NEXT RECORD([Orders])
+End for 
+UNLOAD RECORD([Orders])
+
+USE SET("offlist")
+CLEAR SET("offlist")
+ORDER BY([Orders];[Orders]Customer;>)
+ALERT("Done")

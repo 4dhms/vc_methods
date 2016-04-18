@@ -1,0 +1,15 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($process)
+C_TEXT($user)
+C_TEXT($session)
+C_TEXT($processname)
+C_POINTER($thistable)
+
+$thistable:=$1
+
+If (Locked($thistable->))
+	LOCKED BY($thistable->;$process;$user;$session;$processName)
+	OBJECT SET VISIBLE(bUnload;True)
+Else 
+	OBJECT SET VISIBLE(bUnload;False)
+End if 

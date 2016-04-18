@@ -1,0 +1,41 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n)
+ARRAY TEXT(asDCcc;0)
+ARRAY LONGINT(alDCLine;0)
+ARRAY LONGINT(alDCQty;0)
+ARRAY LONGINT(alDCNumber;0)
+ARRAY TEXT(asDCNote;0)
+ARRAY LONGINT(alDCListBG;0)
+ARRAY LONGINT(alDCListKey;0)
+ARRAY TEXT(asDClineColor;0)
+ARRAY TEXT(asDClinePO;0)
+ARRAY LONGINT(alDCLine;0)
+
+QUERY([DC_Spreads];[DC_Spreads]OrderNumber=[Orders]OrderNum)
+ORDER BY([DC_Spreads];[DC_Locations]Customer;>;[DC_Locations]DCNumber;>)
+
+$i:=1
+For ($i;1;Records in selection([DC_Spreads]))
+	QUERY([DC_SpreadLines];[DC_SpreadLines]DCSheetKey=[DC_Spreads]DCSheetKey)
+	ORDER BY([DC_SpreadLines];[DC_SpreadLines]SortOrder;>;[DC_SpreadLines]DCLineKey;>)
+	
+	FIRST RECORD([DC_SpreadLines])
+	
+	$n:=1
+	For ($n;1;Records in selection([DC_SpreadLines]))
+		APPEND TO ARRAY(asDCNote;[DC_SpreadLines]Note)
+		APPEND TO ARRAY(alDCLine;[DC_SpreadLines]LineNumber)
+		APPEND TO ARRAY(asDCcc;[DC_SpreadLines]ColorCode)
+		APPEND TO ARRAY(alDCQty;Num([DC_SpreadLines]Total))
+		APPEND TO ARRAY(alDCNumber;Find in array(alDCKeys;[DC_Spreads]DCKey))
+		APPEND TO ARRAY(alDCListKey;[DC_SpreadLines]DCLineKey)
+		APPEND TO ARRAY(alDCListBG;0)
+		APPEND TO ARRAY(asDClineColor;[DC_SpreadLines]ColorNumber)
+		APPEND TO ARRAY(asDClinePO;[DC_SpreadLines]DCpo)
+		NEXT RECORD([DC_SpreadLines])
+	End for 
+	NEXT RECORD([DC_Spreads])
+End for 
+UNLOAD RECORD([DC_SpreadLines])
+
+DC_List_Color 

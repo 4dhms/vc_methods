@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (cbHistory=1)
+	QUERY([SampleTrack];[SampleTrack]EZ=True)
+	QUERY SELECTION([SampleTrack];[SampleTrack]DateIn#!00-00-00!)
+	ORDER BY([SampleTrack];[SampleTrack]DateOut;<)
+Else 
+	QUERY([SampleTrack];[SampleTrack]EZ=True)
+	QUERY SELECTION([SampleTrack];[SampleTrack]DateIn=!00-00-00!)
+	ORDER BY([SampleTrack];[SampleTrack]DateOut;<)
+End if 

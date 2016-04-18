@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Form event=On Load)
+	ARRAY TEXT(asField;0)
+	ARRAY TEXT(asSortOrder;0)
+	APPEND TO ARRAY(asField;"PO Number")
+	APPEND TO ARRAY(asField;"Article Number")
+	APPEND TO ARRAY(asField;"Supplier")
+End if 

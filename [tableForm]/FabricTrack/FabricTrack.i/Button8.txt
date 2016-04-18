@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+C_TEXT($po)
+
+$po:="FB-"+vtFabPO
+
+If (vtFabPO#"")
+	QUERY([FabricOrders];[FabricOrders]PONumber=$po)
+	
+	QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+	ARRAY LONGINT($orders;0)
+	SELECTION TO ARRAY([OrdersFabricXRef]OrderNumber;$orders)
+	
+	If (Records in selection([FabricOrders])=0)
+		WinPrompt ($po+" does not exist.")
+	Else 
+		$i:=1
+		For ($i;1;Size of array(afAllShip))
+			If (Find in array($orders;alPOrder{$i})>0)
+				afAllShip{$i}:=True
+			Else 
+				afAllShip{$i}:=False
+			End if 
+		End for 
+		vtFabPO:=""
+	End if 
+End if 

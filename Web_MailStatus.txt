@@ -1,0 +1,83 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asSubCC;0)
+C_TEXT($stripper;$address)
+C_LONGINT($i)
+C_BOOLEAN($done)
+
+Web_GetSort 
+
+$stripper:=Replace string(vtEmailAddress;" ";"")
+
+Repeat 
+	If (Position(",";$stripper)>0)
+		$address:=Substring($stripper;1;Position(",";$stripper)-1)
+	Else 
+		$address:=$stripper
+		$done:=True
+		$stripper:=""
+	End if 
+	INSERT IN ARRAY(asSubCC;1;1)
+	asSubCC{1}:=$address
+	If (Substring($stripper;1;1)=",")
+		$stripper:=Substring($stripper;2;999)
+	End if 
+	If (Position(Char(64);vtEmailAddress;*)<1)
+		$done:=True
+	Else 
+		$stripper:=Substring($stripper;Position(",";$stripper)+1;999)
+	End if 
+Until ($done)
+
+vfProdStatus:=True
+vfPDF:=True
+  //EMail_Pointers ("Status")
+vtBodyText:="Attached is the current status report."
+cbHistory:=0
+cbStatus:=0
+cbUnresolved:=1
+cbAll:=0
+Order_StatusReturn (False)
+vfToSpenser:=False
+
+LOAD SET([Orders];vsWebSession;<>vtWebSetPath+vsWebSession)
+USE SET(vsWebSession)
+CLEAR SET(vsWebSession)
+
+QUERY([Spooler];[Spooler]Waiting=False;*)
+QUERY([Spooler]; & ;[Spooler]SpoolLog=False)
+QUERY SELECTION([Spooler];[Spooler]Genre#"BLOB")
+
+If (Records in selection([Spooler])<1) | (Locked([Spooler]))
+	CREATE RECORD([Spooler])
+Else 
+	Spooler_ClearSprocket 
+End if 
+
+[Spooler]SpoolKey:=Sequence number([Spooler])
+<>vlMailKey:=[Spooler]SpoolKey
+[Spooler]Waiting:=True
+[Spooler]Attempts:=0
+QUERY([Staff];[Staff]UserName=vsWebUser)
+[Spooler]ReturnAddress:=[Staff]EmailAddress
+UNLOAD RECORD([Staff])
+[Spooler]SpoolRouter:=1
+[Spooler]OutputChoice:=0
+[Spooler]Status:=1
+[Spooler]User:=Current user
+[Spooler]MachineName:=Current machine owner
+VARIABLE TO BLOB(asSubCC;[Spooler]AddressListBlob)
+$i:=1
+ARRAY LONGINT($records;Records in selection([Orders]))
+FIRST RECORD([Orders])
+For ($i;1;Size of array($records))
+	$records{$i}:=Record number([Orders])
+	NEXT RECORD([Orders])
+End for 
+VARIABLE TO BLOB($records;[Spooler]OrderArrayBlob)
+VARIABLE TO BLOB(asSortOrder;[Spooler]SortArray)
+[Spooler]Genre:="Status"
+[Spooler]StatusGuide:=vtProdStatGuide
+
+SAVE RECORD([Spooler])
+UNLOAD RECORD([Spooler])
+Web_Index 

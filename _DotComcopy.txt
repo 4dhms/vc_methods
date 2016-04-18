@@ -1,0 +1,82 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY DATE(adDates;0)
+ARRAY TEXT(asList2;0)
+ARRAY TEXT(asList3;0)
+ARRAY TEXT(asList4;0)
+ARRAY TEXT(asList5;0)
+ARRAY TEXT(asList6;0)
+ARRAY TEXT(asColor1;0)
+ARRAY TEXT(asList7;0)
+ARRAY TEXT(asList8;0)
+ARRAY TEXT(asList9;0)
+ARRAY TEXT(asList10;0)
+ARRAY LONGINT(alUnits;0)
+ARRAY REAL(arMcol1;0)
+ARRAY REAL(arMcol2;0)
+ARRAY TEXT(asCustomers;0)
+ARRAY LONGINT(alOrders;0)
+ARRAY LONGINT(alXUnits;0)
+ARRAY LONGINT(alXQty;0)
+
+C_BOOLEAN($process)
+C_LONGINT($i;$n)
+C_TIME($docref)
+C_TEXT($return;$rem)
+C_DATE($testdate;$start;$end)
+C_TEXT($build)
+
+$start:=Date(String(<>asStartMonth)+"/"+String(<>asStartDay)+"/"+<>asStartYear{<>asStartYear})
+$end:=Date(String(<>asEndMonth)+"/"+String(<>asEndDay)+"/"+<>asEndYear{<>asEndYear})
+
+$docref:=Open document("")
+If (ok=1)
+	$i:=1
+	Repeat 
+		RECEIVE PACKET($docref;$return;Char(13))
+		$rem:=$return
+		$n:=1
+		ARRAY TEXT($import;0)
+		
+		Repeat 
+			$return:=Substring($rem;1;Position(Char(9);$rem)-1)
+			$rem:=Substring($rem;Position(Char(44);$rem)+1;999)
+			APPEND TO ARRAY($import;$return)
+			$n:=$n+1
+		Until ($rem="")
+		
+		If ($i>1)
+			$build:=Substring($import{2};6;2)+"/"
+			$build:=$build+Substring($import{2};9;2)+"/"
+			$build:=$build+Substring($import{2};3;2)
+			$testdate:=Date($build)
+			
+			If ($start<=$testdate) & ($end>=$testdate)
+				Case of 
+					: (asStyleNumbers=1)
+						$process:=True
+					: ($import{45}=asStyleNumbers{asStyleNumbers})
+						$process:=True
+					Else 
+						$process:=False
+				End case 
+			End if 
+			
+			If ($process)
+				APPEND TO ARRAY(asList1;$build)
+				APPEND TO ARRAY(asList2;$import{13})
+				APPEND TO ARRAY(asList3;$import{17})
+				APPEND TO ARRAY(asList4;$import{18})
+				APPEND TO ARRAY(asList5;$import{45})
+				APPEND TO ARRAY(asList6;$import{40})
+				APPEND TO ARRAY(asList7;$import{44})
+				APPEND TO ARRAY(alUnits;Num($import{41}))
+				APPEND TO ARRAY(arMcol1;Num($import{42}))
+				APPEND TO ARRAY(arMcol2;Num($import{43}))
+				APPEND TO ARRAY(asList8;Replace string($import{1};Char(10);""))
+			End if 
+		End if 
+		
+		$i:=$i+1
+	Until (ok=0)
+	CLOSE DOCUMENT($docref)
+End if 

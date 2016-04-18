@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Case of 
+	: (Find in array(afReceived;True)<1)
+		WinPrompt ("Select Season")
+	: (Find in array(afInventory;True)<1)
+		WinPrompt ("Select Divison")
+	Else 
+		DL_PullStock 
+		DL_StockPages 
+End case 

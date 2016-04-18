@@ -1,0 +1,14 @@
+  //%attributes = {"publishedWeb":true,"folder":"Calendar","lang":"en"} comment added and reserved by 4D.
+C_LONGINT($button1)
+vfNewMonth:=False
+
+$button1:=Day number(vdCalDay1)
+
+Case of 
+	: ($1>=$button1)
+		vdCalToday:=vdCalDay1+($1-$button1)
+	: ($1<$button1)
+		vdCalToday:=vdCalDay1-($button1-$1)
+End case 
+Cal_DisplayThumb 
+Cal_FindSched 

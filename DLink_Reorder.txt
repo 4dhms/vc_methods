@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i)
+
+ORDER BY([DesignLinkedPages];[DesignLinkedPages]PageNumber;>)
+
+$i:=1
+FIRST RECORD([DesignLinkedPages])
+For ($i;1;Records in selection([DesignLinkedPages]))
+	[DesignLinkedPages]PageNumber:=$i
+	SAVE RECORD([DesignLinkedPages])
+	NEXT RECORD([DesignLinkedPages])
+End for 

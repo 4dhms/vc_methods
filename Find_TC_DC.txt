@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Orders];[Orders]Customer="Marmax@";*)
+QUERY([Orders]; | ;[Orders]Customer="Macy's East";*)
+QUERY([Orders]; | ;[Orders]Customer="Dillard@";*)
+QUERY([Orders]; | ;[Orders]Customer="Petite Sophisticat@";*)
+QUERY([Orders]; | ;[Orders]Customer="Lane Bryant@";*)
+QUERY([Orders]; & ;[Orders]DCInfo=False)
+

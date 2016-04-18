@@ -1,0 +1,30 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$tempkey)
+C_BOOLEAN($overwrite)
+
+WinChoice ("Do you want to overwrite or just fill in empties?";"Empties";"Overwrite")
+If (ok=1)
+	$overwrite:=False
+Else 
+	$overwrite:=True
+End if 
+
+QUERY([SpecTemplate];[SpecTemplate]Template=asTempList{asTempList})
+$tempkey:=[SpecTemplate]TempKeyNumber
+QUERY([SpecTempBuilder];[SpecTempBuilder]TempKey=$tempkey)
+CREATE SET([SpecTempBuilder];"tol")
+
+$i:=1
+FIRST RECORD([SpecSheetLines])
+For ($i;1;Records in selection([SpecSheetLines]))
+	USE SET("tol")
+	QUERY SELECTION([SpecTempBuilder];[SpecTempBuilder]TempSpec=[SpecSheetLines]OtherDescription)
+	
+	If ([SpecSheetLines]Tolerance="") | ($overwrite) & ([SpecTempBuilder]TempToleranceM#"")
+		[SpecSheetLines]Tolerance:=[SpecTempBuilder]TempToleranceM
+		SAVE RECORD([SpecSheetLines])
+	End if 
+	NEXT RECORD([SpecSheetLines])
+End for 
+CLEAR SET("tol")
+

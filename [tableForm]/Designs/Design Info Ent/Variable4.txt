@@ -1,0 +1,24 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (Design_Mandatory )
+	SAVE RECORD([Designs])
+	OBJECT SET TITLE(bCancel;"Cancel")
+	
+	FORM SET INPUT([Specs];"SpecsInptTall")
+	QUERY([Specs];[Specs]Design Num=[Designs]DesignNum)
+	ACCEPT
+	If (Records in set("DesSet")>0)
+		USE SET("DesSet")
+		CLEAR SET("DesSet")
+	End if 
+	If (vfNewDesign)
+		p_SetWndDesLib 
+	End if 
+	vfNewDesign:=False
+	
+	If (<>SalesPrcID>0) | (<>SamGarPrcID>0)
+	Else 
+		UNLOAD RECORD([Designs])
+		UNLOAD RECORD([Orders])
+		UNLOAD RECORD([Samples])
+	End if 
+End if 

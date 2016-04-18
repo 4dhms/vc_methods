@@ -1,0 +1,92 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($srchDate)
+C_TIME($docRef)
+C_TEXT($path)
+C_LONGINT($i)
+C_TEXT($datestamp)
+C_TEXT($message)
+C_LONGINT($range)
+C_BOOLEAN($continue)
+C_TEXT($whnote)
+$continue:=False
+
+$range:=2
+
+$srchDate:=!2015-04-01!
+QUERY([Orders];[Orders]CancelDate>=$srchDate)
+QUERY SELECTION([Orders];[Orders]CustPONumber="")
+QUERY SELECTION([Orders];[Orders]Customer#"stock")
+QUERY SELECTION([Orders];[Orders]Cancelled=False)
+
+ORDER BY([Orders];[Orders]CancelDate;>;[Orders]OrderNum;>)
+
+If (Application type=5) | (Current user="Spooler") | (Shift down)
+	$datestamp:=Replace string(String(Current date(*));"/";"_")
+	$path:=PDF_FindFolder +":NoCustPO_"+$datestamp+".xls"
+	  //$path:=Replace string($path;"DirectShip";"DirectShip")
+	$path:=Replace string($path;"__";"_")
+	$docRef:=Create document($path;"xls")
+	$continue:=True
+Else 
+	$docRef:=Create document("";"xls")
+	If (ok=1)
+		$continue:=True
+	End if 
+End if 
+
+If ($continue)
+	SEND PACKET($docRef;"PO"+Char(9))
+	SEND PACKET($docRef;"Style"+Char(9))
+	SEND PACKET($docRef;"Design"+Char(9))
+	SEND PACKET($docRef;"Factory"+Char(9))
+	SEND PACKET($docRef;"Customer"+Char(9))
+	SEND PACKET($docRef;"Cancel Date"+Char(9))
+	SEND PACKET($docRef;"Quantity"+Char(9))
+	SEND PACKET($docRef;"Order Writer"+Char(9))
+	SEND PACKET($docRef;"Salesperson"+Char(9))
+	SEND PACKET($docRef;"Coordinator"+Char(13))
+	
+	$i:=1
+	FIRST RECORD([Orders])
+	For ($i;1;Records in selection([Orders]))
+		  //If ([Orders]OrderNum=60775)
+		  //TRACE
+		  //End if 
+		
+		SEND PACKET($docRef;String([Orders]OrderNum)+Char(9))
+		SEND PACKET($docRef;[Orders]StyleNumber+Char(9))
+		SEND PACKET($docRef;[Orders]DesignNumber+Char(9))
+		SEND PACKET($docRef;[Orders]Factory+Char(9))
+		SEND PACKET($docRef;[Orders]Customer+Char(9))
+		SEND PACKET($docRef;String([Orders]CancelDate)+Char(9))
+		SEND PACKET($docRef;String([Orders]TotalOrderQuantity)+Char(9))
+		SEND PACKET($docRef;[Orders]Order_Enterer+Char(9))
+		SEND PACKET($docRef;[Orders]Salesperson+Char(9))
+		SEND PACKET($docRef;[Orders]Coordinator+Char(13))
+		  //SEND PACKET($docRef;[Orders]CustPONumber+Char(13))
+		NEXT RECORD([Orders])
+		UNLOAD RECORD([Designs])
+	End for 
+	
+	CLOSE DOCUMENT($docRef)
+	
+	$message:="Attached "+String(Records in selection([Orders]))+" orders are missing customer purchase orders."+Char(13)
+	
+	
+	If (Application type=5) | (Current user="Spooler") | (Shift down)
+		
+		ARRAY TEXT(asSubCC;0)
+		APPEND TO ARRAY(asSubCC;"spenser@nubby.com")
+		APPEND TO ARRAY(asSubCC;"phil@persinger.com")
+		APPEND TO ARRAY(asSubCC;"anthony@nubby.com")
+		
+		APPEND TO ARRAY(asSubCC;"Sales@nubby.com")
+		APPEND TO ARRAY(asSubCC;"Salescoordinators@nubby.com")
+		APPEND TO ARRAY(asSubCC;"Production@nubby.com")
+		
+		  //Mail_SimpleSend ("List";$path;"Missing Customer PO Report ("+String(Current date(*))+")";$message)
+		Mail_SimpleSend ("List";$path;"TEST: There's an awful lot of these things ("+String(Current date(*))+")";$message)
+	End if 
+End if 
+
+

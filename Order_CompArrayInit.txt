@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY LONGINT(alCompOrderNumber;$1)
+ARRAY LONGINT(alCompLineKey;$1)
+ARRAY LONGINT(alCompQty;$1)
+ARRAY TEXT(asCompName;$1)
+ARRAY TEXT(asCompMini;$1)
+ARRAY TEXT(atCompNote;$1)
+ARRAY TEXT(asCompArt;$1)
+ARRAY TEXT(asCompSource;$1)
+ARRAY TEXT(asCompStatus;$1)
+ARRAY DATE(adCompStatusDate;$1)
+ARRAY LONGINT(alCompDeleted;$1)

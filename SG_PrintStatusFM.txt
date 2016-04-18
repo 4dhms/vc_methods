@@ -1,0 +1,82 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+C_LONGINT(vlSubtotal)
+
+Case of 
+	: (Form event=On Printing Footer)
+		OBJECT SET VISIBLE(vsPrintingHeader;True)
+		OBJECT SET VISIBLE(vlGrandTotal;True)
+		OBJECT SET VISIBLE(vlPageTotal;True)
+		OBJECT SET VISIBLE(*;"xInternal";True)
+		OBJECT SET VISIBLE(*;"xPage";True)
+		OBJECT SET VISIBLE(*;"xGrand";True)
+		
+	: (Form event=On Header)
+		vlPageTotal:=0
+		vsPrintingHeader:="MORE"
+		vDesc:=""
+		  //clears running total
+		vsDatePage:=String(Current date(*))+"   "+String(Records in selection([Samples]))+" Sample Orders   "+"Page "+String(Printing page)
+		
+	: (Form event=On Printing Detail)
+		  //SET VISIBLE(vsPrintingHeader;False)
+		OBJECT SET VISIBLE(vlGrandTotal;False)
+		OBJECT SET VISIBLE(vlPageTotal;False)
+		OBJECT SET VISIBLE(*;"xInternal";False)
+		OBJECT SET VISIBLE(*;"xPage";False)
+		OBJECT SET VISIBLE(*;"xGrand";False)
+		
+		<>vlOrderNumber:=[Samples]SampleNumber*-1
+		<>vlSGPO:=[Samples]SampleNumber*-1
+		
+		If (vfComponents)
+			CS_GetSheet 
+			
+			QUERY([CS_Lines];[CS_Lines]CS_ID=[ComponentSheets]CS_ID)
+			QUERY SELECTION([CS_Lines];[CS_Lines]OrderNumber=0;*)
+			QUERY SELECTION([CS_Lines]; | ;[CS_Lines]OrderNumber=<>vlOrderNumber)
+			RELATE MANY SELECTION([CS_Status]CS_LineKey)
+			ORDER BY([CS_Status];[CS_Lines]OrderNumber;>;[CS_Status]CS_Sort;>;[CS_Status]CS_LineKey;>;[CS_Status]CS_StatusKey;>)
+		End if 
+		
+		vfShow:=False  //dividing line for pos
+		
+		QUERY([Specs];[Specs]Design Num=[Samples]DesignNum)
+		vlPageTotal:=vlPageTotal+[Samples]SGQuantity
+		
+		If (Selected record number([Samples])=Records in selection([Samples]))
+			vsPrintingHeader:="LAST PAGE"
+		End if 
+		
+		OBJECT SET VISIBLE([Samples]DueDate;[Samples]DueDate#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]XFactoryReq;[Samples]XFactoryReq#!00-00-00!)
+		OBJECT SET VISIBLE([Samples]SampleReceived;[Samples]SampleReceived#!00-00-00!)
+		
+		  //-------------------------
+		vlSubtotal:=vlSubtotal+([Orders]TotalOrderQuantity)
+		QUERY([Designs];[Designs]DesignNum=[Samples]DesignNum)
+		QUERY([Specs];[Specs]Design Num=[Samples]DesignNum)
+		QUERY([OrdersFabricXRef];[OrdersFabricXRef]OrderNumber=<>vlOrderNumber)
+		
+		If (vfComponents)
+			Order_PullCP (<>vlOrderNumber)
+			OBJECT SET VISIBLE(*;"xLine";Records in selection([CS_Lines])>0)
+			
+			
+			If (vfStatus)
+				CS_CurrentOnly 
+			End if 
+			
+			
+			
+			Order_Fab_Sort 
+			ORDER BY([CS_Issues];[CS_Issues]OrderNumber;>;[CS_Issues]Resolved;<;[CS_Issues]CS_IssueKey;>)
+			ORDER BY([CS_Status];[CS_Status]CS_Sort;>)
+			
+		Else 
+			  //no components
+			REDUCE SELECTION([CS_Status];0)
+			REDUCE SELECTION([CS_Issues];0)
+			REDUCE SELECTION([CP_OrderXRef];0)
+		End if 
+		
+End case 

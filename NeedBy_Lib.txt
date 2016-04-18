@@ -1,0 +1,14 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(asPages;0)
+
+APPEND TO ARRAY(asPages;"Customer")
+APPEND TO ARRAY(asPages;"Factory")
+APPEND TO ARRAY(asPages;"Special")
+
+<>CloseBox:=True
+
+Center Window (600;550;4;"")
+DIALOG("NeedByLib")
+CLOSE WINDOW
+<>vlNeedByProc:=0
+

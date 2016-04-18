@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (<>atTreatmentList=1)
+	List_Var ("Treatment";->vsTreatment)
+Else 
+	vsTreatment:=<>atTreatmentList{<>atTreatmentList}
+End if 

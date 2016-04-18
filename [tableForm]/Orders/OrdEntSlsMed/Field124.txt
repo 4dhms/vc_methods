@@ -1,0 +1,6 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([CostSheets]YarnCost>0)
+	[CostSheets]WtYarn:=0
+	[CostSheets]PriceYarn:=0
+End if 
+Cost_EntryCalculate 

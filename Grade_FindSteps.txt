@@ -1,0 +1,69 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$cleanup;$c)
+C_POINTER($col)
+C_TEXT($catagory;$Qfix)
+$cleanup:=0
+Case of 
+	: (pOne=1)
+		$catagory:=[SpecFactory]KnitWoven1
+	: (pTwo=1)
+		$catagory:=[SpecFactory]KnitWoven2
+	: (pThree=1)
+		$catagory:=[SpecFactory]KnitWoven3
+End case 
+
+vtGradeRange:=""
+
+$i:=1
+For ($i;1;10)
+	$col:=Get pointer("vsSize"+String($i))
+	Case of 
+		: ($col->#"") & (vtGradeRange="")
+			vtGradeRange:=$col->
+		: ($col->#"")
+			vtGradeRange:=vtGradeRange+"-"+$col->
+	End case 
+End for 
+
+  //CREATE SET([Steps];"steps")
+
+$i:=1
+$c:=0
+FIRST RECORD([Sizes])
+For ($i;1;Records in selection([Sizes]))
+	If ([Sizes]Step="") | ([Sizes]Step="Auto")
+		  //USE SET("steps")
+		
+		QUERY([SpecSheetLines];[SpecSheetLines]SpecLineKey=[Sizes]SpecLineKey)
+		
+		
+		QUERY([Steps];[Steps]Range=vtGradeRange;*)
+		QUERY([Steps]; & ;[Steps]POM=[SpecSheetLines]OtherDescription;*)
+		QUERY([Steps]; & ;[Steps]Category=$catagory)
+		QUERY SELECTION([Steps];[Steps]Garment="")
+		If ([SpecSheetLines]MisMatch="") | ([SpecSheetLines]MisMatch="3") | ([SpecSheetLines]MisMatch="0")
+			[SpecSheetLines]MisMatch:="!"
+			SAVE RECORD([SpecSheetLines])
+		End if 
+		
+		Case of 
+			: (Records in selection([Steps])=0) & ([Sizes]Step="Auto")
+				$c:=$c+1
+				[Sizes]Step:=""
+				SAVE RECORD([Sizes])
+				  //End if 
+			: (Records in selection([Steps])>0)
+				[Sizes]Step:="Auto"
+				SAVE RECORD([Sizes])
+				If ([SpecSheetLines]MisMatch#"")
+					[SpecSheetLines]MisMatch:=""
+					SAVE RECORD([SpecSheetLines])
+				End if 
+		End case 
+	End if 
+	NEXT RECORD([Sizes])
+End for 
+
+
+
+

@@ -1,0 +1,110 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($choice)
+C_TEXT($list)
+
+
+$list:="Marmax Report;"  //1
+$list:=$list+"Steinmart Report;"  //2
+$list:=$list+"Direct Shipment Report;"  //3
+$list:=$list+"-;"  //4
+  //$list:=$list+"Sample Season Estimate Report;"
+$list:=$list+"Sales Projection Report;"  //5
+$list:=$list+"-;"  //6
+$list:=$list+"Susan's Report;"  //7
+$list:=$list+"Projected GP Report;"  //8
+$list:=$list+"Retail Price Report;"  //9
+$list:=$list+"Booking Report;"  //10
+$list:=$list+"Sales Projection vs Actual;"  //11
+$list:=$list+"Stock Report;"  //12
+$list:=$list+"-;"  //13
+$list:=$list+"Component Status Report;"  //14
+$list:=$list+"Unapproved Quota;"  //15
+$list:=$list+"Unapproved Samples;"  //16
+$list:=$list+"-;"  //17
+$list:=$list+"Order Report;"  //18
+$list:=$list+"Price Ticket Report;"  //19
+$list:=$list+"New Order Summary;"  //20
+$list:=$list+"Shipments Report;"  //21
+$list:=$list+"-;"  //22
+$list:=$list+"Sample Tracker;"  //23
+$list:=$list+"Print Usage;"  //24
+$list:=$list+"DN Usage;"  //25
+$list:=$list+"Fabric Inventory;"  //26
+$list:=$list+"-;"  //27
+$list:=$list+"LDP Updater;"  //28
+Case of 
+	: (Current user="Designer") | (Current user="Sara Wingate")
+		$list:=$list+"Cupio Missing Breaks"
+	: (Current user="Joann")  //29
+		$list:=$list+"Joann's Spreadsheet"
+	Else 
+		$list:=$list+" "
+End case 
+
+$choice:=Pop up menu($list)
+
+Case of 
+	: ($choice=1)  //"Marmax DC & Pre-Carton Report")
+		PreCarton_Screen 
+	: ($choice=2)  //"Steinmart")
+		PreCarton_Steinmart 
+	: ($choice=3)  //"Direct Ship")
+		Report_DirectShip 
+		  //: ($choice=4)  `"Sample Season Estimate Report")
+		  //Report_SampleEstProc 
+	: ($choice=5)  //"Sales Projection Report")
+		m_ReportSales 
+	: ($choice=7)  //"Susan's Report")
+		SR_Launch 
+	: ($choice=8)  //"Projected GP Report")
+		m_prjctGPList 
+	: ($choice=9)  //"Retail Price Report")
+		WinPrompt ("Report discontinued.")
+		  //m_ReportProc 
+	: ($choice=10)  //"Monthly Booking Report")
+		m_BookingReport 
+	: ($choice=11)  //"Sales Projection vs Actual")
+		m_VarianceReport 
+	: ($choice=12)  //"Stock Report")
+		m_StockReport 
+	: ($choice=14)  //"Component Status Report")
+		m_CompStatus 
+	: ($choice=15)  //"Unapproved Quota")
+		WinPrompt ("Under repair")
+	: ($choice=16)  //"Unapproved Samples")
+		WinPrompt ("Under repair")
+	: ($choice=18)  //"Order Report")
+		m_NewOrderReport 
+	: ($choice=19)  //"Price Ticket Report")
+		m_PriceTicket 
+	: ($choice=20)  //"New Order Summary")
+		m_NewOrderSummary 
+	: ($choice=21)  //"Shipments Report")
+		m_ShipReport 
+	: ($choice=23)  //"Sample Tracker")
+		Sample_Track 
+	: ($choice=24)
+		<>vlUsageRouter:=1
+		UsageChart 
+	: ($choice=25)
+		<>vlUsageRouter:=2
+		UsageChart 
+	: ($choice=26)
+		m_FabricUsage 
+		  //: ($choice=28)
+		  //Dotcom_ImportCenter 
+		  //2DoProc 
+	: ($choice=28)
+		Cost_CKProc 
+	: ($choice=29)
+		Case of 
+			: (Current user="Designer") | (Current user="Sara Wingate")
+				Report_MissingBreak 
+			: (Current user="Joann")
+				JoannReport 
+		End case 
+		  //Else 
+		  //WinPrompt ("Be patient")
+End case 
+
+

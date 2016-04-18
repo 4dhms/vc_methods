@@ -1,0 +1,79 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$n;$s;$line)
+C_POINTER($arrayPtr)
+C_TEXT($header)
+ARRAY LONGINT(alDCRef;0)
+ARRAY TEXT($numbers;0)
+
+$i:=1
+CREATE EMPTY SET([CP_OrderXRef];"DCCol")
+For ($i;1;Size of array(alSelfKey))
+	If (alShadeFab{$i}#16711690)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=alSelfKey{$i})
+		QUERY SELECTION([CP_OrderXRef];[CP_OrderXRef]CPType="Self")
+		ADD TO SET([CP_OrderXRef];"DCCol")
+	End if 
+End for 
+
+USE SET("DCCol")
+CLEAR SET("DCCol")
+
+ORDER BY([CP_OrderXRef];[CP_OrderXRef]SelfKey;>;[CP_OrderXRef]SortOrder;>)
+SELECTION TO ARRAY([CP_OrderXRef]CPNumber;$numbers)
+
+ARRAY LONGINT(alDCLine;0)
+RELATE MANY SELECTION([DC]CPOrdID)
+DISTINCT VALUES([DC]DCLine;alDCLine)
+SORT ARRAY(alDCLine;>)
+INSERT IN ARRAY(alDCline;1;1)
+APPEND TO ARRAY(alDCLine;0)
+APPEND TO ARRAY(alDCLine;0)
+$s:=Size of array(alDCLine)
+Order_DC_Arrays (0)
+Order_DC_Arrays ($s)
+
+$i:=1
+FIRST RECORD([CP_OrderXRef])
+asCustomers{1}:="TOTAL CUT"
+asCustomers{Size of array(asCustomers)-1}:="TOTAL"
+asCustomers{Size of array(asCustomers)}:="OTS"
+
+
+For ($i;1;10)
+	$header:="HEADER"+String($i+22)
+	$arrayPtr:=Get pointer("asColor"+String($i))
+	If ($i>Records in selection([CP_OrderXRef]))
+		$arrayPtr->{1}:=""
+		OBJECT SET TITLE(*;$header;"")
+	Else 
+		QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=$numbers{$i})
+		$arrayPtr->{1}:=String([CP_OrderXRef]Quantity)
+		OBJECT SET TITLE(*;$header;[ColorPrintNumber]CPName)
+		APPEND TO ARRAY(alDCRef;[CP_OrderXRef]CPOrdID)
+	End if 
+	NEXT RECORD([CP_OrderXRef])
+End for 
+
+$i:=1
+For ($i;1;Size of array(alDCRef))
+	QUERY([DC];[DC]CPOrdID=alDCRef{$i})
+	$arrayPtr:=Get pointer("asColor"+String($i))
+	$n:=1
+	FIRST RECORD([DC])
+	For ($n;1;Records in selection([DC]))
+		$line:=Find in array(alDCLine;[DC]DCLine)
+		adCancel{$line}:=[DC]CancelDate
+		asCustomers{$line}:=[DC]Customer
+		atNote{$line}:=[DC]Note
+		adCreateDate{$line}:=[DC]CreateDate
+		arPrice{$line}:=[DC]Price
+		afIn{$line}:=[DC]InWarehouse
+		$arrayPtr->{$line}:=String([DC]Count)
+		NEXT RECORD([DC])
+	End for 
+End for 
+
+Order_DC_Total 
+
+
+

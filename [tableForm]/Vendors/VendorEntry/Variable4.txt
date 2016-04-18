@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If (User in group(Current user;"Admin"))
+	WinChoice ("Are you sure you want to delete this?")
+	If (ok=1)
+		DELETE RECORD([Vendors])
+		ACCEPT
+	End if 
+Else 
+	WinPrompt ("You do not have permission to delete this.")
+End if 

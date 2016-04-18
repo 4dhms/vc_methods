@@ -1,0 +1,49 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($line;cbGroup)
+
+Case of 
+	: ([SampleTrack]Description="") & ([SampleTrack]StyleNumber="")
+		WinPrompt ("Enter style number or description.")
+	: ([SampleTrack]Color="")
+		WinPrompt ("Enter color number.")
+	: ([SampleTrack]Store="")
+		WinPrompt ("Enter store.")
+	Else 
+		If (Find in array(alTrackId;[SampleTrack]TrackId)<1)
+			INSERT IN ARRAY(asEnterer;1;1)
+			INSERT IN ARRAY(atLDescript;1;1)
+			INSERT IN ARRAY(asDiv;1;1)
+			INSERT IN ARRAY(asStyleNumbers;1;1)
+			INSERT IN ARRAY(asColor1;1;1)
+			INSERT IN ARRAY(asCustomers;1;1)
+			INSERT IN ARRAY(adDateOut;1;1)
+			INSERT IN ARRAY(adDateIn;1;1)
+			INSERT IN ARRAY(asBDNotes;1;1)
+			INSERT IN ARRAY(alTrackId;1;1)
+			$line:=1
+		Else 
+			$line:=alTrackId
+		End if 
+		
+		asEnterer{$line}:=[SampleTrack]SentBy
+		atLDescript{$line}:=[SampleTrack]Description
+		asDiv{$line}:=[SampleTrack]Division
+		asStyleNumbers{$line}:=[SampleTrack]StyleNumber
+		asColor1{$line}:=[SampleTrack]Color
+		asCustomers{$line}:=[SampleTrack]Store
+		adDateOut{$line}:=[SampleTrack]DateOut
+		adDateIn{$line}:=[SampleTrack]DateIn
+		asBDNotes{$line}:=[SampleTrack]Notes
+		alTrackId{$line}:=[SampleTrack]TrackId
+		If (vfGroup)
+			vtPart1:=[SampleTrack]Division
+			vtPart2:=[SampleTrack]Store
+			vtPart3:=[SampleTrack]Notes
+		Else 
+			vtPart1:=""
+			vtPart2:=""
+			vtPart3:=""
+		End if 
+		SAVE RECORD([SampleTrack])
+		ACCEPT
+End case 

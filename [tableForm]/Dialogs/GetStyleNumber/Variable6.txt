@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+QUERY([Designs];[Designs]DesignNum=<>vsDesignNumber)
+If (Records in selection([Designs])<1)
+	vsFlag:=<>vsDesignNumber+" is NOT in design library"
+	<>vsDesignNumber:=""
+	GOTO OBJECT(<>vsDesignNumber)
+Else 
+	<>vsCustomer:=[Designs]Customer
+End if 
+UNLOAD RECORD([Designs])

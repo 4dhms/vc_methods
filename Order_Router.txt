@@ -1,0 +1,22 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+Order_LoadOrder 
+
+If (Table name(Current form table)="CostSheets")
+	
+	If (Order_Mandatory )
+		If (User in group(Current user;"Warehouse"))
+			Revise_FlagFields (False)
+			OBJECT SET VISIBLE(asPOv;False)
+			OBJECT SET VISIBLE(bSelf;False)
+			OBJECT SET VISIBLE(bNew;False)
+			OBJECT SET ENABLED(bDupe;False)
+			OBJECT SET ENABLED(bMore;False)
+		End if 
+		Cost_RouterLaunch 
+	End if 
+End if 
+
+Order_LoadPO 
+  //Revise_Array 
+
+

@@ -1,0 +1,106 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($selection)
+C_LONGINT($i)
+vfPrintPicture:=False
+
+C_BOOLEAN($0)
+
+FIRST RECORD(vptablePtr->)
+SP_WindowTitle ($1)
+
+Case of 
+	: ($1="DL")
+		If ([Spooler]OutputChoice=1)
+			FORM SET OUTPUT([Designs];"prtDesInfEntry")
+		Else 
+			FORM SET OUTPUT([Designs];"Des Sheet ")
+		End if 
+		PAGE SETUP([Designs];"Des Sheet ")
+		$selection:=False
+		
+		  //QUERY([Designs];[Designs]DesignNum=vpnumberPtr->)
+		If (Records in selection([Designs])=1)
+			vtPDFName:="DN"+[Designs]DesignNum
+		Else 
+			vtPDFName:="Designs"
+		End if 
+		
+		PDF_SetPrinter (-1;->[Designs];False)
+		
+	: ($1="CS")
+		  //PDF_MakeCostSheet 
+	: ($1="DP@")
+		vtPDFName:="Design Line Plan"
+		QUERY([DesignLines];[DesignLines]DesignLineKey=[Spooler]RecordNumber)
+		
+		vf8up:=[DesignLines]8Up
+		vf8UpH:=[DesignLines]8UpH
+		If ($1="DPN")
+			vfVisible:=False
+			cbDL:=0
+		Else 
+			vfVisible:=True
+			cbDL:=1
+		End if 
+		SP_PrintDP 
+		UNLOAD RECORD([DesignLines])
+	: ($1="RMA")
+		QUERY([Returns];[Returns]RMAkey=[Spooler]RecordNumber)
+		QUERY([ReturnStores];[ReturnStores]StoreID=[RMA]StoreID)
+		FORM SET OUTPUT([Returns];"Returns.print")
+		PAGE SETUP([Returns];"Returns.print")
+		PDF_SetPrinter (-1;->[Returns])
+		FORM SET OUTPUT([Speedpost Form];"SpeedpostOutp")
+	: ($1="SP")
+		FORM SET OUTPUT([Speedpost Form];"PrtSpeedp")
+		PAGE SETUP([Speedpost Form];"PrtSpeedp")
+		PDF_SetPrinter (-1;->[Speedpost Form])
+		FORM SET OUTPUT([Speedpost Form];"SpeedpostOutp")
+	: ($1="SG")
+		SG_POEngine 
+		  //FIRST RECORD([Samples])
+		  //OUTPUT FORM([Samples];"PrtSGwCPFabric")
+		  //PAGE SETUP([Samples];"PrtSGwCPFabric")
+		  //PDF_SetPrinter (-1;->[Samples])
+	: ($1="SF")
+		FORM SET OUTPUT([SampleFabrics];"PrtSamFab")
+		PAGE SETUP([SampleFabrics];"PrtSamFab")
+		SET PRINT OPTION(Orientation option;2)
+		PDF_SetPrinter (-2;->[SampleFabrics])
+	: ($1="FO") | ($1="FOs")
+		vfPO:=True
+		$i:=1
+		FIRST RECORD([FabricOrders])
+		For ($i;1;Records in selection([FabricOrders]))
+			QUERY([OrdersFabricXRef];[OrdersFabricXRef]FabricOrderKey=[FabricOrders]FabOrderKey)
+			FabricOrder_Print 
+			If ($i<Records in selection([FabricOrders]))
+				PAGE BREAK(>)
+			Else 
+				PAGE BREAK
+			End if 
+			NEXT RECORD([FabricOrders])
+		End for 
+	: ($1="TC")
+		TC_BuildPDF 
+	: ($1="PO") | ($1="POs")
+		vfPO:=True
+		vfEmail:=True
+		Order_POEngine 
+	: ($1="Status")
+		vfPDF:=True
+		vtBodyText:="Attached is the current status report."
+		Order_PrtProdStat3 
+		
+	: ($1="Fitting")
+		  //Sets up headline
+		If (<>asFactories<2)
+			vsFlag:="Fitting Sample Schedule (all factories)"
+		Else 
+			vsFlag:="Fitting Sample Schedule ("+<>asFactories{<>asFactories}+")"
+		End if 
+		FORM SET OUTPUT([Orders];"FitSampleSched.print")
+		ORDER BY([Orders])
+		PAGE SETUP([Orders];"FitSampleSched.print")
+		PRINT SELECTION([Orders])
+End case 

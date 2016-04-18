@@ -1,0 +1,71 @@
+  //%attributes = {"publishedWeb":true,"folder":"Default Project Methods","lang":"en"} comment added and reserved by 4D.
+ARRAY TEXT(atFiles;0)
+C_LONGINT($i;$n)
+C_POINTER($orderPtr)
+C_POINTER($tablePtr)
+C_POINTER($voidPtr)
+C_TEXT($body)
+
+$i:=1
+
+Case of 
+	: ($1="PO") | ($1="POs")
+		$orderPtr:=->[Orders]OrderNum
+		$tablePtr:=->[Orders]
+		$voidPtr:=->[Orders]Cancelled
+	: ($1="SF")
+		$orderPtr:=->[SampleFabrics]SampleFab PO Nu
+		$tablePtr:=->[SampleFabrics]
+	: ($1="SG")
+		$orderPtr:=->[Samples]SampleNumber
+		$tablePtr:=->[Samples]
+	: ($1="SP")
+		$orderPtr:=->[Speedpost Form]Package number
+		$tablePtr:=->[Speedpost Form]
+End case 
+
+ORDER BY($tablePtr->;$orderPtr->;<)
+FIRST RECORD($tablePtr->)
+For ($i;1;Records in selection($tablePtr->))
+	INSERT IN ARRAY(atFiles;1;1)
+	Case of 
+		: ($1="SP")
+			atFiles{1}:=$orderPtr->
+		: ($1="PO")
+			If ($voidPtr->)
+				atFiles{1}:="X"+String($orderPtr->)
+			Else 
+				atFiles{1}:=$1+String($orderPtr->)
+			End if 
+		: ($1="SG")
+			atFiles{1}:="SG"+String([Samples]SampleNumber)+" (DN"+[Samples]DesignNum+")"
+		Else 
+			atFiles{1}:=$1+String($orderPtr->)
+	End case 
+	
+	NEXT RECORD($tablePtr->)
+End for 
+
+If (Size of array(atFiles)=1)
+	If ($1="SP")
+		$body:="Attached file contains 1 speed post: "+atFiles{1}
+	Else 
+		$body:="Attached file contains 1 order: "+atFiles{1}
+	End if 
+Else 
+	If ($1="SP")
+		$body:="Attached file contains "+String(Size of array(atFiles))+" speed posts: "
+	Else 
+		$body:="Attached file contains "+String(Size of array(atFiles))+" orders: "
+	End if 
+	$n:=1
+	For ($n;1;Size of array(atFiles))
+		If ($n=1)
+			$body:=$body+atFiles{1}
+		Else 
+			$body:=$body+", "+atFiles{$n}
+		End if 
+	End for 
+End if 
+
+$0:=$body+Char(13)+Char(13)

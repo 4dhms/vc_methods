@@ -1,0 +1,25 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_DATE($when)
+C_LONGINT($i)
+
+$when:=Date(Request("Find received samples for:";String(Current date(*))))
+
+Case of 
+	: ($when=!00-00-00!)
+		WinPrompt ("Bad date format.")
+	: (ok=1)
+		QUERY([SpecFactory];[SpecFactory]Received=$when)
+		
+		CREATE EMPTY SET([Orders];"got")
+		FIRST RECORD([SpecFactory])
+		$i:=1
+		For ($i;1;Records in selection([SpecFactory]))
+			QUERY([Orders];[Orders]OrderNum=[SpecFactory]OrderNumber)
+			ADD TO SET([Orders];"got")
+			NEXT RECORD([SpecFactory])
+		End for 
+		
+		USE SET("got")
+		CLEAR SET("got")
+		SET WINDOW TITLE("HMS Orders: "+String(Records in selection([Orders]))+" of "+String(Records in table([Orders])))
+End case 

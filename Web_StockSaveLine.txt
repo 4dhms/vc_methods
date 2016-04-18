@@ -1,0 +1,118 @@
+  //%attributes = {"publishedWeb":true,"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$page;$self)
+C_BOOLEAN($combo;$change)
+C_TEXT($colorname;$changeamt)
+C_REAL($msrp)
+
+ARRAY LONGINT($key;0)
+ARRAY LONGINT($qty;0)
+ARRAY REAL($price;0)
+ARRAY TEXT($color;0)
+
+
+Web_StockVar 
+Web_StockVarLookUp 
+
+ARRAY TEXT($name;0)
+ARRAY TEXT($value;0)
+WEB GET VARIABLES($name;$value)
+
+$i:=1
+For ($i;1;Size of array($name))
+	Case of 
+		: ($name{$i}="qty")
+			APPEND TO ARRAY($qty;Num($value{$i}))
+		: ($name{$i}="Key")
+			APPEND TO ARRAY($key;Num(Substring($value{$i};Position("_";$value{$i});10)))
+		: ($name{$i}="vsActual")
+			vsActual:=$value{$i}
+		: ($name{$i}="50cent")
+			Case of 
+				: ($value{$i}="")
+					$changeamt:=".00"
+				Else 
+					$changeamt:=$value{$i}
+			End case 
+		: ($name{$i}="vsMSRP")
+			$msrp:=Num($value{$i})
+		: ($name{$i}="vsFlag")
+			If ($value{$i}="change")
+				$change:=True
+			Else 
+				$change:=False
+			End if 
+	End case 
+End for 
+
+$i:=1
+For ($i;1;Size of array($qty))
+	APPEND TO ARRAY($price;Num(vsActual)+Num($changeamt))
+End for 
+
+$i:=1
+For ($i;1;Size of array($qty))
+	If ($qty{$i}>0)
+		QUERY([CP_OrderXRef];[CP_OrderXRef]CPOrdID=$key{$i})
+		QUERY([Orders];[Orders]OrderNum=[CP_OrderXRef]OrderNumber)
+		
+		QUERY([StockOrders];[StockOrders]TempID=vsWebSession)
+		
+		If (Records in selection([StockOrders])=0)
+			CREATE RECORD([StockOrders])
+			[StockOrders]BuyerKey:=Num(vtBuyer)
+			[StockOrders]SODate:=Current date(*)
+			[StockOrders]MyLine:=False
+			[StockOrders]TempID:=vsWebSession
+			[StockOrders]SONumber:=Num(PO_GetNumber ("Stock"))+1000
+			QUERY([Contacts];[Contacts]ContactID=[StockOrders]BuyerKey)
+			QUERY([Customers];[Customers]CustomerKey=[Contacts]CustomerKey)
+			[StockOrders]CustomerOrder:=[Customers]CustomerName
+			SAVE RECORD([StockOrders])
+		End if 
+		
+		QUERY([StockOrdersLines];[StockOrdersLines]CP_OrdID=[CP_OrderXRef]CPOrdID;*)
+		QUERY([StockOrdersLines]; & ;[StockOrdersLines]TempID=vsWebSession)
+		
+		If (Records in selection([StockOrdersLines])=0)
+			CREATE RECORD([StockOrdersLines])
+			[StockOrdersLines]SOKey:=Sequence number([StockOrdersLines])
+			[StockOrdersLines]Style:=[Orders]StyleNumber
+			[StockOrdersLines]Design:=[Orders]DesignNumber
+			[StockOrdersLines]TempID:=vsWebSession
+			[StockOrdersLines]CP_OrdID:=$key{$i}
+			[StockOrdersLines]MSRP:=$msrp
+			
+			QUERY([ColorConverter];[ColorConverter]CPOrdID=[CP_OrderXRef]CPOrdID)
+			If (Records in selection([ColorConverter])>0)
+				$colorname:=[ColorConverter]StockName
+			Else 
+				QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+				$colorname:=[ColorPrintNumber]CPName
+				If ($combo)
+					$self:=[CP_OrderXRef]SelfKey
+					QUERY([CP_OrderXRef];[CP_OrderXRef]SelfKey=$self)
+					QUERY SELECTION([CP_OrderXRef]; & ;[CP_OrderXRef]CPType="Combo 1")
+					If (Records in selection([CP_OrderXRef])>0)
+						QUERY([ColorPrintNumber];[ColorPrintNumber]CPNumber=[CP_OrderXRef]CPNumber)
+						$colorname:=$colorname+"/"+[ColorPrintNumber]CPName
+					End if 
+				End if 
+			End if 
+			[StockOrdersLines]Color:=$colorname
+		End if 
+		[StockOrdersLines]CancelMonth:=vtTitle
+		[StockOrdersLines]Quantity:=$qty{$i}
+		[StockOrdersLines]Price:=$price{$i}
+		[StockOrdersLines]Ext:=[StockOrdersLines]Quantity*[StockOrdersLines]Price
+		SAVE RECORD([StockOrdersLines])
+	End if 
+End for 
+
+QUERY([StockOrdersLines];[StockOrdersLines]TempID=vsWebSession)
+ORDER BY([StockOrdersLines];[StockOrdersLines]SOKey;<)
+
+If ($change)
+	WEB SEND FILE("stockorder.html")
+Else 
+	WEB SEND FILE("stockprep.html")
+End if 
