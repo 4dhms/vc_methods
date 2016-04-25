@@ -1,2 +1,2 @@
   //%attributes = {"lang":"en"} comment added and reserved by 4D.
-EXECUTE METHOD("VC_STARTUP")
+QR REPORT(Current form table->;Char(1))

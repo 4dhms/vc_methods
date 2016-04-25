@@ -1,0 +1,10 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($size;$process)
+C_TEXT($user)
+C_PICTURE(btScreenshot)
+C_TEXT($path)
+C_TEXT(txtBug)
+C_BOOLEAN(btSubmit)
+C_PICTURE(btFile)
+
+

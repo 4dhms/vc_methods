@@ -1,0 +1,12 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+  // Save new bug and email anthony
+CREATE RECORD([Bug_Tracker])
+[Bug_Tracker]Bug:=txtBug
+$user:=Current user
+[Bug_Tracker]Reported_By:=$user
+[Bug_Tracker]Reported_Date:=Current date
+[Bug_Tracker]Reported_Time:=Current time
+[Bug_Tracker]Status:="Pending"
+SAVE RECORD([Bug_Tracker])
+
+Mail_SimpleSend ("anthony@nubby.com";btPath;"A New Bug Reported ("+String(Current date(*))+")";txtBug+" | Reported by: "+$user)

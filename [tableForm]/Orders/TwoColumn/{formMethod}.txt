@@ -1,14 +1,42 @@
   //%attributes = {"lang":"en"} comment added and reserved by 4D.
 C_TEXT(vtPart1;vtPart2)
+C_LONGINT($style)
+C_BOOLEAN($special1;$special2)
 
 If (Form event=On Printing Detail)
-	If (vtPart1="Notes@") | (vtPart1="Care and Content@") | (Find in array(asList21;vtPart1)>0)
-		OBJECT SET FONT STYLE(vtPart1;1)
+	$style:=5
+	Case of 
+		: (vtPart1="Notes@") | (vtPart1="Care and Content@") | (vtPart1="Revisions@")
+			$special1:=True
+		: (vtPart1="Notes@") | (vtPart1="Fit Notes:@") | (vtPart1="Fabric Notes:@")
+			$special1:=True
+		: (vtPart1="Trim Notes:@") | (vtPart1="Inspection Report:@") | (vtPart1="Production Status Notes:@")
+			$special1:=True
+		: (vtPart1="Special Instructions:@") | (vtPart1="Time and Action Notes:@")
+			$special1:=True
+		Else 
+			$special1:=False
+	End case 
+	Case of 
+		: (vtPart2="Notes@") | (vtPart2="Care and Content@") | (vtPart2="Revisions@")
+			$special2:=True
+		: (vtPart2="Notes@") | (vtPart2="Fit Notes:@") | (vtPart2="Fabric Notes:@")
+			$special2:=True
+		: (vtPart2="Trim Notes:@") | (vtPart2="Inspection Report:@") | (vtPart2="Production Status Notes:@")
+			$special2:=True
+		: (vtPart2="Special Instructions:@") | (vtPart2="Time and Action Notes:@")
+			$special2:=True
+		Else 
+			$special2:=False
+	End case 
+	
+	If ($special1)
+		OBJECT SET FONT STYLE(vtPart1;$style)
 	Else 
 		OBJECT SET FONT STYLE(vtPart1;0)
 	End if 
-	If (vtPart2="Care and Content@")
-		OBJECT SET FONT STYLE(vtPart2;1)
+	If ($special2)
+		OBJECT SET FONT STYLE(vtPart2;$style)
 	Else 
 		OBJECT SET FONT STYLE(vtPart2;0)
 	End if 

@@ -50,3 +50,11 @@ Startup_WebSetFolder
 If (Test path name("4D:")#0)
 	ALERT("Mount HMSFILESERVER:4D")
 End if 
+
+C_LONGINT($vc_found_l)
+ARRAY TEXT($vc_components_at;0)
+COMPONENT LIST($vc_components_at)
+$vc_found_l:=Find in array($vc_components_at;"VC_Framework")
+If ($vc_found_l>0)
+	EXECUTE METHOD("VC_STARTUP")
+End if 

@@ -1,0 +1,5 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+$btProccessID:=New process("BugTracker_Submit";64*1024;"Submit Bug";*)
+If ($btProccessID#0)
+	BRING TO FRONT($btProccessID)
+End if 

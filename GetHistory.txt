@@ -2,6 +2,8 @@
 C_LONGINT($i;$c)
 
 QUERY([Changes];[Changes]OrderNumber=<>vlOrderNumber)
+QUERY SELECTION([Changes];[Changes]FieldName#"Special Discount")
+
 If (Current user="Claudia Chang") | (Current user="Elaine Yang") | (Current user="TC Li") | (Current user="Designer") | (Current user="Joseph") | (Current user="Lin Li")
 Else 
 	QUERY SELECTION([Changes];[Changes]FieldName#"@FOB@")

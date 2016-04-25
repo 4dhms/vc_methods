@@ -13,7 +13,9 @@ If (Test path name($target)=0)
 	
 	If (Size of array($docs)>15)
 		Mail_SimpleSend ("List";"None";"Clean Backup";"There are "+String(Size of array($docs))+" backup files on HMS FileServer.")
+		RESTART 4D
 	End if 
 Else 
 	Mail_SimpleSend ("List";"None";"Incomplete 4D Backup";"Remount the 4D Folder on HMSFILESERVER.")
+	RESTART 4D
 End if 

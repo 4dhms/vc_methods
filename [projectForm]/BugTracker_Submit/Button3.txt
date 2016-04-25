@@ -1,0 +1,21 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_BOOLEAN($continue)
+C_LONGINT($run;$filesize)
+C_TEXT($path)
+C_PICTURE($image)
+C_BLOB($pblob)
+
+vhDocRef:=Open document("")
+CLOSE DOCUMENT(vhDocRef)
+
+
+If (ok=1)
+	$path:=Document
+	btPath:=$path
+	READ PICTURE FILE($path;$image)
+	btFile:=$image
+	VARIABLE TO BLOB(btFile;$pblob)
+	OBJECT SET VISIBLE(btFile;True)
+	$run:=Execute on server("Picture_ServerPut";0;"BTAttachment";[Bug_Tracker]ID;"R";$pblob)
+End if 
+

@@ -4,13 +4,13 @@ C_LONGINT($t;$b)
 Case of 
 	: (<>vlPlatform=3)
 		$t:=60
-		$b:=510
+		$b:=580
 	: (Current user="Designer") & (Not(Macintosh command down))
-		$t:=50
-		$b:=520
+		$t:=60
+		$b:=580
 	Else 
-		$t:=50
-		$b:=500
+		$t:=60
+		$b:=580
 End case 
 
   //If (<>vlPlatform<3) & (Not(Update_Confirm ))

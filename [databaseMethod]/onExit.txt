@@ -2,3 +2,4 @@
 If (Current user="Spooler")
 	LAUNCH EXTERNAL PROCESS("open /Applications/Test.app")
 End if 
+VC_EXIT 

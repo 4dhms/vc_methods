@@ -1,2 +1,2 @@
   //%attributes = {"lang":"en"} comment added and reserved by 4D.
-EXECUTE METHOD("VC_STARTUP")
+PRINT LABEL(Current form table->;Char(1))

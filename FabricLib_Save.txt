@@ -20,3 +20,10 @@ If (Not(Is new record([FabricLibrary])))
 	End if 
 End if 
 SAVE RECORD([FabricLibrary])
+
+  ///UPDATE ASSOCIATED POS - WIP
+  //vsOrderNumber:=String([OrdersFabricXRef]OrderNumber)
+  //QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
+  //vStyle:=[Orders]StyleNumber
+  //vDesign:=[Orders]DesignNumber
+  //UNLOAD RECORD([Orders])

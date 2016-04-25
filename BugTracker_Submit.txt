@@ -1,2 +1,3 @@
   //%attributes = {"lang":"en"} comment added and reserved by 4D.
-EXECUTE METHOD("VC_STARTUP")
+  // Open Bug Tracker Window
+DIALOG("BugTracker_Submit")
