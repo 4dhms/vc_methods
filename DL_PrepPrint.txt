@@ -51,6 +51,8 @@ $p:=1
 vPge:=1
 Case of 
 	: ([DesignLines]Stock) & ([DesignLines]8Up)
+		FORM SET OUTPUT([DLPages];"DesignLine8Up.print")
+	: ([DesignLines]Stock) & ([DesignLines]EightText)
 		FORM SET OUTPUT([DLPages];"DLStock8up.print")
 	: ([DesignLines]Stock)
 		FORM SET OUTPUT([DLPages];"DLStock.print")

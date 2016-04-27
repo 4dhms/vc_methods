@@ -1,0 +1,8 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+If ([DesignLines]8Up)
+	If ([DesignLines]EightText)
+		[DesignLines]EightText:=False
+	Else 
+		WinPrompt ("If this is a pre-existing 12-up plan, designs 9-12 will be stripped off.")
+	End if 
+End if 
