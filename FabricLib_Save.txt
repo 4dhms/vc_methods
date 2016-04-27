@@ -1,29 +1,54 @@
   //%attributes = {"lang":"en"} comment added and reserved by 4D.
+C_LONGINT($i;$c)
 C_TEXT($change)
+C_TEXT($alertChange)
+C_TEXT($varOrderNumber)
+C_TEXT($fabcontent)
+$alertChange:="False"
 
 If (Not(Is new record([FabricLibrary])))
 	If (Old([FabricLibrary]ArticleNumber)#[FabricLibrary]ArticleNumber)
 		$change:="Article number changed from "+Old([FabricLibrary]ArticleNumber)+" to "+[FabricLibrary]ArticleNumber+"; "
+		$alertChange:="True"
 	End if 
 	If (Old([FabricLibrary]FabricName)#[FabricLibrary]FabricName)
 		$change:=$change+"Fabric name changed from "+Old([FabricLibrary]FabricName)+" to "+[FabricLibrary]ArticleNumber+"; "
+		$alertChange:="True"
 	End if 
 	If (Old([FabricLibrary]FiberContent)#[FabricLibrary]FiberContent)
 		$change:=$change+"Article number changed from "+Old([FabricLibrary]FiberContent)+" to "+[FabricLibrary]FiberContent+"; "
+		$alertChange:="True"
 	End if 
 	If (Old([FabricLibrary]WashingInstructions)#[FabricLibrary]WashingInstructions)
 		$change:=$change+"Article number changed from "+Old([FabricLibrary]WashingInstructions)+" to "+[FabricLibrary]WashingInstructions+"; "
+		$alertChange:="True"
 	End if 
 	If ($change#"")
 		$change:=$change+"by "+Current user+" on "+String(Current date(*))+" at "+String(Current time(*))+Char(13)+Char(13)
 		[FabricLibrary]History:=$change+[FabricLibrary]History
+		$alertChange:="True"
 	End if 
 End if 
+Mail_SimpleSend ("anthony@nubby.com";"None";"Fabric Library Change";$change)
+
 SAVE RECORD([FabricLibrary])
 
-  ///UPDATE ASSOCIATED POS - WIP
-  //vsOrderNumber:=String([OrdersFabricXRef]OrderNumber)
-  //QUERY([Orders];[Orders]OrderNum=[OrdersFabricXRef]OrderNumber)
-  //vStyle:=[Orders]StyleNumber
-  //vDesign:=[Orders]DesignNumber
-  //UNLOAD RECORD([Orders])
+$i:=1
+If ($alertChange="True")
+	FIRST RECORD([OrdersFabricXRef])
+	QUERY SELECTION([OrdersFabricXRef];[OrdersFabricXRef]FabArtNo=[FabricLibrary]ArticleNumber)
+	CONFIRM("Would you like to update the related orders ?")
+	If (ok=1)
+		For ($i:1;Records in selection([OrdersFabricXRef]))
+			[OrdersFabricXRef]FabArtNo:=[FabricLibrary]ArticleNumber
+			[OrdersFabricXRef]FabricName:=[FabricLibrary]FabricName
+			[OrdersFabricXRef]FiberContent:=[FabricLibrary]FiberContent
+			SAVE RECORD([OrdersFabricXRef])
+			
+			NEXT RECORD([OrdersFabricXRef])
+		End for 
+	End if 
+End if 
+
+
+

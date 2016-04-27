@@ -24,12 +24,16 @@ For ($i;1;Records in selection([OrdersFabricXRef]))
 		If (Records in selection([FabricLibrary])>0)
 			If ($test1#$test2) | ($test3#$test4) & ([OrdersFabricXRef]FabArtNo#"TBD")  //& (vsHeader="")
 				vsHeader:="SPEC CHANGE: Article # "+[OrdersFabricXRef]FabArtNo
-				OBJECT SET VISIBLE(bUpdate;True)
-				OBJECT SET VISIBLE(vsHeader;True)
+				  //OBJECT SET VISIBLE(bUpdate;True)
+				  //OBJECT SET VISIBLE(vsHeader;True)
+				  // This automatically updates the orders fabric information - AA 4/26/16
+				ArticleUpdate 
 			End if 
 			UNLOAD RECORD([FabricLibrary])
 		End if 
 	End if 
 	NEXT RECORD([OrdersFabricXRef])
 End for 
+
+
 
