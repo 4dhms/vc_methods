@@ -1,0 +1,27 @@
+  //%attributes = {"lang":"en"} comment added and reserved by 4D.
+
+C_LONGINT($i;$order)
+
+$i:=1
+CREATE SET([Samples];"Set")
+FIRST RECORD([Samples])
+For ($i;1;Records in selection([Samples]))
+	$order:=-1*[Samples]SampleNumber
+	QUERY([Costing];[Costing]OrderNumber=$order)
+	If (Records in selection([CostSheets])=0)
+		REMOVE FROM SET([Samples];"Set"))
+	Else 
+		
+		QUERY([CostSheets];[CostSheets]SheetNumber=[Costing]SheetNumber;*)
+		QUERY([CostSheets]; & ;[CostSheets]SheetName="Estimate@")
+		If (Records in selection([CostSheets])>3)
+			REMOVE FROM SET([Samples];"Set"))
+		End if 
+	End if 
+	NEXT RECORD([Samples])
+End for 
+
+USE SET("Set")
+CLEAR SET("Set")
+
+ALERT("Done")
